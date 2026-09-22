@@ -64,7 +64,8 @@ export class LevelRenderer {
         r.frame(ctx,hero,af.frame,p.x*24-p.dx*p.offset+af.x,p.y*24-p.dy*p.offset+af.y,af.flags);
         if(sim.chestCell>=0&&sim.opened.has(sim.chestCell)&&
           animationFrameAt(CHEST_OPEN_DURATIONS,sim.chestTicks,false)>13)
-          r.frame(ctx,a.sprite('cm-2'),0,p.x*24-p.dx*p.offset+af.x,p.y*24-p.dy*p.offset+af.y-24,0,1);
+          r.frame(ctx,a.sprite('cm-2'),0,p.x*24-p.dx*p.offset+af.x,p.y*24-p.dy*p.offset+af.y-24,0,
+            level.tiles[sim.chestCell]===41?0:1);
       }
     }
     // Original foreground tiles and vegetation render after the player (method_153).

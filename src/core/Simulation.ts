@@ -24,6 +24,7 @@ export class Simulation {
   chestFrames:Int16Array;checkpointOrder=-1;private savedCheckpoint!:CheckpointState;
   lives=5;hurtTicks=0;deathTicks=0;chestCell=-1;chestTicks=0;exitDirection:Direction=0;stonePressure=0;
   goldKeys=0;silverKeys=0;gatePhases:Int16Array;gateCounts:Int16Array;unlockedGates=new Set<number>();
+  permanentPickups=new Set<number>();
   pendingDirection:Direction=0;private actionHeld=false;private lastInputDirection:Direction=0;entranceGate=-1;
   readonly initial:StageStart;
   constructor(level:LevelDefinition,initial:StageStart={diamonds:0,redDiamonds:0,lives:5,health:4}){
@@ -88,6 +89,7 @@ export class Simulation {
   restoreCheckpoint(heal=false){
     const save=this.savedCheckpoint;
     this.tiles.set(save.tiles);this.state.set(save.state);this.motion.set(save.motion);this.active.set(save.active);this.chestFrames.set(save.chestFrames);
+    for(const i of this.permanentPickups)this.tiles[i]=-1;
     this.gatePhases.set(save.gatePhases);this.gateCounts.set(save.gateCounts);this.unlockedGates=new Set(save.unlockedGates);
     this.goldKeys=save.goldKeys;this.silverKeys=save.silverKeys;
     this.player={x:save.x,y:save.y,dx:0,dy:1,offset:0,direction:3};
@@ -219,7 +221,11 @@ export class Simulation {
     if(this.chestCell>=0){
       this.chestTicks++;this.pendingDirection=0;
       if(animationFrameAt(CHEST_OPEN_DURATIONS,this.chestTicks,false)>=13&&!this.opened.has(this.chestCell)){
-        this.opened.add(this.chestCell);if(this.tiles[this.chestCell]===2){this.tiles[this.chestCell]=-1;this.redDiamonds++;}
+        this.opened.add(this.chestCell);
+        if(this.tiles[this.chestCell]===2){this.tiles[this.chestCell]=-1;this.redDiamonds++;}
+        else if(this.tiles[this.chestCell]===41){
+          this.tiles[this.chestCell]=-1;const amount=this.level.parameters[this.chestCell];this.diamonds+=amount===255?1:Math.max(1,amount);
+        }
         this.events.push('chest-reward');
       }
       if(this.chestTicks>=CHEST_OPEN_DURATIONS.reduce((a,b)=>a+b,0)){this.chestCell=-1;this.setAnimation(p.direction-1);}
@@ -256,6 +262,8 @@ export class Simulation {
     const i=this.index(p.x,p.y),t=this.tiles[i],o=this.level.objects[i];
     if(p.offset===0){
       if(t===4||t===5){this.tiles[i]=-1;if(t===4)this.goldKeys++;else this.silverKeys++;this.events.push(t===4?'gold-key':'silver-key');}
+      if(t===6){this.tiles[i]=-1;this.permanentPickups.add(i);if(this.lives>=99){this.health=4;this.events.push('health');}else{this.lives++;this.events.push('extra-life');}}
+      if(t===7){this.tiles[i]=-1;this.health=4;this.events.push('health');}
       if(o===4&&this.level.parameters[i]>this.checkpointOrder){this.checkpoint=i;this.checkpointOrder=this.level.parameters[i];this.captureCheckpoint();this.events.push('checkpoint');}
       if([14,33].includes(o)&&!this.opened.has(i)&&this.chestFrames[i]===0){
         this.chestCell=i;this.chestTicks=0;this.chestFrames[i]=1;this.setAnimation(40);this.events.push('chest');
@@ -271,5 +279,5 @@ export class Simulation {
   }
   private updateCamera(){const p=this.player;this.camera.update(p.x*24-p.dx*p.offset,p.y*24-p.dy*p.offset,this.level.width,this.level.height);}
   replay():Replay{return {version:3,target:'1.2.0-s700',engine:ENGINE_REVISION,levelFingerprint:levelFingerprint(this.level),world:this.level.world,level:this.level.index,initial:{...this.initial},inputs:this.inputs.map(i=>({...i}))};}
-  snapshot(){return {tick:this.tick,player:{...this.player},camera:{x:this.camera.x,y:this.camera.y},tiles:[...this.tiles],state:[...this.state],motion:[...this.motion],active:[...this.active],diamonds:this.diamonds,redDiamonds:this.redDiamonds,goldKeys:this.goldKeys,silverKeys:this.silverKeys,gatePhases:[...this.gatePhases],gateCounts:[...this.gateCounts],unlockedGates:[...this.unlockedGates],health:this.health,invulnerable:this.invulnerable,status:this.status,playerAnimation:this.playerAnimation,animationTick:this.animationTick,pushDelay:this.pushDelay,checkpoint:this.checkpoint,checkpointOrder:this.checkpointOrder,opened:[...this.opened],chestFrames:[...this.chestFrames],chestCell:this.chestCell,chestTicks:this.chestTicks,lives:this.lives,hurtTicks:this.hurtTicks,deathTicks:this.deathTicks,exitDirection:this.exitDirection,stonePressure:this.stonePressure,pendingDirection:this.pendingDirection,lastInputDirection:this.lastInputDirection,actionHeld:this.actionHeld,entranceGate:this.entranceGate,savedCheckpoint:structuredClone(this.savedCheckpoint)};}
+  snapshot(){return {tick:this.tick,player:{...this.player},camera:{x:this.camera.x,y:this.camera.y},tiles:[...this.tiles],state:[...this.state],motion:[...this.motion],active:[...this.active],diamonds:this.diamonds,redDiamonds:this.redDiamonds,goldKeys:this.goldKeys,silverKeys:this.silverKeys,gatePhases:[...this.gatePhases],gateCounts:[...this.gateCounts],unlockedGates:[...this.unlockedGates],permanentPickups:[...this.permanentPickups],health:this.health,invulnerable:this.invulnerable,status:this.status,playerAnimation:this.playerAnimation,animationTick:this.animationTick,pushDelay:this.pushDelay,checkpoint:this.checkpoint,checkpointOrder:this.checkpointOrder,opened:[...this.opened],chestFrames:[...this.chestFrames],chestCell:this.chestCell,chestTicks:this.chestTicks,lives:this.lives,hurtTicks:this.hurtTicks,deathTicks:this.deathTicks,exitDirection:this.exitDirection,stonePressure:this.stonePressure,pendingDirection:this.pendingDirection,lastInputDirection:this.lastInputDirection,actionHeld:this.actionHeld,entranceGate:this.entranceGate,savedCheckpoint:structuredClone(this.savedCheckpoint)};}
 }

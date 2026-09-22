@@ -73,6 +73,20 @@ test('later phase floor types follow the original walking collision cases',()=>{
     const sim=new Simulation(level);step(sim,2);assert.equal(sim.player.x,1,`tile ${tile}`);
   }
 });
+test('the later Angkor health pickup restores life without repeating',()=>{
+  const level=fixture(['#####','#@  #','#####']);level.tiles[7]=7;
+  const sim=new Simulation(level);sim.health=2;step(sim,2,4);
+  assert.equal(sim.health,4);assert.equal(sim.tile(2,1),-1);
+  sim.health=3;step(sim,0,5);assert.equal(sim.health,3);
+});
+test('an extra life stays collected after checkpoint restore',()=>{
+  const level=fixture(['#####','#@  #','#####']);level.tiles[7]=6;level.objects[6]=4;level.parameters[6]=0;
+  const sim=new Simulation(level);step(sim,2,4);
+  assert.equal(sim.lives,6);assert.equal(sim.tile(2,1),-1);
+  step(sim,4,4);sim.step({direction:0,action:true});
+  assert.equal(sim.lives,6);assert.equal(sim.tile(2,1),-1);
+  step(sim,2,4);assert.equal(sim.lives,6);
+});
 test('closed map gate blocks entry until its opening phase reaches two',()=>{
   const level=fixture(['#####','#@  #','#####']);level.objects[7]=7;level.parameters[7]=0;
   const closed=new Simulation(level);step(closed,2);assert.equal(closed.player.x,1);
@@ -158,6 +172,14 @@ test('red chest reveals its diamond once, after the opening animation',()=>{
   assert.equal(s.redDiamonds,1);assert.ok(s.opened.has(7));
   step(s,0,80);assert.equal(s.redDiamonds,1);
 });
+test('later stage chest awards the diamond quantity encoded in the map',()=>{
+  const level=fixture(['#####','#@  #','#####']);level.tiles[7]=41;level.parameters[7]=5;level.objects[7]=33;
+  const sim=new Simulation(level);step(sim,2,4);
+  assert.equal(sim.diamonds,0);assert.equal(sim.chestCell,7);
+  while(!sim.opened.has(7))step(sim);
+  assert.equal(sim.diamonds,5);assert.equal(sim.tile(2,1),-1);
+  step(sim,0,80);assert.equal(sim.diamonds,5);
+});
 test('checkpoint action restores collected objects and counters',()=>{
   const level=fixture(['#######','#@    #','#######']);level.objects[9]=4;level.parameters[9]=1;level.tiles[10]=2;
   const s=new Simulation(level);step(s,2,4);assert.equal(s.checkpoint,9);
@@ -194,12 +216,17 @@ test('the red prize rises above the hero after the chest reward frame',()=>{
     frame(_ctx:unknown,s:{name:string},frame:number,x:number,y:number,_flags=0,palette=0){draws.push({id:s.name,frame,x,y,palette});}} as unknown as SpriteRenderer;
   const assets={sprite:(id:string)=>id==='o-0'?hero:id==='gen3-3'?chest:
     {name:id,frames:Array.from({length:8},()=>({})),animations:[]}} as unknown as AssetManager;
-  const renderer=new LevelRenderer(assets,spy),draw=()=>{
-    draws.length=0;renderer.draw({} as CanvasRenderingContext2D,level,sim.tick,sim);
-    return draws.filter(d=>d.id==='cm-2'&&d.palette===1);
+  const renderer=new LevelRenderer(assets,spy),draw=(shownLevel=level,shownSim=sim)=>{
+    draws.length=0;renderer.draw({} as CanvasRenderingContext2D,shownLevel,shownSim.tick,shownSim);
+    return draws.filter(d=>d.id==='cm-2');
   };
   while(animationFrameAt(CHEST_OPEN_DURATIONS,sim.chestTicks,false)<13)step(sim);
   assert.equal(draw().length,0);
   while(animationFrameAt(CHEST_OPEN_DURATIONS,sim.chestTicks,false)<=13)step(sim);
   assert.equal(draw().length,1);assert.equal(draw()[0].y,sim.player.y*24-24);
+  assert.equal(draw()[0].palette,1);
+  const normalLevel=fixture(['#####','#@  #','#####']);normalLevel.tiles[7]=41;normalLevel.parameters[7]=5;normalLevel.objects[7]=33;
+  const normal=new Simulation(normalLevel);step(normal,2,4);
+  while(animationFrameAt(CHEST_OPEN_DURATIONS,normal.chestTicks,false)<=13)step(normal);
+  assert.equal(draw(normalLevel,normal)[0].palette,0);
 });

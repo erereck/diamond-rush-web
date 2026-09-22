@@ -11,8 +11,8 @@ Estado em 22/09/2026. Fonte canônica S700 1.2.0. Referências Nokia e ferrament
 | Relógio e câmera | Inteiros, 20 Hz, teste independente de refresh | Comparação de traces Java |
 | Controles | Teclado, toque e ação de checkpoint; gamepad implementado | Testar controle físico e armas |
 | Movimento / pedras / coleta / cobras | Subconjunto experimental; chão transitável alinhado aos casos de `method_288`, giro visual da pedra, esquerda do herói e esmagamento sob pedra corrigidos | Água, colisões especiais, cobras vermelhas e demais regras |
-| Chaves e portões | Coleta de chaves prateadas/douradas, fechaduras numeradas e abertura animada da passagem | Tempo fino da animação, interruptores, fechaduras especiais e puzzles restantes |
-| Fogo e baú vermelho de Angkor | Alcance, dano, abertura e prêmio visível implementados | Validar tempos por trace Java e efeitos de partículas/áudio |
+| Itens, chaves e portões | Chaves prateadas/douradas, vida extra, cura, fechaduras numeradas e abertura animada da passagem | Tempo fino das animações, interruptores, equipamentos e puzzles restantes |
+| Fogo e baús de Angkor | Alcance, dano, abertura e prêmio visível; baús comuns concedem a quantidade codificada no mapa | Validar tempos por trace Java e efeitos de partículas/áudio |
 | Checkpoint e morte | Snapshot/restore, vidas, dano e retorno após animação | Integrar com RMS, vida máxima e demais equipamentos |
 | Campanha / cenas / menus | Progressão experimental segue as ligações principais dos mapas originais, levando vidas e diamantes à próxima fase | Mapa interativo, ramificações secretas, introdução Angkor índice 13 e regras canônicas de desbloqueio |
 | Save RMS | Codec e modelo inicial, 994 bytes | Integração de campanha e save real de referência |

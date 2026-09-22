@@ -12,6 +12,8 @@ import { animationFrameAt, CHEST_OPEN_DURATIONS, fallingDrawOffset, fireReach } 
 import { decodeSprite } from '../src/assets/SpriteDecoder.ts';
 import { parsePack } from '../src/assets/Pack.ts';
 import { SpriteRenderer } from '../src/render/SpriteRenderer.ts';
+import { LevelRenderer } from '../src/render/LevelRenderer.ts';
+import type { AssetManager } from '../src/assets/AssetManager.ts';
 function fixture(rows:string[]):LevelDefinition{
   const tiles=rows.flatMap(row=>[...row].map(c=>({'#':80,' ':255,'@':79,'O':0,'*':1,g:10,S:19} as Record<string,number>)[c]));
   return {world:0,index:0,width:rows[0].length,height:rows.length,offset:0,tiles,parameters:tiles.map(t=>t===19?2:255),objects:tiles.map(()=>255)};
@@ -119,4 +121,36 @@ test('fatal damage plays hurt and death before returning to the checkpoint',()=>
   const s=new Simulation(fixture(['#####','# @ #','#####']));s.hurt(4);assert.equal(s.health,0);
   step(s,0,8);assert.equal(s.deathTicks,80);assert.equal(s.lives,5);
   step(s,0,80);assert.equal(s.lives,4);assert.equal(s.health,4);assert.equal(s.status,'playing');
+});
+test('a boulder held overhead plays the bracing animation then crushes the hero',()=>{
+  const s=new Simulation(fixture(['#####','# O #','# @ #','#####']));
+  step(s);assert.equal(s.playerAnimation,11);assert.equal(s.stonePressure,1);
+  step(s,0,30);assert.equal(s.health,4);assert.equal(s.playerAnimation,11);
+  step(s);assert.equal(s.health,0);assert.equal(s.playerAnimation,10);
+  step(s,0,8);assert.equal(s.deathTicks,80);
+});
+test('walking out from under a boulder releases its pressure',()=>{
+  const s=new Simulation(fixture(['######','# O  #','# @  #','######']));
+  step(s,0,12);assert.equal(s.playerAnimation,11);
+  step(s,2);step(s);assert.equal(s.stonePressure,0);
+  step(s,0,40);assert.equal(s.health,4);
+});
+test('the red prize rises above the hero after the chest reward frame',()=>{
+  const level=fixture(['#####','#@  #','#####']);level.tiles[7]=2;level.objects[7]=33;
+  const sim=new Simulation(level);step(sim,2,4);
+  const fromPack=(name:string,index:number)=>decodeSprite(parsePack(readFileSync(new URL(`../../../work/reference-s700/res/${name}.f`,import.meta.url)),`${name}.f`)[index].data,`${name}-${index}`);
+  const hero=fromPack('o',0),chest=fromPack('gen3',3),draws:{id:string;frame:number;x:number;y:number;palette:number}[]=[];
+  const base=new SpriteRenderer();
+  const spy={module(){},animation(){},animationFrame:base.animationFrame.bind(base),
+    frame(_ctx:unknown,s:{name:string},frame:number,x:number,y:number,_flags=0,palette=0){draws.push({id:s.name,frame,x,y,palette});}} as unknown as SpriteRenderer;
+  const assets={sprite:(id:string)=>id==='o-0'?hero:id==='gen3-3'?chest:
+    {name:id,frames:Array.from({length:8},()=>({})),animations:[]}} as unknown as AssetManager;
+  const renderer=new LevelRenderer(assets,spy),draw=()=>{
+    draws.length=0;renderer.draw({} as CanvasRenderingContext2D,level,sim.tick,sim);
+    return draws.filter(d=>d.id==='cm-2'&&d.palette===1);
+  };
+  while(animationFrameAt(CHEST_OPEN_DURATIONS,sim.chestTicks,false)<13)step(sim);
+  assert.equal(draw().length,0);
+  while(animationFrameAt(CHEST_OPEN_DURATIONS,sim.chestTicks,false)<=13)step(sim);
+  assert.equal(draw().length,1);assert.equal(draw()[0].y,sim.player.y*24-24);
 });

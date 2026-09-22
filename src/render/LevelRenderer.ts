@@ -2,7 +2,7 @@ import { AssetManager } from '../assets/AssetManager.ts';
 import type { LevelDefinition } from '../level/LevelParser.ts';
 import { SpriteRenderer } from './SpriteRenderer.ts';
 import type { Simulation } from '../core/Simulation.ts';
-import { fallingDrawOffset } from '../core/PhaseOneRules.ts';
+import { animationFrameAt, CHEST_OPEN_DURATIONS, fallingDrawOffset } from '../core/PhaseOneRules.ts';
 const tileSprite:Record<number,string>={8:'gen0-5',11:'gen1-4',14:'gen1-2',16:'gen1-3',18:'gen3-9',22:'gen0-9',23:'gen0-9',24:'gen1-9',26:'gen1-9',27:'gen1-9',28:'gen0-8',30:'gen0-7',31:'gen2-8',34:'gen2-4',35:'gen2-4',36:'gen0-8',37:'gen2-5',38:'gen2-6',39:'gen2-6',40:'gen2-7',42:'gen3-1',44:'gen3-4',45:'gen3-5',46:'gen3-7',47:'gen2-3',48:'gen3-2',49:'gen4-1'};
 export class LevelRenderer {
   assets:AssetManager; sprites:SpriteRenderer;
@@ -21,7 +21,7 @@ export class LevelRenderer {
       const obj=level.objects[i];
       if(obj===4&&(sim?.checkpointOrder??-1)<=level.parameters[i])frame('cm-6',sim?.checkpoint===i?7:((tick>>1)%7),px,py);
       if(obj===5||obj===28)r.module(ctx,a.sprite('cm-0'),0,px,py);
-      if(sim?.entranceGate===i)r.module(ctx,a.sprite('cm-4'),1,px,py);
+      if(sim?.entranceGate===i){frame('cm-1',2,px,py);frame('cm-1',5,px,py);}
     }
     const sparkle=((tick&63)>>1)<4?(tick&63)>>1:0;
     for(let y=0;y<level.height;y++)for(let x=0;x<level.width;x++) {
@@ -56,6 +56,9 @@ export class LevelRenderer {
         // cGame.method_159 adds each animation frame's X/Y before drawing the
         // hero. Left-facing frames are mirrored around x+24 or x+26.
         r.frame(ctx,hero,af.frame,p.x*24-p.dx*p.offset+af.x,p.y*24-p.dy*p.offset+af.y,af.flags);
+        if(sim.chestCell>=0&&sim.opened.has(sim.chestCell)&&
+          animationFrameAt(CHEST_OPEN_DURATIONS,sim.chestTicks,false)>13)
+          r.frame(ctx,a.sprite('cm-2'),0,p.x*24-p.dx*p.offset+af.x,p.y*24-p.dy*p.offset+af.y-24,0,1);
       }
     }
     // Original foreground tiles and vegetation render after the player (method_153).

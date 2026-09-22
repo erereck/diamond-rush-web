@@ -10,8 +10,8 @@ Estado em 22/09/2026. Fonte canônica S700 1.2.0. Referências Nokia e ferrament
 | Renderização Canvas | Implementada, com desenhos provisórios de alguns objetos | Ordem exata, animações e efeitos por entidade |
 | Relógio e câmera | Inteiros, 20 Hz, teste independente de refresh | Comparação de traces Java |
 | Controles | Teclado, toque e ação de checkpoint; gamepad implementado | Testar controle físico e armas |
-| Movimento / pedras / coleta / cobras | Subconjunto experimental; giro visual da pedra e esquerda do herói corrigidos | Água, colisões especiais, cobras vermelhas e demais regras |
-| Fogo e baú vermelho de Angkor | Alcance, dano, abertura e recompensa implementados | Validar tempos por trace Java e efeitos de partículas/áudio |
+| Movimento / pedras / coleta / cobras | Subconjunto experimental; giro visual da pedra, esquerda do herói e esmagamento sob pedra corrigidos | Água, colisões especiais, cobras vermelhas e demais regras |
+| Fogo e baú vermelho de Angkor | Alcance, dano, abertura e prêmio visível implementados | Validar tempos por trace Java e efeitos de partículas/áudio |
 | Checkpoint e morte | Snapshot/restore, vidas, dano e retorno após animação | Integrar com RMS, vida máxima e demais equipamentos |
 | Campanha / cenas / menus | Pendente | Fluxo começa na introdução Angkor índice 13 |
 | Save RMS | Codec e modelo inicial, 994 bytes | Integração de campanha e save real de referência |

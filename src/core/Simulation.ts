@@ -1,7 +1,7 @@
 import type { LevelDefinition } from '../level/LevelParser.ts';
 import { Camera } from './Camera.ts';
 import { ENGINE_REVISION, levelFingerprint } from './Compatibility.ts';
-import { animationFrameAt, CHEST_OPEN_DURATIONS, fireReach } from './PhaseOneRules.ts';
+import { animationFrameAt, BOULDER_BRACE_TICKS, BOULDER_PRESSURE_TICKS, CHEST_OPEN_DURATIONS, fireReach } from './PhaseOneRules.ts';
 export type Direction=0|1|2|3|4;
 export const DX=[0,0,1,0,-1], DY=[0,-1,0,1,0];
 export interface InputFrame {direction:Direction;action:boolean}
@@ -18,7 +18,7 @@ export class Simulation {
   playerAnimation=1;animationTick=0;pushDelay=6;checkpoint=-1;status:'playing'|'dead'|'complete'='playing';
   opened=new Set<number>();events:string[]=[];inputs:InputFrame[]=[];
   chestFrames:Int16Array;checkpointOrder=-1;private savedCheckpoint!:CheckpointState;
-  lives=5;hurtTicks=0;deathTicks=0;chestCell=-1;chestTicks=0;exitDirection:Direction=0;
+  lives=5;hurtTicks=0;deathTicks=0;chestCell=-1;chestTicks=0;exitDirection:Direction=0;stonePressure=0;
   pendingDirection:Direction=0;private actionHeld=false;private lastInputDirection:Direction=0;entranceGate=-1;
   constructor(level:LevelDefinition){
     this.level=level;this.tiles=Int16Array.from(level.tiles,t=>t===255?-1:t);this.state=new Int32Array(this.tiles.length);
@@ -71,7 +71,7 @@ export class Simulation {
     this.tiles.set(save.tiles);this.state.set(save.state);this.motion.set(save.motion);this.active.set(save.active);this.chestFrames.set(save.chestFrames);
     this.player={x:save.x,y:save.y,dx:0,dy:1,offset:0,direction:3};
     this.diamonds=save.diamonds;this.redDiamonds=save.redDiamonds;this.opened=new Set(save.opened);
-    this.hurtTicks=0;this.deathTicks=0;this.chestCell=-1;this.chestTicks=0;this.exitDirection=0;this.pendingDirection=0;this.pushDelay=6;
+    this.hurtTicks=0;this.deathTicks=0;this.chestCell=-1;this.chestTicks=0;this.exitDirection=0;this.pendingDirection=0;this.pushDelay=6;this.stonePressure=0;
     if(heal){this.health=4;this.invulnerable=0;}
     this.playerAnimation=2;this.animationTick=0;
     // method_347 reactivates the saved objects; it does not reset the global clock.
@@ -169,6 +169,15 @@ export class Simulation {
     }
     if(this.status!=='playing')return;
     const p=this.player;
+    const overhead=this.index(p.x,p.y-1);
+    this.stonePressure=overhead>=0&&[0,8,9,48].includes(this.tiles[overhead])&&p.offset===0
+      ?this.stonePressure+1:0;
+    // cGame.method_236/260: a hero trapped under a boulder braces with
+    // animation 11; when that animation ends (or the 40-tick timer expires),
+    // the weight is fatal. Moving clear resets the pressure.
+    if(this.stonePressure>0&&!this.hurtTicks&&!this.deathTicks&&this.chestCell<0){
+      if(this.playerAnimation!==11)this.setAnimation(11);
+    }
     if(this.chestCell>=0){
       this.chestTicks++;this.pendingDirection=0;
       if(animationFrameAt(CHEST_OPEN_DURATIONS,this.chestTicks,false)>=13&&!this.opened.has(this.chestCell)){
@@ -202,8 +211,8 @@ export class Simulation {
       if(pass){
         this.wake(p.x,p.y);p.x=x;p.y=y;p.offset=18;this.wake(x,y);this.setAnimation(3+p.direction);
         if(t===10){this.state[i]=1;this.events.push('grass');}
-      }else if(t!==0)this.setAnimation(p.direction-1);
-    }else {this.pushDelay=6;this.setAnimation(p.direction-1);}
+      }else if(t!==0&&this.stonePressure===0)this.setAnimation(p.direction-1);
+    }else {this.pushDelay=6;if(this.stonePressure===0)this.setAnimation(p.direction-1);}
     const i=this.index(p.x,p.y),t=this.tiles[i],o=this.level.objects[i];
     if(p.offset===0){
       if(o===4&&this.level.parameters[i]>this.checkpointOrder){this.checkpoint=i;this.checkpointOrder=this.level.parameters[i];this.captureCheckpoint();this.events.push('checkpoint');}
@@ -213,9 +222,13 @@ export class Simulation {
       if(o===5||o===28)this.exitDirection=p.direction;
       if(this.exitDirection&&(p.x>this.level.width+5||p.x< -5||p.y>this.level.height+5||p.y< -5)){this.status='complete';this.events.push('complete');}
     }
+    const rockAbove=this.index(p.x,p.y-1);
+    if(p.offset>0||rockAbove<0||![0,8,9,48].includes(this.tiles[rockAbove]))this.stonePressure=0;
+    else if((this.animationTick>=BOULDER_BRACE_TICKS||this.stonePressure>=BOULDER_PRESSURE_TICKS)&&!this.invulnerable)
+      this.hurt(4);
     this.updateCamera();
   }
   private updateCamera(){const p=this.player;this.camera.update(p.x*24-p.dx*p.offset,p.y*24-p.dy*p.offset,this.level.width,this.level.height);}
   replay():Replay{return {version:2,target:'1.2.0-s700',engine:ENGINE_REVISION,levelFingerprint:levelFingerprint(this.level),world:this.level.world,level:this.level.index,inputs:this.inputs.map(i=>({...i}))};}
-  snapshot(){return {tick:this.tick,player:{...this.player},camera:{x:this.camera.x,y:this.camera.y},tiles:[...this.tiles],state:[...this.state],motion:[...this.motion],active:[...this.active],diamonds:this.diamonds,redDiamonds:this.redDiamonds,health:this.health,invulnerable:this.invulnerable,status:this.status,playerAnimation:this.playerAnimation,animationTick:this.animationTick,pushDelay:this.pushDelay,checkpoint:this.checkpoint,checkpointOrder:this.checkpointOrder,opened:[...this.opened],chestFrames:[...this.chestFrames],chestCell:this.chestCell,chestTicks:this.chestTicks,lives:this.lives,hurtTicks:this.hurtTicks,deathTicks:this.deathTicks,exitDirection:this.exitDirection,pendingDirection:this.pendingDirection,lastInputDirection:this.lastInputDirection,actionHeld:this.actionHeld,entranceGate:this.entranceGate,savedCheckpoint:structuredClone(this.savedCheckpoint)};}
+  snapshot(){return {tick:this.tick,player:{...this.player},camera:{x:this.camera.x,y:this.camera.y},tiles:[...this.tiles],state:[...this.state],motion:[...this.motion],active:[...this.active],diamonds:this.diamonds,redDiamonds:this.redDiamonds,health:this.health,invulnerable:this.invulnerable,status:this.status,playerAnimation:this.playerAnimation,animationTick:this.animationTick,pushDelay:this.pushDelay,checkpoint:this.checkpoint,checkpointOrder:this.checkpointOrder,opened:[...this.opened],chestFrames:[...this.chestFrames],chestCell:this.chestCell,chestTicks:this.chestTicks,lives:this.lives,hurtTicks:this.hurtTicks,deathTicks:this.deathTicks,exitDirection:this.exitDirection,stonePressure:this.stonePressure,pendingDirection:this.pendingDirection,lastInputDirection:this.lastInputDirection,actionHeld:this.actionHeld,entranceGate:this.entranceGate,savedCheckpoint:structuredClone(this.savedCheckpoint)};}
 }

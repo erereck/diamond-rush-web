@@ -18,7 +18,7 @@ npm run dev -- --port 5173
 
 Acesse http://127.0.0.1:5173. Os recursos já foram extraídos para `public/assets`. O servidor atende apenas a máquina local. Para gerar a versão estática: `npm run build`; para conferir essa versão: `npm run preview`.
 
-Use **Iniciar teste de Angkor**, setas ou WASD, Escape para pausar e R para reiniciar. Em tela pequena há direcional de toque. Espaço ou o botão de ação restaura o último checkpoint quando o personagem está sobre ele; armas ainda não foram portadas. O jogo tem tela lógica de 240 × 320 e roda a simulação a 20 Hz; a interface usa escala inteira de pixels.
+O jogo abre no menu S700. Escolha **New Game** para abrir o mapa de Angkor ou **Continue** para voltar ao mapa salvo. Use setas ou WASD para seguir as ligações entre fases e Enter/Espaço para entrar; Escape abre a seleção de mundos. No celular, o direcional e o botão de ação também navegam no menu e no mapa. Durante a fase, Escape pausa, R reinicia e o botão de ação restaura o checkpoint quando o personagem está sobre ele; armas ainda não foram portadas. O jogo tem tela lógica de 240 × 320 e roda a simulação a 20 Hz; a interface usa escala inteira de pixels.
 
 No **Laboratório de preservação** é possível:
 
@@ -29,7 +29,7 @@ No **Laboratório de preservação** é possível:
 - Renderizar todos os recursos para detectar erros de acesso.
 - Inspecionar e exportar o modelo do record 1 do save RMS original.
 
-O navegador salva a sessão experimental ao pausar ou sair. Ela retorna pausada. Essa sessão é um replay de entradas, **separado do save de campanha RMS**. Replays de versões anteriores do motor são rejeitados para evitar restauração divergente.
+O navegador salva o progresso do mapa e os recursos obtidos ao concluir uma fase. **Continue** retorna ao mapa; a partida dentro de uma fase não é retomada automaticamente. O replay experimental exportável continua separado do progresso do mapa e do save canônico RMS. Replays de versões anteriores do motor são rejeitados para evitar restauração divergente.
 
 ## Reproduzir a extração
 
@@ -50,9 +50,9 @@ Se o clone já existe, não repita `git clone`. Para outra localização: `npm r
 
 ## Estado real
 
-Concluídos nesta etapa: auditoria e hashes das fontes, decodificação dos packs/sprites/mapas/strings/MIDI, renderização de recursos, relógio fixo, câmera, controles, simulação inicial, replays versionados e codec estrutural do save original.
+Concluídos nesta etapa: auditoria e hashes das fontes, decodificação dos packs/sprites/mapas/strings/MIDI, renderização de recursos, menu e mapa interativos com os sprites originais, progresso local de campanha, relógio fixo, câmera, controles, simulação inicial, replays versionados e codec estrutural do save original.
 
-A simulação contém somente um subconjunto: movimento, paredes, vegetação, coleta, gravidade/empurrão de pedras, patrulha básica de cobras, alcance e dano do fogo de Angkor, abertura do baú vermelho, checkpoints e retorno após morte. O prêmio vermelho aparece acima do herói durante a abertura. A pedra apoiada sobre o personagem ativa a animação de esforço e o esmaga se ele permanecer sob ela. O desenho do personagem ao andar para a esquerda usa os deslocamentos dos frames originais; a pedra em rolagem usa o mesmo sentido visual do deslocamento físico. A entrada usa o portão do recurso original em vez do sprite incorreto que parecia uma poção. Portas e mecanismos restantes, água, armas, chefes, cenas, menus e progressão ainda precisam ser portados. Algumas representações de objetos são provisórias. Uma fase carregar não significa que pode ser concluída corretamente.
+A simulação contém somente um subconjunto: movimento, paredes, vegetação, coleta, gravidade/empurrão de pedras, patrulha básica de cobras, alcance e dano do fogo de Angkor, abertura do baú vermelho, checkpoints e retorno após morte. O prêmio vermelho aparece acima do herói durante a abertura. A pedra apoiada sobre o personagem ativa a animação de esforço e o esmaga se ele permanecer sob ela. O desenho do personagem ao andar para a esquerda usa os deslocamentos dos frames originais; a pedra em rolagem usa o mesmo sentido visual do deslocamento físico. A entrada usa o portão do recurso original em vez do sprite incorreto que parecia uma poção. O mapa segue as ligações extraídas, mas as regras de desbloqueio ainda são simplificadas. Portas e mecanismos restantes, água, armas, chefes, cenas e integração com o save RMS ainda precisam ser portados. Algumas representações de objetos são provisórias. Uma fase carregar não significa que pode ser concluída corretamente.
 
 O JAR executável S700 correspondente ainda não foi validado. Não há alegação de equivalência completa com o original. Consulte `docs/STATUS.md` para os próximos marcos e `docs/VERIFICATION.md` para as verificações feitas.
 

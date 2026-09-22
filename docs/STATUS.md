@@ -14,7 +14,7 @@ Estado em 22/09/2026. Fonte canônica S700 1.2.0. Referências Nokia e ferrament
 | Itens, chaves e portões | Chaves prateadas/douradas, vida extra, cura, fechaduras numeradas e abertura animada da passagem | Tempo fino das animações, interruptores, equipamentos e puzzles restantes |
 | Fogo e baús de Angkor | Alcance, dano, abertura e prêmio visível; baús comuns concedem a quantidade codificada no mapa | Validar tempos por trace Java e efeitos de partículas/áudio |
 | Checkpoint e morte | Snapshot/restore, vidas, dano e retorno após animação | Integrar com RMS, vida máxima e demais equipamentos |
-| Campanha / cenas / menus | Progressão experimental segue as ligações principais dos mapas originais, levando vidas e diamantes à próxima fase | Mapa interativo, ramificações secretas, introdução Angkor índice 13 e regras canônicas de desbloqueio |
+| Campanha / cenas / menus | Menu S700 e mapas dos três mundos com sprites originais, navegação pelas ligações, seleção de fases, desbloqueio simplificado e progresso local; conclusão retorna ao mapa com vidas e diamantes | Regras canônicas de desbloqueio, save RMS, loja/selo completos, introdução Angkor índice 13 e demais cenas |
 | Save RMS | Codec e modelo inicial, 994 bytes | Integração de campanha e save real de referência |
 | Replay de desenvolvimento | Versionado, validado e restaurável, inclusive recursos iniciais de uma fase seguinte | Golden traces comparados ao original |
 | MIDI | Parsing das 21 faixas e prévia | Eventos de jogo, sintetizador/timbres equivalentes |

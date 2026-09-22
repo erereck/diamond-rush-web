@@ -1,0 +1,61 @@
+name: Test and publish GitHub Pages
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: github-pages
+  cancel-in-progress: true
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: outputs/diamond-rush-web
+    steps:
+      - name: Checkout web port
+        uses: actions/checkout@v4
+        with:
+          path: outputs/diamond-rush-web
+          persist-credentials: false
+      - name: Checkout pinned canonical resources
+        uses: actions/checkout@v4
+        with:
+          repository: palaceswitcher/Diamond-Rush-Decomp
+          ref: 5e05c42aa1aae3377790600eb6d27497101b79e7
+          path: work/reference-s700
+          persist-credentials: false
+      - name: Set up Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+          cache: npm
+          cache-dependency-path: outputs/diamond-rush-web/package-lock.json
+      - run: npm ci
+      - run: npm run extract-assets
+      - run: npm test
+      - run: npm run build
+      - name: Upload website
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: outputs/diamond-rush-web/dist
+
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    permissions:
+      pages: write
+      id-token: write
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - name: Publish
+        id: deployment
+        uses: actions/deploy-pages@v4

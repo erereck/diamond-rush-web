@@ -1,0 +1,62 @@
+[
+  {
+    "name": "ASprite.java",
+    "bytes": 26559,
+    "lines": 777,
+    "sha256": "3e190ccdd3ab55d58887d60fc6c2118d9bc6288da1758faab38dac075de49905"
+  },
+  {
+    "name": "ASpriteInstance.java",
+    "bytes": 3517,
+    "lines": 141,
+    "sha256": "718b7c94df7846c3f1db17f2f53123f2e3d625a3e48ce4b18fa7322e01a203b1"
+  },
+  {
+    "name": "cGame.java",
+    "bytes": 502043,
+    "lines": 18796,
+    "sha256": "8f30263debad4a8d2faeb910e06bfd9497b9acb332cdae3ec8212157c71061b5"
+  },
+  {
+    "name": "cSoundEngine.java",
+    "bytes": 9826,
+    "lines": 329,
+    "sha256": "18d3a201d4fc88c417b10ced4992b56f572287bbf4c68fea9737bb9e14315fea"
+  },
+  {
+    "name": "Define.java",
+    "bytes": 586,
+    "lines": 18,
+    "sha256": "0224cff0dad7e87b4e3caf9800f5b4dda025b0394e73000e545b6190a46049ca"
+  },
+  {
+    "name": "DemoInterpreter.java",
+    "bytes": 43035,
+    "lines": 1099,
+    "sha256": "e0733dba49f9fb9390f1711f4a1a5c14565f58af9d35e9e6bcf3aab538fbf56e"
+  },
+  {
+    "name": "GemsRain.java",
+    "bytes": 2995,
+    "lines": 119,
+    "sha256": "61b8e90f207c2947ea83e8d6094e0b735a7ab3bc1e4630ffda9ffbfaef50edda"
+  },
+  {
+    "name": "GloftDIRU.java",
+    "bytes": 1418,
+    "lines": 55,
+    "sha256": "667cfd713dca0bb48a79fee29b8a7a825141db4c8f0601139a20528b02ab6cd7"
+  },
+  {
+    "name": "IGA.java",
+    "bytes": 6510,
+    "lines": 229,
+    "sha256": "b285505dbee3dc4b78f57657200fcd986816394dda8d42bae97fd00d6772ed36"
+  },
+  {
+    "name": "Utils.java",
+    "bytes": 357,
+    "lines": 13,
+    "sha256": "52e9949e79674a908abdd8bd19a1d98d3ae584726f44fbd11b2726c824724916"
+  }
+]

@@ -1,0 +1,202 @@
+[
+  {
+    "name": "0.f",
+    "reference-nokia": "identical",
+    "reference-tools": "identical"
+  },
+  {
+    "name": "1.f",
+    "reference-nokia": "identical",
+    "reference-tools": "identical"
+  },
+  {
+    "name": "2.f",
+    "reference-nokia": "identical",
+    "reference-tools": "identical"
+  },
+  {
+    "name": "ad1",
+    "reference-nokia": "absent",
+    "reference-tools": "identical"
+  },
+  {
+    "name": "ad2",
+    "reference-nokia": "absent",
+    "reference-tools": "identical"
+  },
+  {
+    "name": "ad3",
+    "reference-nokia": "absent",
+    "reference-tools": "identical"
+  },
+  {
+    "name": "ad4",
+    "reference-nokia": "absent",
+    "reference-tools": "identical"
+  },
+  {
+    "name": "b0.f",
+    "reference-nokia": "identical",
+    "reference-tools": "identical"
+  },
+  {
+    "name": "b1.f",
+    "reference-nokia": "identical",
+    "reference-tools": "identical"
+  },
+  {
+    "name": "cm.f",
+    "reference-nokia": "different",
+    "reference-tools": "identical"
+  },
+  {
+    "name": "cr.f",
+    "reference-nokia": "different",
+    "reference-tools": "identical"
+  },
+  {
+    "name": "demo.f",
+    "reference-nokia": "different",
+    "reference-tools": "different"
+  },
+  {
+    "name": "demoSpr.bin",
+    "reference-nokia": "different",
+    "reference-tools": "identical"
+  },
+  {
+    "name": "demoui.f",
+    "reference-nokia": "identical",
+    "reference-tools": "identical"
+  },
+  {
+    "name": "gen0.f",
+    "reference-nokia": "identical",
+    "reference-tools": "identical"
+  },
+  {
+    "name": "gen1.f",
+    "reference-nokia": "identical",
+    "reference-tools": "identical"
+  },
+  {
+    "name": "gen2.f",
+    "reference-nokia": "identical",
+    "reference-tools": "identical"
+  },
+  {
+    "name": "gen3.f",
+    "reference-nokia": "different",
+    "reference-tools": "identical"
+  },
+  {
+    "name": "gen4.f",
+    "reference-nokia": "identical",
+    "reference-tools": "identical"
+  },
+  {
+    "name": "icon.png",
+    "reference-nokia": "different",
+    "reference-tools": "identical"
+  },
+  {
+    "name": "iga.f",
+    "reference-nokia": "absent",
+    "reference-tools": "identical"
+  },
+  {
+    "name": "lang.f",
+    "reference-nokia": "absent",
+    "reference-tools": "identical"
+  },
+  {
+    "name": "lang_IGA.f",
+    "reference-nokia": "absent",
+    "reference-tools": "identical"
+  },
+  {
+    "name": "map_angkor.out",
+    "reference-nokia": "identical",
+    "reference-tools": "identical"
+  },
+  {
+    "name": "map_scotland.out",
+    "reference-nokia": "identical",
+    "reference-tools": "identical"
+  },
+  {
+    "name": "map_tibet.out",
+    "reference-nokia": "identical",
+    "reference-tools": "identical"
+  },
+  {
+    "name": "mc",
+    "reference-nokia": "identical",
+    "reference-tools": "identical"
+  },
+  {
+    "name": "mm0.f",
+    "reference-nokia": "identical",
+    "reference-tools": "identical"
+  },
+  {
+    "name": "mm1.f",
+    "reference-nokia": "identical",
+    "reference-tools": "identical"
+  },
+  {
+    "name": "mmv.f",
+    "reference-nokia": "identical",
+    "reference-tools": "identical"
+  },
+  {
+    "name": "ms.f",
+    "reference-nokia": "different",
+    "reference-tools": "identical"
+  },
+  {
+    "name": "o.f",
+    "reference-nokia": "identical",
+    "reference-tools": "identical"
+  },
+  {
+    "name": "snd.f",
+    "reference-nokia": "identical",
+    "reference-tools": "identical"
+  },
+  {
+    "name": "spl.f",
+    "reference-nokia": "identical",
+    "reference-tools": "identical"
+  },
+  {
+    "name": "tips.f",
+    "reference-nokia": "identical",
+    "reference-tools": "different"
+  },
+  {
+    "name": "tipst.f",
+    "reference-nokia": "identical",
+    "reference-tools": "different"
+  },
+  {
+    "name": "ui.f",
+    "reference-nokia": "different",
+    "reference-tools": "different"
+  },
+  {
+    "name": "w0.bin",
+    "reference-nokia": "identical",
+    "reference-tools": "different"
+  },
+  {
+    "name": "w1.bin",
+    "reference-nokia": "different",
+    "reference-tools": "identical"
+  },
+  {
+    "name": "w2.bin",
+    "reference-nokia": "identical",
+    "reference-tools": "different"
+  }
+]

@@ -2,6 +2,7 @@ import { AssetManager } from '../assets/AssetManager.ts';
 import type { LevelDefinition } from '../level/LevelParser.ts';
 import { SpriteRenderer } from './SpriteRenderer.ts';
 import type { Simulation } from '../core/Simulation.ts';
+import { fallingDrawOffset } from '../core/PhaseOneRules.ts';
 const tileSprite:Record<number,string>={8:'gen0-5',11:'gen1-4',14:'gen1-2',16:'gen1-3',18:'gen3-9',22:'gen0-9',23:'gen0-9',24:'gen1-9',26:'gen1-9',27:'gen1-9',28:'gen0-8',30:'gen0-7',31:'gen2-8',34:'gen2-4',35:'gen2-4',36:'gen0-8',37:'gen2-5',38:'gen2-6',39:'gen2-6',40:'gen2-7',42:'gen3-1',44:'gen3-4',45:'gen3-5',46:'gen3-7',47:'gen2-3',48:'gen3-2',49:'gen4-1'};
 export class LevelRenderer {
   assets:AssetManager; sprites:SpriteRenderer;
@@ -18,17 +19,19 @@ export class LevelRenderer {
       if(t>=80)frame(`${w}-2`,t-80,px,py);
       if(t===10)frame(`${w}-1`,0,px,py);
       const obj=level.objects[i];
-      if(obj===4)frame('cm-6',sim?.checkpoint===i?7:((tick>>1)%7),px,py);
+      if(obj===4&&(sim?.checkpointOrder??-1)<=level.parameters[i])frame('cm-6',sim?.checkpoint===i?7:((tick>>1)%7),px,py);
       if(obj===5||obj===28)r.module(ctx,a.sprite('cm-0'),0,px,py);
+      if(sim?.entranceGate===i)r.module(ctx,a.sprite('cm-4'),1,px,py);
     }
     const sparkle=((tick&63)>>1)<4?(tick&63)>>1:0;
     for(let y=0;y<level.height;y++)for(let x=0;x<level.width;x++) {
-      const i=x+y*level.width,t=tile(i),motion=sim?.motion[i]??0,dir=(sim?.state[i]??0)&7;
-      const ox=motion*([0,0,-1,0,1][dir]??0),oy=motion*([0,1,0,-1,0][dir]??0);
+      const i=x+y*level.width,t=tile(i),motion=sim?.motion[i]??0;
+      const {x:ox,y:oy}=fallingDrawOffset(sim?.state[i]??0,motion,tick);
       const px=x*24+ox,py=y*24+oy,obj=level.objects[i];
       if(obj===14||obj===33) {
         const id=obj===14?'gen2-2':'gen3-3',s=a.sprite(id),an=s.animations[0];
-        const n=sim?.opened.has(i)?an.count-1:0;r.frame(ctx,s,s.animationFrames[an.start+n].frame,x*24,y*24);
+        const n=sim?.opened.has(i)?an.count-1:sim?.chestFrames[i]??0;
+        const af=s.animationFrames[an.start+Math.min(n,an.count-1)];r.frame(ctx,s,af.frame,x*24,y*24,af.flags);
       } else if(t===0)frame(`${w}-0`,((sim?.state[i]??0)&56)>>3,px,py);
       else if(t===1)frame('cm-2',sparkle,px,py);
       else if(t===2)frame('cm-2',sparkle,px,py,1);
@@ -40,6 +43,7 @@ export class LevelRenderer {
       else if(tileSprite[t]) {
         const id=tileSprite[t],s=a.sprite(id);
         if(s.animations.length)anim(id,0,px,py);else if(s.frames.length)frame(id,0,px,py);else r.module(ctx,s,0,px,py);
+        if(t===22||t===23)anim('gen1-0',0,t===22?x*24+24:x*24,y*24,0,t===23?1:0);
       } else if(t===79&&!sim)frame('o-0',0,px,py);
       if(debug&&t>=0&&t<80&&![0,1,2,4,5,6,7,10,12,19,43,79].includes(t)&&!tileSprite[t]) {
         ctx.fillStyle='#ed489d';ctx.fillRect(px,py,24,24);ctx.fillStyle='#100719';ctx.font='10px monospace';ctx.fillText(String(t),px+2,py+15);
@@ -47,7 +51,12 @@ export class LevelRenderer {
     }
     if(sim) {
       const p=sim.player;
-      if(sim.invulnerable%4<2)r.animation(ctx,a.sprite('o-0'),sim.playerAnimation,sim.animationTick,p.x*24-p.dx*p.offset,p.y*24-p.dy*p.offset);
+      if(sim.invulnerable%4<2){
+        const hero=a.sprite('o-0'),af=r.animationFrame(hero,sim.playerAnimation,sim.animationTick);
+        // cGame.method_159 adds each animation frame's X/Y before drawing the
+        // hero. Left-facing frames are mirrored around x+24 or x+26.
+        r.frame(ctx,hero,af.frame,p.x*24-p.dx*p.offset+af.x,p.y*24-p.dy*p.offset+af.y,af.flags);
+      }
     }
     // Original foreground tiles and vegetation render after the player (method_153).
     for(let y=0;y<level.height;y++)for(let x=0;x<level.width;x++) {

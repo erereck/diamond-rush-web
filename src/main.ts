@@ -38,15 +38,24 @@ function drawTitle(){
   if(!lastError)$('debug-info').textContent='Tela de abertura · nenhuma simulação em execução';
   $<HTMLButtonElement>('pause').disabled=true;$<HTMLButtonElement>('restart').disabled=true;
 }
+function hudNumber(hud:ReturnType<AssetManager['sprite']>,value:number,right:number,top:number){
+  if(value===0){sprites.module(ctx,hud,0,right-hud.modules[0].width,top);return;}
+  for(let n=value;n>0;n=Math.floor(n/10)){
+    const digit=n%10;right-=hud.modules[digit].width;sprites.module(ctx,hud,digit,right,top);
+  }
+}
 function drawGame(){
   if(!simulation){drawTitle();return;}
   const s=simulation;ctx.fillStyle='#091509';ctx.fillRect(0,0,240,320);
   ctx.save();ctx.beginPath();ctx.rect(0,40,240,240);ctx.clip();ctx.translate(-s.camera.x,40-s.camera.y);renderer.draw(ctx,s.level,s.tick,s);ctx.restore();
   const hud=assets.sprite('ui-2');sprites.frame(ctx,hud,0,120,320);sprites.frame(ctx,hud,1,120,320);
-  text(assets.strings[28+s.level.world],120,12,'center',1);
-  text(`FASE ${s.level.index+1}`,120,27,'center');
-  // Original HUD artwork with a temporary text counter, separately tracked from UI parity.
-  text(`${s.diamonds}`,210,301,'right');text(`${s.redDiamonds}`,28,301);text(`${s.health}/4`,119,291,'center');
+  sprites.frame(ctx,hud,20,120,0);
+  const low=s.health<=1,cap=low?12:11,empty=low?14:13,filled=low?16:15;
+  let healthX=87;sprites.module(ctx,hud,cap,healthX,291);healthX+=hud.modules[cap].width;
+  for(let i=0;i<4;i++){sprites.module(ctx,hud,i<s.health?filled:empty,healthX,291);healthX+=hud.modules[15].width;}
+  sprites.module(ctx,hud,low?18:17,healthX,291);
+  hudNumber(hud,s.diamonds,190,308);hudNumber(hud,s.redDiamonds,227,308);
+  hudNumber(hud,s.lives,91,18);hudNumber(hud,0,167,18);hudNumber(hud,0,207,18);
   if(paused||s.status!=='playing'){
     ctx.fillStyle='#000b';ctx.fillRect(0,96,240,115);
     text(s.status==='dead'?'GAME OVER':s.status==='complete'?'FASE CONCLUIDA':'PAUSADO',120,124,'center',1);

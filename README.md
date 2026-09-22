@@ -18,7 +18,7 @@ npm run dev -- --port 5173
 
 Acesse http://127.0.0.1:5173. Os recursos já foram extraídos para `public/assets`. O servidor atende apenas a máquina local. Para gerar a versão estática: `npm run build`; para conferir essa versão: `npm run preview`.
 
-Use **Iniciar teste de Angkor**, setas ou WASD, Escape para pausar e R para reiniciar. Em tela pequena há direcional de toque. A ação/armas ainda não está implementada. O jogo tem tela lógica de 240 × 320 e roda a simulação a 20 Hz; a interface usa escala inteira de pixels.
+Use **Iniciar teste de Angkor**, setas ou WASD, Escape para pausar e R para reiniciar. Em tela pequena há direcional de toque. Espaço ou o botão de ação restaura o último checkpoint quando o personagem está sobre ele; armas ainda não foram portadas. O jogo tem tela lógica de 240 × 320 e roda a simulação a 20 Hz; a interface usa escala inteira de pixels.
 
 No **Laboratório de preservação** é possível:
 
@@ -52,7 +52,7 @@ Se o clone já existe, não repita `git clone`. Para outra localização: `npm r
 
 Concluídos nesta etapa: auditoria e hashes das fontes, decodificação dos packs/sprites/mapas/strings/MIDI, renderização de recursos, relógio fixo, câmera, controles, simulação inicial, replays versionados e codec estrutural do save original.
 
-A simulação contém somente um subconjunto: movimento, paredes, vegetação, coleta, gravidade/empurrão de pedras e patrulha básica de cobras. Portas, mecanismos, água, fogo, armas, chefes, cenas, menus e progressão ainda precisam ser portados. Checkpoints são apenas marcados visualmente; morte ainda não restaura o estado original. Algumas representações de objetos são provisórias. Uma fase carregar não significa que pode ser concluída corretamente.
+A simulação contém somente um subconjunto: movimento, paredes, vegetação, coleta, gravidade/empurrão de pedras, patrulha básica de cobras, alcance e dano do fogo de Angkor, abertura do baú vermelho, checkpoints e retorno após morte. O desenho do personagem ao andar para a esquerda usa os deslocamentos dos frames originais; a pedra em rolagem usa o mesmo sentido visual do deslocamento físico. Portas e mecanismos restantes, água, armas, chefes, cenas, menus e progressão ainda precisam ser portados. Algumas representações de objetos são provisórias. Uma fase carregar não significa que pode ser concluída corretamente.
 
 O JAR executável S700 correspondente ainda não foi validado. Não há alegação de equivalência completa com o original. Consulte `docs/STATUS.md` para os próximos marcos e `docs/VERIFICATION.md` para as verificações feitas.
 

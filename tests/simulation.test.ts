@@ -8,6 +8,10 @@ import type { Direction } from '../src/core/Simulation.ts';
 import { parseWorld } from '../src/level/LevelParser.ts';
 import type { LevelDefinition } from '../src/level/LevelParser.ts';
 import { validateReplay, restoreReplay } from '../src/platform/Session.ts';
+import { animationFrameAt, CHEST_OPEN_DURATIONS, fallingDrawOffset, fireReach } from '../src/core/PhaseOneRules.ts';
+import { decodeSprite } from '../src/assets/SpriteDecoder.ts';
+import { parsePack } from '../src/assets/Pack.ts';
+import { SpriteRenderer } from '../src/render/SpriteRenderer.ts';
 function fixture(rows:string[]):LevelDefinition{
   const tiles=rows.flatMap(row=>[...row].map(c=>({'#':80,' ':255,'@':79,'O':0,'*':1,g:10,S:19} as Record<string,number>)[c]));
   return {world:0,index:0,width:rows[0].length,height:rows.length,offset:0,tiles,parameters:tiles.map(t=>t===19?2:255),objects:tiles.map(()=>255)};
@@ -60,4 +64,59 @@ test('red diamond is collected once and does not open a chest',()=>{
   const level=fixture(['#####','#@  #','#####']);level.tiles[7]=2;
   const sim=new Simulation(level);step(sim,2,4);assert.equal(sim.redDiamonds,1);assert.equal(sim.opened.size,0);
   step(sim,0,8);assert.equal(sim.redDiamonds,1);
+});
+test('left-facing hero frames use the original mirrored origin',()=>{
+  const sprite=decodeSprite(parsePack(readFileSync(new URL('../../../work/reference-s700/res/o.f',import.meta.url)),'o.f')[0].data, 'o-0');
+  const renderer=new SpriteRenderer();
+  const right=renderer.animationFrame(sprite,5,0),left=renderer.animationFrame(sprite,7,0);
+  assert.equal(right.x,0);assert.equal(right.flags&1,0);
+  assert.equal(left.x,24);assert.equal(left.flags&1,1);
+  const rightIdle=renderer.animationFrame(sprite,1,0),leftIdle=renderer.animationFrame(sprite,3,0);
+  assert.equal(rightIdle.x,-2);assert.equal(leftIdle.x,26);
+  // The frame modules themselves mirror around the offset anchor.
+  const bounds=(frame:number,origin:number,flip:boolean)=>{
+    const f=sprite.frames[frame],modules=sprite.frameModules.slice(f.start,f.start+f.count);
+    return [Math.min(...modules.map(fm=>origin+(flip?-fm.x-sprite.modules[fm.module].width:fm.x))),
+      Math.max(...modules.map(fm=>origin+(flip?-fm.x:fm.x+sprite.modules[fm.module].width)))];
+  };
+  assert.deepEqual(bounds(right.frame,right.x,false),bounds(left.frame,left.x,true));
+});
+test('leftward movement reaches the adjacent cell and faces left at a wall',()=>{
+  const s=new Simulation(fixture(['#######','#  @  #','#######']));
+  step(s,4);assert.equal(s.player.x,2);assert.equal(s.player.offset,18);assert.equal(s.playerAnimation,7);
+  step(s,4,4);assert.equal(s.player.x,1);assert.equal(s.playerAnimation,7);
+  step(s,4,4);assert.equal(s.player.x,1);assert.equal(s.playerAnimation,3);
+});
+test('rolling boulders draw toward the same side they fall',()=>{
+  assert.ok(fallingDrawOffset(512|2,6,0).x>0);
+  assert.ok(fallingDrawOffset(512|4,6,0).x<0);
+  assert.equal(fallingDrawOffset(3,18,0).y,-18);
+});
+test('the Angkor flame reaches its third neighboring cell only at the long frame',()=>{
+  assert.equal(fireReach(0),0);assert.equal(fireReach(20),1);
+  assert.equal(fireReach(40),2);assert.equal(fireReach(60),3);
+  const level=fixture(['#######','#@    #','#######']);level.tiles[11]=23;
+  const s=new Simulation(level);step(s,0,59);assert.equal(s.health,4);
+  step(s);assert.equal(s.health,3);assert.ok(s.events.includes('hurt'));
+});
+test('red chest reveals its diamond once, after the opening animation',()=>{
+  const level=fixture(['#####','#@  #','#####']);level.tiles[7]=2;level.objects[7]=33;
+  const s=new Simulation(level);step(s,2,4);assert.equal(s.chestCell,7);assert.equal(s.redDiamonds,0);
+  let rewardTick=0;for(let tick=1;tick<=80;tick++){step(s);if(s.redDiamonds){rewardTick=tick;break;}}
+  assert.equal(animationFrameAt(CHEST_OPEN_DURATIONS,rewardTick,false),13);
+  assert.equal(s.redDiamonds,1);assert.ok(s.opened.has(7));
+  step(s,0,80);assert.equal(s.redDiamonds,1);
+});
+test('checkpoint action restores collected objects and counters',()=>{
+  const level=fixture(['#######','#@    #','#######']);level.objects[9]=4;level.parameters[9]=1;level.tiles[10]=2;
+  const s=new Simulation(level);step(s,2,4);assert.equal(s.checkpoint,9);
+  step(s,2,4);assert.equal(s.redDiamonds,1);assert.equal(s.tile(3,1),-1);
+  step(s,4,4);s.step({direction:0,action:true});
+  assert.equal(s.redDiamonds,0);assert.equal(s.tile(3,1),2);assert.equal(s.player.x,2);
+  step(s,2,4);assert.equal(s.redDiamonds,1);
+});
+test('fatal damage plays hurt and death before returning to the checkpoint',()=>{
+  const s=new Simulation(fixture(['#####','# @ #','#####']));s.hurt(4);assert.equal(s.health,0);
+  step(s,0,8);assert.equal(s.deathTicks,80);assert.equal(s.lives,5);
+  step(s,0,80);assert.equal(s.lives,4);assert.equal(s.health,4);assert.equal(s.status,'playing');
 });

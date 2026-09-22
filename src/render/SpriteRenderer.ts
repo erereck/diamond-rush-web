@@ -1,4 +1,4 @@
-import type { DecodedSprite, FrameModule } from '../assets/SpriteDecoder.ts';
+import type { AnimationFrame, DecodedSprite, FrameModule } from '../assets/SpriteDecoder.ts';
 export class SpriteRenderer {
   cache=new Map<string,HTMLCanvasElement>();
   moduleImage(s:DecodedSprite,index:number,palette=0) {
@@ -27,12 +27,18 @@ export class SpriteRenderer {
     const f=s.frames[index];if(!f)throw new Error(`${s.name}: invalid frame ${index}`);
     for(let i=0;i<f.count;i++)this.frameModule(ctx,s,s.frameModules[f.start+i],x,y,flags,palette);
   }
-  animation(ctx:CanvasRenderingContext2D,s:DecodedSprite,animation:number,tick:number,x:number,y:number,flags=0,palette=0) {
+  animationFrame(s:DecodedSprite,animation:number,tick:number):AnimationFrame {
     const a=s.animations[animation];if(!a||!a.count)throw new Error(`${s.name}: invalid animation ${animation}`);
     const frames=s.animationFrames.slice(a.start,a.start+a.count), duration=frames.reduce((n,f)=>n+Math.max(1,f.duration),0);
     let t=((tick%duration)+duration)%duration, af=frames[0];
     for(const f of frames){af=f;if(t<Math.max(1,f.duration))break;t-=Math.max(1,f.duration);}
-    if(flags&32){x+=(flags&1)?-af.x:af.x;y+=(flags&2)?-af.y:af.y;}
+    return af;
+  }
+  animation(ctx:CanvasRenderingContext2D,s:DecodedSprite,animation:number,tick:number,x:number,y:number,flags=0,palette=0) {
+    const af=this.animationFrame(s,animation,tick);
+    // ASprite.drawAnimFrame: FLAG_OFFSET_AF subtracts the stored offset,
+    // unless the caller also mirrors that axis.
+    if(flags&32){x+=(flags&1)?af.x:-af.x;y+=(flags&2)?af.y:-af.y;}
     this.frame(ctx,s,af.frame,x,y,(flags^af.flags)&15,palette);
   }
   text(ctx:CanvasRenderingContext2D,s:DecodedSprite,map:Uint8Array,text:string,x:number,y:number,align:'left'|'center'|'right'='left',palette=0) {

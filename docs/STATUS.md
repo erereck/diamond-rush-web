@@ -10,12 +10,13 @@ Estado em 22/09/2026. Fonte canônica S700 1.2.0. Referências Nokia e ferrament
 | Renderização Canvas | Implementada, com desenhos provisórios de alguns objetos | Ordem exata, animações e efeitos por entidade |
 | Relógio e câmera | Inteiros, 20 Hz, teste independente de refresh | Comparação de traces Java |
 | Controles | Teclado, toque e ação de checkpoint; gamepad implementado | Testar controle físico e armas |
-| Movimento / pedras / coleta / cobras | Subconjunto experimental; giro visual da pedra, esquerda do herói e esmagamento sob pedra corrigidos | Água, colisões especiais, cobras vermelhas e demais regras |
+| Movimento / pedras / coleta / cobras | Subconjunto experimental; chão transitável alinhado aos casos de `method_288`, giro visual da pedra, esquerda do herói e esmagamento sob pedra corrigidos | Água, colisões especiais, cobras vermelhas e demais regras |
+| Chaves e portões | Coleta de chaves prateadas/douradas, fechaduras numeradas e abertura animada da passagem | Tempo fino da animação, interruptores, fechaduras especiais e puzzles restantes |
 | Fogo e baú vermelho de Angkor | Alcance, dano, abertura e prêmio visível implementados | Validar tempos por trace Java e efeitos de partículas/áudio |
 | Checkpoint e morte | Snapshot/restore, vidas, dano e retorno após animação | Integrar com RMS, vida máxima e demais equipamentos |
-| Campanha / cenas / menus | Pendente | Fluxo começa na introdução Angkor índice 13 |
+| Campanha / cenas / menus | Progressão experimental segue as ligações principais dos mapas originais, levando vidas e diamantes à próxima fase | Mapa interativo, ramificações secretas, introdução Angkor índice 13 e regras canônicas de desbloqueio |
 | Save RMS | Codec e modelo inicial, 994 bytes | Integração de campanha e save real de referência |
-| Replay de desenvolvimento | Versionado, validado e restaurável | Golden traces comparados ao original |
+| Replay de desenvolvimento | Versionado, validado e restaurável, inclusive recursos iniciais de uma fase seguinte | Golden traces comparados ao original |
 | MIDI | Parsing das 21 faixas e prévia | Eventos de jogo, sintetizador/timbres equivalentes |
 
 ## Próximo marco de gameplay

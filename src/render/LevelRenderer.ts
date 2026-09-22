@@ -3,7 +3,7 @@ import type { LevelDefinition } from '../level/LevelParser.ts';
 import { SpriteRenderer } from './SpriteRenderer.ts';
 import type { Simulation } from '../core/Simulation.ts';
 import { animationFrameAt, CHEST_OPEN_DURATIONS, fallingDrawOffset } from '../core/PhaseOneRules.ts';
-const tileSprite:Record<number,string>={8:'gen0-5',11:'gen1-4',14:'gen1-2',16:'gen1-3',18:'gen3-9',22:'gen0-9',23:'gen0-9',24:'gen1-9',26:'gen1-9',27:'gen1-9',28:'gen0-8',30:'gen0-7',31:'gen2-8',34:'gen2-4',35:'gen2-4',36:'gen0-8',37:'gen2-5',38:'gen2-6',39:'gen2-6',40:'gen2-7',42:'gen3-1',44:'gen3-4',45:'gen3-5',46:'gen3-7',47:'gen2-3',48:'gen3-2',49:'gen4-1'};
+const tileSprite:Record<number,string>={8:'gen0-5',11:'gen1-4',14:'gen1-2',16:'gen1-3',18:'gen3-9',22:'gen0-9',23:'gen0-9',24:'gen1-9',26:'gen1-9',27:'gen1-9',28:'gen0-8',30:'gen0-7',34:'gen2-4',35:'gen2-4',36:'gen0-8',37:'gen2-5',38:'gen2-6',39:'gen2-6',40:'gen2-7',42:'gen3-1',44:'gen3-4',45:'gen3-5',46:'gen3-7',47:'gen2-3',48:'gen3-2',49:'gen4-1'};
 export class LevelRenderer {
   assets:AssetManager; sprites:SpriteRenderer;
   constructor(assets:AssetManager,sprites:SpriteRenderer){this.assets=assets;this.sprites=sprites;}
@@ -21,6 +21,12 @@ export class LevelRenderer {
       const obj=level.objects[i];
       if(obj===4&&(sim?.checkpointOrder??-1)<=level.parameters[i])frame('cm-6',sim?.checkpoint===i?7:((tick>>1)%7),px,py);
       if(obj===5||obj===28)r.module(ctx,a.sprite('cm-0'),0,px,py);
+      if(obj===8||obj===9)r.module(ctx,a.sprite('gen2-8'),sim?.unlockedGates.has(i)?1:0,px,py,obj===8?1:0);
+      if(obj===7){
+        const phase=sim?.gatePhases[i]??0,frameNumber=Math.max(0,phase-1);
+        if(![8,9].includes(level.objects[i-level.width]))frame('cm-1',frameNumber,px,py);
+        frame('cm-1',frameNumber+3,px,py);
+      }
       if(sim?.entranceGate===i){frame('cm-1',2,px,py);frame('cm-1',5,px,py);}
     }
     const sparkle=((tick&63)>>1)<4?(tick&63)>>1:0;

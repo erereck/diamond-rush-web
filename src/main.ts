@@ -4,6 +4,8 @@ import { SpriteRenderer } from './render/SpriteRenderer.ts';
 import { LevelRenderer } from './render/LevelRenderer.ts';
 import { Clock } from './core/Clock.ts';
 import { Simulation } from './core/Simulation.ts';
+import type { StageStart } from './core/Simulation.ts';
+import { nextMainLevel } from './level/Progression.ts';
 import { Input } from './platform/Input.ts';
 import { MidiPreview, parseMidi } from './platform/Midi.ts';
 import { SESSION_KEY, validateReplay, restoreReplay } from './platform/Session.ts';
@@ -22,7 +24,14 @@ function updateLevels(){
   const w=Number(world.value);options(level,assets.worlds[w].levels.map(l=>({value:String(l.index),label:l.index===13&&w===0?'13 · Introdução':`${String(l.index).padStart(2,'0')} · ${l.width} × ${l.height}`})));inspectionDirty=true;updateLevelInfo();
 }
 function updateLevelInfo(){const l=selectedLevel();$('level-info').textContent=`${l.width} × ${l.height} células · ${l.tiles.filter(t=>t===1).length} diamantes · ${[...new Set(l.tiles.filter(t=>t<80))].length} tipos de objeto. Dados originais; simulação parcial.`;inspectionDirty=true;}
-function start(l=assets.worlds[0].levels[0]){simulation=new Simulation(l);paused=false;clock.reset();input.clear();lastError='';$('pause').textContent='Ⅱ';$('play').innerHTML='Reiniciar teste de Angkor <span>↻</span>';game.focus();}
+function start(l=assets.worlds[0].levels[0],initial?:StageStart){simulation=new Simulation(l,initial);paused=false;clock.reset();input.clear();lastError='';$('pause').textContent='Ⅱ';$('play').innerHTML='Recomeçar em Angkor <span>↻</span>';$('next-level').hidden=true;game.focus();saveSession();}
+function advanceLevel(){
+  const current=simulation;
+  if(!current||current.status!=='complete')return;
+  const next=nextMainLevel(current.level,assets.worlds,assets.maps);
+  if(!next)return;
+  start(next,{diamonds:current.diamonds,redDiamonds:current.redDiamonds,lives:current.lives,health:current.health});
+}
 function togglePause(){if(!simulation)return;paused=!paused;clock.reset();input.clear();$('pause').textContent=paused?'▷':'Ⅱ';saveSession();}
 function saveSession(){if(simulation){try{localStorage.setItem(SESSION_KEY,JSON.stringify(simulation.replay()));}catch{report('Não foi possível salvar a sessão neste navegador. Exporte uma cópia.');}}}
 function downloadBlob(name:string,blob:Blob){const url=URL.createObjectURL(blob);const a=document.createElement('a');a.href=url;a.download=name;a.click();setTimeout(()=>URL.revokeObjectURL(url),1000);}
@@ -37,6 +46,7 @@ function drawTitle(){
   $('game-status').textContent='Recursos originais carregados';
   if(!lastError)$('debug-info').textContent='Tela de abertura · nenhuma simulação em execução';
   $<HTMLButtonElement>('pause').disabled=true;$<HTMLButtonElement>('restart').disabled=true;
+  $('next-level').hidden=true;
 }
 function hudNumber(hud:ReturnType<AssetManager['sprite']>,value:number,right:number,top:number){
   if(value===0){sprites.module(ctx,hud,0,right-hud.modules[0].width,top);return;}
@@ -55,18 +65,19 @@ function drawGame(){
   for(let i=0;i<4;i++){sprites.module(ctx,hud,i<s.health?filled:empty,healthX,291);healthX+=hud.modules[15].width;}
   sprites.module(ctx,hud,low?18:17,healthX,291);
   hudNumber(hud,s.diamonds,190,308);hudNumber(hud,s.redDiamonds,227,308);
-  hudNumber(hud,s.lives,91,18);hudNumber(hud,0,167,18);hudNumber(hud,0,207,18);
+  hudNumber(hud,s.lives,91,18);hudNumber(hud,s.goldKeys,167,18);hudNumber(hud,s.silverKeys,207,18);
   if(paused||s.status!=='playing'){
     ctx.fillStyle='#000b';ctx.fillRect(0,96,240,115);
     text(s.status==='dead'?'GAME OVER':s.status==='complete'?'FASE CONCLUIDA':'PAUSADO',120,124,'center',1);
-    text(s.status==='playing'?'ESC PARA CONTINUAR':'R PARA REINICIAR',120,151,'center');
-    if(s.status==='complete')text('PROGRESSAO EM DESENVOLVIMENTO',120,177,'center');
+    text(s.status==='complete'?(nextMainLevel(s.level,assets.worlds,assets.maps)?'ENTER: PROXIMA FASE':'FIM DA ROTA PRINCIPAL'):s.status==='playing'?'ESC PARA CONTINUAR':'R PARA REINICIAR',120,151,'center');
+    if(s.status==='complete')text('ROTA PRINCIPAL EXPERIMENTAL',120,177,'center');
   }
   $('game-status').textContent=`${assets.strings[28+s.level.world]} / ${String(s.level.index+1).padStart(2,'0')} · ${paused?'pausado':'20 Hz'}`;
   $('pause').textContent=paused?'▷':'Ⅱ';
   $('pause').setAttribute('aria-label',paused?'Continuar':'Pausar');
   $<HTMLButtonElement>('pause').disabled=false;$<HTMLButtonElement>('restart').disabled=false;
-  if(!lastError)$('debug-info').textContent=`tick ${s.tick} · posição ${s.player.x}, ${s.player.y}\ncâmera ${s.camera.x}, ${s.camera.y} · vida ${s.health}/4\n${s.status} · ${s.diamonds} diamantes · ${s.redDiamonds} vermelhos`;
+  $('next-level').hidden=s.status!=='complete'||!nextMainLevel(s.level,assets.worlds,assets.maps);
+  if(!lastError)$('debug-info').textContent=`tick ${s.tick} · posição ${s.player.x}, ${s.player.y}\ncâmera ${s.camera.x}, ${s.camera.y} · vida ${s.health}/4\n${s.status} · ${s.diamonds} diamantes · ${s.redDiamonds} vermelhos · chaves ${s.goldKeys}/${s.silverKeys}`;
 }
 function showInspector(){inspectorVisible=true;$('inspector').hidden=false;inspectionDirty=true;drawInspector();$('inspector').scrollIntoView({behavior:'smooth',block:'start'});}
 function drawInspector(){
@@ -91,8 +102,8 @@ function drawInspector(){
 }
 function updateSprite(){const s=assets.sprite(sprite.value);options(palette,s.palettes.map((_,i)=>({value:String(i),label:`Paleta ${i}`})));$('sprite-info').textContent=`${s.modules.length} módulos · ${s.frames.length} frames · ${s.animations.length} animações`;inspectionDirty=true;}
 async function importFile(file:File|null){if(!file)return;try{const data=validateReplay(JSON.parse(await file.text()),assets.worlds);simulation=restoreReplay(data,assets.worlds);paused=true;clock.reset();lastError='';saveSession();}catch(e){report(String(e));}}
-input.onCommand=code=>{if(!ready)return;if(code==='Escape')togglePause();else if(code==='KeyR'&&simulation)start(simulation.level);else if(code==='Enter'&&!simulation)start();else if(code==='Period'&&simulation){paused=true;simulation.step({direction:0,action:false});}};
-$('play').onclick=()=>start();$('restart').onclick=()=>{if(simulation)start(simulation.level);};$('pause').onclick=togglePause;
+input.onCommand=code=>{if(!ready)return;if(code==='Escape')togglePause();else if(code==='KeyR'&&simulation)start(simulation.level,simulation.initial);else if(code==='Enter'&&simulation?.status==='complete')advanceLevel();else if(code==='Enter'&&!simulation)start();else if(code==='Period'&&simulation){paused=true;simulation.step({direction:0,action:false});}};
+$('play').onclick=()=>start();$('restart').onclick=()=>{if(simulation)start(simulation.level,simulation.initial);};$('next-level').onclick=advanceLevel;$('pause').onclick=togglePause;
 $('fullscreen').onclick=async()=>{try{if(document.fullscreenElement)await document.exitFullscreen();else await game.parentElement!.requestFullscreen();}catch(e){report(`Tela cheia não disponível: ${String(e)}`);}};
 world.onchange=updateLevels;level.onchange=updateLevelInfo;$('grid').onchange=()=>inspectionDirty=true;
 $('inspect').onclick=()=>{view='levels';showInspector();};$('test-level').onclick=()=>start(selectedLevel());

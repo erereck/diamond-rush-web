@@ -5,7 +5,8 @@ import { Clock } from '../src/core/Clock.ts';
 import { Camera } from '../src/core/Camera.ts';
 import { Simulation } from '../src/core/Simulation.ts';
 import type { Direction } from '../src/core/Simulation.ts';
-import { parseWorld } from '../src/level/LevelParser.ts';
+import { parseWorld, parseWorldMap } from '../src/level/LevelParser.ts';
+import { nextMainLevel } from '../src/level/Progression.ts';
 import type { LevelDefinition } from '../src/level/LevelParser.ts';
 import { validateReplay, restoreReplay } from '../src/platform/Session.ts';
 import { animationFrameAt, CHEST_OPEN_DURATIONS, fallingDrawOffset, fireReach } from '../src/core/PhaseOneRules.ts';
@@ -49,6 +50,54 @@ test('camera preserves original integer dead zones',()=>{
   c.update(-100,-100,26,21);assert.equal(c.x,0);assert.equal(c.y,0);
 });
 const worlds=[0,1,2].map(w=>parseWorld(readFileSync(new URL(`../../../work/reference-s700/res/w${w}.bin`,import.meta.url)),w));
+const maps=['angkor','scotland','tibet'].map(name=>parseWorldMap(readFileSync(new URL(`../../../work/reference-s700/res/map_${name}.out`,import.meta.url)),name));
+test('the normal route follows links in the original world maps',()=>{
+  assert.equal(nextMainLevel(worlds[0].levels[0],worlds,maps),worlds[0].levels[1]);
+  assert.equal(nextMainLevel(worlds[0].levels[7],worlds,maps),worlds[0].levels[8]);
+  assert.equal(nextMainLevel(worlds[0].levels[8],worlds,maps),worlds[1].levels[0]);
+  assert.equal(nextMainLevel(worlds[2].levels[10],worlds,maps),null);
+  assert.equal(nextMainLevel(worlds[0].levels[12],worlds,maps),null);
+});
+test('leaving an exit marks the stage complete for progression',()=>{
+  const level=fixture(['######','#@   #','######']);level.objects[8]=5;
+  const sim=new Simulation(level);step(sim,2,52);
+  assert.equal(sim.status,'complete');assert.ok(sim.events.includes('complete'));
+});
+test('later phase floor types follow the original walking collision cases',()=>{
+  for(const tile of [4,5,6,7,11,14,24,26,27,33,40,41,42,45,50,51,52,53]){
+    const level=fixture(['#####','#@  #','#####']);level.tiles[7]=tile;
+    const sim=new Simulation(level);step(sim,2);assert.equal(sim.player.x,2,`tile ${tile}`);
+  }
+  for(const tile of [3,28,30,31,49]){
+    const level=fixture(['#####','#@  #','#####']);level.tiles[7]=tile;
+    const sim=new Simulation(level);step(sim,2);assert.equal(sim.player.x,1,`tile ${tile}`);
+  }
+});
+test('closed map gate blocks entry until its opening phase reaches two',()=>{
+  const level=fixture(['#####','#@  #','#####']);level.objects[7]=7;level.parameters[7]=0;
+  const closed=new Simulation(level);step(closed,2);assert.equal(closed.player.x,1);
+  const open=new Simulation(level);open.gatePhases[7]=2;step(open,2);assert.equal(open.player.x,2);
+});
+test('both key colors unlock their numbered locks and open the matching gate',()=>{
+  for(const [keyTile,lockKind,counter] of [[4,9,'goldKeys'],[5,8,'silverKeys']] as const){
+  const level=fixture(['#######','#     #','#@    #','#     #','#######']);
+  const key=2+2*level.width,lock=3+level.width,gate=3+2*level.width;
+  level.tiles[key]=keyTile;level.tiles[lock]=31;level.objects[lock]=lockKind;level.parameters[lock]=0;
+  level.objects[gate]=7;level.parameters[gate]=0;
+  const sim=new Simulation(level);assert.equal(sim.gateCounts[gate],1);
+  step(sim,2,4);assert.equal(sim[counter],1);assert.equal(sim.tile(2,2),-1);
+  step(sim,2);assert.equal(sim.player.x,2);
+  step(sim,1,4);step(sim,0,8);
+  assert.equal(sim[counter],0);assert.ok(sim.unlockedGates.has(lock));assert.equal(sim.gatePhases[gate],3);
+  step(sim,3,4);step(sim,2);assert.equal(sim.player.x,3);
+  }
+});
+test('next phase replay preserves starting resources without replaying the previous map',()=>{
+  const initial={diamonds:21,redDiamonds:2,lives:3,health:2};
+  const sim=new Simulation(worlds[0].levels[1],initial);step(sim,2,8);
+  const restored=restoreReplay(validateReplay(sim.replay(),worlds),worlds);
+  assert.deepEqual(restored.snapshot(),sim.snapshot());assert.deepEqual(restored.initial,initial);
+});
 test('canonical level input replay reconstructs full deterministic state',()=>{
   const s=new Simulation(worlds[0].levels[0]);for(let i=0;i<400;i++)step(s,([0,2,1,4,3] as Direction[])[Math.floor(i/20)%5]);
   const replay=validateReplay(JSON.parse(JSON.stringify(s.replay())),worlds),restored=restoreReplay(replay,worlds);assert.deepEqual(s.snapshot(),restored.snapshot());

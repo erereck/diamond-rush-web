@@ -80,7 +80,7 @@ export class FrontEndRenderer {
       scene==='about'?['DIAMOND RUSH 1.2.0 S700','GAMELOFT','WEB PORT IN DEVELOPMENT']:
       scene==='more'?['CATALOG UNAVAILABLE','IN THE WEB PORT','BACK']:
       scene==='exit'?['YOU MAY CLOSE THIS TAB','BACK']:
-      confirmExit?['EXIT GAME?','ARE YOU SURE?','YES       NO']:['STARTING A NEW GAME','WILL DELETE YOUR PROGRESS.','ARE YOU SURE?','YES       NO'];
+      confirmExit?['EXIT GAME?','ARE YOU SURE?','YES       NO']:['START NEW GAME?','ERASE SAVED GAME?','ARE YOU SURE?','YES       NO'];
     lines.forEach((line,i)=>{
       if(scene==='confirm'&&i===lines.length-1){this.text(ctx,'YES',85,220+i*15,'center',selected===0?1:0);this.text(ctx,'NO',155,220+i*15,'center',selected===1?1:0);}
       else this.text(ctx,line,120,220+i*15,'center',scene==='options'&&i===selected?1:0);

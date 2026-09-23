@@ -146,7 +146,12 @@ export class Simulation {
       m-=6;
       if(m===0||m===12){if(s&1024)s=s&~56|(s+8)&56;else if(s&2048)s=s&~56|(s-8)&56;}
       this.motion[i]=m;
-      if(m===0&&dir===3){this.active[i]=30;if(t===0&&!this.free(x,y+1))this.events.push('boulder');if(!this.isPlayer(x,y+1))s&=~7;}
+      if(m===0&&dir===3){
+        this.active[i]=30;
+        if(t===0&&!this.free(x,y+1))this.events.push('boulder');
+        if(this.tile(x,y+1)===30)this.triggerBrick(x,y+1);
+        if(!this.isPlayer(x,y+1))s&=~7;
+      }
       this.state[i]=s;
     }else {
       const side=dir===4?-1:dir===2?1:0;
@@ -169,9 +174,9 @@ export class Simulation {
     // cGame.method_350 -> method_349 uses strict 24-pixel AABB overlap.
     return Math.abs(x*24-DX[dir]*m-px)<24&&Math.abs(y*24-DY[dir]*m-py)<24;
   }
-  /** Normal patrolling snake subset of method_325. Red snake pursuit remains unported. */
+  /** Shared method_325 patrol and boulder collision for ordinary and red snakes. */
   updateSnake(x:number,y:number){
-    const i=this.index(x,y);let s=this.state[i],dir=s&7,m=this.motion[i],tx=x,ty=y;
+    const i=this.index(x,y),kind=this.tiles[i];let s=this.state[i],dir=s&7,m=this.motion[i],tx=x,ty=y;
     const above=this.index(x,y-1);
     if(above>=0&&[0,1].includes(this.tiles[above])&&this.motion[above]<=6&&(this.state[above]&7)===3){this.tiles[i]=-1;this.enemySmoke.push({cell:i,age:0});this.events.push('enemy-death');this.wake(x,y);return;}
     if(m<=0){
@@ -179,9 +184,24 @@ export class Simulation {
       if(!dir){dir=(s&28672)>>12;m=21;s=s&~7|dir;if(this.enemyFree(x+DX[dir],y+DY[dir])){tx+=DX[dir];ty+=DY[dir];}else m=0;}
       else if(this.enemyFree(x+DX[dir],y+DY[dir])){m=21;tx+=DX[dir];ty+=DY[dir];}
       else {const reverse=[0,3,4,1,2][dir];s=s&~28672|(reverse<<12);s&=~7;dir=0;m=21;}
-      const dest=this.index(tx,ty);this.moveObject(i,dest,19,s,m);
+      const dest=this.index(tx,ty);this.moveObject(i,dest,kind,s,m);
     }else {m=Math.max(0,m-3);this.motion[i]=m;}
     if(this.overlap(tx,ty,dir,Math.max(0,m)))this.hurt(1,dir as Direction);
+  }
+  triggerBrick(x:number,y:number){
+    const i=this.index(x,y);
+    if(i<0||this.tiles[i]!==30||this.state[i]>0)return;
+    this.state[i]=1;this.active[i]=24;this.events.push('break');
+  }
+  /** cGame.method_329: a struck brick propagates to its neighbors at frame 4. */
+  updateBrick(x:number,y:number){
+    const i=this.index(x,y),age=this.state[i];if(age<=0)return;
+    if(age===4)for(const [dx,dy] of [[0,-1],[1,0],[0,1],[-1,0]]){
+      const j=this.index(x+dx,y+dy);
+      if(j>=0&&this.tiles[j]===30&&this.state[j]===0){this.state[j]=1;this.active[j]=24;}
+    }
+    if(age>=16){this.tiles[i]=-1;this.state[i]=0;this.wake(x,y);}
+    else {this.state[i]=age+1;this.active[i]=24;}
   }
   step(input:InputFrame){
     if(this.status!=='playing')return;
@@ -211,7 +231,8 @@ export class Simulation {
       for(let x=Math.max(1,this.player.x-8);x<=Math.min(this.level.width-2,this.player.x+8);x++){
         const i=this.index(x,y);if(this.active[i]<=0)continue;this.active[i]-=6;
         if(this.tiles[i]===0||this.tiles[i]===1)this.updateFalling(x,y);
-        else if(this.tiles[i]===19)this.updateSnake(x,y);
+        else if(this.tiles[i]===19||this.tiles[i]===43)this.updateSnake(x,y);
+        else if(this.tiles[i]===30)this.updateBrick(x,y);
         else if(this.tiles[i]===22||this.tiles[i]===23){
           this.active[i]=24;const side=this.tiles[i]===23?-1:1;
           if(this.player.y===y)for(let n=0;n<=fireReach(this.tick);n++)if(this.player.x===x+n*side)this.hurt(1);

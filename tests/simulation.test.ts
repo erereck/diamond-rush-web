@@ -17,8 +17,8 @@ import { LevelRenderer } from '../src/render/LevelRenderer.ts';
 import type { AssetManager } from '../src/assets/AssetManager.ts';
 import { introLines, stageCollectibleTotals, stageTitle } from '../src/core/OriginalText.ts';
 function fixture(rows:string[]):LevelDefinition{
-  const tiles=rows.flatMap(row=>[...row].map(c=>({'#':80,' ':255,'@':79,'O':0,'*':1,g:10,S:19} as Record<string,number>)[c]));
-  return {world:0,index:0,width:rows[0].length,height:rows.length,offset:0,tiles,parameters:tiles.map(t=>t===19?2:255),objects:tiles.map(()=>255)};
+  const tiles=rows.flatMap(row=>[...row].map(c=>({'#':80,' ':255,'@':79,'O':0,'*':1,g:10,S:19,V:43,B:30} as Record<string,number>)[c]));
+  return {world:0,index:0,width:rows[0].length,height:rows.length,offset:0,tiles,parameters:tiles.map(t=>t===19||t===43?2:255),objects:tiles.map(()=>255)};
 }
 const step=(s:Simulation,d:Direction=0,n=1)=>{for(let i=0;i<n;i++)s.step({direction:d,action:false});};
 test('display refresh rates do not alter 20 Hz simulation cadence',()=>{
@@ -196,6 +196,34 @@ test('a falling stone kills a snake and leaves the original smoke effect briefly
   assert.equal(sim.tiles[snake],-1);assert.deepEqual(sim.enemySmoke,[{cell:snake,age:0}]);
   step(sim,0,14);assert.deepEqual(sim.enemySmoke,[]);
 });
+test('red snakes patrol with the same cell movement and can be crushed',()=>{
+  const sim=new Simulation(fixture(['########','# @V   #','#      #','########']));
+  const from=sim.index(3,1),to=sim.index(4,1);
+  sim.step({direction:0,action:false});
+  assert.equal(sim.tiles[from],-1);
+  assert.equal(sim.tiles[to],43);
+  const stone=sim.index(4,0);sim.tiles[stone]=0;sim.state[stone]=3;sim.motion[stone]=6;
+  sim.updateSnake(4,1);
+  assert.equal(sim.tiles[to],-1);
+  assert.deepEqual(sim.enemySmoke,[{cell:to,age:0}]);
+});
+test('a falling boulder starts the original breakable-brick chain',()=>{
+  const sim=new Simulation(fixture(['########','#  O   #','#  BB  #','#  @   #','########']));
+  const stone=sim.index(3,1),first=sim.index(3,2),second=sim.index(4,2);
+  sim.state[stone]=3;sim.motion[stone]=6;sim.updateFalling(3,1);
+  assert.equal(sim.state[first],1);assert.equal(sim.state[second],0);
+  step(sim,0,25);
+  assert.notEqual(sim.tiles[first],30);assert.equal(sim.tiles[second],-1);
+});
+test('intact breakable bricks stay on their first frame until struck',()=>{
+  const frames:number[]=[],sprite=(id:string)=>({name:id,frames:Array(8).fill({}),animations:[{start:0,count:8}],animationFrames:Array(8).fill({frame:0,flags:0})});
+  const assets={sprite} as unknown as AssetManager;
+  const render=new LevelRenderer(assets,{module(){},animation(){},frame(_ctx:unknown,s:{name:string},n:number){if(s.name==='gen0-7')frames.push(n);}} as unknown as SpriteRenderer);
+  const map=fixture(['#####','#@B #','#####']);
+  render.draw({} as CanvasRenderingContext2D,map,0);
+  render.draw({} as CanvasRenderingContext2D,map,80);
+  assert.deepEqual(frames,[0,0]);
+});
 test('opening titles and collection totals come from the original S700 tables',()=>{
   assert.deepEqual(introLines,['The Great Temple Of Angkor Wat...',"I'm finally in!","Let's go!"]);
   const first=worlds[0].levels[0];assert.equal(stageTitle(Array.from({length:115},(_,i)=>`text${i}`),first),'text8');
@@ -250,11 +278,11 @@ test('the red prize rises above the hero after the chest reward frame',()=>{
   const level=fixture(['#####','#@  #','#####']);level.tiles[7]=2;level.objects[7]=33;
   const sim=new Simulation(level);step(sim,2,4);
   const fromPack=(name:string,index:number)=>decodeSprite(parsePack(readFileSync(new URL(`../../../work/reference-s700/res/${name}.f`,import.meta.url)),`${name}.f`)[index].data,`${name}-${index}`);
-  const hero=fromPack('o',0),chest=fromPack('gen3',3),draws:{id:string;frame:number;x:number;y:number;palette:number}[]=[];
+  const hero=fromPack('o',0),chest=fromPack('gen3',3),smallChest=fromPack('gen2',2),draws:{id:string;frame:number;x:number;y:number;palette:number}[]=[];
   const base=new SpriteRenderer();
   const spy={module(){},animation(){},animationFrame:base.animationFrame.bind(base),
     frame(_ctx:unknown,s:{name:string},frame:number,x:number,y:number,_flags=0,palette=0){draws.push({id:s.name,frame,x,y,palette});}} as unknown as SpriteRenderer;
-  const assets={sprite:(id:string)=>id==='o-0'?hero:id==='gen3-3'?chest:
+  const assets={sprite:(id:string)=>id==='o-0'?hero:id==='gen3-3'?chest:id==='gen2-2'?smallChest:
     {name:id,frames:Array.from({length:8},()=>({})),animations:[]}} as unknown as AssetManager;
   const renderer=new LevelRenderer(assets,spy),draw=(shownLevel=level,shownSim=sim)=>{
     draws.length=0;renderer.draw({} as CanvasRenderingContext2D,shownLevel,shownSim.tick,shownSim);
@@ -269,4 +297,9 @@ test('the red prize rises above the hero after the chest reward frame',()=>{
   const normal=new Simulation(normalLevel);step(normal,2,4);
   while(animationFrameAt(CHEST_OPEN_DURATIONS,normal.chestTicks,false)<=13)step(normal);
   assert.equal(draw(normalLevel,normal)[0].palette,0);
+  const compassLevel=fixture(['#####','#@  #','#####']);compassLevel.tiles[7]=42;compassLevel.objects[7]=14;
+  const compass=new Simulation(compassLevel);step(compass,2,4);
+  while(animationFrameAt(CHEST_OPEN_DURATIONS,compass.chestTicks,false)<=13)step(compass);
+  draws.length=0;renderer.draw({} as CanvasRenderingContext2D,compassLevel,compass.tick,compass);
+  assert.ok(draws.some(d=>d.id==='gen3-1'&&d.y===compass.player.y*24-24));
 });

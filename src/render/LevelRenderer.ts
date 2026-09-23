@@ -3,7 +3,7 @@ import type { LevelDefinition } from '../level/LevelParser.ts';
 import { SpriteRenderer } from './SpriteRenderer.ts';
 import type { Simulation } from '../core/Simulation.ts';
 import { animationFrameAt, CHEST_OPEN_DURATIONS, fallingDrawOffset } from '../core/PhaseOneRules.ts';
-const tileSprite:Record<number,string>={8:'gen0-5',11:'gen1-4',14:'gen1-2',16:'gen1-3',18:'gen3-9',22:'gen0-9',23:'gen0-9',24:'gen1-9',26:'gen1-9',27:'gen1-9',28:'gen0-8',30:'gen0-7',34:'gen2-4',35:'gen2-4',36:'gen0-8',37:'gen2-5',38:'gen2-6',39:'gen2-6',40:'gen2-7',42:'gen3-1',44:'gen3-4',45:'gen3-5',46:'gen3-7',47:'gen2-3',48:'gen3-2',49:'gen4-1'};
+const tileSprite:Record<number,string>={8:'gen0-5',11:'gen1-4',14:'gen1-2',16:'gen1-3',18:'gen3-9',22:'gen0-9',23:'gen0-9',24:'gen1-9',26:'gen1-9',27:'gen1-9',28:'gen0-8',34:'gen2-4',35:'gen2-4',36:'gen0-8',37:'gen2-5',38:'gen2-6',39:'gen2-6',40:'gen2-7',42:'gen3-1',44:'gen3-4',45:'gen3-5',46:'gen3-7',47:'gen2-3',48:'gen3-2',49:'gen4-1'};
 export class LevelRenderer {
   assets:AssetManager; sprites:SpriteRenderer;
   constructor(assets:AssetManager,sprites:SpriteRenderer){this.assets=assets;this.sprites=sprites;}
@@ -52,6 +52,7 @@ export class LevelRenderer {
         const id=w===1?'gen1-7':'gen1-5',direction=sim?((sim.state[i]&7)||((sim.state[i]&28672)>>12)):level.parameters[i];
         anim(id,w===1?0:Math.max(0,direction-1),px,py,t===43?1:w===2?2:0,0,tick>>1);
       } else if(t===6||t===7)r.module(ctx,a.sprite('cm-4'),t===6?0:1,px,py);
+      else if(t===30)frame('gen0-7',Math.min(7,Math.floor(Math.max(0,(sim?.state[i]??0)-1)*7/16)),px,py);
       else if(tileSprite[t]) {
         const id=tileSprite[t],s=a.sprite(id);
         if(s.animations.length)anim(id,0,px,py,0,0,t===16?0:tick);else if(s.frames.length)frame(id,0,px,py);else r.module(ctx,s,0,px,py);
@@ -72,6 +73,7 @@ export class LevelRenderer {
         if(sim.chestCell>=0&&sim.opened.has(sim.chestCell)&&animationFrameAt(CHEST_OPEN_DURATIONS,sim.chestTicks,false)>13){
           const prize=level.tiles[sim.chestCell],rx=p.x*24-p.dx*p.offset+af.x,ry=p.y*24-p.dy*p.offset+af.y-24;
           if(prize===2||prize===41)r.frame(ctx,a.sprite('cm-2'),0,rx,ry,0,prize===2?1:0);
+          else if(prize===42)r.frame(ctx,a.sprite('gen3-1'),0,rx,ry);
           else if(prize===4||prize===5)r.module(ctx,a.sprite('gen0-2'),0,rx+6,ry,0,prize===5?1:0);
           else if(prize===6||prize===7)r.module(ctx,a.sprite('cm-4'),prize===6?0:1,rx,ry);
         }

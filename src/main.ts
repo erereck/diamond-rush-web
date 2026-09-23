@@ -39,7 +39,7 @@ function updateLevels(){
 function updateLevelInfo(){const l=selectedLevel();$('level-info').textContent=`${l.width} × ${l.height} células · ${l.tiles.filter(t=>t===1).length} diamantes · ${[...new Set(l.tiles.filter(t=>t<80))].length} tipos de objeto. Dados originais; simulação parcial.`;inspectionDirty=true;}
 function saveCampaign(){if(campaign)try{localStorage.setItem(CAMPAIGN_KEY,JSON.stringify(campaign));}catch{report('Não foi possível salvar a campanha neste navegador.');}}
 function openMenu(){scene='menu';simulation=null;campaignStage=false;paused=false;audio.stop();input.clear();clock.reset();frontCooldown=0;menuSelected=campaign?1:0;}
-function startIntro(){scene='intro';intro=new IntroSequence(assets.worlds[0].levels[13],assets.demoScripts);input.clear();frontActionHeld=false;frontCooldown=0;game.focus();}
+function startIntro(){scene='intro';intro=new IntroSequence(assets.worlds[0].levels[13],assets.demoScripts);paused=false;input.clear();frontActionHeld=false;frontCooldown=0;game.focus();}
 function openMap(world=campaign?.world??0){if(!campaign)return;campaign.world=world;campaign.selected=assets.maps[world].find(n=>n.level===campaign!.selected&&unlockedNode(campaign!,world,n,assets.maps))?.level??0;scene='map';simulation=null;campaignStage=false;paused=false;input.clear();clock.reset();frontCooldown=0;saveCampaign();game.focus();}
 function start(l=assets.worlds[0].levels[0],initial?:StageStart,fromCampaign=false){simulation=new Simulation(l,initial);scene='playing';campaignStage=fromCampaign;paused=false;stageIntroTicks=60;results.reset();clock.reset();input.clear();lastError='';$('pause').textContent='Ⅱ';$('play').innerHTML='Abrir menu do jogo <span>→</span>';$('next-level').hidden=true;game.focus();saveSession();}
 function startSelected(){if(!campaign)return;const node=assets.maps[campaign.world].find(n=>n.level===campaign!.selected);if(!node||!unlockedNode(campaign,campaign.world,node,assets.maps))return;start(assets.worlds[campaign.world].levels[node.level],campaign.resources,true);}
@@ -64,6 +64,7 @@ function continueGameOver(){
   else start(s.level,resources);
 }
 function togglePause(){if(!simulation||simulation.status!=='playing')return;paused=!paused;clock.reset();input.clear();$('pause').textContent=paused?'▷':'Ⅱ';saveSession();}
+function toggleIntroPause(){if(scene!=='intro')return;paused=!paused;clock.reset();input.clear();frontActionHeld=false;$('pause').textContent=paused?'▷':'Ⅱ';}
 function saveSession(){if(simulation){try{localStorage.setItem(SESSION_KEY,JSON.stringify(simulation.replay()));}catch{report('Não foi possível salvar a sessão neste navegador. Exporte uma cópia.');}}}
 function downloadBlob(name:string,blob:Blob){const url=URL.createObjectURL(blob);const a=document.createElement('a');a.href=url;a.download=name;a.click();setTimeout(()=>URL.revokeObjectURL(url),1000);}
 function download(name:string,data:unknown){downloadBlob(name,new Blob([JSON.stringify(data)],{type:'application/json'}));}
@@ -72,9 +73,6 @@ function drawIntro(){
   ctx.fillStyle='#000';ctx.fillRect(0,0,240,320);
   ctx.save();ctx.beginPath();ctx.rect(0,42,240,236);ctx.clip();ctx.translate(-sequence.cameraX,42-sequence.cameraY);
   renderer.draw(ctx,sim.level,sequence.tick,sim);
-  if(sim.chestCell===sim.index(28,6)&&sim.opened.has(sim.chestCell)){
-    const prize=assets.sprite('gen3-1');if(prize.frames.length)sprites.frame(ctx,prize,0,28*24,6*24-20);
-  }
   ctx.restore();
   if(sequence.portraitVisible){
     const x=sequence.portraitX,y=sequence.portraitY;
@@ -90,9 +88,13 @@ function drawIntro(){
     if((sequence.tick>>2)%2===0){ctx.fillStyle='#f3d276';ctx.beginPath();ctx.moveTo(x+211,y+height-11);ctx.lineTo(x+219,y+height-11);ctx.lineTo(x+215,y+height-7);ctx.fill();}
   }
   if(sequence.flash){ctx.fillStyle=sequence.flashColor;ctx.fillRect(0,0,240,320);}
+  if(paused){ctx.fillStyle='#000c';ctx.fillRect(0,97,240,110);text('PAUSADO',120,126,'center',1);text('TOQUE PARA SEGUIR',120,154,'center');}
   text(assets.strings[53],5,315);
-  $('game-status').textContent=`Introdução de Angkor · ${dialogue?'toque para continuar':sequence.phase==='free'?'explore livremente':`cena ${sequence.scriptId??'final'}`}`;
-  $<HTMLButtonElement>('pause').disabled=true;$<HTMLButtonElement>('restart').disabled=true;$('next-level').hidden=true;
+  $('game-status').textContent=`Introdução de Angkor · ${paused?'pausada':dialogue?'toque para continuar':sequence.phase==='free'?'explore livremente':`cena ${sequence.scriptId??'final'}`}`;
+  $('pause').textContent=paused?'▷':'Ⅱ';
+  $('pause').setAttribute('aria-label',paused?'Continuar introdução':'Pausar introdução');
+  $('restart').setAttribute('aria-label','Voltar ao círculo da introdução');
+  $<HTMLButtonElement>('pause').disabled=false;$<HTMLButtonElement>('restart').disabled=paused||sequence.phase!=='free';$('next-level').hidden=true;
 }
 function drawResult(s:Simulation){
   const phase=results.phase,ticks=results.ticks;
@@ -231,6 +233,7 @@ function enterFront(){
 function stepFront(){
   if(scene==='intro'){
     const frame=input.read();
+    if(paused)return;
     if(frame.action&&!frontActionHeld)intro?.press();
     intro?.step(frame);frontActionHeld=frame.action;
     if(intro?.finished)openMap();
@@ -242,7 +245,7 @@ function stepFront(){
   if(frame.action&&!frontActionHeld){enterFront();frontCooldown=5;}
   frontActionHeld=frame.action;
 }
-input.onCommand=code=>{if(!ready)return;if(scene!=='playing'){if(code==='Escape')backFront();return;}
+input.onCommand=code=>{if(!ready)return;if(scene==='intro'){if(code==='Escape')toggleIntroPause();return;}if(scene!=='playing'){if(code==='Escape')backFront();return;}
   if(code==='Escape')togglePause();else if(code==='KeyR'&&simulation?.status==='dead')continueGameOver();
   else if(code==='KeyR'&&simulation?.status==='playing'){paused=false;clock.reset();}
   else if(code==='Enter'&&simulation?.status==='complete')advanceLevel();
@@ -250,14 +253,14 @@ input.onCommand=code=>{if(!ready)return;if(scene!=='playing'){if(code==='Escape'
   else if(code==='Period'&&simulation){paused=true;simulation.step({direction:0,action:false});}};
 document.querySelectorAll<HTMLButtonElement>('[data-command]').forEach(button=>button.onclick=()=>{
   if(touchControls.editing)return;
-  if(button.dataset.command==='pause'){if(scene==='playing')togglePause();else if(scene!=='menu')backFront();}
+  if(button.dataset.command==='pause'){if(scene==='playing')togglePause();else if(scene==='intro')toggleIntroPause();else if(scene!=='menu')backFront();}
   else if(scene==='playing'){if(paused){if(campaignStage&&campaign)openMap(simulation?.level.world);else openMenu();}else togglePause();}
   else backFront();
 });
 game.addEventListener('pointerup',event=>{
   if(!ready||scene==='playing')return;
   const rect=game.getBoundingClientRect(),x=(event.clientX-rect.left)*240/rect.width,y=(event.clientY-rect.top)*320/rect.height;
-  if(scene==='intro'){if(y>300&&x<75)backFront();else enterFront();return;}
+  if(scene==='intro'){if(paused)toggleIntroPause();else if(y>300&&x<75)backFront();else enterFront();return;}
   if(y>303&&x<26){backFront();return;}
   if(scene==='menu'){
     const items=MENU_ITEMS.filter(id=>id!==1||!!campaign),top=campaign?190:205,row=Math.floor((y-top+2)/15);
@@ -272,7 +275,7 @@ game.addEventListener('pointerup',event=>{
     if(y>240){pageSelected=x<120?0:1;enterFront();}
   }else if(scene==='options'){pageSelected=y>235?1:0;enterFront();}else backFront();
 });
-$('play').onclick=()=>openMenu();$('restart').onclick=()=>{if(simulation?.status==='dead')continueGameOver();else if(simulation?.status==='playing'){paused=false;input.queueReset();clock.reset();}};$('next-level').onclick=advanceLevel;$('pause').onclick=togglePause;
+$('play').onclick=()=>openMenu();$('restart').onclick=()=>{if(scene==='intro'&&intro?.phase==='free'&&!paused){input.queueReset();clock.reset();}else if(simulation?.status==='dead')continueGameOver();else if(simulation?.status==='playing'){paused=false;input.queueReset();clock.reset();}};$('next-level').onclick=advanceLevel;$('pause').onclick=()=>{if(scene==='intro')toggleIntroPause();else togglePause();};
 $('fullscreen').onclick=async()=>{try{if(document.fullscreenElement)await document.exitFullscreen();else await $('game').closest('.player-panel')!.requestFullscreen();}catch(e){report(`Tela cheia não disponível: ${String(e)}`);}};
 world.onchange=updateLevels;level.onchange=updateLevelInfo;$('grid').onchange=()=>inspectionDirty=true;
 $('inspect').onclick=()=>{view='levels';showInspector();};$('test-level').onclick=()=>start(selectedLevel());

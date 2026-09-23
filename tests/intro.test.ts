@@ -98,3 +98,18 @@ test('scripted steps use the normal collision and movement state',()=>{
   assert.equal(intro.sim.player.offset,0);
   assert.equal(intro.sim.tiles[intro.sim.index(30,7)],-1);
 });
+
+test('lethal damage during a scene interrupts it and returns to the checkpoint',()=>{
+  const intro=new IntroSequence(level,scripts);
+  walkTo(intro,6,4);
+  for(let i=0;i<10;i++)intro.step();
+  assert.equal(intro.phase,'script');
+  intro.sim.hurt(4);
+  for(let i=0;i<20&&intro.phase==='script';i++)intro.step();
+  assert.equal(intro.phase,'free');
+  for(let i=0;i<200&&(intro.sim.deathTicks>0||intro.sim.respawnTravel);i++)intro.step();
+  assert.equal(intro.sim.player.x,5);
+  assert.equal(intro.sim.player.y,4);
+  assert.equal(intro.sim.health,4);
+  assert.equal(intro.sim.lives,4);
+});

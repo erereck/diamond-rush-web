@@ -22,7 +22,7 @@ O jogo abre no menu S700. Escolha **New Game** para assistir à abertura de Angk
 
 No **Laboratório de preservação** é possível:
 
-- Inspecionar os 41 mapas e abrir qualquer um na simulação parcial.
+- Inspecionar os 41 mapas e abrir qualquer um na simulação parcial, escolhendo o equipamento inicial para testar martelo, gancho ou martelo de gelo sem alterar a campanha.
 - Ver os frames e paletas dos 98 recursos de sprites, incluindo os três da abertura.
 - Ouvir as 21 faixas MIDI com timbres de prévia.
 - Pausar, avançar um tick e exportar/importar replays de desenvolvimento.

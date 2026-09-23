@@ -279,7 +279,11 @@ game.addEventListener('pointerup',event=>{
 $('play').onclick=()=>openMenu();$('restart').onclick=()=>{if(scene==='intro'&&intro?.phase==='free'&&!paused){input.queueReset();clock.reset();}else if(simulation?.status==='dead')continueGameOver();else if(simulation?.status==='playing'){paused=false;input.queueReset();clock.reset();}};$('next-level').onclick=advanceLevel;$('pause').onclick=()=>{if(scene==='intro')toggleIntroPause();else togglePause();};
 $('fullscreen').onclick=async()=>{try{if(document.fullscreenElement)await document.exitFullscreen();else await $('game').closest('.player-panel')!.requestFullscreen();}catch(e){report(`Tela cheia não disponível: ${String(e)}`);}};
 world.onchange=updateLevels;level.onchange=updateLevelInfo;$('grid').onchange=()=>inspectionDirty=true;
-$('inspect').onclick=()=>{view='levels';showInspector();};$('test-level').onclick=()=>start(selectedLevel());
+$('inspect').onclick=()=>{view='levels';showInspector();};
+$('test-level').onclick=()=>start(selectedLevel(),{
+  diamonds:0,redDiamonds:0,lives:5,health:4,
+  weaponTier:Number($<HTMLSelectElement>('test-weapon').value) as 0|1|2|8,
+});
 sprite.onchange=()=>{updateSprite();showInspector();};palette.onchange=()=>inspectionDirty=true;
 $('close-inspector').onclick=()=>{inspectorVisible=false;$('inspector').hidden=true;};
 document.querySelectorAll<HTMLButtonElement>('[data-view]').forEach(button=>button.onclick=()=>{

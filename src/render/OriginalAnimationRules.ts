@@ -32,3 +32,26 @@ export function snakeVisual(world:number,state:number,tick:number,animationCount
   const animation=world===1?(stunned?2:0):stunned?4:Math.max(0,(direction||((state&28672)>>12))-1);
   return {animation,frame:(world===1?tick:tick>>1)%Math.max(1,animationCount)};
 }
+
+/** cGame.method_197 paints Bavaria's six pre-rendered explosive images. */
+export function scotlandExplosiveVisual(state:number,motion:number,tick:number) {
+  const phase=(state&3840)>>8;
+  if(phase>=4)return null;
+  const direction=state&7,reverse=(state&16)!==0;
+  let x=motion*([0,0,-1,0,1][direction]??0)+2;
+  let y=motion*([0,1,0,-1,0][direction]??0)+2;
+  const wobble=reverse?-4:4;
+  if(direction===1)x+=wobble;
+  else if(direction===2)y+=wobble;
+  else if(direction===3)x-=wobble;
+  else if(direction===4)y-=wobble;
+  return {module:phase===0?(tick>>1)%3:phase+2,x,y};
+}
+
+/** cGame.method_155: the upper half of Tibet's sliding gate is invisible. */
+export function tibetSliderVisual(state:number,motion:number) {
+  if(state&8)return null;
+  const direction=state&7,opening=(state&16)===0;
+  const frame=(opening&&direction===2)||(!opening&&direction===4)?2:opening?1:0;
+  return {frame,x:motion*([0,0,-1,0,1][direction]??0),y:motion*([0,1,0,-1,0][direction]??0)};
+}

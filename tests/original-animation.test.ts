@@ -2,7 +2,7 @@ import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
 import type { DecodedSprite } from '../src/assets/SpriteDecoder.ts';
-import { crusherFrameIndex, rollingStoneVisual, snakeVisual, sourceFrameForElapsed } from '../src/render/OriginalAnimationRules.ts';
+import { crusherFrameIndex, rollingStoneVisual, scotlandExplosiveVisual, snakeVisual, sourceFrameForElapsed, tibetSliderVisual } from '../src/render/OriginalAnimationRules.ts';
 
 const sprite=(id:string)=>JSON.parse(readFileSync(new URL(`../public/assets/${id}.json`,import.meta.url),'utf8')) as DecodedSprite;
 
@@ -57,4 +57,20 @@ test('Tibetan plant and gear phases use source duration boundaries and AF offset
   const full=durations.reduce((n,d)=>n+d,0);
   assert.equal(sourceFrameForElapsed(durations,full+1,true),0);
   assert.equal(sourceFrameForElapsed(durations,full,true),durations.length-1);
+});
+
+test('Bavaria explosive cycles six canonical images and mirrors its wobble',()=>{
+  assert.equal(sprite('gen1-4').modules.length,6);
+  assert.deepEqual(scotlandExplosiveVisual(2,12,4),{module:2,x:-10,y:6});
+  assert.deepEqual(scotlandExplosiveVisual(2|16,12,4),{module:2,x:-10,y:-2});
+  assert.deepEqual(scotlandExplosiveVisual(3<<8,0,4),{module:5,x:2,y:2});
+  assert.equal(scotlandExplosiveVisual(4<<8,0,4),null);
+});
+
+test('Tibet slider hides its upper half and switches the three source frames',()=>{
+  assert.equal(sprite('gen3-2').frames.length,3);
+  assert.deepEqual(tibetSliderVisual(0,0),{frame:1,x:0,y:0});
+  assert.deepEqual(tibetSliderVisual(2,12),{frame:2,x:-12,y:0});
+  assert.deepEqual(tibetSliderVisual(4|16,12),{frame:2,x:12,y:0});
+  assert.equal(tibetSliderVisual(8,0),null);
 });

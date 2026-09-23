@@ -4,7 +4,7 @@ import { SpriteRenderer } from './SpriteRenderer.ts';
 import type { Simulation } from '../core/Simulation.ts';
 import { animationFrameAt, CHEST_OPEN_DURATIONS, fallingDrawOffset } from '../core/PhaseOneRules.ts';
 import { spikeExtension, spikeReach } from '../core/LaterStageRules.ts';
-import { crusherFrameIndex, rollingStoneVisual, snakeVisual, sourceFrameForElapsed } from './OriginalAnimationRules.ts';
+import { crusherFrameIndex, rollingStoneVisual, scotlandExplosiveVisual, snakeVisual, sourceFrameForElapsed, tibetSliderVisual } from './OriginalAnimationRules.ts';
 const tileSprite:Record<number,string>={8:'gen0-5',11:'gen1-4',14:'gen1-2',16:'gen1-3',18:'gen3-9',22:'gen0-9',23:'gen0-9',28:'gen1-1',34:'gen2-4',35:'gen2-4',36:'gen0-8',37:'gen2-5',38:'gen2-6',39:'gen2-6',40:'gen2-7',42:'gen3-1',44:'gen3-4',45:'gen3-5',46:'gen3-7',47:'gen2-3',48:'gen3-2',49:'gen4-1'};
 export class LevelRenderer {
   assets:AssetManager; sprites:SpriteRenderer;
@@ -64,6 +64,9 @@ export class LevelRenderer {
           const af=sprite.animationFrames[animation.start+snakeVisual(w,state,tick,animation.count).frame];
           frame(id,af.frame,px,py,t===43?1:w===2?2:0,af.flags);
         }
+      } else if(t===11){
+        const visual=scotlandExplosiveVisual(sim?.state[i]??level.parameters[i],motion,tick);
+        if(visual)r.module(ctx,a.sprite('gen1-4'),visual.module,x*24+visual.x,y*24+visual.y);
       } else if(t===6||t===7)r.module(ctx,a.sprite('cm-4'),t===6?0:1,px,py);
       else if(t===30)frame('gen0-7',Math.min(7,Math.floor(Math.max(0,(sim?.state[i]??0)-1)*7/16)),px,py);
       else if(t===28){
@@ -114,6 +117,20 @@ export class LevelRenderer {
           r.module(ctx,sprite,visual.dust.module,x*24+visual.dust.x,y*24+visual.dust.y-dustModule.height);
         }
         r.module(ctx,sprite,visual.body,x*24+visual.x,y*24+visual.y);
+      }
+      else if(t===48){
+        const visual=tibetSliderVisual(sim?.state[i]??level.parameters[i],motion);
+        if(visual)frame('gen3-2',visual.frame,x*24+visual.x,y*24+visual.y);
+      }
+      else if(t===49){
+        const state=sim?.state[i]??level.parameters[i],direction=state&7,previous=(state&28672)>>12;
+        const horizontal=[2,4].includes(previous)||[2,4].includes(direction),vertical=[1,3].includes(previous)||[1,3].includes(direction);
+        const blockedHorizontal=horizontal&&x>0&&x<level.width-1&&tile(i-1)>=0&&tile(i+1)>=0;
+        const blockedVertical=vertical&&y>0&&y<level.height-1&&tile(i-level.width)>=0&&tile(i+level.width)>=0;
+        const animationId=blockedHorizontal||blockedVertical?1:[1,3].includes(direction)?direction-1:0;
+        const sprite=a.sprite('gen4-1'),animation=sprite.animations[animationId];
+        if(animation){const af=sprite.animationFrames[animation.start+(blockedHorizontal||blockedVertical?0:(tick>>1)%animation.count)];
+          frame('gen4-1',af.frame,px,py,0,af.flags);}
       }
       else if(tileSprite[t]) {
         const id=tileSprite[t],s=a.sprite(id);

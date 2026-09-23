@@ -16,15 +16,17 @@ import type { Campaign } from './core/Campaign.ts';
 import { FrontEndRenderer, MENU_ITEMS } from './render/FrontEndRenderer.ts';
 import type { FrontScene } from './render/FrontEndRenderer.ts';
 import { introLines, stageCollectibleTotals, stageTitle, worldTitle } from './core/OriginalText.ts';
+import { LevelResults } from './core/LevelResults.ts';
 const $=<T extends HTMLElement>(id:string)=>document.getElementById(id) as T;
 const game=$<HTMLCanvasElement>('game'), ctx=game.getContext('2d')!, inspection=$<HTMLCanvasElement>('inspection'), ic=inspection.getContext('2d')!;
 ctx.imageSmoothingEnabled=false;ic.imageSmoothingEnabled=false;
 const assets=new AssetManager(), sprites=new SpriteRenderer(), renderer=new LevelRenderer(assets,sprites),clock=new Clock(),input=new Input(game),audio=new MidiPreview();
 const front=new FrontEndRenderer(assets,sprites);
 const touchControls=new MobileControls(input);
+const results=new LevelResults();
 let simulation:Simulation|null=null,paused=false,ready=false,sceneTick=0,view:'levels'|'sprites'|'audio'='levels',inspectionDirty=true,inspectorVisible=false,lastError='';
 let scene:FrontScene|'playing'|'intro'='menu',campaign:Campaign|null=null,menuSelected=0,sealSelected=0,pageSelected=0,soundEnabled=true,campaignStage=false,confirmExit=false,frontCooldown=0,frontActionHeld=false;
-let introPage=0,introTick=0,stageIntroTicks=0,resultPhase=0;
+let introPage=-1,introTick=0,introSimulation:Simulation|null=null,introWalkPixels=0,stageIntroTicks=0;
 const world=$<HTMLSelectElement>('world'),level=$<HTMLSelectElement>('level'),sprite=$<HTMLSelectElement>('sprite'),palette=$<HTMLSelectElement>('palette');
 const selectedLevel=()=>assets.worlds[Number(world.value)].levels[Number(level.value)];
 const text=(s:string,x:number,y:number,align:'left'|'center'|'right'='left',pal=0)=>sprites.text(ctx,assets.sprite('ui-1'),assets.fontMap,s,x,y,align,pal);
@@ -36,9 +38,9 @@ function updateLevels(){
 function updateLevelInfo(){const l=selectedLevel();$('level-info').textContent=`${l.width} × ${l.height} células · ${l.tiles.filter(t=>t===1).length} diamantes · ${[...new Set(l.tiles.filter(t=>t<80))].length} tipos de objeto. Dados originais; simulação parcial.`;inspectionDirty=true;}
 function saveCampaign(){if(campaign)try{localStorage.setItem(CAMPAIGN_KEY,JSON.stringify(campaign));}catch{report('Não foi possível salvar a campanha neste navegador.');}}
 function openMenu(){scene='menu';simulation=null;campaignStage=false;paused=false;audio.stop();input.clear();clock.reset();frontCooldown=0;menuSelected=campaign?1:0;}
-function startIntro(){scene='intro';introPage=0;introTick=0;input.clear();frontActionHeld=false;frontCooldown=0;game.focus();}
+function startIntro(){scene='intro';introPage=-1;introTick=0;introSimulation=new Simulation(assets.worlds[0].levels[13]);introWalkPixels=introSimulation.player.x*24;input.clear();frontActionHeld=false;frontCooldown=0;game.focus();}
 function openMap(world=campaign?.world??0){if(!campaign)return;campaign.world=world;campaign.selected=assets.maps[world].find(n=>n.level===campaign!.selected&&unlockedNode(campaign!,world,n,assets.maps))?.level??0;scene='map';simulation=null;campaignStage=false;paused=false;input.clear();clock.reset();frontCooldown=0;saveCampaign();game.focus();}
-function start(l=assets.worlds[0].levels[0],initial?:StageStart,fromCampaign=false){simulation=new Simulation(l,initial);scene='playing';campaignStage=fromCampaign;paused=false;stageIntroTicks=60;resultPhase=0;clock.reset();input.clear();lastError='';$('pause').textContent='Ⅱ';$('play').innerHTML='Abrir menu do jogo <span>→</span>';$('next-level').hidden=true;game.focus();saveSession();}
+function start(l=assets.worlds[0].levels[0],initial?:StageStart,fromCampaign=false){simulation=new Simulation(l,initial);scene='playing';campaignStage=fromCampaign;paused=false;stageIntroTicks=60;results.reset();clock.reset();input.clear();lastError='';$('pause').textContent='Ⅱ';$('play').innerHTML='Abrir menu do jogo <span>→</span>';$('next-level').hidden=true;game.focus();saveSession();}
 function startSelected(){if(!campaign)return;const node=assets.maps[campaign.world].find(n=>n.level===campaign!.selected);if(!node||!unlockedNode(campaign,campaign.world,node,assets.maps))return;start(assets.worlds[campaign.world].levels[node.level],campaign.resources,true);}
 function completionBonus(s:Simulation){
   const totals=stageCollectibleTotals(s.level);
@@ -48,10 +50,10 @@ function completeCampaignStage(){const s=simulation;if(!s||!campaign||s.status!=
 function advanceLevel(){
   const current=simulation;
   if(!current||current.status!=='complete')return;
-  if(resultPhase<5){resultPhase++;return;}
+  if(!results.press())return;
   if(campaignStage){completeCampaignStage();return;}
   const next=nextMainLevel(current.level,assets.worlds,assets.maps);
-  if(!next)return;
+  if(!next){openMenu();return;}
   start(next,{diamonds:current.diamonds,redDiamonds:current.redDiamonds,lives:Math.min(99,current.lives+completionBonus(current)),health:current.health});
 }
 function continueGameOver(){
@@ -66,32 +68,40 @@ function downloadBlob(name:string,blob:Blob){const url=URL.createObjectURL(blob)
 function download(name:string,data:unknown){downloadBlob(name,new Blob([JSON.stringify(data)],{type:'application/json'}));}
 function drawIntro(){
   const level=assets.worlds[0].levels[13];ctx.fillStyle='#000';ctx.fillRect(0,0,240,320);
-  ctx.save();ctx.beginPath();ctx.rect(0,42,240,236);ctx.clip();ctx.translate(-Math.min(36,introTick*2),42);
-  renderer.draw(ctx,level,introTick);ctx.restore();
-  sprites.animation(ctx,assets.sprite('demo-sprite-2'),0,introTick,17,50);
-  sprites.frame(ctx,assets.sprite('demo-sprite-0'),[2,1,3][introPage],17,50);
-  ctx.fillStyle='#2e2818';ctx.fillRect(7,90,226,38);ctx.strokeStyle='#c4a05b';ctx.strokeRect(7.5,90.5,225,37);
-  const lines=introPage===0?['The Great Temple','Of Angkor Wat...']:[introLines[introPage]];
-  lines.forEach((line,i)=>text(line,10,94+i*15));
-  text(assets.strings[53],5,315);text(`${introPage+1}/3`,231,315,'right');
+  const sim=introSimulation!,walk=Math.min(introTick*6,introWalkPixels),cell=Math.ceil(walk/24);
+  sim.player.x=cell;sim.player.y=4;sim.player.dx=1;sim.player.dy=0;sim.player.offset=cell*24-walk;sim.player.direction=2;
+  sim.playerAnimation=introPage<0?5:1;sim.animationTick=introTick;
+  ctx.save();ctx.beginPath();ctx.rect(0,42,240,236);ctx.clip();ctx.translate(-Math.max(0,Math.min(36,walk-108)),42);
+  renderer.draw(ctx,level,introTick,sim);ctx.restore();
+  if(introPage>=0){
+    sprites.animation(ctx,assets.sprite('demo-sprite-2'),0,introTick,17,50);
+    sprites.frame(ctx,assets.sprite('demo-sprite-0'),[2,1,3][introPage],17,50);
+    ctx.fillStyle='#2e2818';ctx.fillRect(7,90,226,38);ctx.strokeStyle='#c4a05b';ctx.strokeRect(7.5,90.5,225,37);
+    const lines=introPage===0?['The Great Temple','Of Angkor Wat...']:[introLines[introPage]];
+    lines.forEach((line,i)=>text(line,10,94+i*15));
+  }
+  text(assets.strings[53],5,315);if(introPage>=0)text(`${introPage+1}/3`,231,315,'right');
   $('game-status').textContent='Introdução original de Angkor Wat · toque para continuar';
   $<HTMLButtonElement>('pause').disabled=true;$<HTMLButtonElement>('restart').disabled=true;$('next-level').hidden=true;
 }
 function drawResult(s:Simulation){
+  const phase=results.phase,ticks=results.ticks;
   const totals=stageCollectibleTotals(s.level),collectedDiamonds=Math.max(0,s.diamonds-s.initial.diamonds),collectedRed=Math.max(0,s.redDiamonds-s.initial.redDiamonds);
   ctx.fillStyle='#261707';ctx.fillRect(0,0,240,320);
-  text(stageTitle(assets.strings,s.level),120,10,'center');text(assets.strings[41],120,25,'center');
-  const rows:[string,string,()=>void,boolean][]=[
-    [assets.strings[109],`${collectedDiamonds}/${totals.diamonds}`,()=>sprites.frame(ctx,assets.sprite('cm-2'),0,7,69),collectedDiamonds>=totals.diamonds],
-    [assets.strings[114],`${collectedRed}/${totals.redDiamonds}`,()=>sprites.frame(ctx,assets.sprite('cm-2'),0,7,127,0,1),collectedRed>=totals.redDiamonds],
-    [assets.strings[43],String(s.hits),()=>sprites.animation(ctx,assets.sprite('o-0'),10,0,7,189),s.hits===0],
-    [assets.strings[44],String(s.retries),()=>sprites.animation(ctx,assets.sprite('o-0'),12,0,7,243),s.retries===0]
+  const titleSlide=phase===0?Math.min(0,-100+ticks*10):0;
+  text(stageTitle(assets.strings,s.level),120+titleSlide,10,'center');text(assets.strings[41],120+(phase===0?Math.min(0,-340+ticks*10):0),25,'center');
+  const awardAvailable=!campaignStage||!campaign?.completed[s.level.world].includes(s.level.index);
+  const rows:[string,string,(x:number)=>void,boolean][]=[
+    [assets.strings[109],`${phase===1?Math.min(collectedDiamonds,ticks>>1):collectedDiamonds}/${totals.diamonds}`,x=>sprites.frame(ctx,assets.sprite('cm-2'),0,x,69),collectedDiamonds>=totals.diamonds],
+    [assets.strings[114],`${collectedRed}/${totals.redDiamonds}`,x=>sprites.frame(ctx,assets.sprite('cm-2'),0,x,127,0,1),collectedRed>=totals.redDiamonds],
+    [assets.strings[43],String(s.hits),x=>sprites.animation(ctx,assets.sprite('o-0'),10,0,x,189),s.hits===0],
+    [assets.strings[44],String(s.retries),x=>sprites.animation(ctx,assets.sprite('o-0'),12,0,x,243),s.retries===0]
   ];
-  rows.forEach(([label,value,icon,perfect],i)=>{if(resultPhase<=i)return;const y=69+i*58;icon();text(label,120,y,'center');text(value,120,y+12,'center');if(perfect&&resultPhase===5)sprites.module(ctx,assets.sprite('cm-4'),0,200,y+5);});
-  text(assets.strings[resultPhase===5?98:53],5,318);
-  $('game-status').textContent=`${stageTitle(assets.strings,s.level)} · conclusão ${resultPhase}/5`;
+  rows.forEach(([label,value,icon,perfect],i)=>{if(phase<=i)return;const y=69+i*58,slide=phase===i+1?Math.min(0,-100+ticks*10):0;icon(7+slide);text(label,120,y,'center');text(value,120,y+12,'center');if(awardAvailable&&perfect&&phase>i+1){sprites.module(ctx,assets.sprite('ui-4'),0,180,y+11);sprites.module(ctx,assets.sprite('cm-4'),0,200,y-6);}});
+  text(assets.strings[phase===5?98:53],5,318);
+  $('game-status').textContent=`${stageTitle(assets.strings,s.level)} · conclusão ${phase}/5`;
   $<HTMLButtonElement>('pause').disabled=true;$<HTMLButtonElement>('restart').disabled=true;
-  $('next-level').hidden=false;$('next-level').textContent=resultPhase===5?(campaignStage?'Mapa →':'Próxima →'):'Continuar →';
+  $('next-level').hidden=false;$('next-level').textContent=phase===5?(campaignStage?'Mapa →':'Próxima →'):'Pular animação →';
 }
 function drawFront(){
   if(scene==='intro'){drawIntro();return;}
@@ -191,7 +201,10 @@ function moveFront(direction:number){
   else if(scene==='confirm'&&(direction===2||direction===4))pageSelected=1-pageSelected;
 }
 function enterFront(){
-  if(scene==='intro'){if(++introPage>=introLines.length)openMap();return;}
+  if(scene==='intro'){
+    if(introPage<0){introTick=Math.ceil(introWalkPixels/6);introPage=0;return;}
+    if(++introPage>=introLines.length)openMap();return;
+  }
   if(scene==='menu'){
     if(menuSelected===0){if(campaign){scene='confirm';confirmExit=false;pageSelected=1;}else{campaign=newCampaign();saveCampaign();startIntro();}}
     else if(menuSelected===1&&campaign)openMap();
@@ -209,7 +222,10 @@ function enterFront(){
   }else backFront();
 }
 function stepFront(){
-  if(scene==='intro')introTick++;
+  if(scene==='intro'){
+    introTick++;
+    if(introPage<0&&introTick*6>=introWalkPixels)introPage=0;
+  }
   const frame=input.read();
   if(frontCooldown>0)frontCooldown--;
   if(frame.direction&&frontCooldown===0){moveFront(frame.direction);frontCooldown=4;}
@@ -305,7 +321,11 @@ async function boot(){
     try{const stored=localStorage.getItem(CAMPAIGN_KEY);if(stored)campaign=validateCampaign(JSON.parse(stored),assets.maps);}catch{localStorage.removeItem(CAMPAIGN_KEY);}
     menuSelected=campaign?1:0;
     function frame(time:number){
-      try{clock.advance(time,()=>{sceneTick++;if(scene==='playing'&&simulation&&!paused){simulation.step(input.read());if(stageIntroTicks>0)stageIntroTicks--;}else if(scene!=='playing')stepFront();});drawGame();drawInspector();}
+      try{clock.advance(time,()=>{sceneTick++;if(scene==='playing'&&simulation&&!paused){
+        if(simulation.status==='complete')results.step(Math.max(0,simulation.diamonds-simulation.initial.diamonds));
+        else simulation.step(input.read());
+        if(stageIntroTicks>0)stageIntroTicks--;
+      }else if(scene!=='playing')stepFront();});drawGame();drawInspector();}
       catch(e){paused=true;report(`Falha de execução: ${String(e)}`);console.error(e);return;}
       requestAnimationFrame(frame);
     }

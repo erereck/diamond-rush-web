@@ -5,7 +5,8 @@ import { animationFrameAt, BOULDER_BRACE_TICKS, BOULDER_PRESSURE_TICKS, CHEST_OP
 import { spikeExtension, spikeReach } from './LaterStageRules.ts';
 export type Direction=0|1|2|3|4;
 export const DX=[0,0,1,0,-1], DY=[0,-1,0,1,0];
-export interface InputFrame {direction:Direction;action:boolean;reset?:boolean}
+export interface DemoEdit {cell:number;object?:number;parameter?:number;state?:number}
+export interface InputFrame {direction:Direction;action:boolean;reset?:boolean;demoEdits?:DemoEdit[]}
 export interface StageStart {diamonds:number;redDiamonds:number;lives:number;health:number;weaponTier?:0|1|2|8}
 export interface Replay {version:3;target:'1.2.0-s700';engine:typeof ENGINE_REVISION;levelFingerprint:string;world:number;level:number;initial:StageStart;inputs:InputFrame[]}
 /** Tile cases which set var15=true in cGame.method_288. */
@@ -36,10 +37,13 @@ export class Simulation {
   permanentPickups=new Set<number>();
   pendingDirection:Direction=0;private actionHeld=false;private lastInputDirection:Direction=0;entranceGate=-1;
   readonly initial:StageStart;
+  readonly initialLevelFingerprint:string;
   constructor(level:LevelDefinition,initial:StageStart={diamonds:0,redDiamonds:0,lives:5,health:4}){
+    this.initialLevelFingerprint=levelFingerprint(level);
     this.initial={...initial};this.diamonds=initial.diamonds;this.redDiamonds=initial.redDiamonds;
     this.lives=initial.lives;this.health=initial.health;this.weaponTier=initial.weaponTier??0;
-    this.level=level;this.tiles=Int16Array.from(level.tiles,t=>t===255?-1:t);this.state=new Int32Array(this.tiles.length);
+    this.level={...level,tiles:[...level.tiles],parameters:[...level.parameters],objects:[...level.objects]};
+    this.tiles=Int16Array.from(level.tiles,t=>t===255?-1:t);this.state=new Int32Array(this.tiles.length);
     this.motion=new Int16Array(this.tiles.length);this.active=new Int16Array(this.tiles.length);
     this.chestFrames=new Int16Array(this.tiles.length);this.frozenKinds=new Int16Array(this.tiles.length).fill(-1);
     this.gatePhases=new Int16Array(this.tiles.length);this.gateCounts=new Int16Array(this.tiles.length);
@@ -88,6 +92,13 @@ export class Simulation {
     this.captureCheckpoint();
   }
   index(x:number,y:number){return x<0||y<0||x>=this.level.width||y>=this.level.height?-1:x+y*this.level.width;}
+  applyDemoEdit(edit:DemoEdit,record=false){
+    if(edit.cell<0||edit.cell>=this.tiles.length)return;
+    if(edit.object!==undefined)this.level.objects[edit.cell]=edit.object;
+    if(edit.parameter!==undefined)this.level.parameters[edit.cell]=edit.parameter;
+    if(edit.state!==undefined)this.state[edit.cell]=edit.state;
+    if(record&&this.inputs.length)(this.inputs[this.inputs.length-1].demoEdits??=[]).push({...edit});
+  }
   tile(x:number,y:number){const i=this.index(x,y);return i<0?80:this.tiles[i];}
   object(x:number,y:number){const i=this.index(x,y);return i<0?255:i===this.entranceGate?7:this.level.objects[i];}
   isPlayer(x:number,y:number){return this.player.x===x&&this.player.y===y;}
@@ -488,8 +499,9 @@ export class Simulation {
         else if(reward===41){const amount=this.level.parameters[this.chestCell];this.diamonds+=amount===255?1:Math.max(1,amount);}
         else if(reward===24||reward===27||reward===26){
           this.weaponTier=reward===24?Math.max(this.weaponTier,1) as 1|2|8:reward===27?Math.max(this.weaponTier,2) as 2|8:8;
-          this.permanentEquipmentChests.add(this.chestCell);this.events.push('weapon');
+          this.permanentEquipmentChests.add(this.chestCell);this.events.push('weapon',`demo:${reward===24?22:reward===27?23:25}`);
         }
+        else if(reward===40)this.events.push('demo:24');
         this.events.push('chest-reward');
       }
       if(this.chestTicks>=CHEST_OPEN_DURATIONS.reduce((a,b)=>a+b,0)){this.chestCell=-1;this.setAnimation(p.direction-1);}
@@ -563,6 +575,6 @@ export class Simulation {
     if(this.health===4){this.diamonds+=10;this.bonusDiamondTotal+=10;this.events.push('diamond');}
     else {this.health=4;this.events.push('health');}
   }
-  replay():Replay{return {version:3,target:'1.2.0-s700',engine:ENGINE_REVISION,levelFingerprint:levelFingerprint(this.level),world:this.level.world,level:this.level.index,initial:{...this.initial},inputs:this.inputs.map(i=>({...i}))};}
+  replay():Replay{return {version:3,target:'1.2.0-s700',engine:ENGINE_REVISION,levelFingerprint:this.initialLevelFingerprint,world:this.level.world,level:this.level.index,initial:{...this.initial},inputs:this.inputs.map(i=>({...i,demoEdits:i.demoEdits?.map(edit=>({...edit}))}))};}
   snapshot(){return {tick:this.tick,player:{...this.player},camera:{x:this.camera.x,y:this.camera.y},tiles:[...this.tiles],state:[...this.state],motion:[...this.motion],active:[...this.active],objects:[...this.level.objects],parameters:[...this.level.parameters],frozenKinds:[...this.frozenKinds],diamonds:this.diamonds,bonusDiamondTotal:this.bonusDiamondTotal,redDiamonds:this.redDiamonds,goldKeys:this.goldKeys,silverKeys:this.silverKeys,gatePhases:[...this.gatePhases],gateCounts:[...this.gateCounts],unlockedGates:[...this.unlockedGates],permanentPickups:[...this.permanentPickups],permanentEquipmentChests:[...this.permanentEquipmentChests],weaponTier:this.weaponTier,attackTicks:this.attackTicks,pendingHammer:this.pendingHammer?{...this.pendingHammer}:null,hook:this.hook?{...this.hook}:null,health:this.health,invulnerable:this.invulnerable,status:this.status,playerAnimation:this.playerAnimation,animationTick:this.animationTick,pushDelay:this.pushDelay,checkpoint:this.checkpoint,checkpointOrder:this.checkpointOrder,opened:[...this.opened],chestFrames:[...this.chestFrames],chestCell:this.chestCell,chestTicks:this.chestTicks,lives:this.lives,hurtTicks:this.hurtTicks,deathTicks:this.deathTicks,respawnTravel:this.respawnTravel,respawnFlash:this.respawnFlash,respawnTarget:{...this.respawnTarget},exitDirection:this.exitDirection,exitObject:this.exitObject,stonePressure:this.stonePressure,pendingDirection:this.pendingDirection,lastInputDirection:this.lastInputDirection,actionHeld:this.actionHeld,entranceGate:this.entranceGate,enemySmoke:this.enemySmoke.map(s=>({...s})),hits:this.hits,retries:this.retries,savedCheckpoint:structuredClone(this.savedCheckpoint)};}
 }

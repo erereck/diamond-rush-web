@@ -5,7 +5,7 @@ Referência: versão S700 1.2.0 do [Diamond-Rush-Decomp](https://github.com/pala
 | Sistema | Evidência e verificação atual | Limite de paridade |
 |---|---|---|
 | Recursos, mapas e texto | `npm run audit`, 41 níveis, 98 sprites, 21 MIDI; parsers e testes de dados canônicos | Há objetos decodificados que ainda não têm regra de jogo |
-| Menu, mapa e introdução | Recursos S700, links dos três mapas, seis roteiros de `demo.f` na abertura; fluxo menu → diálogo visto no navegador | Regras completas de desbloqueio e demais roteiros não portados |
+| Menu, mapa e cenas | Recursos S700, links dos três mapas, seis roteiros da abertura, dois retornos ao círculo, oito gatilhos nas fases e quatro eventos de baú de `demo.f`; diálogo da câmara final de Angkor visto no navegador | Seis roteiros sem gatilho ativo nesta versão; tempos e enquadramento ainda sem comparação quadro a quadro |
 | Movimento e colisão | Casos transitáveis de `cGame.method_288`, relógio de 20 Hz, câmera, empurrão, queda e animação esquerda/rolagem cobertos por testes | Sem trace por tick contra o executável J2ME |
 | Coleta e baús | `method_321/322`: recompensa específica do baú; cura do chão com vida cheia rende dez diamantes e aumenta o total da fase; vida extra no limite de 99 segue a mesma conversão | Momento exato da animação de coleta precisa de trace |
 | Inimigos, fogo e armas | Colisões e efeitos principais das cobras, fogo, martelo, gancho e gelo têm testes de cenário; o martelo acerta no frame 2 da animação 13–16 de `o.f`, como em `cGame.method_260` | Alvos especiais, água, chefes e parte dos puzzles permanecem parciais |

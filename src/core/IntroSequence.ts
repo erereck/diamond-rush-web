@@ -2,6 +2,7 @@ import type { LevelDefinition } from '../level/LevelParser.ts';
 import { Simulation } from './Simulation.ts';
 import type { Direction, InputFrame } from './Simulation.ts';
 import type { DemoCommand, DemoScript } from './DemoScript.ts';
+import type { DecodedSprite } from '../assets/SpriteDecoder.ts';
 
 interface RunningCommand {
   command:DemoCommand;ticks:number;startX:number;startY:number;page:number;children?:RunningCommand[];done?:boolean;
@@ -14,6 +15,28 @@ export function wrapDemoText(value:string,maxCharacters:number):string[]{
     else line+=(line?' ':'')+word;
   }
   if(line)lines.push(line);return lines;
+}
+export function demoFontWidth(font:DecodedSprite,map:Uint8Array,value:string){
+  const spacing=font.frameModules[0].x;
+  return [...value].reduce((total,char)=>{
+    if(char===' ')return total+font.modules[0].width+spacing;
+    const n=map[char.charCodeAt(0)]??map[63];
+    if(n>=font.frames[0].count){const r=font.frames[n-font.frames[0].count].rect;return total+r[2]-(r[0]&255)+spacing;}
+    const fm=font.frameModules[n];return total+font.modules[fm.module].width-fm.x+spacing;
+  },-spacing);
+}
+export function wrapDemoTextPixels(value:string,maxWidth:number,font:DecodedSprite,map:Uint8Array){
+  const lines:string[]=[];
+  for(const paragraph of value.trim().split('\n')){
+    let line='';
+    for(const word of paragraph.trim().split(/\s+/)){
+      const candidate=line?`${line} ${word}`:word;
+      if(line&&demoFontWidth(font,map,candidate)>maxWidth){lines.push(line);line=word;}
+      else line=candidate;
+    }
+    if(line)lines.push(line);
+  }
+  return lines;
 }
 const STOPS=[
   {id:29,x:6,y:4}, // first encounter and three opening lines
@@ -28,25 +51,30 @@ const NO_INPUT:InputFrame={direction:0,action:false};
 /** Playable S700 tutorial: free movement between the original demo.f scripts. */
 export class IntroSequence {
   readonly sim:Simulation;readonly scripts:Map<number,DemoScript>;
+  readonly stops:readonly {id:number;x:number;y:number}[];readonly standalone:boolean;
+  readonly font?:DecodedSprite;readonly fontMap?:Uint8Array;
   section=0;phase:'free'|'script'|'done'='free';
   commandIndex=0;active:RunningCommand|null=null;tick=0;
   cameraX=0;cameraY=0;
   portraitVisible=false;portraitFrame=2;portraitSprite=2;portraitX=17;portraitY=50;portraitRevealTicks=0;blinkFrame=-1;flashColor='#fff';flash=false;
   private pressed=false;
-  constructor(level:LevelDefinition,scripts:Map<number,DemoScript>){
-    for(const stop of STOPS)if(!scripts.has(stop.id))throw new Error(`Missing original intro script ${stop.id}`);
+  private auxiliaryScriptId:number|null=null;private recoveryAfterReset:number|null=null;
+  constructor(level:LevelDefinition,scripts:Map<number,DemoScript>,sim?:Simulation,scriptId?:number,font?:DecodedSprite,fontMap?:Uint8Array){
+    this.standalone=scriptId!==undefined;
+    this.stops=this.standalone?[{id:scriptId!,x:0,y:0}]:STOPS;
+    for(const stop of this.stops)if(!scripts.has(stop.id))throw new Error(`Missing original demo script ${stop.id}`);
     const copy={...level,tiles:[...level.tiles],parameters:[...level.parameters],objects:[...level.objects]};
-    this.sim=new Simulation(copy);this.scripts=scripts;this.followHero();
+    this.sim=sim??new Simulation(copy);this.scripts=scripts;this.font=font;this.fontMap=fontMap;this.phase=this.standalone?'script':'free';this.followHero();
   }
   get heroX(){const p=this.sim.player;return p.x*24-p.dx*p.offset;}
   get heroY(){const p=this.sim.player;return p.y*24-p.dy*p.offset;}
-  get scriptId(){return this.phase==='script'?STOPS[this.section].id:null;}
+  get scriptId(){return this.phase==='script'?(this.auxiliaryScriptId??this.stops[this.section].id):null;}
   get finished(){return this.phase==='done';}
   get commandTick(){return this.active?.ticks??0;}
   get dialogue():{lines:string[];popup:boolean;slide:number}|null{
     const running=this.findDialogue(this.active);
     if(!running)return null;
-    const popup=running.command.opcode===27,lines=wrapDemoText(running.command.text??'',popup?23:18);
+    const popup=running.command.opcode===27,lines=this.wrap(running.command.text??'',popup);
     return {lines:lines.slice(running.page,running.page+(popup?2:running.command.args[0])),popup,slide:Math.min(0,-240+running.ticks*30)};
   }
   private findDialogue(r:RunningCommand|null):RunningCommand|null{
@@ -63,17 +91,22 @@ export class IntroSequence {
   step(input:InputFrame=NO_INPUT){
     if(this.phase==='done')return;
     if(this.phase==='free'){
+      if(input.reset)this.recoveryAfterReset=this.recoveryAtPlayer()??this.recoveryAfterReset;
       this.sim.step(input);this.tick=this.sim.tick;this.followHero();
+      if(this.sim.deathTicks>0)this.recoveryAfterReset=this.recoveryAtPlayer()??this.recoveryAfterReset;
       if(this.sim.status==='dead'){
         this.sim.lives=5;this.sim.status='playing';this.sim.restoreCheckpoint(true,true);
       }
-      if(this.section>=STOPS.length){
+      if(this.recoveryAfterReset!==null&&this.sim.events.includes('respawn')){
+        this.auxiliaryScriptId=this.recoveryAfterReset;this.recoveryAfterReset=null;this.startScript();return;
+      }
+      if(this.section>=this.stops.length){
         if(this.atSealExit())this.phase='done';
       }else if(this.atTrigger())this.startScript();
       return;
     }
     if(this.phase!=='script')return;
-    const commands=this.scripts.get(STOPS[this.section].id)!.commands;
+    const commands=this.scripts.get(this.scriptId!)!.commands;
     if(!this.active){
       if(this.commandIndex>=commands.length){this.nextSection();return;}
       this.active=this.running(commands[this.commandIndex]);
@@ -83,26 +116,36 @@ export class IntroSequence {
     this.sim.step({direction,action:false});this.tick=this.sim.tick;
     if(direction)this.followHero();
     if(this.sim.deathTicks>0||this.sim.status==='dead'){
-      this.phase='free';this.active=null;this.portraitVisible=false;this.portraitRevealTicks=0;this.pressed=false;
+      this.recoveryAfterReset=this.recoveryAtPlayer()??this.recoveryAfterReset;
+      this.phase=this.standalone?'done':'free';this.active=null;this.portraitVisible=false;this.portraitRevealTicks=0;this.pressed=false;
       return;
     }
     if(this.sim.hurtTicks>0||this.sim.respawnTravel)return;
     if(this.stepCommand(this.active)){this.active=null;this.commandIndex++;}
   }
+  private wrap(value:string,popup:boolean){
+    return this.font&&this.fontMap?wrapDemoTextPixels(value,popup?196:222,this.font,this.fontMap):wrapDemoText(value,popup?23:18);
+  }
   private atTrigger(){
     if(this.sim.status!=='playing'||this.sim.player.offset!==0||this.sim.chestCell>=0)return false;
-    const stop=STOPS[this.section],i=this.sim.index(stop.x,stop.y);
+    const stop=this.stops[this.section],i=this.sim.index(stop.x,stop.y);
     if(this.section===2)return this.sim.opened.has(i);
     return this.sim.player.x===stop.x&&this.sim.player.y===stop.y;
   }
   private atSealExit(){return [60,61].includes(this.sim.player.x)&&this.sim.player.y===3&&this.sim.player.offset===0;}
+  private recoveryAtPlayer(){
+    const i=this.sim.index(this.sim.player.x,this.sim.player.y);
+    if(i<0||this.sim.level.objects[i]!==0)return null;
+    return this.sim.level.parameters[i]===13?15:this.sim.level.parameters[i]===16?17:null;
+  }
   private startScript(){
     this.phase='script';this.commandIndex=0;this.active=null;this.pressed=false;
     this.sim.pendingDirection=0;
   }
   private nextSection(){
+    if(this.auxiliaryScriptId!==null){this.auxiliaryScriptId=null;this.commandIndex=0;this.active=null;this.phase='free';this.followHero();return;}
     this.section++;
-    if(this.section>=STOPS.length){this.phase=this.atSealExit()?'done':'free';this.flash=false;return;}
+    if(this.section>=this.stops.length){this.phase=this.standalone||this.atSealExit()?'done':'free';this.flash=false;return;}
     this.commandIndex=0;this.active=null;this.portraitVisible=false;this.portraitRevealTicks=0;this.blinkFrame=-1;
     this.phase='free';this.followHero();
     if(this.atTrigger())this.startScript();
@@ -133,7 +176,7 @@ export class IntroSequence {
       if(this.pressed){
         this.pressed=false;
         if(r.ticks<8){r.ticks=8;return false;}
-        const lines=wrapDemoText(r.command.text??'',opcode===27?23:18),perPage=opcode===27?2:args[0];
+        const lines=this.wrap(r.command.text??'',opcode===27),perPage=opcode===27?2:args[0];
         if(r.page+perPage<lines.length){r.page+=perPage;return false;}
         return true;
       }
@@ -171,10 +214,10 @@ export class IntroSequence {
       return false;
     }
     if(opcode===25){
-      const i=this.sim.index(args[0],args[1]);if(i>=0){this.sim.level.objects[i]=args[2];this.sim.level.parameters[i]=args[3];}
+      const i=this.sim.index(args[0],args[1]);if(i>=0)this.sim.applyDemoEdit({cell:i,object:args[2],parameter:args[3]},this.standalone);
       return true;
     }
-    if(opcode===26){const i=this.sim.index(args[0],args[1]);if(i>=0)this.sim.state[i]=args[2];return true;}
+    if(opcode===26){const i=this.sim.index(args[0],args[1]);if(i>=0)this.sim.applyDemoEdit({cell:i,state:args[2]},this.standalone);return true;}
     // Resource edits and animation overlays not used in the Angkor introduction.
     return true;
   }

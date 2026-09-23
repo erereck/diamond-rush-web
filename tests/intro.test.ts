@@ -147,3 +147,20 @@ test('portrait reveal and hint flash follow the source command phases',()=>{
   intro.step();assert.equal(intro.flash,true);
   intro.step();assert.equal(intro.flash,false);
 });
+
+test('the two original recovery demos run after resetting from the blocked-path lessons',()=>{
+  for(const [marker,section,recovery] of [[13,4,15],[16,5,17]]){
+    const intro=new IntroSequence(level,scripts);
+    intro.section=section;
+    const i=level.parameters.findIndex((p,j)=>p===marker&&level.objects[j]===0);
+    assert(i>=0);
+    intro.sim.player.x=i%level.width;intro.sim.player.y=Math.floor(i/level.width);
+    intro.step({direction:0,action:false,reset:true});
+    for(let tick=0;tick<300&&intro.scriptId!==recovery;tick++)intro.step();
+    assert.equal(intro.scriptId,recovery);
+    if(recovery===17)assert.match(intro.scripts.get(17)!.commands[0].text!,/cost you a life/);
+    finishScript(intro,new Set());
+    assert.equal(intro.section,section);
+    assert.equal(intro.phase,'free');
+  }
+});

@@ -141,6 +141,13 @@ export class LevelRenderer {
         ctx.fillStyle='#ed489d';ctx.fillRect(px,py,24,24);ctx.fillStyle='#100719';ctx.font='10px monospace';ctx.fillText(String(t),px+2,py+15);
       }
     }
+    if(sim?.boss){
+      const boss=sim.boss;
+      if(boss.visible)anim('b0-0',boss.animation,boss.x*24,boss.drawY,0,0,boss.animationAge);
+      if(boss.phase===11)anim('gen1-0',2,(boss.x+1)*24,96,0,0,boss.age);
+      if(boss.phase===7)anim('gen0-3',1,boss.x*24+tick*boss.age%48,boss.drawY,0,0,tick);
+      for(const x of [10,12,15])frame('b0-1',1,x*24,216);
+    }
     if(sim)for(const smoke of sim.enemySmoke)r.animation(ctx,a.sprite('cm-3'),0,Math.min(6,smoke.age>>1),(smoke.cell%level.width)*24,Math.floor(smoke.cell/level.width)*24);
     if(sim?.hook){
       const p=sim.player,h=sim.hook;
@@ -160,6 +167,7 @@ export class LevelRenderer {
           else if(prize===24||prize===27||prize===26)r.module(ctx,a.sprite('gen1-9'),prize===24?0:prize===27?1:2,rx,ry);
           else if(prize===4||prize===5)r.module(ctx,a.sprite('gen0-2'),0,rx+6,ry,0,prize===5?1:0);
           else if(prize===6||prize===7)r.module(ctx,a.sprite('cm-4'),prize===6?0:1,rx,ry);
+          else if(prize===51||prize===52||prize===53)r.module(ctx,a.sprite(`mmv-${prize===53?3:prize===51?2:1}`),0,rx,ry);
         }
       }
       if(sim.respawnFlash>0){

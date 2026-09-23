@@ -172,6 +172,10 @@ function drawGame(){
   ctx.save();ctx.beginPath();ctx.rect(0,40,240,240);ctx.clip();ctx.translate(-s.camera.x,40-s.camera.y);renderer.draw(ctx,s.level,s.tick,s);ctx.restore();
   const hud=assets.sprite('ui-2');sprites.frame(ctx,hud,0,120,320);sprites.frame(ctx,hud,1,120,320);
   sprites.frame(ctx,hud,20,120,0);
+  if(s.boss&&s.boss.phase!==0&&s.boss.phase!==8&&s.boss.health>0){
+    const left=(240-44)/2;ctx.fillStyle='#000';ctx.fillRect(left,5,44,12);
+    ctx.fillStyle='#3bb78f';for(let i=0;i<s.boss.health;i++)ctx.fillRect(left+2+i*14,7,12,8);
+  }
   const low=s.health<=1,cap=low?12:11,empty=low?14:13,filled=low?16:15;
   let healthX=87;sprites.module(ctx,hud,cap,healthX,291);healthX+=hud.modules[cap].width;
   for(let i=0;i<4;i++){sprites.module(ctx,hud,i<s.health?filled:empty,healthX,291);healthX+=hud.modules[15].width;}

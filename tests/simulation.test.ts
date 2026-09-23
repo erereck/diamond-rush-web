@@ -347,11 +347,20 @@ test('an equipment chest stays open when its upgrade was saved before reentering
 
 test('the hammer starts brick destruction and stuns a neighboring snake',()=>{
   const bricks=new Simulation(fixture(['#######','#@BB  #','#######']),{diamonds:0,redDiamonds:0,lives:5,health:4,weaponTier:1});
-  bricks.step({direction:0,action:true});assert.equal(bricks.state[bricks.index(2,1)],1);
+  bricks.step({direction:0,action:true});assert.equal(bricks.playerAnimation,14);assert.equal(bricks.state[bricks.index(2,1)],0);
+  step(bricks,0,2);assert.equal(bricks.state[bricks.index(2,1)],0);
+  step(bricks);assert.equal(bricks.state[bricks.index(2,1)],1);
   step(bricks,0,25);assert.equal(bricks.tile(2,1),-1);assert.equal(bricks.tile(3,1),-1);
   const snake=new Simulation(fixture(['######','#@S###','######']),{diamonds:0,redDiamonds:0,lives:5,health:4,weaponTier:1});
-  snake.step({direction:0,action:true});assert.equal(snake.state[snake.index(2,1)]&248,120);
+  snake.step({direction:0,action:true});step(snake,0,3);assert.equal(snake.state[snake.index(2,1)]&248,120);
   step(snake,0,10);assert.equal(snake.tile(2,1),19);
+});
+test('the hammer bounces off a boulder only when its striking frame lands',()=>{
+  const sim=new Simulation(fixture(['#####','#@O##','#####']),{diamonds:0,redDiamonds:0,lives:5,health:4,weaponTier:1});
+  sim.step({direction:0,action:true});assert.equal(sim.playerAnimation,14);
+  step(sim,0,2);assert.equal(sim.playerAnimation,14);
+  step(sim);assert.equal(sim.playerAnimation,42);assert.ok(sim.events.includes('hammer-block'));
+  step(sim,0,16);assert.equal(sim.playerAnimation,1);assert.equal(sim.tile(2,1),0);
 });
 
 test('the hook pulls a distant boulder to the cell beside the hero',()=>{
@@ -373,14 +382,15 @@ test('the hook can bring a red diamond and a frozen block closer',()=>{
 
 test('the ice hammer freezes a snake and another blow thaws it',()=>{
   const sim=new Simulation(fixture(['######','#@S###','######']),{diamonds:0,redDiamonds:0,lives:5,health:4,weaponTier:8});
-  sim.step({direction:0,action:true});assert.equal(sim.tile(2,1),9);assert.equal(sim.frozenKinds[sim.index(2,1)],19);
-  step(sim,0,8);sim.step({direction:0,action:true});assert.equal(sim.tile(2,1),19);
+  sim.step({direction:0,action:true});step(sim,0,3);assert.equal(sim.tile(2,1),9);assert.equal(sim.frozenKinds[sim.index(2,1)],19);
+  step(sim,0,9);sim.step({direction:0,action:true});step(sim,0,3);assert.equal(sim.tile(2,1),19);
   assert.equal(sim.frozenKinds[sim.index(2,1)],-1);assert.equal(sim.state[sim.index(2,1)]&248,120);
 });
 
 test('action aims the hammer at a neighboring brick and the hook to either side',()=>{
   const hammer=new Simulation(fixture(['#####','# B #','# @ #','#####']),{diamonds:0,redDiamonds:0,lives:5,health:4,weaponTier:1});
-  hammer.step({direction:0,action:true});assert.equal(hammer.player.direction,1);assert.equal(hammer.state[hammer.index(2,1)],1);
+  hammer.step({direction:0,action:true});assert.equal(hammer.player.direction,1);assert.equal(hammer.playerAnimation,13);
+  step(hammer,0,3);assert.equal(hammer.state[hammer.index(2,1)],1);
   const hook=new Simulation(fixture(['########','# O @  #','########']),{diamonds:0,redDiamonds:0,lives:5,health:4,weaponTier:2});
   hook.step({direction:0,action:true});assert.equal(hook.player.direction,4);assert.equal(hook.hook?.x,2);
   step(hook,0,12);assert.equal(hook.tile(3,1),0);
@@ -388,8 +398,8 @@ test('action aims the hammer at a neighboring brick and the hook to either side'
 
 test('the ice hammer freezes diamonds, and red snakes pursue after their stun',()=>{
   const ice=new Simulation(fixture(['######','#@*###','######']),{diamonds:0,redDiamonds:0,lives:5,health:4,weaponTier:8});
-  ice.step({direction:0,action:true});assert.equal(ice.tile(2,1),9);
-  step(ice,0,8);ice.step({direction:0,action:true});assert.equal(ice.tile(2,1),1);
+  ice.step({direction:0,action:true});step(ice,0,3);assert.equal(ice.tile(2,1),9);
+  step(ice,0,9);ice.step({direction:0,action:true});step(ice,0,3);assert.equal(ice.tile(2,1),1);
   const red=new Simulation(fixture(['########','#@  V  #','########']));
   const at=red.index(4,1);red.state[at]=3072;red.motion[at]=0;
   step(red);assert.equal(red.tile(3,1),43);assert.equal(red.state[red.index(3,1)]&3840,2816);
@@ -398,7 +408,7 @@ test('the ice hammer freezes diamonds, and red snakes pursue after their stun',(
 test('a frozen diamond falls with its original kind attached',()=>{
   const sim=new Simulation(fixture(['#######','#@*   #','# B   #','#######']),
     {diamonds:0,redDiamonds:0,lives:5,health:4,weaponTier:8});
-  sim.step({direction:0,action:true});assert.equal(sim.tile(2,1),9);
+  sim.step({direction:0,action:true});step(sim,0,3);assert.equal(sim.tile(2,1),9);
   sim.tiles[sim.index(2,2)]=-1;
   step(sim);assert.equal(sim.tile(2,2),9);assert.equal(sim.frozenKinds[sim.index(2,2)],1);
   assert.equal(sim.frozenKinds[sim.index(2,1)],-1);

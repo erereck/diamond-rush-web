@@ -26,7 +26,7 @@ O codec preserva bytes desconhecidos e cauda, valida limites e sobreposições, 
 
 ## Replay experimental
 
-JSON com `version: 3`, `target: "1.2.0-s700"`, `engine: "fidelity-7"`, mundo, fase, recursos iniciais (inclusive equipamento), impressão FNV-1a dos três planos/dimensões e entradas por tick. A impressão detecta diferenças de dados; não é assinatura de segurança. Entradas são reconstruídas executando a mesma simulação desde o começo. Máximo importado: 144000 ticks, ou duas horas a 20 Hz.
+JSON com `version: 3`, `target: "1.2.0-s700"`, `engine: "fidelity-8"`, mundo, fase, recursos iniciais (inclusive equipamento), impressão FNV-1a dos três planos/dimensões e entradas por tick. A impressão detecta diferenças de dados; não é assinatura de segurança. Entradas são reconstruídas executando a mesma simulação desde o começo. Máximo importado: 144000 ticks, ou duas horas a 20 Hz.
 
 Qualquer alteração semântica no motor exige alterar `ENGINE_REVISION`. Arquivos de outra revisão são rejeitados. O armazenamento local usa `diamond-rush:experimental-session:v3`; não altera saves anteriores. O replay não substitui o formato RMS nem comprova determinismo em relação ao Java.
 

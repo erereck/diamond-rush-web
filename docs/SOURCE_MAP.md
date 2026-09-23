@@ -17,6 +17,7 @@
 | Full-health field pickup conversion | cGame.method_322, method_321 |
 | Per-category level rewards | cGame.method_249(11), method_116, method_117 |
 | Intro scripted movement and object edits | DemoInterpreter.method_28 opcodes 10/25/26 |
+| Hammer impact and hook launch animations | cGame.method_227, method_230, method_260; o.f/0 animations 13–16, 20/22, 41–44 |
 
 See SAVE_FORMAT.md for the distinction between original RMS payloads and versioned development replays.
 

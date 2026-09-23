@@ -5,6 +5,7 @@ import { animationFrameAt, BOULDER_BRACE_TICKS, BOULDER_PRESSURE_TICKS, CHEST_OP
 import { spikeExtension, spikeReach } from './LaterStageRules.ts';
 import { AngkorBoss } from './AngkorBoss.ts';
 import { BavariaBoss } from './BavariaBoss.ts';
+import { TibetBoss } from './TibetBoss.ts';
 export type Direction=0|1|2|3|4;
 export const DX=[0,0,1,0,-1], DY=[0,-1,0,1,0];
 export interface DemoEdit {cell:number;object?:number;parameter?:number;state?:number}
@@ -41,7 +42,7 @@ export class Simulation {
   pendingDirection:Direction=0;private actionHeld=false;private lastInputDirection:Direction=0;entranceGate=-1;
   readonly initial:StageStart;
   readonly initialLevelFingerprint:string;
-  boss:AngkorBoss|BavariaBoss|null=null;
+  boss:AngkorBoss|BavariaBoss|TibetBoss|null=null;
   constructor(level:LevelDefinition,initial:StageStart={diamonds:0,redDiamonds:0,lives:5,health:4}){
     this.initialLevelFingerprint=levelFingerprint(level);
     this.initial={...initial};this.diamonds=initial.diamonds;this.redDiamonds=initial.redDiamonds;
@@ -49,6 +50,7 @@ export class Simulation {
     this.level={...level,tiles:[...level.tiles],parameters:[...level.parameters],objects:[...level.objects]};
     if(level.world===0&&level.index===8)this.boss=new AngkorBoss();
     if(level.world===1&&level.index===9)this.boss=new BavariaBoss();
+    if(level.world===2&&level.index===10)this.boss=new TibetBoss();
     this.tiles=Int16Array.from(level.tiles,t=>t===255?-1:t);this.state=new Int32Array(this.tiles.length);
     this.motion=new Int16Array(this.tiles.length);this.active=new Int16Array(this.tiles.length);
     this.chestFrames=new Int16Array(this.tiles.length);this.frozenKinds=new Int16Array(this.tiles.length).fill(-1);
@@ -363,7 +365,7 @@ export class Simulation {
   }
   private freeze(x:number,y:number){
     const i=this.index(x,y),kind=this.tile(x,y);
-    if(i<0||![1,19,43].includes(kind))return false;
+    if(i<0||![1,19,43,45].includes(kind))return false;
     this.frozenKinds[i]=kind;this.tiles[i]=9;this.state[i]=0;this.motion[i]=0;this.active[i]=24;
     this.events.push('freeze');this.wake(x,y);return true;
   }
@@ -371,7 +373,7 @@ export class Simulation {
     const i=this.index(x,y),kind=this.frozenKinds[i];if(i<0||kind<0)return;
     this.tiles[i]=kind;this.frozenKinds[i]=-1;
     // method_231 restores snakes through method_233, leaving them stunned.
-    this.state[i]=kind===19||kind===43?120|(this.isPlayer(x,y-1)?2:1):0;
+    this.state[i]=[19,43,45].includes(kind)?120|(this.isPlayer(x,y-1)?2:1):0;
     this.motion[i]=0;
     this.active[i]=48;this.events.push('thaw');this.wake(x,y);
   }
@@ -380,8 +382,9 @@ export class Simulation {
     if(kind===9){this.thaw(x,y);return;}
     if(kind===30){this.triggerBrick(x,y);return;}
     if(kind===10){this.state[i]=1;this.active[i]=24;this.events.push('grass');return;}
+    if(kind===18&&this.boss instanceof TibetBoss){this.boss.flipBridge(this);return;}
     if(this.weaponTier===8&&this.freeze(x,y))return;
-    if(kind===19||kind===43){this.state[i]=this.state[i]&~248|120;this.motion[i]=0;this.active[i]=24;this.events.push('enemy-hit');return;}
+    if(kind===19||kind===43||kind===45){this.state[i]=this.state[i]&~248|120;this.motion[i]=0;this.active[i]=24;this.events.push('enemy-hit');return;}
     if(kind===0||kind===16||kind>=80||(this.object(x,y)===7&&this.gatePhases[i]<2)){
       this.setAnimation(40+this.player.direction);
       this.attackTicks=HAMMER_BOUNCE_TICKS[this.player.direction];
@@ -408,7 +411,7 @@ export class Simulation {
     const adjacent:[Direction,number,number][]=[direction,1,2,3,4]
       .filter((side,index,sides)=>side!==0&&sides.indexOf(side)===index)
       .map(side=>[side as Direction,p.x+DX[side],p.y+DY[side]]);
-    const aimed=adjacent.find(([,x,y])=>[9,10,18,19,30,43].includes(this.tile(x,y)));
+    const aimed=adjacent.find(([,x,y])=>[9,10,18,19,30,43,45].includes(this.tile(x,y)));
     const target=forwardHook??(!aimed&&this.weaponTier>=2?hookDirections.map(side=>this.hookTarget(side)).find(Boolean):null);
     if(target){
       p.direction=target.direction;this.hook=target;this.attackTicks=4+Math.abs(target.x-p.x)*4;
@@ -552,16 +555,16 @@ export class Simulation {
         if(spike<0||this.tiles[spike]!==28)continue;
         if(spikeExtension(this.tick,(this.state[spike]&8)!==0)>=24){pass=false;break;}
       }
-      if(t===0&&p.dx){
+      if((t===0||t===9)&&p.dx){
         this.pushDelay--;this.setAnimation(p.dx>0?8:9);
         if(this.pushDelay<0&&this.free(x+p.dx,y)&&this.motion[i]===0&&![19,43,45,49].includes(this.tile(x,y+1))){
-          this.moveObject(i,this.index(x+p.dx,y),0,(this.state[i]&~(7|3072|512))|p.direction| (p.dx>0?1024:2048),18);this.wake(x+p.dx,y);pass=true;
+          this.moveObject(i,this.index(x+p.dx,y),t,(this.state[i]&~(7|3072|512))|p.direction| (p.dx>0?1024:2048),18);this.wake(x+p.dx,y);pass=true;
         }
       }else this.pushDelay=6;
       if(pass){
         this.wake(p.x,p.y);p.x=x;p.y=y;p.offset=18;this.wake(x,y);this.setAnimation(3+p.direction);
         if(t===10){this.state[i]=1;this.events.push('grass');}
-      }else if(t!==0&&this.stonePressure===0)this.setAnimation(p.direction-1);
+      }else if(t!==0&&t!==9&&this.stonePressure===0)this.setAnimation(p.direction-1);
     }else {this.pushDelay=6;if(this.stonePressure===0)this.setAnimation(p.direction-1);}
     const i=this.index(p.x,p.y),t=this.tiles[i],o=this.level.objects[i];
     if(p.offset===0){

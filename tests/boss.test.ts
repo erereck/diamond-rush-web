@@ -3,14 +3,17 @@ import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
 import { Simulation } from '../src/core/Simulation.ts';
 import { BavariaBoss } from '../src/core/BavariaBoss.ts';
+import { TibetBoss } from '../src/core/TibetBoss.ts';
 import type { WorldDefinition } from '../src/level/LevelParser.ts';
 import { CHEST_OPEN_DURATIONS } from '../src/core/PhaseOneRules.ts';
 import { restoreReplay } from '../src/platform/Session.ts';
 
 const world=JSON.parse(readFileSync(new URL('../public/assets/world-0.json',import.meta.url),'utf8')) as WorldDefinition;
 const bavaria=JSON.parse(readFileSync(new URL('../public/assets/world-1.json',import.meta.url),'utf8')) as WorldDefinition;
+const tibet=JSON.parse(readFileSync(new URL('../public/assets/world-2.json',import.meta.url),'utf8')) as WorldDefinition;
 const make=()=>new Simulation(world.levels[8]);
 const makeBavaria=()=>new Simulation(bavaria.levels[9]);
+const makeTibet=()=>new Simulation(tibet.levels[10],{diamonds:0,redDiamonds:0,lives:5,health:4,weaponTier:8});
 const idle=(s:Simulation,n=1)=>{for(let i=0;i<n;i++)s.step({direction:0,action:false});};
 
 test('the Angkor guardian wakes at the original arena and exposes three health segments',()=>{
@@ -134,6 +137,64 @@ test('Bavaria guardian state is deterministic in a saved input replay',()=>{
   const s=makeBavaria();
   for(let i=0;i<160;i++)s.step({direction:i<110?2:0,action:false});
   const restored=restoreReplay(s.replay(),[world,bavaria]);
+  assert.deepEqual(restored.boss?.snapshot(),s.boss?.snapshot());
+  assert.deepEqual(restored.snapshot(),s.snapshot());
+});
+
+test('the Tibet guardian wakes at the arena entrance with five health segments',()=>{
+  const s=makeTibet(),boss=s.boss!;assert.ok(boss instanceof TibetBoss);
+  assert.equal(boss.phase,-1);assert.equal(boss.health,5);
+  s.player.x=14;s.player.y=22;idle(s);
+  assert.equal(boss.phase,0);assert.equal(boss.maxHealth,5);
+  idle(s,8);assert.ok([4,5,10,11].includes(boss.phase));
+});
+
+test('Tibet floor switches open the bridge and spawn the original ice target',()=>{
+  const s=makeTibet(),boss=s.boss!;assert.ok(boss instanceof TibetBoss);
+  s.player.x=14;s.player.y=22;s.player.direction=4;
+  s.step({direction:0,action:true});idle(s,45);
+  assert.equal(boss.bridgePosition,9);
+  assert.equal(s.tile(13,16),-1);assert.equal(s.tile(22,16),-1);
+  assert.equal(s.tile(10,19),45);
+  boss.flipBridge(s);idle(s,45);
+  assert.equal(boss.bridgePosition,0);
+  assert.equal(s.tile(13,16),34);assert.equal(s.tile(22,16),35);
+});
+
+test('the ice hammer freezes a real Tibet arena creature into a movable block',()=>{
+  const s=makeTibet();s.player.x=24;s.player.y=16;s.player.direction=4;
+  assert.equal(s.tile(23,16),45);
+  s.step({direction:0,action:true});idle(s,10);
+  assert.equal(s.tile(23,16),9);assert.equal(s.frozenKinds[s.index(23,16)],45);
+});
+
+test('a falling ice block wounds Tibet guardian; five hits finish the fight',()=>{
+  const s=makeTibet(),boss=s.boss!;assert.ok(boss instanceof TibetBoss);
+  s.player.x=14;s.player.y=22;boss.phase=4;boss.animation=4;
+  for(let n=0;n<5;n++){
+    boss.phase=4;boss.animation=4;boss.x=360;
+    const i=s.index(16,21);s.tiles[i]=9;s.state[i]=3;s.active[i]=0;s.frozenKinds[i]=45;
+    boss.step(s);assert.equal(boss.health,4-n);assert.equal(s.tile(16,21),30);
+  }
+  assert.equal(boss.phase,12);boss.age=101;boss.step(s);assert.equal(boss.phase,15);
+  s.restoreCheckpoint();assert.equal(boss.phase,-1);assert.equal(boss.health,5);
+});
+
+test('Tibet heavy attack schedules the staggered ceiling stones',()=>{
+  const s=makeTibet(),boss=s.boss!;assert.ok(boss instanceof TibetBoss);
+  boss.phase=13;boss.animation=13;boss.animationAge=31;
+  boss.step(s);assert.equal(boss.phase,4);assert.equal(boss.ceilingPulseAt,s.tick+40);
+  s.tick=boss.ceilingPulseAt+7;boss.step(s);
+  assert.equal(s.state[s.index(14,15)]&56,8);
+  assert.ok(s.events.includes('boss-ceiling'));
+});
+
+test('the Tibet fight and switch state reproduce from an input replay',()=>{
+  const arena=structuredClone(tibet),level=arena.levels[10];
+  level.tiles[16*level.width+5]=255;level.tiles[22*level.width+14]=79;
+  const s=new Simulation(level,{diamonds:0,redDiamonds:0,lives:5,health:4,weaponTier:8});
+  for(let i=0;i<120;i++)s.step({direction:0,action:false});
+  const restored=restoreReplay(s.replay(),[world,bavaria,arena]);
   assert.deepEqual(restored.boss?.snapshot(),s.boss?.snapshot());
   assert.deepEqual(restored.snapshot(),s.snapshot());
 });

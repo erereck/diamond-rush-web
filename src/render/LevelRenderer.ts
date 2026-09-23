@@ -7,6 +7,7 @@ import { spikeExtension, spikeReach } from '../core/LaterStageRules.ts';
 import { crusherFrameIndex, rollingStoneVisual, scotlandExplosiveVisual, snakeVisual, sourceFrameForElapsed, tibetSliderVisual } from './OriginalAnimationRules.ts';
 import { AngkorBoss } from '../core/AngkorBoss.ts';
 import { BavariaBoss } from '../core/BavariaBoss.ts';
+import { TibetBoss } from '../core/TibetBoss.ts';
 const tileSprite:Record<number,string>={8:'gen0-5',11:'gen1-4',14:'gen1-2',16:'gen1-3',18:'gen3-9',22:'gen0-9',23:'gen0-9',28:'gen1-1',34:'gen2-4',35:'gen2-4',36:'gen0-8',37:'gen2-5',38:'gen2-6',39:'gen2-6',40:'gen2-7',42:'gen3-1',44:'gen3-4',45:'gen3-5',46:'gen3-7',47:'gen2-3',48:'gen3-2',49:'gen4-1'};
 export class LevelRenderer {
   assets:AssetManager; sprites:SpriteRenderer;
@@ -57,6 +58,7 @@ export class LevelRenderer {
         const kind=sim.frozenKinds[i];
         if(kind===1)frame('cm-2',0,px,py);
         else if(kind===19||kind===43)anim(w===1?'gen1-7':'gen1-5',0,px,py,kind===43?1:w===2?2:0);
+        else if(kind===45)anim('gen3-5',0,px,py);
         ctx.fillStyle='#80d9ffe0';ctx.fillRect(px,py,24,24);ctx.strokeStyle='#eefbff';ctx.strokeRect(px+.5,py+.5,23,23);
       }
       else if(t===19||t===43) {
@@ -152,6 +154,11 @@ export class LevelRenderer {
     }
     if(sim?.boss instanceof BavariaBoss&&sim.boss.visible){
       const boss=sim.boss,sprite=a.sprite('b1-0'),af=r.animationFrame(sprite,boss.animation,boss.animationAge);
+      r.frame(ctx,sprite,af.frame,boss.x+af.x,504+af.y,af.flags);
+      if(boss.phase===12)anim('gen0-3',0,boss.x+tick*boss.age%48,528,0,0,tick);
+    }
+    if(sim?.boss instanceof TibetBoss&&sim.boss.visible){
+      const boss=sim.boss,sprite=a.sprite('mm1-0'),af=r.animationFrame(sprite,boss.animation,boss.animationAge);
       r.frame(ctx,sprite,af.frame,boss.x+af.x,504+af.y,af.flags);
       if(boss.phase===12)anim('gen0-3',0,boss.x+tick*boss.age%48,528,0,0,tick);
     }

@@ -12,7 +12,7 @@
 | Camera | cGame.method_285 |
 | Movement investigation | cGame.method_236, method_288 |
 | Object update investigation | cGame.method_304, method_351 |
-| Bavaria rolling obstacles and timed spikes | cGame.method_264, method_336, method_338; gen1.f/1 spike frames |
+| Bavaria rolling obstacles, paired crushers and timed spikes | cGame.method_264, method_336, method_337, method_338; gen1.f/1 spike frames |
 | Tibet falling ceiling stones | cGame.method_314, method_160; gen3.f/4 animations |
 | CanonicalSave | cGame.method_109–128; method_426 for first secret level |
 | Checkpoint snapshot and restore | cGame.method_346, method_347, killPlayer |

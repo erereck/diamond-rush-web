@@ -119,6 +119,17 @@ test('Scotland rolling hazard waits at walls but retries next to a moving obstac
   assert.equal(retry.state[8]>>8,0);
   assert.equal(retry.tile(2,1),14);
 });
+test('Bavaria paired crusher copies its upper half and attacks after approaching',()=>{
+  const level=fixture(['######','#    #','#@   #','#    #','######']);
+  level.world=1;level.tiles[14]=16;level.parameters[14]=2;
+  const sim=new Simulation(level),lower=sim.index(2,2),upper=sim.index(2,1);
+  assert.equal(sim.tiles[upper],16);assert.equal(sim.state[upper],2);
+  step(sim);assert.equal(sim.motion[lower],36);
+  step(sim,0,24);assert.equal(sim.health,4);
+  step(sim);assert.equal(sim.motion[lower],11);assert.equal(sim.health,3);
+  assert.equal(sim.motion[upper],11);
+  sim.restoreCheckpoint();assert.equal(sim.motion[lower],0);assert.equal(sim.tiles[upper],16);
+});
 test('Tibet ceiling stone warns, falls, injures and shatters',()=>{
   const level=fixture(['#####','#   #','#   #','# @ #','#####']);
   level.world=2;level.tiles[7]=44;
@@ -143,6 +154,8 @@ test('canonical later maps initialize timed spikes and ceiling traps from parame
   const second=new Simulation(worlds[1].levels[1]);
   const hazard=second.index(14,11);assert.equal(second.tile(14,11),14);
   assert.equal(second.state[hazard],8);assert.equal(second.active[hazard],24);
+  const crusher=scotland.index(14,13);
+  assert.equal(scotland.tile(14,12),16);assert.equal(scotland.state[crusher],2);
   const tibet=new Simulation(worlds[2].levels[0]);
   const trap=tibet.index(27,2);assert.equal(tibet.tile(27,2),44);
   assert.equal(tibet.state[trap],0);assert.equal(tibet.active[trap],24);

@@ -51,9 +51,17 @@ export class Simulation {
       if(t===19||t===43){this.state[i]=p;this.active[i]=48;}
       if(t===22||t===23)this.active[i]=48;
       if(t===14){this.state[i]=p===4?8:0;this.active[i]=24;}
+      if(t===16){this.state[i]=p<0?2:p;this.active[i]=24;}
       if(t===28){this.state[i]=p<0?0:p>10?(Math.floor(p/11)|8):p;this.active[i]=24;}
       if(t===44){this.state[i]=0;this.active[i]=24;}
     });
+    // loadLevelData creates the upper half of each paired Bavaria crusher.
+    for(let y=1;y<level.height-1;y++)for(let x=1;x<level.width-1;x++){
+      const i=this.index(x,y),above=this.index(x,y-1),below=this.index(x,y+1);
+      if(this.tiles[i]===16&&this.tiles[below]!==16&&this.tiles[above]!==16){
+        this.tiles[above]=16;this.state[above]=this.state[i];this.active[above]=24;
+      }
+    }
     // The equipment level lives in recordData[9], so revisiting its chest
     // after a campaign save must not award the same upgrade a second time.
     for(let i=0;i<this.tiles.length;i++){
@@ -282,6 +290,22 @@ export class Simulation {
     this.wake(tx,ty);
     if(this.overlap(tx,ty,nextDirection,18))this.hurt(1,nextDirection);
   }
+  /** cGame.method_337: the two-tile crusher waits for approach, then strikes. */
+  updateCrusher(x:number,y:number){
+    const i=this.index(x,y);
+    this.active[i]=24;
+    if(this.tile(x,y+1)===16)return; // Upper half shares the lower timer.
+    const above=this.index(x,y-1),paired=this.tiles[above]===16;
+    const side=(this.state[i]&7)===4?1:-1;
+    const adjacent=this.isPlayer(x+side,y)||(paired&&this.isPlayer(x+side,y-1));
+    if(this.motion[i]<=0&&adjacent){
+      this.motion[i]=36;this.events.push('crusher-trigger');
+    }else if(this.motion[i]>0){
+      this.motion[i]--;
+      if(this.motion[i]<=11&&adjacent)this.hurt(1,side<0?2:4);
+    }
+    if(paired){this.motion[above]=this.motion[i];this.active[above]=24;}
+  }
   /** cGame.method_314: a Tibet ceiling stone warns, drops, then shatters. */
   updateCeilingTrap(x:number,y:number){
     const i=this.index(x,y),phase=(this.state[i]&56)>>3;
@@ -415,6 +439,7 @@ export class Simulation {
         else if(this.tiles[i]===19||this.tiles[i]===43)this.updateSnake(x,y);
         else if(this.tiles[i]===30)this.updateBrick(x,y);
         else if(this.tiles[i]===14)this.updateRollingHazard(x,y);
+        else if(this.tiles[i]===16)this.updateCrusher(x,y);
         else if(this.tiles[i]===28)this.updateSpikes(x,y);
         else if(this.tiles[i]===44)this.updateCeilingTrap(x,y);
         else if(this.tiles[i]===22||this.tiles[i]===23){

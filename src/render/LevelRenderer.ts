@@ -75,6 +75,11 @@ export class LevelRenderer {
         const sprite=a.sprite('gen3-4'),animation=sprite.animations[animId];
         if(animation){const af=sprite.animationFrames[animation.start+frameIndex];frame('gen3-4',af.frame,px,py-(phase===3?age:0));}
       }
+      else if(t===16&&sim){
+        const below=i+level.width,lower=below<sim.tiles.length&&sim.tiles[below]===16?below:i,
+          direction=(sim.state[lower]&7)===4?1:0,elapsed=Math.max(0,36-sim.motion[lower]);
+        anim('gen1-3',direction,px,py,0,0,sim.motion[lower]>0?elapsed:0);
+      }
       else if(tileSprite[t]) {
         const id=tileSprite[t],s=a.sprite(id);
         if(s.animations.length)anim(id,0,px,py,0,0,t===16?0:tick);else if(s.frames.length)frame(id,0,px,py);else r.module(ctx,s,0,px,py);

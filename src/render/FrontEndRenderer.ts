@@ -43,6 +43,7 @@ export class FrontEndRenderer {
     }
     for(const node of nodes){
       const x=37+node.x*13,y=73+node.y*13,open=unlockedNode(c,world,node,this.assets.maps);
+      if(node.type===1&&!open)continue;
       const frame=node.type===1?9:open?0:1;
       this.sprites.frame(ctx,map,frame,x,y);
       if(c.completed[world].includes(node.level))this.sprites.frame(ctx,map,node.type===1?18:17,x+(node.type===1?0:1),y);

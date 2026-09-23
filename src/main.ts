@@ -50,7 +50,7 @@ function eligibleRewards(s:Simulation){
     (s.hits===0?16:0)|(s.retries===0?32:0);
 }
 function completionBonus(s:Simulation){return pendingRewards(newCampaign(),s.level.world,s.level.index,eligibleRewards(s),s.lives).lives-s.lives;}
-function completeCampaignStage(){const s=simulation;if(!s||!campaign||s.status!=='complete')return;const awarded=pendingRewards(campaign,s.level.world,s.level.index,eligibleRewards(s),s.lives);campaign=finishLevel(campaign,s.level.world,s.level.index,{diamonds:s.diamonds,redDiamonds:s.redDiamonds,lives:awarded.lives,health:s.health,weaponTier:s.weaponTier},awarded.mask);saveCampaign();openMap(s.level.world);}
+function completeCampaignStage(){const s=simulation;if(!s||!campaign||s.status!=='complete')return;const awarded=pendingRewards(campaign,s.level.world,s.level.index,eligibleRewards(s),s.lives);campaign=finishLevel(campaign,s.level.world,s.level.index,{diamonds:s.diamonds,redDiamonds:s.redDiamonds,lives:awarded.lives,health:s.health,weaponTier:s.weaponTier},awarded.mask,s.exitObject===28,assets.maps);saveCampaign();openMap(s.level.world);}
 function advanceLevel(){
   const current=simulation;
   if(!current||current.status!=='complete')return;
@@ -77,10 +77,17 @@ function drawIntro(){
   ctx.save();ctx.beginPath();ctx.rect(0,42,240,236);ctx.clip();ctx.translate(-sequence.cameraX,42-sequence.cameraY);
   renderer.draw(ctx,sim.level,sequence.tick,sim);
   ctx.restore();
+  if(sequence.portraitRevealTicks>0){
+    const t=sequence.portraitRevealTicks,p=sim.player;
+    const x=Math.trunc(((p.x*24-sequence.cameraX)*(5-t)+sequence.portraitX*t)/5);
+    const y=Math.trunc(((p.y*24-sequence.cameraY+40)*(5-t)+sequence.portraitY*t)/5);
+    ctx.fillStyle='#fff';ctx.fillRect(x,y,Math.trunc(102*t/5),Math.trunc(38*t/5));
+  }
   if(sequence.portraitVisible){
     const x=sequence.portraitX,y=sequence.portraitY;
     ctx.fillStyle='#000';ctx.fillRect(x-3,y-3,109,45);
-    sprites.animation(ctx,assets.sprite(`demo-sprite-${sequence.portraitSprite}`),0,sequence.tick,x,y);
+    const portrait=assets.sprite(`demo-sprite-${sequence.portraitSprite}`),animation=portrait.animations[0];
+    if(animation){const af=portrait.animationFrames[animation.start+sequence.commandTick%animation.count];sprites.frame(ctx,portrait,af.frame,x,y,af.flags);}
     sprites.frame(ctx,assets.sprite('demo-sprite-0'),sequence.portraitFrame,x,y);
     if(sequence.blinkFrame>=0)sprites.frame(ctx,assets.sprite('demo-sprite-1'),sequence.blinkFrame,x+90,y-6);
   }
@@ -88,6 +95,7 @@ function drawIntro(){
     const x=dialogue.popup?6:7+dialogue.slide,y=dialogue.popup?229:90,height=dialogue.popup?35:dialogue.lines.length*16+7;
     ctx.fillStyle='#2e2818';ctx.fillRect(x,y,226,height);ctx.strokeStyle='#c4a05b';ctx.strokeRect(x+.5,y+.5,225,height-1);
     dialogue.lines.forEach((line,i)=>text(line,x+(dialogue.popup?16:3),y+4+i*15));
+    if(dialogue.popup)text(assets.strings[70],19,211);
     if((sequence.tick>>2)%2===0){ctx.fillStyle='#f3d276';ctx.beginPath();ctx.moveTo(x+211,y+height-11);ctx.lineTo(x+219,y+height-11);ctx.lineTo(x+215,y+height-7);ctx.fill();}
   }
   if(sequence.flash){ctx.fillStyle=sequence.flashColor;ctx.fillRect(0,0,240,320);}

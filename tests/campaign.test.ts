@@ -52,3 +52,41 @@ test('old campaign saves migrate reward flags without duplicating earned lives',
   assert.deepEqual(pendingRewards(migrated,0,8,60,8),{mask:0,lives:8});
   assert.equal(migrated.awards[0][0],0);
 });
+
+test('canonical secret branches require the secret exit, then chain only to their linked rooms',()=>{
+  const entrances:[[number,number,number],...Array<[number,number,number]>]=[
+    [0,6,9],[0,7,12],[1,3,10],[1,6,11],[2,1,11],[2,4,12]
+  ];
+  for(const [world,from,target] of entrances){
+    let c=newCampaign();
+    if(world>0)c.completed[world-1].push([8,9][world-1]);
+    const secret=maps[world].find(n=>n.level===target)!;
+    c=finishLevel(c,world,from,c.resources,0,false,maps);
+    assert.equal(unlockedNode(c,world,secret,maps),false,`${world}/${from} normal exit exposed ${target}`);
+    c=finishLevel(c,world,from,c.resources,0,true,maps);
+    assert.equal(unlockedNode(c,world,secret,maps),true,`${world}/${from} secret exit did not expose ${target}`);
+    assert.equal(c.selected,target);
+    assert.deepEqual(c.secretUnlocked[world],[target]);
+  }
+  let c=newCampaign();c=finishLevel(c,0,6,c.resources,0,true,maps);
+  assert.equal(unlockedNode(c,0,maps[0].find(n=>n.level===10)!,maps),false);
+  c=finishLevel(c,0,9,c.resources,0,true,maps);
+  assert.equal(unlockedNode(c,0,maps[0].find(n=>n.level===10)!,maps),true);
+  c=finishLevel(c,0,10,c.resources,0,true,maps);
+  assert.equal(unlockedNode(c,0,maps[0].find(n=>n.level===11)!,maps),true);
+  const tibet=newCampaign();tibet.completed[0].push(8);tibet.completed[1].push(9);
+  tibet.secretUnlocked[2].push(12);
+  const afterTibetSecret=finishLevel(tibet,2,12,tibet.resources,0,false,maps);
+  assert.equal(unlockedNode(afterTibetSecret,2,maps[2].find(n=>n.level===13)!,maps),true);
+});
+
+test('old campaign saves preserve discovered secret stages without revealing every branch',()=>{
+  const old=finishLevel(newCampaign(),0,6,newCampaign().resources);
+  delete (old as Partial<typeof old>).secretUnlocked;
+  assert.equal(unlockedNode(validateCampaign(old,maps),0,maps[0].find(n=>n.level===9)!,maps),false);
+  old.selected=9;
+  const migrated=validateCampaign(old,maps);
+  assert.deepEqual(migrated.secretUnlocked[0],[9]);
+  assert.equal(unlockedNode(migrated,0,maps[0].find(n=>n.level===9)!,maps),true);
+  assert.equal(unlockedNode(migrated,0,maps[0].find(n=>n.level===12)!,maps),false);
+});

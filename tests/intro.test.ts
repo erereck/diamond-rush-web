@@ -25,6 +25,18 @@ test('all original S700 demo scripts decode, including the six Angkor opening sc
   assert.match(scripts.get(28)!.commands.find(c=>c.text?.includes('seal is reacting'))!.text!,/seal is reacting/);
 });
 
+test('the complete spoken introduction follows demo.f order without invented dialogue',()=>{
+  const flatten=(commands:import('../src/core/DemoScript.ts').DemoCommand[]):string[]=>commands.flatMap(c=>c.children?flatten(c.children):c.text?[c.text.trim()]:[]);
+  assert.deepEqual([29,10,11,13,16,28].flatMap(id=>flatten(scripts.get(id)!.commands)),[
+    'The Great Temple Of Angkor Wat...',"I'm finally in!","Let's go!",
+    'I should check that chest first.','You found a compass! It will help you find your way out.',
+    'Avoid blocking your own path','when pushing rocks.','You can return all elements to their original positions',
+    'by going back to the last circle and pressing 5.','If you can\'t reach the circle',
+    'and your way is blocked,','you can press * at any time to go back to the last circle,',
+    'Is this a kind of seal?','Ah! The seal is reacting!',"Let's see what happens if I step on it..."
+  ]);
+});
+
 function walkTo(intro:IntroSequence,goalX:number,goalY:number){
   const sim=intro.sim,w=sim.level.width,start=sim.index(sim.player.x,sim.player.y),goal=sim.index(goalX,goalY);
   const queue=[start],seen=new Set([start]),prev=new Map<number,number>();
@@ -66,6 +78,11 @@ test('the introduction is freely controlled between all six original scenes',()=
     if(id===13)assert.equal(intro.sim.tiles[intro.sim.index(38,5)],10);
     seen.push(id);finishScript(intro,dialogue);
     if(id===13)assert.equal(intro.sim.tiles[intro.sim.index(38,5)],-1,'scripted walk must cut grass');
+    if(id===28){
+      assert.equal(intro.phase,'done','the seal script goes straight to the map');
+      assert([60,61].includes(intro.sim.player.x));
+      assert.equal(intro.sim.player.y,3);
+    }
   }
   for(let i=0;i<20&&!intro.finished;i++)intro.step();
   assert.equal(intro.finished,true);
@@ -112,4 +129,21 @@ test('lethal damage during a scene interrupts it and returns to the checkpoint',
   assert.equal(intro.sim.player.y,4);
   assert.equal(intro.sim.health,4);
   assert.equal(intro.sim.lives,4);
+});
+
+test('portrait reveal and hint flash follow the source command phases',()=>{
+  const altered=new Map(scripts),opening={...scripts.get(29)!,commands:[
+    {opcode:11,args:[2,2]},{opcode:12,args:[17,50]},{opcode:18,args:[1,255,255,255]},{opcode:15,args:[]}
+  ]};altered.set(29,opening);
+  const intro=new IntroSequence(level,altered);
+  walkTo(intro,6,4);assert.equal(intro.scriptId,29);
+  intro.step();
+  for(let tick=1;tick<=5;tick++){
+    intro.step();assert.equal(intro.portraitRevealTicks,tick);
+    assert.equal(intro.portraitVisible,false);
+  }
+  intro.step();assert.equal(intro.portraitRevealTicks,0);assert.equal(intro.portraitVisible,true);
+  intro.step();assert.equal(intro.flash,true);
+  intro.step();assert.equal(intro.flash,true);
+  intro.step();assert.equal(intro.flash,false);
 });

@@ -5,6 +5,7 @@ import type { DemoCommand, DemoScript } from './DemoScript.ts';
 
 interface RunningCommand {
   command:DemoCommand;ticks:number;startX:number;startY:number;page:number;children?:RunningCommand[];done?:boolean;
+  blinkRemaining?:number;blinkOn?:boolean;
 }
 export function wrapDemoText(value:string,maxCharacters:number):string[]{
   const lines:string[]=[];let line='';
@@ -27,10 +28,10 @@ const NO_INPUT:InputFrame={direction:0,action:false};
 /** Playable S700 tutorial: free movement between the original demo.f scripts. */
 export class IntroSequence {
   readonly sim:Simulation;readonly scripts:Map<number,DemoScript>;
-  section=0;phase:'free'|'script'|'ending'|'done'='free';
-  commandIndex=0;active:RunningCommand|null=null;tick=0;phaseTicks=0;
+  section=0;phase:'free'|'script'|'done'='free';
+  commandIndex=0;active:RunningCommand|null=null;tick=0;
   cameraX=0;cameraY=0;
-  portraitVisible=false;portraitFrame=2;portraitSprite=2;portraitX=17;portraitY=50;blinkFrame=-1;flashColor='#fff';flash=false;
+  portraitVisible=false;portraitFrame=2;portraitSprite=2;portraitX=17;portraitY=50;portraitRevealTicks=0;blinkFrame=-1;flashColor='#fff';flash=false;
   private pressed=false;
   constructor(level:LevelDefinition,scripts:Map<number,DemoScript>){
     for(const stop of STOPS)if(!scripts.has(stop.id))throw new Error(`Missing original intro script ${stop.id}`);
@@ -41,6 +42,7 @@ export class IntroSequence {
   get heroY(){const p=this.sim.player;return p.y*24-p.dy*p.offset;}
   get scriptId(){return this.phase==='script'?STOPS[this.section].id:null;}
   get finished(){return this.phase==='done';}
+  get commandTick(){return this.active?.ticks??0;}
   get dialogue():{lines:string[];popup:boolean;slide:number}|null{
     const running=this.findDialogue(this.active);
     if(!running)return null;
@@ -65,13 +67,9 @@ export class IntroSequence {
       if(this.sim.status==='dead'){
         this.sim.lives=5;this.sim.status='playing';this.sim.restoreCheckpoint(true,true);
       }
-      if(this.atTrigger())this.startScript();
-      return;
-    }
-    if(this.phase==='ending'){
-      this.sim.step(NO_INPUT);this.tick=this.sim.tick;
-      this.phaseTicks++;this.flash=this.phaseTicks%4<2;
-      if(this.phaseTicks>=16){this.phase='done';this.flash=false;}
+      if(this.section>=STOPS.length){
+        if(this.atSealExit())this.phase='done';
+      }else if(this.atTrigger())this.startScript();
       return;
     }
     if(this.phase!=='script')return;
@@ -81,9 +79,11 @@ export class IntroSequence {
       this.active=this.running(commands[this.commandIndex]);
     }
     // The same physics and collision path runs while the hero is scripted.
-    this.sim.step({direction:this.scriptedDirection(this.active),action:false});this.tick=this.sim.tick;
+    const direction=this.scriptedDirection(this.active);
+    this.sim.step({direction,action:false});this.tick=this.sim.tick;
+    if(direction)this.followHero();
     if(this.sim.deathTicks>0||this.sim.status==='dead'){
-      this.phase='free';this.active=null;this.portraitVisible=false;this.pressed=false;
+      this.phase='free';this.active=null;this.portraitVisible=false;this.portraitRevealTicks=0;this.pressed=false;
       return;
     }
     if(this.sim.hurtTicks>0||this.sim.respawnTravel)return;
@@ -95,14 +95,15 @@ export class IntroSequence {
     if(this.section===2)return this.sim.opened.has(i);
     return this.sim.player.x===stop.x&&this.sim.player.y===stop.y;
   }
+  private atSealExit(){return [60,61].includes(this.sim.player.x)&&this.sim.player.y===3&&this.sim.player.offset===0;}
   private startScript(){
     this.phase='script';this.commandIndex=0;this.active=null;this.pressed=false;
     this.sim.pendingDirection=0;
   }
   private nextSection(){
     this.section++;
-    if(this.section>=STOPS.length){this.phase='ending';this.phaseTicks=0;return;}
-    this.commandIndex=0;this.active=null;this.portraitVisible=false;this.blinkFrame=-1;
+    if(this.section>=STOPS.length){this.phase=this.atSealExit()?'done':'free';this.flash=false;return;}
+    this.commandIndex=0;this.active=null;this.portraitVisible=false;this.portraitRevealTicks=0;this.blinkFrame=-1;
     this.phase='free';this.followHero();
     if(this.atTrigger())this.startScript();
   }
@@ -124,8 +125,8 @@ export class IntroSequence {
     }
     if(opcode===1){
       const duration=Math.max(1,args[2]),t=Math.min(1,r.ticks/duration),maxX=this.sim.level.width*24-240,maxY=this.sim.level.height*24-240;
-      this.cameraX=Math.max(0,Math.min(maxX,Math.round(r.startX+(args[0]*24-108-r.startX)*t)));
-      this.cameraY=Math.max(0,Math.min(maxY,Math.round(r.startY+(args[1]*24-108-r.startY)*t)));
+      this.cameraX=Math.max(0,Math.min(maxX,Math.trunc(r.startX+(args[0]*24-108-r.startX)*t)));
+      this.cameraY=Math.max(0,Math.min(maxY,Math.trunc(r.startY+(args[1]*24-108-r.startY)*t)));
       return r.ticks>=duration;
     }
     if(opcode===2||opcode===27){
@@ -141,16 +142,34 @@ export class IntroSequence {
     if(opcode===6)return r.ticks>=args[0];
     if(opcode===10)return r.ticks>1&&this.sim.player.offset<=0;
     if(opcode===11){this.portraitFrame=args[0];this.portraitSprite=args[1];return true;}
-    if(opcode===12){this.portraitX=args[0];this.portraitY=args[1];this.portraitVisible=true;return r.ticks>=5;}
+    if(opcode===12){
+      this.portraitX=args[0];this.portraitY=args[1];
+      if(r.ticks<=5){this.portraitRevealTicks=r.ticks;return false;}
+      this.portraitRevealTicks=0;this.portraitVisible=true;return true;
+    }
     if(opcode===13){
       const t=Math.min(1,r.ticks/Math.max(1,args[2]));
       this.portraitX=Math.round(r.startX+(args[0]-r.startX)*t);this.portraitY=Math.round(r.startY+(args[1]-r.startY)*t);
       return r.ticks>=args[2];
     }
     if(opcode===14){this.portraitVisible=true;return true;}
-    if(opcode===15){this.portraitVisible=false;this.blinkFrame=-1;return true;}
-    if(opcode===16||opcode===17){this.blinkFrame=r.ticks%2?args[0]:-1;return r.ticks>=args[1]*4;}
-    if(opcode===18){this.flashColor=`#${args.slice(1).map(n=>n.toString(16).padStart(2,'0')).join('')}`;this.flash=r.ticks%2===1;return r.ticks>=args[0]*4;}
+    if(opcode===15){this.portraitVisible=false;this.portraitRevealTicks=0;this.blinkFrame=-1;return true;}
+    if(opcode===16||opcode===17||opcode===18){
+      r.blinkRemaining??=opcode===18?args[0]:args[1];r.blinkOn??=false;
+      if(opcode===18)this.flashColor=`#${args.slice(1).map(n=>n.toString(16).padStart(2,'0')).join('')}`;
+      if(r.ticks%2===1){
+        if(r.blinkOn){r.blinkOn=false;r.blinkRemaining--;}
+        else if(r.blinkRemaining>0)r.blinkOn=true;
+      }
+      if(opcode===18)this.flash=!!r.blinkOn;
+      else this.blinkFrame=r.blinkOn?args[0]:-1;
+      if(r.blinkRemaining<=0){
+        if(opcode===18)this.flash=false;
+        else this.blinkFrame=opcode===16?args[0]:-1;
+        return true;
+      }
+      return false;
+    }
     if(opcode===25){
       const i=this.sim.index(args[0],args[1]);if(i>=0){this.sim.level.objects[i]=args[2];this.sim.level.parameters[i]=args[3];}
       return true;

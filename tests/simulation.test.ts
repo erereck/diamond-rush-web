@@ -63,7 +63,10 @@ test('the normal route follows links in the original world maps',()=>{
 test('leaving an exit marks the stage complete for progression',()=>{
   const level=fixture(['######','#@   #','######']);level.objects[8]=5;
   const sim=new Simulation(level);step(sim,2,52);
-  assert.equal(sim.status,'complete');assert.ok(sim.events.includes('complete'));
+  assert.equal(sim.status,'complete');assert.equal(sim.exitObject,5);assert.ok(sim.events.includes('complete'));
+  const secret=fixture(['######','#@   #','######']);secret.objects[8]=28;
+  const hidden=new Simulation(secret);step(hidden,2,52);
+  assert.equal(hidden.status,'complete');assert.equal(hidden.exitObject,28);
 });
 test('later phase floor types follow the original walking collision cases',()=>{
   for(const tile of [4,5,6,7,11,14,24,26,27,33,40,41,42,45,50,51,52,53]){

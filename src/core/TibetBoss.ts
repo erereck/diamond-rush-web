@@ -34,7 +34,9 @@ export class TibetBoss {
     this.bridgePosition+=this.bridgeDirection;
     if(this.bridgePosition===5){
       for(let j=0;j<this.wallCells.length;j++){
-        const i=this.wallCells[j];sim.tiles[i]=this.bridgeDirection>0?-1:this.wallTypes[j];
+        const i=this.wallCells[j],kind=this.wallTypes[j];
+        sim.tiles[i]=this.bridgeDirection>0?(kind===34?34:-1):(kind===34?-1:35);
+        sim.level.objects[i]=sim.tiles[i]===-1?(kind===34?15:16):255;
         sim.wake(i%sim.level.width,Math.floor(i/sim.level.width));
       }
       const left=this.bridgeDirection<=0;

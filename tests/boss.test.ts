@@ -144,9 +144,18 @@ test('Bavaria guardian state is deterministic in a saved input replay',()=>{
 test('the Tibet guardian wakes at the arena entrance with five health segments',()=>{
   const s=makeTibet(),boss=s.boss!;assert.ok(boss instanceof TibetBoss);
   assert.equal(boss.phase,-1);assert.equal(boss.health,5);
-  s.player.x=14;s.player.y=22;idle(s);
-  assert.equal(boss.phase,0);assert.equal(boss.maxHealth,5);
-  idle(s,8);assert.ok([4,5,10,11].includes(boss.phase));
+  assert.equal(s.tile(13,16),-1);assert.equal(s.tile(22,16),35);
+  for(let i=0;i<160;i++)s.step({direction:2,action:false});
+  assert.ok(s.player.x>13);assert.notEqual(boss.phase,-1);
+  assert.equal(boss.maxHealth,5);
+});
+
+test('source tile 34 loads as an open bridge in later worlds',()=>{
+  const level=bavaria.levels[4],s=new Simulation(level);
+  const open=level.tiles.indexOf(34),closed=level.tiles.indexOf(35);
+  assert.ok(open>=0&&closed>=0);
+  assert.equal(s.tiles[open],-1);assert.equal(s.level.objects[open],15);
+  assert.equal(s.tiles[closed],35);assert.equal(s.level.objects[closed],255);
 });
 
 test('Tibet floor switches open the bridge and spawn the original ice target',()=>{
@@ -154,11 +163,13 @@ test('Tibet floor switches open the bridge and spawn the original ice target',()
   s.player.x=14;s.player.y=22;s.player.direction=4;
   s.step({direction:0,action:true});idle(s,45);
   assert.equal(boss.bridgePosition,9);
-  assert.equal(s.tile(13,16),-1);assert.equal(s.tile(22,16),-1);
+  assert.equal(s.tile(13,16),34);assert.equal(s.tile(22,16),-1);
+  assert.equal(s.object(13,16),255);assert.equal(s.object(22,16),16);
   assert.equal(s.tile(10,19),45);
   boss.flipBridge(s);idle(s,45);
   assert.equal(boss.bridgePosition,0);
-  assert.equal(s.tile(13,16),34);assert.equal(s.tile(22,16),35);
+  assert.equal(s.tile(13,16),-1);assert.equal(s.tile(22,16),35);
+  assert.equal(s.object(13,16),15);assert.equal(s.object(22,16),255);
 });
 
 test('the ice hammer freezes a real Tibet arena creature into a movable block',()=>{
@@ -190,11 +201,10 @@ test('Tibet heavy attack schedules the staggered ceiling stones',()=>{
 });
 
 test('the Tibet fight and switch state reproduce from an input replay',()=>{
-  const arena=structuredClone(tibet),level=arena.levels[10];
-  level.tiles[16*level.width+5]=255;level.tiles[22*level.width+14]=79;
-  const s=new Simulation(level,{diamonds:0,redDiamonds:0,lives:5,health:4,weaponTier:8});
-  for(let i=0;i<120;i++)s.step({direction:0,action:false});
-  const restored=restoreReplay(s.replay(),[world,bavaria,arena]);
+  const s=makeTibet();
+  for(let i=0;i<160;i++)s.step({direction:2,action:false});
+  assert.notEqual(s.boss?.phase,-1);
+  const restored=restoreReplay(s.replay(),[world,bavaria,tibet]);
   assert.deepEqual(restored.boss?.snapshot(),s.boss?.snapshot());
   assert.deepEqual(restored.snapshot(),s.snapshot());
 });

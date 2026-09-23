@@ -59,6 +59,10 @@ export class Simulation {
       const p=level.parameters[i]===255?-1:level.parameters[i];
       if(t===79){this.player.x=i%level.width;this.player.y=Math.floor(i/level.width);this.tiles[i]=-1;}
       if(t===12)this.tiles[i]=-1;
+      // cGame's level initialization turns tile 34 into the open half of
+      // the alternating ice bridge (background object 15). Tile 35 stays solid.
+      if(t===34){this.tiles[i]=-1;this.level.objects[i]=15;}
+      if(t===35)this.level.objects[i]=255;
       if(t===0||t===1)this.active[i]=48;
       if(t===19||t===43){this.state[i]=p;this.active[i]=48;}
       if(t===22||t===23)this.active[i]=48;

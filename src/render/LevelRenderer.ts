@@ -4,6 +4,7 @@ import { SpriteRenderer } from './SpriteRenderer.ts';
 import type { Simulation } from '../core/Simulation.ts';
 import { animationFrameAt, CHEST_OPEN_DURATIONS, fallingDrawOffset } from '../core/PhaseOneRules.ts';
 import { spikeExtension, spikeReach } from '../core/LaterStageRules.ts';
+import { crusherFrameIndex, rollingStoneVisual, snakeVisual, sourceFrameForElapsed } from './OriginalAnimationRules.ts';
 const tileSprite:Record<number,string>={8:'gen0-5',11:'gen1-4',14:'gen1-2',16:'gen1-3',18:'gen3-9',22:'gen0-9',23:'gen0-9',28:'gen1-1',34:'gen2-4',35:'gen2-4',36:'gen0-8',37:'gen2-5',38:'gen2-6',39:'gen2-6',40:'gen2-7',42:'gen3-1',44:'gen3-4',45:'gen3-5',46:'gen3-7',47:'gen2-3',48:'gen3-2',49:'gen4-1'};
 export class LevelRenderer {
   assets:AssetManager; sprites:SpriteRenderer;
@@ -53,12 +54,16 @@ export class LevelRenderer {
       else if(t===9&&sim){
         const kind=sim.frozenKinds[i];
         if(kind===1)frame('cm-2',0,px,py);
-        else if(kind===19||kind===43)anim(w===1?'gen1-7':'gen1-5',0,px,py,kind===43?1:0);
+        else if(kind===19||kind===43)anim(w===1?'gen1-7':'gen1-5',0,px,py,kind===43?1:w===2?2:0);
         ctx.fillStyle='#80d9ffe0';ctx.fillRect(px,py,24,24);ctx.strokeStyle='#eefbff';ctx.strokeRect(px+.5,py+.5,23,23);
       }
       else if(t===19||t===43) {
-        const id=w===1?'gen1-7':'gen1-5',direction=sim?((sim.state[i]&7)||((sim.state[i]&28672)>>12)):level.parameters[i];
-        anim(id,w===1?0:Math.max(0,direction-1),px,py,t===43?1:w===2?2:0,0,tick>>1);
+        const id=w===1?'gen1-7':'gen1-5',sprite=a.sprite(id),state=sim?.state[i]??level.parameters[i];
+        const selection=snakeVisual(w,state,tick,1),animation=sprite.animations[selection.animation];
+        if(animation){
+          const af=sprite.animationFrames[animation.start+snakeVisual(w,state,tick,animation.count).frame];
+          frame(id,af.frame,px,py,t===43?1:w===2?2:0,af.flags);
+        }
       } else if(t===6||t===7)r.module(ctx,a.sprite('cm-4'),t===6?0:1,px,py);
       else if(t===30)frame('gen0-7',Math.min(7,Math.floor(Math.max(0,(sim?.state[i]??0)-1)*7/16)),px,py);
       else if(t===28){
@@ -67,18 +72,48 @@ export class LevelRenderer {
           extension=spikeExtension(tick,alternate),reach=spikeReach(tick,alternate);
         for(let segment=0;segment<reach;segment++)
           frame('gen1-1',down?segment:3-segment,px+3,py+(down?1:-1)*(extension-segment*24));
+        const adjacent=i+(down?-level.width:level.width),wall=tile(adjacent);
+        if(wall>=80)frame(`${w}-2`,wall-80,px,py+(down?-24:24));
       }
       else if(t===44){
         const phase=((sim?.state[i]??0)&56)>>3,age=sim?.motion[i]??0;
-        const animId=phase===1?1:phase===3?3:phase===4?4:0;
-        const frameIndex=phase===1?(age>>1)%2:phase===4?Math.min(2,age):0;
+        const animId=phase;
         const sprite=a.sprite('gen3-4'),animation=sprite.animations[animId];
-        if(animation){const af=sprite.animationFrames[animation.start+frameIndex];frame('gen3-4',af.frame,px,py-(phase===3?age:0));}
+        // method_151 resets field_286 after method_160: every phase uses AF zero.
+        if(animation){const af=sprite.animationFrames[animation.start];frame('gen3-4',af.frame,x*24,y*24-(phase===3?age:0));}
+      }
+      else if(t===45||t===46){
+        const id=t===45?'gen3-5':'gen3-7',sprite=a.sprite(id),state=sim?.state[i]??level.parameters[i];
+        const animationId=t===45?state&15:state&31,animation=sprite.animations[animationId];
+        if(animation){
+          const frames=sprite.animationFrames.slice(animation.start,animation.start+animation.count),
+            elapsed=t===45?(state&2088960)>>13:(state&8160)>>5,
+            index=t===46&&(animationId===8||animationId===9)?0:sourceFrameForElapsed(frames.map(f=>f.duration),elapsed,t===45&&animationId===10),
+            af=frames[index],floorSlide=t===45&&(state&7)===1&&obj===35;
+          const drawX=floorSlide?x*24:px,drawY=floorSlide?y*24+motion:py;
+          frame(id,af.frame,drawX+(t===45&&animationId===10?0:af.x),
+            drawY+(t===45&&animationId===10?0:t===46&&(animationId===8||animationId===9)?-motion:af.y),0,af.flags);
+        }
       }
       else if(t===16&&sim){
-        const below=i+level.width,lower=below<sim.tiles.length&&sim.tiles[below]===16?below:i,
-          direction=(sim.state[lower]&7)===4?1:0,elapsed=Math.max(0,36-sim.motion[lower]);
-        anim('gen1-3',direction,px,py,0,0,sim.motion[lower]>0?elapsed:0);
+        // The upper tile is a logical half only; method_202 draws at the lower tile.
+        const below=i+level.width;
+        if(below>=sim.tiles.length||sim.tiles[below]!==16){
+          const sprite=a.sprite('gen1-3'),direction=(sim.state[i]&7)===4?1:0,
+            animation=sprite.animations[direction];
+          const durations=sprite.animationFrames.slice(animation.start,animation.start+animation.count).map(af=>af.duration);
+          const af=sprite.animationFrames[animation.start+crusherFrameIndex(durations,sim.motion[i])];
+          frame('gen1-3',af.frame,x*24+af.x,y*24);
+        }
+      }
+      else if(t===14){
+        const visual=rollingStoneVisual(sim?.state[i]??level.parameters[i],motion,tick,x>0&&tile(i-1)>=0);
+        const sprite=a.sprite('gen1-2');
+        if(visual.dust){
+          const dustModule=sprite.modules[visual.dust.module];
+          r.module(ctx,sprite,visual.dust.module,x*24+visual.dust.x,y*24+visual.dust.y-dustModule.height);
+        }
+        r.module(ctx,sprite,visual.body,x*24+visual.x,y*24+visual.y);
       }
       else if(tileSprite[t]) {
         const id=tileSprite[t],s=a.sprite(id);

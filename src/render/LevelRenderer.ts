@@ -5,6 +5,8 @@ import type { Simulation } from '../core/Simulation.ts';
 import { animationFrameAt, CHEST_OPEN_DURATIONS, fallingDrawOffset } from '../core/PhaseOneRules.ts';
 import { spikeExtension, spikeReach } from '../core/LaterStageRules.ts';
 import { crusherFrameIndex, rollingStoneVisual, scotlandExplosiveVisual, snakeVisual, sourceFrameForElapsed, tibetSliderVisual } from './OriginalAnimationRules.ts';
+import { AngkorBoss } from '../core/AngkorBoss.ts';
+import { BavariaBoss } from '../core/BavariaBoss.ts';
 const tileSprite:Record<number,string>={8:'gen0-5',11:'gen1-4',14:'gen1-2',16:'gen1-3',18:'gen3-9',22:'gen0-9',23:'gen0-9',28:'gen1-1',34:'gen2-4',35:'gen2-4',36:'gen0-8',37:'gen2-5',38:'gen2-6',39:'gen2-6',40:'gen2-7',42:'gen3-1',44:'gen3-4',45:'gen3-5',46:'gen3-7',47:'gen2-3',48:'gen3-2',49:'gen4-1'};
 export class LevelRenderer {
   assets:AssetManager; sprites:SpriteRenderer;
@@ -141,12 +143,17 @@ export class LevelRenderer {
         ctx.fillStyle='#ed489d';ctx.fillRect(px,py,24,24);ctx.fillStyle='#100719';ctx.font='10px monospace';ctx.fillText(String(t),px+2,py+15);
       }
     }
-    if(sim?.boss){
+    if(sim?.boss instanceof AngkorBoss){
       const boss=sim.boss;
       if(boss.visible)anim('b0-0',boss.animation,boss.x*24,boss.drawY,0,0,boss.animationAge);
       if(boss.phase===11)anim('gen1-0',2,(boss.x+1)*24,96,0,0,boss.age);
       if(boss.phase===7)anim('gen0-3',1,boss.x*24+tick*boss.age%48,boss.drawY,0,0,tick);
       for(const x of [10,12,15])frame('b0-1',1,x*24,216);
+    }
+    if(sim?.boss instanceof BavariaBoss&&sim.boss.visible){
+      const boss=sim.boss,sprite=a.sprite('b1-0'),af=r.animationFrame(sprite,boss.animation,boss.animationAge);
+      r.frame(ctx,sprite,af.frame,boss.x+af.x,504+af.y,af.flags);
+      if(boss.phase===12)anim('gen0-3',0,boss.x+tick*boss.age%48,528,0,0,tick);
     }
     if(sim)for(const smoke of sim.enemySmoke)r.animation(ctx,a.sprite('cm-3'),0,Math.min(6,smoke.age>>1),(smoke.cell%level.width)*24,Math.floor(smoke.cell/level.width)*24);
     if(sim?.hook){

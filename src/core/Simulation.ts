@@ -4,6 +4,7 @@ import { ENGINE_REVISION, levelFingerprint } from './Compatibility.ts';
 import { animationFrameAt, BOULDER_BRACE_TICKS, BOULDER_PRESSURE_TICKS, CHEST_OPEN_DURATIONS, fireReach, HAMMER_ATTACK_TICKS, HAMMER_BOUNCE_TICKS, HAMMER_IMPACT_TICK } from './PhaseOneRules.ts';
 import { spikeExtension, spikeReach } from './LaterStageRules.ts';
 import { AngkorBoss } from './AngkorBoss.ts';
+import { BavariaBoss } from './BavariaBoss.ts';
 export type Direction=0|1|2|3|4;
 export const DX=[0,0,1,0,-1], DY=[0,-1,0,1,0];
 export interface DemoEdit {cell:number;object?:number;parameter?:number;state?:number}
@@ -40,13 +41,14 @@ export class Simulation {
   pendingDirection:Direction=0;private actionHeld=false;private lastInputDirection:Direction=0;entranceGate=-1;
   readonly initial:StageStart;
   readonly initialLevelFingerprint:string;
-  boss:AngkorBoss|null=null;
+  boss:AngkorBoss|BavariaBoss|null=null;
   constructor(level:LevelDefinition,initial:StageStart={diamonds:0,redDiamonds:0,lives:5,health:4}){
     this.initialLevelFingerprint=levelFingerprint(level);
     this.initial={...initial};this.diamonds=initial.diamonds;this.redDiamonds=initial.redDiamonds;
     this.lives=initial.lives;this.health=initial.health;this.weaponTier=initial.weaponTier??0;
     this.level={...level,tiles:[...level.tiles],parameters:[...level.parameters],objects:[...level.objects]};
     if(level.world===0&&level.index===8)this.boss=new AngkorBoss();
+    if(level.world===1&&level.index===9)this.boss=new BavariaBoss();
     this.tiles=Int16Array.from(level.tiles,t=>t===255?-1:t);this.state=new Int32Array(this.tiles.length);
     this.motion=new Int16Array(this.tiles.length);this.active=new Int16Array(this.tiles.length);
     this.chestFrames=new Int16Array(this.tiles.length);this.frozenKinds=new Int16Array(this.tiles.length).fill(-1);

@@ -6,6 +6,8 @@ export class AngkorBoss {
   markerX=-1;markerY=-1;attackDone=false;
   get x(){return [10,12,15][this.column];}
   get visible(){return ![0,6,8].includes(this.phase);}
+  get maxHealth(){return 3;}
+  get showHealth(){return this.phase!==0&&this.phase!==8&&this.health>0;}
   reset(){this.phase=0;this.age=0;this.health=3;this.column=0;this.animation=0;this.animationAge=0;
     this.markerX=-1;this.markerY=-1;this.attackDone=false;}
   private setAnimation(n:number){if(n!==this.animation){this.animation=n;this.animationAge=0;}else this.animationAge++;}

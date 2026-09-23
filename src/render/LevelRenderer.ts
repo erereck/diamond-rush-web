@@ -3,7 +3,7 @@ import type { LevelDefinition } from '../level/LevelParser.ts';
 import { SpriteRenderer } from './SpriteRenderer.ts';
 import type { Simulation } from '../core/Simulation.ts';
 import { animationFrameAt, CHEST_OPEN_DURATIONS, fallingDrawOffset } from '../core/PhaseOneRules.ts';
-const tileSprite:Record<number,string>={8:'gen0-5',11:'gen1-4',14:'gen1-2',16:'gen1-3',18:'gen3-9',22:'gen0-9',23:'gen0-9',24:'gen1-9',26:'gen1-9',27:'gen1-9',28:'gen0-8',34:'gen2-4',35:'gen2-4',36:'gen0-8',37:'gen2-5',38:'gen2-6',39:'gen2-6',40:'gen2-7',42:'gen3-1',44:'gen3-4',45:'gen3-5',46:'gen3-7',47:'gen2-3',48:'gen3-2',49:'gen4-1'};
+const tileSprite:Record<number,string>={8:'gen0-5',11:'gen1-4',14:'gen1-2',16:'gen1-3',18:'gen3-9',22:'gen0-9',23:'gen0-9',28:'gen0-8',34:'gen2-4',35:'gen2-4',36:'gen0-8',37:'gen2-5',38:'gen2-6',39:'gen2-6',40:'gen2-7',42:'gen3-1',44:'gen3-4',45:'gen3-5',46:'gen3-7',47:'gen2-3',48:'gen3-2',49:'gen4-1'};
 export class LevelRenderer {
   assets:AssetManager; sprites:SpriteRenderer;
   constructor(assets:AssetManager,sprites:SpriteRenderer){this.assets=assets;this.sprites=sprites;}
@@ -48,6 +48,13 @@ export class LevelRenderer {
       else if(t===1)frame('cm-2',sparkle,px,py);
       else if(t===2)frame('cm-2',sparkle,px,py,1);
       else if(t===4||t===5)r.module(ctx,a.sprite('gen0-2'),0,px,py,0,t===5?1:0);
+      else if(t===24||t===27||t===26)r.module(ctx,a.sprite('gen1-9'),t===24?0:t===27?1:2,px,py);
+      else if(t===9&&sim){
+        const kind=sim.frozenKinds[i];
+        if(kind===1)frame('cm-2',0,px,py);
+        else if(kind===19||kind===43)anim(w===1?'gen1-7':'gen1-5',0,px,py,kind===43?1:0);
+        ctx.fillStyle='#80d9ffe0';ctx.fillRect(px,py,24,24);ctx.strokeStyle='#eefbff';ctx.strokeRect(px+.5,py+.5,23,23);
+      }
       else if(t===19||t===43) {
         const id=w===1?'gen1-7':'gen1-5',direction=sim?((sim.state[i]&7)||((sim.state[i]&28672)>>12)):level.parameters[i];
         anim(id,w===1?0:Math.max(0,direction-1),px,py,t===43?1:w===2?2:0,0,tick>>1);
@@ -63,6 +70,10 @@ export class LevelRenderer {
       }
     }
     if(sim)for(const smoke of sim.enemySmoke)r.animation(ctx,a.sprite('cm-3'),0,Math.min(6,smoke.age>>1),(smoke.cell%level.width)*24,Math.floor(smoke.cell/level.width)*24);
+    if(sim?.hook){
+      const p=sim.player,h=sim.hook;
+      ctx.strokeStyle='#e5d1a7';ctx.lineWidth=2;ctx.setLineDash([4,2]);ctx.beginPath();ctx.moveTo(p.x*24+12,p.y*24+12);ctx.lineTo(h.x*24+12,h.y*24+12);ctx.stroke();ctx.setLineDash([]);
+    }
     if(sim&&!sim.respawnTravel) {
       const p=sim.player;
       if(sim.invulnerable%4<2){
@@ -74,6 +85,7 @@ export class LevelRenderer {
           const prize=level.tiles[sim.chestCell],rx=p.x*24-p.dx*p.offset+af.x,ry=p.y*24-p.dy*p.offset+af.y-24;
           if(prize===2||prize===41)r.frame(ctx,a.sprite('cm-2'),0,rx,ry,0,prize===2?1:0);
           else if(prize===42)r.frame(ctx,a.sprite('gen3-1'),0,rx,ry);
+          else if(prize===24||prize===27||prize===26)r.module(ctx,a.sprite('gen1-9'),prize===24?0:prize===27?1:2,rx,ry);
           else if(prize===4||prize===5)r.module(ctx,a.sprite('gen0-2'),0,rx+6,ry,0,prize===5?1:0);
           else if(prize===6||prize===7)r.module(ctx,a.sprite('cm-4'),prize===6?0:1,rx,ry);
         }

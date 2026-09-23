@@ -5,12 +5,12 @@ import { animationFrameAt, BOULDER_BRACE_TICKS, BOULDER_PRESSURE_TICKS, CHEST_OP
 export type Direction=0|1|2|3|4;
 export const DX=[0,0,1,0,-1], DY=[0,-1,0,1,0];
 export interface InputFrame {direction:Direction;action:boolean;reset?:boolean}
-export interface StageStart {diamonds:number;redDiamonds:number;lives:number;health:number}
+export interface StageStart {diamonds:number;redDiamonds:number;lives:number;health:number;weaponTier?:0|1|2|8}
 export interface Replay {version:3;target:'1.2.0-s700';engine:typeof ENGINE_REVISION;levelFingerprint:string;world:number;level:number;initial:StageStart;inputs:InputFrame[]}
 /** Tile cases which set var15=true in cGame.method_288. */
 export const WALKABLE_TILES=new Set([-1,1,2,4,5,6,7,11,14,19,24,26,27,33,40,41,42,43,45,50,51,52,53]);
 interface CheckpointState {
-  tiles:Int16Array; state:Int32Array; motion:Int16Array; active:Int16Array; chestFrames:Int16Array;
+  tiles:Int16Array; state:Int32Array; motion:Int16Array; active:Int16Array; chestFrames:Int16Array; frozenKinds:Int16Array;
   gatePhases:Int16Array;gateCounts:Int16Array;unlockedGates:number[];goldKeys:number;silverKeys:number;
   x:number;y:number;diamonds:number;redDiamonds:number;opened:number[];
 }
@@ -25,16 +25,19 @@ export class Simulation {
   lives=5;hurtTicks=0;deathTicks=0;chestCell=-1;chestTicks=0;exitDirection:Direction=0;stonePressure=0;
   respawnTravel=false;respawnFlash=0;respawnTarget={x:0,y:0};
   enemySmoke:{cell:number;age:number}[]=[];hits=0;retries=0;
+  weaponTier:0|1|2|8=0;attackTicks=0;
+  hook:{x:number;y:number;direction:2|4;ticks:number}|null=null;
+  frozenKinds:Int16Array;permanentEquipmentChests=new Set<number>();
   goldKeys=0;silverKeys=0;gatePhases:Int16Array;gateCounts:Int16Array;unlockedGates=new Set<number>();
   permanentPickups=new Set<number>();
   pendingDirection:Direction=0;private actionHeld=false;private lastInputDirection:Direction=0;entranceGate=-1;
   readonly initial:StageStart;
   constructor(level:LevelDefinition,initial:StageStart={diamonds:0,redDiamonds:0,lives:5,health:4}){
     this.initial={...initial};this.diamonds=initial.diamonds;this.redDiamonds=initial.redDiamonds;
-    this.lives=initial.lives;this.health=initial.health;
+    this.lives=initial.lives;this.health=initial.health;this.weaponTier=initial.weaponTier??0;
     this.level=level;this.tiles=Int16Array.from(level.tiles,t=>t===255?-1:t);this.state=new Int32Array(this.tiles.length);
     this.motion=new Int16Array(this.tiles.length);this.active=new Int16Array(this.tiles.length);
-    this.chestFrames=new Int16Array(this.tiles.length);
+    this.chestFrames=new Int16Array(this.tiles.length);this.frozenKinds=new Int16Array(this.tiles.length).fill(-1);
     this.gatePhases=new Int16Array(this.tiles.length);this.gateCounts=new Int16Array(this.tiles.length);
     this.tiles.forEach((t,i)=>{
       const p=level.parameters[i]===255?-1:level.parameters[i];
@@ -44,6 +47,14 @@ export class Simulation {
       if(t===19||t===43){this.state[i]=p;this.active[i]=48;}
       if(t===22||t===23)this.active[i]=48;
     });
+    // The equipment level lives in recordData[9], so revisiting its chest
+    // after a campaign save must not award the same upgrade a second time.
+    for(let i=0;i<this.tiles.length;i++){
+      const reward=this.tiles[i],required=reward===24?1:reward===27?2:reward===26?8:0;
+      if(required&&this.weaponTier>=required&&[14,33].includes(level.objects[i])){
+        this.tiles[i]=-1;this.chestFrames[i]=3;this.opened.add(i);this.permanentEquipmentChests.add(i);
+      }
+    }
     // cGame.method_294/296: each numbered door waits for its matching locks.
     for(let i=0;i<this.tiles.length;i++)if(this.level.objects[i]===7){
       const id=this.level.parameters[i],x=i%level.width,y=Math.floor(i/level.width);
@@ -85,20 +96,21 @@ export class Simulation {
   }
   private captureCheckpoint(){
     this.savedCheckpoint={tiles:this.tiles.slice(),state:this.state.slice(),motion:this.motion.slice(),active:this.active.slice(),
-      chestFrames:this.chestFrames.slice(),gatePhases:this.gatePhases.slice(),gateCounts:this.gateCounts.slice(),
+      chestFrames:this.chestFrames.slice(),frozenKinds:this.frozenKinds.slice(),gatePhases:this.gatePhases.slice(),gateCounts:this.gateCounts.slice(),
       unlockedGates:[...this.unlockedGates],goldKeys:this.goldKeys,silverKeys:this.silverKeys,
       x:this.player.x,y:this.player.y,diamonds:this.diamonds,redDiamonds:this.redDiamonds,opened:[...this.opened]};
   }
   restoreCheckpoint(heal=false,travel=false){
     const previousCamera={x:this.camera.x,y:this.camera.y};
     const save=this.savedCheckpoint;
-    this.tiles.set(save.tiles);this.state.set(save.state);this.motion.set(save.motion);this.active.set(save.active);this.chestFrames.set(save.chestFrames);
+    this.tiles.set(save.tiles);this.state.set(save.state);this.motion.set(save.motion);this.active.set(save.active);this.chestFrames.set(save.chestFrames);this.frozenKinds.set(save.frozenKinds);
     for(const i of this.permanentPickups)this.tiles[i]=-1;
+    for(const i of this.permanentEquipmentChests){this.tiles[i]=-1;this.chestFrames[i]=3;}
     this.gatePhases.set(save.gatePhases);this.gateCounts.set(save.gateCounts);this.unlockedGates=new Set(save.unlockedGates);
     this.goldKeys=save.goldKeys;this.silverKeys=save.silverKeys;
     this.player={x:save.x,y:save.y,dx:0,dy:1,offset:0,direction:3};
-    this.diamonds=save.diamonds;this.redDiamonds=save.redDiamonds;this.opened=new Set(save.opened);
-    this.hurtTicks=0;this.deathTicks=0;this.chestCell=-1;this.chestTicks=0;this.exitDirection=0;this.pendingDirection=0;this.pushDelay=6;this.stonePressure=0;
+    this.diamonds=save.diamonds;this.redDiamonds=save.redDiamonds;this.opened=new Set([...save.opened,...this.permanentEquipmentChests]);
+    this.hurtTicks=0;this.deathTicks=0;this.chestCell=-1;this.chestTicks=0;this.exitDirection=0;this.pendingDirection=0;this.pushDelay=6;this.stonePressure=0;this.attackTicks=0;this.hook=null;
     if(heal){this.health=4;this.invulnerable=40;}
     this.playerAnimation=2;this.animationTick=0;
     // method_347 reactivates the saved objects; it does not reset the global clock.
@@ -124,13 +136,13 @@ export class Simulation {
     else {this.health=0;this.hurtTicks=0;this.deathTicks=80;this.invulnerable=0;this.pendingDirection=0;this.setAnimation(19);this.events.push('death');}
   }
   setAnimation(n:number){if(n!==this.playerAnimation){this.playerAnimation=n;this.animationTick=0;}}
-  /** Subset of method_351: normal gravity, diamonds, boulder support and delayed rolling. */
+  /** Subset of method_351: normal gravity, diamonds, ice blocks, boulder support and delayed rolling. */
   updateFalling(x:number,y:number){
     const i=this.index(x,y),t=this.tiles[i];let s=this.state[i],m=this.motion[i],dir=s&7;
     const below=this.index(x,y+1);
     if(t===1&&this.overlap(x,y,dir,m)){this.tiles[i]=-1;this.diamonds++;this.events.push('diamond');this.wake(x,y);return;}
     if(m<=0){
-      if(dir===3&&this.isPlayer(x,y+1)&&this.free(x,y+1)){if(t===0)this.hurt(2);this.state[i]=s&~7;}
+      if(dir===3&&this.isPlayer(x,y+1)&&this.free(x,y+1)){if(t===0||t===9)this.hurt(2);this.state[i]=s&~7;}
       else if(this.free(x,y+1)&&!this.isPlayer(x,y)&&!this.isPlayer(x,y+1)&&
         // method_351's extra AABB test prevents falling through a departing hero.
         !(Math.abs(x*24-(this.player.x*24-this.player.dx*this.player.offset))<24&&
@@ -165,7 +177,10 @@ export class Simulation {
     }
   }
   moveObject(from:number,to:number,t:number,state:number,motion:number){
-    if(from!==to){this.tiles[from]=-1;this.state[from]=0;this.motion[from]=0;}
+    if(from!==to){
+      this.tiles[from]=-1;this.state[from]=0;this.motion[from]=0;
+      this.frozenKinds[to]=this.frozenKinds[from];this.frozenKinds[from]=-1;
+    }
     this.tiles[to]=t;this.state[to]=state;this.motion[to]=motion;this.active[to]=48;
   }
   overlap(x:number,y:number,dir:number,m:number){
@@ -179,9 +194,23 @@ export class Simulation {
     const i=this.index(x,y),kind=this.tiles[i];let s=this.state[i],dir=s&7,m=this.motion[i],tx=x,ty=y;
     const above=this.index(x,y-1);
     if(above>=0&&[0,1].includes(this.tiles[above])&&this.motion[above]<=6&&(this.state[above]&7)===3){this.tiles[i]=-1;this.enemySmoke.push({cell:i,age:0});this.events.push('enemy-death');this.wake(x,y);return;}
+    if(s&248){
+      if((this.tick&3)===0){s-=8;if(kind===43&&(s&248)===0)s=s&~3840|3072;this.state[i]=s;}
+      this.active[i]=24;return;
+    }
     if(m<=0){
       this.wake(x,y);
-      if(!dir){dir=(s&28672)>>12;m=21;s=s&~7|dir;if(this.enemyFree(x+DX[dir],y+DY[dir])){tx+=DX[dir];ty+=DY[dir];}else m=0;}
+      if(kind===43&&(s&3840)){
+        // method_325 uses method_324 for the red snake's short pursuit after a hit.
+        const gapX=this.player.x-x,gapY=this.player.y-y;
+        const horizontal:Direction=gapX>0?2:gapX<0?4:0;
+        const vertical:Direction=gapY>0?3:gapY<0?1:0;
+        const choices=Math.abs(gapX)>Math.abs(gapY)?[horizontal,vertical]:[vertical,horizontal];
+        dir=choices.find(side=>side>0&&this.enemyFree(x+DX[side],y+DY[side]))??0;
+        m=dir?18:0;s=(s&~7)|dir;s-=256;
+        tx+=DX[dir];ty+=DY[dir];
+      }
+      else if(!dir){dir=(s&28672)>>12;m=21;s=s&~7|dir;if(this.enemyFree(x+DX[dir],y+DY[dir])){tx+=DX[dir];ty+=DY[dir];}else m=0;}
       else if(this.enemyFree(x+DX[dir],y+DY[dir])){m=21;tx+=DX[dir];ty+=DY[dir];}
       else {const reverse=[0,3,4,1,2][dir];s=s&~28672|(reverse<<12);s&=~7;dir=0;m=21;}
       const dest=this.index(tx,ty);this.moveObject(i,dest,kind,s,m);
@@ -202,6 +231,67 @@ export class Simulation {
     }
     if(age>=16){this.tiles[i]=-1;this.state[i]=0;this.wake(x,y);}
     else {this.state[i]=age+1;this.active[i]=24;}
+  }
+  private freeze(x:number,y:number){
+    const i=this.index(x,y),kind=this.tile(x,y);
+    if(i<0||![1,19,43].includes(kind))return false;
+    this.frozenKinds[i]=kind;this.tiles[i]=9;this.state[i]=0;this.motion[i]=0;this.active[i]=24;
+    this.events.push('freeze');this.wake(x,y);return true;
+  }
+  private thaw(x:number,y:number){
+    const i=this.index(x,y),kind=this.frozenKinds[i];if(i<0||kind<0)return;
+    this.tiles[i]=kind;this.frozenKinds[i]=-1;
+    // method_231 restores snakes through method_233, leaving them stunned.
+    this.state[i]=kind===19||kind===43?120|(this.isPlayer(x,y-1)?2:1):0;
+    this.motion[i]=0;
+    this.active[i]=48;this.events.push('thaw');this.wake(x,y);
+  }
+  private hammer(x:number,y:number){
+    const i=this.index(x,y),kind=this.tile(x,y);if(i<0)return;
+    if(kind===9){this.thaw(x,y);return;}
+    if(kind===30){this.triggerBrick(x,y);return;}
+    if(kind===10){this.state[i]=1;this.active[i]=24;this.events.push('grass');return;}
+    if(this.weaponTier===8&&this.freeze(x,y))return;
+    if(kind===19||kind===43){this.state[i]=this.state[i]&~248|120;this.motion[i]=0;this.active[i]=24;this.events.push('enemy-hit');return;}
+    if(kind>=0)this.events.push('hammer-block');
+  }
+  /** The hook reaches two or three cells horizontally and draws its target toward the hero. */
+  private hookTarget(direction:2|4){
+    const p=this.player;
+    for(let distance=1;distance<=3;distance++){
+      const x=p.x+DX[direction]*distance,y=p.y,kind=this.tile(x,y);
+      if(this.index(x,y)<0||[14,33,7].includes(this.object(x,y)))return null;
+      if(kind<0)continue;
+      if(distance>=2&&[0,1,2,4,5,6,7,8,9,11,14,19,43,47,48,49].includes(kind))return {x,y,direction,ticks:0};
+      return null;
+    }
+    return null;
+  }
+  private useWeapon(){
+    const p=this.player,direction=p.direction;
+    // method_227 checks the hook on both sides, then nearby hammer targets.
+    const forwardHook=this.weaponTier>=2&&(direction===2||direction===4)?this.hookTarget(direction):null;
+    const hookDirections: (2|4)[]=direction===4?[2]:direction===2?[4]:[2,4];
+    const adjacent:[Direction,number,number][]=[direction,1,2,3,4]
+      .filter((side,index,sides)=>side!==0&&sides.indexOf(side)===index)
+      .map(side=>[side as Direction,p.x+DX[side],p.y+DY[side]]);
+    const aimed=adjacent.find(([,x,y])=>[9,10,18,19,30,43].includes(this.tile(x,y)));
+    const target=forwardHook??(!aimed&&this.weaponTier>=2?hookDirections.map(side=>this.hookTarget(side)).find(Boolean):null);
+    if(target){
+      p.direction=target.direction;this.hook=target;this.attackTicks=4+Math.abs(target.x-p.x)*4;
+      this.setAnimation(19+target.direction);this.events.push('hook');return;
+    }
+    const [side,x,y]=aimed??adjacent[0];
+    p.direction=side;this.attackTicks=8;this.setAnimation(40+side);this.hammer(x,y);this.events.push('hammer');
+  }
+  private advanceHook(){
+    const hook=this.hook;if(!hook)return;
+    if(++hook.ticks<4)return;hook.ticks=0;
+    if(Math.abs(hook.x-this.player.x)<=1)return;
+    const nextX=hook.x-DX[hook.direction],from=this.index(hook.x,hook.y),to=this.index(nextX,hook.y);
+    if(from<0||to<0||this.tiles[from]<0||!this.free(nextX,hook.y)){this.hook=null;return;}
+    this.moveObject(from,to,this.tiles[from],this.state[from],0);hook.x=nextX;
+    this.wake(nextX,hook.y);this.events.push('hook-pull');
   }
   step(input:InputFrame){
     if(this.status!=='playing')return;
@@ -230,7 +320,8 @@ export class Simulation {
     for(let y=Math.min(this.level.height-2,this.player.y+8);y>=Math.max(1,this.player.y-8);y--){
       for(let x=Math.max(1,this.player.x-8);x<=Math.min(this.level.width-2,this.player.x+8);x++){
         const i=this.index(x,y);if(this.active[i]<=0)continue;this.active[i]-=6;
-        if(this.tiles[i]===0||this.tiles[i]===1)this.updateFalling(x,y);
+        if(this.hook?.x===x&&this.hook.y===y){this.active[i]=24;continue;}
+        if(this.tiles[i]===0||this.tiles[i]===1||this.tiles[i]===9)this.updateFalling(x,y);
         else if(this.tiles[i]===19||this.tiles[i]===43)this.updateSnake(x,y);
         else if(this.tiles[i]===30)this.updateBrick(x,y);
         else if(this.tiles[i]===22||this.tiles[i]===23){
@@ -277,13 +368,25 @@ export class Simulation {
         else if(reward===6)this.lives=Math.min(99,this.lives+1);
         else if(reward===7)this.health=4;
         else if(reward===41){const amount=this.level.parameters[this.chestCell];this.diamonds+=amount===255?1:Math.max(1,amount);}
+        else if(reward===24||reward===27||reward===26){
+          this.weaponTier=reward===24?Math.max(this.weaponTier,1) as 1|2|8:reward===27?Math.max(this.weaponTier,2) as 2|8:8;
+          this.permanentEquipmentChests.add(this.chestCell);this.events.push('weapon');
+        }
         this.events.push('chest-reward');
       }
       if(this.chestTicks>=CHEST_OPEN_DURATIONS.reduce((a,b)=>a+b,0)){this.chestCell=-1;this.setAnimation(p.direction-1);}
       this.updateCamera();return;
     }
-    if(this.hurtTicks||this.deathTicks){p.offset=Math.max(0,p.offset-6);this.pendingDirection=0;this.updateCamera();return;}
+    if(this.hurtTicks||this.deathTicks){p.offset=Math.max(0,p.offset-6);this.pendingDirection=0;this.attackTicks=0;this.hook=null;this.updateCamera();return;}
+    if(this.attackTicks>0){
+      if(this.hook)this.advanceHook();
+      if(--this.attackTicks===0){this.hook=null;this.setAnimation(p.direction-1);}
+      this.pendingDirection=0;this.updateCamera();return;
+    }
     if(actionPressed&&this.index(p.x,p.y)===this.checkpoint&&p.offset===0){this.restoreCheckpoint(false,true);return;}
+    if(actionPressed&&this.weaponTier>0&&p.offset===0&&!this.exitDirection){
+      this.useWeapon();this.pendingDirection=0;this.updateCamera();return;
+    }
     const direction=this.exitDirection||input.direction||this.pendingDirection;
     if(p.offset>0)p.offset=Math.max(0,p.offset-6);
     else if(direction){
@@ -331,5 +434,5 @@ export class Simulation {
   }
   private updateCamera(){const p=this.player;this.camera.update(p.x*24-p.dx*p.offset,p.y*24-p.dy*p.offset,this.level.width,this.level.height);}
   replay():Replay{return {version:3,target:'1.2.0-s700',engine:ENGINE_REVISION,levelFingerprint:levelFingerprint(this.level),world:this.level.world,level:this.level.index,initial:{...this.initial},inputs:this.inputs.map(i=>({...i}))};}
-  snapshot(){return {tick:this.tick,player:{...this.player},camera:{x:this.camera.x,y:this.camera.y},tiles:[...this.tiles],state:[...this.state],motion:[...this.motion],active:[...this.active],diamonds:this.diamonds,redDiamonds:this.redDiamonds,goldKeys:this.goldKeys,silverKeys:this.silverKeys,gatePhases:[...this.gatePhases],gateCounts:[...this.gateCounts],unlockedGates:[...this.unlockedGates],permanentPickups:[...this.permanentPickups],health:this.health,invulnerable:this.invulnerable,status:this.status,playerAnimation:this.playerAnimation,animationTick:this.animationTick,pushDelay:this.pushDelay,checkpoint:this.checkpoint,checkpointOrder:this.checkpointOrder,opened:[...this.opened],chestFrames:[...this.chestFrames],chestCell:this.chestCell,chestTicks:this.chestTicks,lives:this.lives,hurtTicks:this.hurtTicks,deathTicks:this.deathTicks,respawnTravel:this.respawnTravel,respawnFlash:this.respawnFlash,respawnTarget:{...this.respawnTarget},exitDirection:this.exitDirection,stonePressure:this.stonePressure,pendingDirection:this.pendingDirection,lastInputDirection:this.lastInputDirection,actionHeld:this.actionHeld,entranceGate:this.entranceGate,enemySmoke:this.enemySmoke.map(s=>({...s})),hits:this.hits,retries:this.retries,savedCheckpoint:structuredClone(this.savedCheckpoint)};}
+  snapshot(){return {tick:this.tick,player:{...this.player},camera:{x:this.camera.x,y:this.camera.y},tiles:[...this.tiles],state:[...this.state],motion:[...this.motion],active:[...this.active],frozenKinds:[...this.frozenKinds],diamonds:this.diamonds,redDiamonds:this.redDiamonds,goldKeys:this.goldKeys,silverKeys:this.silverKeys,gatePhases:[...this.gatePhases],gateCounts:[...this.gateCounts],unlockedGates:[...this.unlockedGates],permanentPickups:[...this.permanentPickups],permanentEquipmentChests:[...this.permanentEquipmentChests],weaponTier:this.weaponTier,attackTicks:this.attackTicks,hook:this.hook?{...this.hook}:null,health:this.health,invulnerable:this.invulnerable,status:this.status,playerAnimation:this.playerAnimation,animationTick:this.animationTick,pushDelay:this.pushDelay,checkpoint:this.checkpoint,checkpointOrder:this.checkpointOrder,opened:[...this.opened],chestFrames:[...this.chestFrames],chestCell:this.chestCell,chestTicks:this.chestTicks,lives:this.lives,hurtTicks:this.hurtTicks,deathTicks:this.deathTicks,respawnTravel:this.respawnTravel,respawnFlash:this.respawnFlash,respawnTarget:{...this.respawnTarget},exitDirection:this.exitDirection,stonePressure:this.stonePressure,pendingDirection:this.pendingDirection,lastInputDirection:this.lastInputDirection,actionHeld:this.actionHeld,entranceGate:this.entranceGate,enemySmoke:this.enemySmoke.map(s=>({...s})),hits:this.hits,retries:this.retries,savedCheckpoint:structuredClone(this.savedCheckpoint)};}
 }

@@ -10,7 +10,7 @@ export interface Campaign {
   resources:StageStart;
 }
 export function newCampaign():Campaign {
-  return {version:1,completed:[[],[],[]],world:0,selected:0,resources:{diamonds:0,redDiamonds:0,lives:5,health:4}};
+  return {version:1,completed:[[],[],[]],world:0,selected:0,resources:{diamonds:0,redDiamonds:0,lives:5,health:4,weaponTier:0}};
 }
 export function unlockedWorld(c:Campaign,world:number,maps:MapNode[][]):boolean {
   if(world===0)return true;
@@ -43,6 +43,6 @@ export function validateCampaign(value:unknown,maps:MapNode[][]):Campaign {
   for(let w=0;w<3;w++)if(!Array.isArray(c.completed[w])||c.completed[w].some(n=>!Number.isInteger(n)||!maps[w].some(node=>node.level===n)))throw new Error('Fases salvas inválidas');
   if(!Number.isInteger(c.world)||c.world<0||c.world>2||!unlockedWorld(c,c.world,maps)||!maps[c.world].some(n=>n.level===c.selected&&unlockedNode(c,c.world,n,maps)))throw new Error('Mapa salvo inválido');
   const r=c.resources;
-  if(!r||![r.diamonds,r.redDiamonds,r.lives,r.health].every(Number.isInteger)||r.diamonds<0||r.diamonds>65535||r.redDiamonds<0||r.redDiamonds>65535||r.lives<0||r.lives>99||r.health<1||r.health>4)throw new Error('Recursos salvos inválidos');
-  return {version:1,completed:c.completed.map(a=>[...new Set(a)]),world:c.world,selected:c.selected,resources:{...r}};
+  if(!r||![r.diamonds,r.redDiamonds,r.lives,r.health].every(Number.isInteger)||r.diamonds<0||r.diamonds>65535||r.redDiamonds<0||r.redDiamonds>65535||r.lives<0||r.lives>99||r.health<1||r.health>4||![0,1,2,8].includes(r.weaponTier??0))throw new Error('Recursos salvos inválidos');
+  return {version:1,completed:c.completed.map(a=>[...new Set(a)]),world:c.world,selected:c.selected,resources:{...r,weaponTier:r.weaponTier??0}};
 }

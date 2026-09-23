@@ -14,7 +14,7 @@ export function validateReplay(value:unknown,worlds:WorldDefinition[]):Replay {
   if(!initial||!Number.isInteger(initial.diamonds)||initial.diamonds<0||initial.diamonds>65535||
     !Number.isInteger(initial.redDiamonds)||initial.redDiamonds<0||initial.redDiamonds>65535||
     !Number.isInteger(initial.lives)||initial.lives<0||initial.lives>99||
-    !Number.isInteger(initial.health)||initial.health<1||initial.health>4)
+    !Number.isInteger(initial.health)||initial.health<1||initial.health>4||![0,1,2,8].includes(initial.weaponTier??0))
     throw new Error('Estado inicial da fase inválido.');
   for(const input of r.inputs){if(!input||!Number.isInteger(input.direction)||input.direction<0||input.direction>4||typeof input.action!=='boolean'||(input.reset!==undefined&&typeof input.reset!=='boolean'))throw new Error('Entrada inválida no replay.');}
   return {version:3,target:'1.2.0-s700',engine:ENGINE_REVISION,levelFingerprint:r.levelFingerprint,world:r.world,level:r.level,

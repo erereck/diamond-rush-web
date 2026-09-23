@@ -23,6 +23,8 @@ test('world access and saved campaign validation cannot skip locked maps',()=>{
   c=finishLevel(c,0,8,{diamonds:28,redDiamonds:2,lives:4,health:3});
   assert.equal(unlockedWorld(c,1,maps),true);
   const restored=validateCampaign(JSON.parse(JSON.stringify(c)),maps);
-  assert.deepEqual(restored.resources,{diamonds:28,redDiamonds:2,lives:4,health:3});
+  assert.deepEqual(restored.resources,{diamonds:28,redDiamonds:2,lives:4,health:3,weaponTier:0});
+  assert.equal(validateCampaign({...c,resources:{diamonds:28,redDiamonds:2,lives:4,health:3,weaponTier:8}},maps).resources.weaponTier,8);
+  assert.throws(()=>validateCampaign({...c,resources:{...c.resources,weaponTier:3}},maps));
   assert.throws(()=>validateCampaign({...c,selected:10},maps));
 });

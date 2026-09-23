@@ -24,6 +24,10 @@ test('RMS preserves unknown header/trailing bytes without aliasing input or outp
   const save=new CanonicalSave(bytes);assert.equal(save.lives,-1);assert.equal(save.diamonds,0x1234);assert.deepEqual(save.export(),bytes);
   bytes[12]=0;const exported=save.export();exported[12]=0;assert.equal(save.export()[12],123);
 });
+test('RMS equipment byte follows the three original upgrade tiers',()=>{
+  const save=new CanonicalSave(expected);assert.equal(save.weaponTier,0);
+  for(const tier of [1,2,8] as const){save.setWeaponTier(tier);assert.equal(save.export()[9],tier);assert.equal(new CanonicalSave(save.export()).weaponTier,tier);}
+});
 test('RMS chest collection is idempotent, flags are ORed and other bytes survive',()=>{
   const save=new CanonicalSave(expected);assert.equal(save.openChest(0,0,1,1),true);assert.equal(save.openChest(0,0,1,1),false);assert.equal(save.openChest(0,0,0,0),false);
   save.addLevelFlags(0,0,2);save.addLevelFlags(0,0,64);save.setLevelStatus(0,0,3);

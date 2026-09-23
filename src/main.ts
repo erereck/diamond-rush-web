@@ -47,7 +47,7 @@ function completionBonus(s:Simulation){
   const totals=stageCollectibleTotals(s.level);
   return Number(s.diamonds-s.initial.diamonds>=totals.diamonds)+Number(s.redDiamonds-s.initial.redDiamonds>=totals.redDiamonds)+Number(s.hits===0)+Number(s.retries===0);
 }
-function completeCampaignStage(){const s=simulation;if(!s||!campaign||s.status!=='complete')return;const firstClear=!campaign.completed[s.level.world].includes(s.level.index);campaign=finishLevel(campaign,s.level.world,s.level.index,{diamonds:s.diamonds,redDiamonds:s.redDiamonds,lives:Math.min(99,s.lives+(firstClear?completionBonus(s):0)),health:s.health});saveCampaign();openMap(s.level.world);}
+function completeCampaignStage(){const s=simulation;if(!s||!campaign||s.status!=='complete')return;const firstClear=!campaign.completed[s.level.world].includes(s.level.index);campaign=finishLevel(campaign,s.level.world,s.level.index,{diamonds:s.diamonds,redDiamonds:s.redDiamonds,lives:Math.min(99,s.lives+(firstClear?completionBonus(s):0)),health:s.health,weaponTier:s.weaponTier});saveCampaign();openMap(s.level.world);}
 function advanceLevel(){
   const current=simulation;
   if(!current||current.status!=='complete')return;
@@ -55,11 +55,11 @@ function advanceLevel(){
   if(campaignStage){completeCampaignStage();return;}
   const next=nextMainLevel(current.level,assets.worlds,assets.maps);
   if(!next){openMenu();return;}
-  start(next,{diamonds:current.diamonds,redDiamonds:current.redDiamonds,lives:Math.min(99,current.lives+completionBonus(current)),health:current.health});
+  start(next,{diamonds:current.diamonds,redDiamonds:current.redDiamonds,lives:Math.min(99,current.lives+completionBonus(current)),health:current.health,weaponTier:current.weaponTier});
 }
 function continueGameOver(){
   const s=simulation;if(!s||s.status!=='dead')return;
-  const resources={diamonds:Math.max(0,s.diamonds-500),redDiamonds:s.redDiamonds,lives:5,health:4};
+  const resources:StageStart={diamonds:Math.max(0,s.diamonds-500),redDiamonds:s.redDiamonds,lives:5,health:4,weaponTier:s.weaponTier};
   if(campaignStage&&campaign){campaign.resources=resources;saveCampaign();openMap(s.level.world);}
   else start(s.level,resources);
 }
@@ -164,7 +164,8 @@ function drawGame(){
     ctx.fillStyle='#000b';ctx.fillRect(0,96,240,115);
     text('PAUSADO',120,124,'center',1);text('ESC PARA CONTINUAR',120,151,'center');
   }
-  $('game-status').textContent=`${assets.strings[28+s.level.world]} / ${String(s.level.index+1).padStart(2,'0')} · ${paused?'pausado':'20 Hz'}`;
+  const weapon=s.weaponTier===8?'martelo de gelo':s.weaponTier===2?'gancho':s.weaponTier===1?'martelo':'sem equipamento';
+  $('game-status').textContent=`${assets.strings[28+s.level.world]} / ${String(s.level.index+1).padStart(2,'0')} · ${paused?'pausado':weapon}`;
   $('pause').textContent=paused?'▷':'Ⅱ';
   $('pause').setAttribute('aria-label',paused?'Continuar':'Pausar');
   $('restart').setAttribute('aria-label','Reiniciar no checkpoint');
@@ -309,7 +310,7 @@ for(const [button,id] of [['import-replay','replay-file'],['import-save','save-f
 $('play-audio').onclick=async()=>{try{if(!soundEnabled)return;const id=$<HTMLSelectElement>('track').value,r=await fetch(`${import.meta.env.BASE_URL}assets/${id}.mid`);if(!r.ok)throw new Error('Faixa ausente');const song=parseMidi(new Uint8Array(await r.arrayBuffer()));await audio.play(song);$('audio-info').textContent=`${song.notes.length} notas · ${song.duration.toFixed(1)} segundos · ${song.tracks} trilhas`;}catch(e){report(String(e));}};
 $('stop-audio').onclick=()=>audio.stop();
 function showRms(save:CanonicalSave){
-  $('rms-info').textContent=`${save.export().length} bytes · ${save.lives} vidas · vida máxima ${save.maxHealth}\n${save.diamonds} diamantes · ${save.redDiamonds} vermelhos\n`+
+  $('rms-info').textContent=`${save.export().length} bytes · ${save.lives} vidas · vida máxima ${save.maxHealth}\n${save.diamonds} diamantes · ${save.redDiamonds} vermelhos · equipamento ${save.weaponTier}\n`+
     save.worlds.map((w,i)=>`${assets.strings[28+i]}: ${w.levels.length} fases · liberada ${w.unlocked} · primeira secreta ${w.firstSecret}`).join('\n');
 }
 $('rms-template').onclick=()=>{try{const save=CanonicalSave.create(assets.worlds,assets.maps);showRms(save);}catch(e){report(String(e));}};
@@ -336,7 +337,7 @@ async function boot(){
     function frame(time:number){
       try{clock.advance(time,()=>{sceneTick++;if(scene==='playing'&&simulation&&!paused){
         if(simulation.status==='complete')results.step(Math.max(0,simulation.diamonds-simulation.initial.diamonds));
-        else simulation.step(input.read());
+        else {simulation.step(input.read());if(campaignStage&&campaign&&simulation.events.includes('weapon')){campaign.resources.weaponTier=simulation.weaponTier;saveCampaign();}}
         if(stageIntroTicks>0)stageIntroTicks--;
       }else if(scene!=='playing')stepFront();});drawGame();drawInspector();}
       catch(e){paused=true;report(`Falha de execução: ${String(e)}`);console.error(e);return;}

@@ -303,3 +303,89 @@ test('the red prize rises above the hero after the chest reward frame',()=>{
   draws.length=0;renderer.draw({} as CanvasRenderingContext2D,compassLevel,compass.tick,compass);
   assert.ok(draws.some(d=>d.id==='gen3-1'&&d.y===compass.player.y*24-24));
 });
+
+test('canonical equipment chests award hammer, hook and ice hammer in order',()=>{
+  for(const [world,index,tile,tier] of [[0,3,24,1],[1,2,27,2],[2,5,26,8]]){
+    const level=parseWorld(readFileSync(new URL(`../../../work/reference-s700/res/w${world}.bin`,import.meta.url)),world).levels[index];
+    assert.ok(level.tiles.some((kind,i)=>kind===tile&&level.objects[i]===14),`equipment chest missing in ${world}/${index}`);
+    const fixtureLevel=fixture(['#####','#@  #','#####']);fixtureLevel.tiles[7]=tile;fixtureLevel.objects[7]=14;
+    const sim=new Simulation(fixtureLevel);step(sim,2,4);
+    while(!sim.opened.has(7))step(sim);
+    assert.equal(sim.weaponTier,tier);assert.ok(sim.events.includes('weapon'));
+    sim.restoreCheckpoint();assert.equal(sim.weaponTier,tier);assert.equal(sim.tile(2,1),-1);assert.ok(sim.opened.has(7));
+  }
+});
+
+test('an equipment chest stays open when its upgrade was saved before reentering',()=>{
+  const level=fixture(['#####','#@  #','#####']);level.tiles[7]=24;level.objects[7]=14;
+  const sim=new Simulation(level,{diamonds:0,redDiamonds:0,lives:5,health:4,weaponTier:2});
+  assert.equal(sim.tile(2,1),-1);assert.ok(sim.opened.has(7));
+  step(sim,2,4);assert.equal(sim.chestCell,-1);assert.equal(sim.weaponTier,2);
+});
+
+test('the hammer starts brick destruction and stuns a neighboring snake',()=>{
+  const bricks=new Simulation(fixture(['#######','#@BB  #','#######']),{diamonds:0,redDiamonds:0,lives:5,health:4,weaponTier:1});
+  bricks.step({direction:0,action:true});assert.equal(bricks.state[bricks.index(2,1)],1);
+  step(bricks,0,25);assert.equal(bricks.tile(2,1),-1);assert.equal(bricks.tile(3,1),-1);
+  const snake=new Simulation(fixture(['######','#@S###','######']),{diamonds:0,redDiamonds:0,lives:5,health:4,weaponTier:1});
+  snake.step({direction:0,action:true});assert.equal(snake.state[snake.index(2,1)]&248,120);
+  step(snake,0,10);assert.equal(snake.tile(2,1),19);
+});
+
+test('the hook pulls a distant boulder to the cell beside the hero',()=>{
+  const sim=new Simulation(fixture(['########','#@  O  #','########']),{diamonds:0,redDiamonds:0,lives:5,health:4,weaponTier:2});
+  sim.step({direction:0,action:true});assert.equal(sim.hook?.x,4);assert.ok(sim.events.includes('hook'));
+  step(sim,0,16);assert.equal(sim.tile(2,1),0);assert.equal(sim.tile(4,1),-1);assert.equal(sim.hook,null);
+});
+
+test('the hook can bring a red diamond and a frozen block closer',()=>{
+  const level=fixture(['########','#@     #','########']);level.tiles[level.width+4]=2;
+  const red=new Simulation(level,{diamonds:0,redDiamonds:0,lives:5,health:4,weaponTier:2});
+  red.step({direction:0,action:true});step(red,0,16);assert.equal(red.tile(2,1),2);
+  const frozen=new Simulation(fixture(['########','#@     #','########']),
+    {diamonds:0,redDiamonds:0,lives:5,health:4,weaponTier:8});
+  frozen.tiles[frozen.index(4,1)]=9;frozen.frozenKinds[frozen.index(4,1)]=1;
+  frozen.step({direction:0,action:true});step(frozen,0,16);
+  assert.equal(frozen.tile(2,1),9);assert.equal(frozen.frozenKinds[frozen.index(2,1)],1);
+});
+
+test('the ice hammer freezes a snake and another blow thaws it',()=>{
+  const sim=new Simulation(fixture(['######','#@S###','######']),{diamonds:0,redDiamonds:0,lives:5,health:4,weaponTier:8});
+  sim.step({direction:0,action:true});assert.equal(sim.tile(2,1),9);assert.equal(sim.frozenKinds[sim.index(2,1)],19);
+  step(sim,0,8);sim.step({direction:0,action:true});assert.equal(sim.tile(2,1),19);
+  assert.equal(sim.frozenKinds[sim.index(2,1)],-1);assert.equal(sim.state[sim.index(2,1)]&248,120);
+});
+
+test('action aims the hammer at a neighboring brick and the hook to either side',()=>{
+  const hammer=new Simulation(fixture(['#####','# B #','# @ #','#####']),{diamonds:0,redDiamonds:0,lives:5,health:4,weaponTier:1});
+  hammer.step({direction:0,action:true});assert.equal(hammer.player.direction,1);assert.equal(hammer.state[hammer.index(2,1)],1);
+  const hook=new Simulation(fixture(['########','# O @  #','########']),{diamonds:0,redDiamonds:0,lives:5,health:4,weaponTier:2});
+  hook.step({direction:0,action:true});assert.equal(hook.player.direction,4);assert.equal(hook.hook?.x,2);
+  step(hook,0,12);assert.equal(hook.tile(3,1),0);
+});
+
+test('the ice hammer freezes diamonds, and red snakes pursue after their stun',()=>{
+  const ice=new Simulation(fixture(['######','#@*###','######']),{diamonds:0,redDiamonds:0,lives:5,health:4,weaponTier:8});
+  ice.step({direction:0,action:true});assert.equal(ice.tile(2,1),9);
+  step(ice,0,8);ice.step({direction:0,action:true});assert.equal(ice.tile(2,1),1);
+  const red=new Simulation(fixture(['########','#@  V  #','########']));
+  const at=red.index(4,1);red.state[at]=3072;red.motion[at]=0;
+  step(red);assert.equal(red.tile(3,1),43);assert.equal(red.state[red.index(3,1)]&3840,2816);
+});
+
+test('a frozen diamond falls with its original kind attached',()=>{
+  const sim=new Simulation(fixture(['#######','#@*   #','# B   #','#######']),
+    {diamonds:0,redDiamonds:0,lives:5,health:4,weaponTier:8});
+  sim.step({direction:0,action:true});assert.equal(sim.tile(2,1),9);
+  sim.tiles[sim.index(2,2)]=-1;
+  step(sim);assert.equal(sim.tile(2,2),9);assert.equal(sim.frozenKinds[sim.index(2,2)],1);
+  assert.equal(sim.frozenKinds[sim.index(2,1)],-1);
+});
+
+test('a replay reconstructs hook motion and equipment state',()=>{
+  const level=fixture(['########','#@  O  #','########']);
+  const initial={diamonds:0,redDiamonds:0,lives:5,health:4,weaponTier:2 as const};
+  const sim=new Simulation(level,initial);sim.step({direction:0,action:true});step(sim,0,12);
+  const replay=validateReplay(sim.replay(),[{version:0,world:0,levels:[level]}]);
+  assert.deepEqual(restoreReplay(replay,[{version:0,world:0,levels:[level]}]).snapshot(),sim.snapshot());
+});

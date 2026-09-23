@@ -72,8 +72,8 @@ function drawIntro(){
   ctx.fillStyle='#000';ctx.fillRect(0,0,240,320);
   ctx.save();ctx.beginPath();ctx.rect(0,42,240,236);ctx.clip();ctx.translate(-sequence.cameraX,42-sequence.cameraY);
   renderer.draw(ctx,sim.level,sequence.tick,sim);
-  if(sequence.phase==='chest'&&sequence.phaseTicks>4){
-    const prize=assets.sprite('gen3-1');if(prize.frames.length)sprites.frame(ctx,prize,0,28*24,6*24-Math.min(20,(sequence.phaseTicks-4)*2));
+  if(sim.chestCell===sim.index(28,6)&&sim.opened.has(sim.chestCell)){
+    const prize=assets.sprite('gen3-1');if(prize.frames.length)sprites.frame(ctx,prize,0,28*24,6*24-20);
   }
   ctx.restore();
   if(sequence.portraitVisible){
@@ -91,7 +91,7 @@ function drawIntro(){
   }
   if(sequence.flash){ctx.fillStyle=sequence.flashColor;ctx.fillRect(0,0,240,320);}
   text(assets.strings[53],5,315);
-  $('game-status').textContent=`Introdução de Angkor · ${dialogue?'toque para continuar':sequence.phase==='route'?'travessia do templo':sequence.phase==='chest'?'abrindo baú':`cena ${sequence.scriptId??'final'}`}`;
+  $('game-status').textContent=`Introdução de Angkor · ${dialogue?'toque para continuar':sequence.phase==='free'?'explore livremente':`cena ${sequence.scriptId??'final'}`}`;
   $<HTMLButtonElement>('pause').disabled=true;$<HTMLButtonElement>('restart').disabled=true;$('next-level').hidden=true;
 }
 function drawResult(s:Simulation){
@@ -230,7 +230,11 @@ function enterFront(){
 }
 function stepFront(){
   if(scene==='intro'){
-    intro?.step();if(intro?.finished){openMap();return;}
+    const frame=input.read();
+    if(frame.action&&!frontActionHeld)intro?.press();
+    intro?.step(frame);frontActionHeld=frame.action;
+    if(intro?.finished)openMap();
+    return;
   }
   const frame=input.read();
   if(frontCooldown>0)frontCooldown--;

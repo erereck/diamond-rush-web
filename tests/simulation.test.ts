@@ -15,6 +15,7 @@ import { parsePack } from '../src/assets/Pack.ts';
 import { SpriteRenderer } from '../src/render/SpriteRenderer.ts';
 import { LevelRenderer } from '../src/render/LevelRenderer.ts';
 import type { AssetManager } from '../src/assets/AssetManager.ts';
+import { introLines, stageCollectibleTotals, stageTitle } from '../src/core/OriginalText.ts';
 function fixture(rows:string[]):LevelDefinition{
   const tiles=rows.flatMap(row=>[...row].map(c=>({'#':80,' ':255,'@':79,'O':0,'*':1,g:10,S:19} as Record<string,number>)[c]));
   return {world:0,index:0,width:rows[0].length,height:rows.length,offset:0,tiles,parameters:tiles.map(t=>t===19?2:255),objects:tiles.map(()=>255)};
@@ -180,6 +181,26 @@ test('later stage chest awards the diamond quantity encoded in the map',()=>{
   assert.equal(sim.diamonds,5);assert.equal(sim.tile(2,1),-1);
   step(sim,0,80);assert.equal(sim.diamonds,5);
 });
+test('a key chest delays the key and never awards a red diamond',()=>{
+  const level=fixture(['#####','#@  #','#####']);level.tiles[7]=4;level.objects[7]=33;
+  const sim=new Simulation(level);step(sim,2,4);
+  assert.equal(sim.chestCell,7);assert.equal(sim.goldKeys,0);assert.equal(sim.redDiamonds,0);
+  while(!sim.opened.has(7))step(sim);
+  assert.equal(sim.goldKeys,1);assert.equal(sim.redDiamonds,0);assert.equal(sim.tile(2,1),-1);
+  step(sim,0,80);assert.equal(sim.goldKeys,1);assert.equal(sim.redDiamonds,0);
+});
+test('a falling stone kills a snake and leaves the original smoke effect briefly',()=>{
+  const sim=new Simulation(fixture(['#######','#  O  #','#  S  #','#  @  #','#######']));
+  const stone=sim.index(3,1),snake=sim.index(3,2);sim.state[stone]=3;sim.motion[stone]=6;
+  sim.updateSnake(3,2);
+  assert.equal(sim.tiles[snake],-1);assert.deepEqual(sim.enemySmoke,[{cell:snake,age:0}]);
+  step(sim,0,14);assert.deepEqual(sim.enemySmoke,[]);
+});
+test('opening titles and collection totals come from the original S700 tables',()=>{
+  assert.deepEqual(introLines,['The Great Temple Of Angkor Wat...',"I'm finally in!","Let's go!"]);
+  const first=worlds[0].levels[0];assert.equal(stageTitle(Array.from({length:115},(_,i)=>`text${i}`),first),'text8');
+  const totals=stageCollectibleTotals(first);assert.equal(totals.redDiamonds,first.tiles.filter(t=>t===2).length);
+});
 test('checkpoint action restores collected objects and counters',()=>{
   const level=fixture(['#######','#@    #','#######']);level.objects[9]=4;level.parameters[9]=1;level.tiles[10]=2;
   const s=new Simulation(level);step(s,2,4);assert.equal(s.checkpoint,9);
@@ -192,6 +213,25 @@ test('fatal damage plays hurt and death before returning to the checkpoint',()=>
   const s=new Simulation(fixture(['#####','# @ #','#####']));s.hurt(4);assert.equal(s.health,0);
   step(s,0,8);assert.equal(s.deathTicks,80);assert.equal(s.lives,5);
   step(s,0,80);assert.equal(s.lives,4);assert.equal(s.health,4);assert.equal(s.status,'playing');
+});
+test('death restores checkpoint and camera travels 8 pixels per tick before hero reappears',()=>{
+  const row='#@'+' '.repeat(20)+'#',level=fixture(['#'.repeat(row.length),row,'#'.repeat(row.length)]);
+  level.objects[2+row.length]=4;level.parameters[2+row.length]=1;
+  const s=new Simulation(level);step(s,2,4);assert.equal(s.checkpoint,2+row.length);
+  step(s,2,4*14);assert.ok(s.camera.x>0);
+  s.hurt(4);step(s,0,8+80);
+  assert.equal(s.lives,4);assert.equal(s.health,4);assert.equal(s.respawnTravel,true);
+  const deathCamera=s.camera.x;assert.equal(s.player.x,2);
+  step(s);assert.equal(s.camera.x,deathCamera-8);
+  let guard=100;while(s.respawnTravel&&guard-->0)step(s);
+  assert.ok(guard>0);assert.equal(s.camera.x,s.respawnTarget.x);assert.equal(s.respawnFlash,12);assert.equal(s.invulnerable,40);
+});
+test('manual reset costs a life away from checkpoint and survives replay restoration',()=>{
+  const level=fixture(['#######','#@    #','#######']);
+  const s=new Simulation(level);step(s,2,4);s.step({direction:0,action:false,reset:true});
+  assert.equal(s.deathTicks,80);assert.equal(s.health,0);
+  step(s,0,80);assert.equal(s.lives,4);
+  assert.deepEqual(restoreReplay(validateReplay(s.replay(),[{version:0,world:0,levels:[level]}]),[{version:0,world:0,levels:[level]}]).snapshot(),s.snapshot());
 });
 test('a boulder held overhead plays the bracing animation then crushes the hero',()=>{
   const s=new Simulation(fixture(['#####','# O #','# @ #','#####']));

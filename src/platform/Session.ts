@@ -16,9 +16,9 @@ export function validateReplay(value:unknown,worlds:WorldDefinition[]):Replay {
     !Number.isInteger(initial.lives)||initial.lives<0||initial.lives>99||
     !Number.isInteger(initial.health)||initial.health<1||initial.health>4)
     throw new Error('Estado inicial da fase inválido.');
-  for(const input of r.inputs){if(!input||!Number.isInteger(input.direction)||input.direction<0||input.direction>4||typeof input.action!=='boolean')throw new Error('Entrada inválida no replay.');}
+  for(const input of r.inputs){if(!input||!Number.isInteger(input.direction)||input.direction<0||input.direction>4||typeof input.action!=='boolean'||(input.reset!==undefined&&typeof input.reset!=='boolean'))throw new Error('Entrada inválida no replay.');}
   return {version:3,target:'1.2.0-s700',engine:ENGINE_REVISION,levelFingerprint:r.levelFingerprint,world:r.world,level:r.level,
-    initial:{...initial},inputs:r.inputs.map((i:InputFrame)=>({direction:i.direction,action:i.action}))};
+    initial:{...initial},inputs:r.inputs.map((i:InputFrame)=>({direction:i.direction,action:i.action,reset:i.reset??false}))};
 }
 export function restoreReplay(replay:Replay,worlds:WorldDefinition[]){const sim=new Simulation(worlds[replay.world].levels[replay.level],replay.initial);for(const input of replay.inputs)sim.step(input);return sim;}
 export const SESSION_KEY='diamond-rush:experimental-session:v3';

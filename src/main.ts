@@ -7,6 +7,7 @@ import { Simulation } from './core/Simulation.ts';
 import type { StageStart } from './core/Simulation.ts';
 import { nextMainLevel } from './level/Progression.ts';
 import { Input } from './platform/Input.ts';
+import { MobileControls } from './platform/MobileControls.ts';
 import { MidiPreview, parseMidi } from './platform/Midi.ts';
 import { SESSION_KEY, validateReplay, restoreReplay } from './platform/Session.ts';
 import { CanonicalSave } from './platform/CanonicalSave.ts';
@@ -14,13 +15,16 @@ import { CAMPAIGN_KEY, adjacentNode, finishLevel, newCampaign, unlockedNode, unl
 import type { Campaign } from './core/Campaign.ts';
 import { FrontEndRenderer, MENU_ITEMS } from './render/FrontEndRenderer.ts';
 import type { FrontScene } from './render/FrontEndRenderer.ts';
+import { introLines, stageCollectibleTotals, stageTitle, worldTitle } from './core/OriginalText.ts';
 const $=<T extends HTMLElement>(id:string)=>document.getElementById(id) as T;
 const game=$<HTMLCanvasElement>('game'), ctx=game.getContext('2d')!, inspection=$<HTMLCanvasElement>('inspection'), ic=inspection.getContext('2d')!;
 ctx.imageSmoothingEnabled=false;ic.imageSmoothingEnabled=false;
 const assets=new AssetManager(), sprites=new SpriteRenderer(), renderer=new LevelRenderer(assets,sprites),clock=new Clock(),input=new Input(game),audio=new MidiPreview();
 const front=new FrontEndRenderer(assets,sprites);
+const touchControls=new MobileControls(input);
 let simulation:Simulation|null=null,paused=false,ready=false,sceneTick=0,view:'levels'|'sprites'|'audio'='levels',inspectionDirty=true,inspectorVisible=false,lastError='';
-let scene:FrontScene|'playing'='menu',campaign:Campaign|null=null,menuSelected=0,sealSelected=0,pageSelected=0,soundEnabled=true,campaignStage=false,confirmExit=false,frontCooldown=0,frontActionHeld=false;
+let scene:FrontScene|'playing'|'intro'='menu',campaign:Campaign|null=null,menuSelected=0,sealSelected=0,pageSelected=0,soundEnabled=true,campaignStage=false,confirmExit=false,frontCooldown=0,frontActionHeld=false;
+let introPage=0,introTick=0,stageIntroTicks=0,resultPhase=0;
 const world=$<HTMLSelectElement>('world'),level=$<HTMLSelectElement>('level'),sprite=$<HTMLSelectElement>('sprite'),palette=$<HTMLSelectElement>('palette');
 const selectedLevel=()=>assets.worlds[Number(world.value)].levels[Number(level.value)];
 const text=(s:string,x:number,y:number,align:'left'|'center'|'right'='left',pal=0)=>sprites.text(ctx,assets.sprite('ui-1'),assets.fontMap,s,x,y,align,pal);
@@ -32,23 +36,65 @@ function updateLevels(){
 function updateLevelInfo(){const l=selectedLevel();$('level-info').textContent=`${l.width} × ${l.height} células · ${l.tiles.filter(t=>t===1).length} diamantes · ${[...new Set(l.tiles.filter(t=>t<80))].length} tipos de objeto. Dados originais; simulação parcial.`;inspectionDirty=true;}
 function saveCampaign(){if(campaign)try{localStorage.setItem(CAMPAIGN_KEY,JSON.stringify(campaign));}catch{report('Não foi possível salvar a campanha neste navegador.');}}
 function openMenu(){scene='menu';simulation=null;campaignStage=false;paused=false;audio.stop();input.clear();clock.reset();frontCooldown=0;menuSelected=campaign?1:0;}
+function startIntro(){scene='intro';introPage=0;introTick=0;input.clear();frontActionHeld=false;frontCooldown=0;game.focus();}
 function openMap(world=campaign?.world??0){if(!campaign)return;campaign.world=world;campaign.selected=assets.maps[world].find(n=>n.level===campaign!.selected&&unlockedNode(campaign!,world,n,assets.maps))?.level??0;scene='map';simulation=null;campaignStage=false;paused=false;input.clear();clock.reset();frontCooldown=0;saveCampaign();game.focus();}
-function start(l=assets.worlds[0].levels[0],initial?:StageStart,fromCampaign=false){simulation=new Simulation(l,initial);scene='playing';campaignStage=fromCampaign;paused=false;clock.reset();input.clear();lastError='';$('pause').textContent='Ⅱ';$('play').innerHTML='Abrir menu do jogo <span>→</span>';$('next-level').hidden=true;game.focus();saveSession();}
+function start(l=assets.worlds[0].levels[0],initial?:StageStart,fromCampaign=false){simulation=new Simulation(l,initial);scene='playing';campaignStage=fromCampaign;paused=false;stageIntroTicks=60;resultPhase=0;clock.reset();input.clear();lastError='';$('pause').textContent='Ⅱ';$('play').innerHTML='Abrir menu do jogo <span>→</span>';$('next-level').hidden=true;game.focus();saveSession();}
 function startSelected(){if(!campaign)return;const node=assets.maps[campaign.world].find(n=>n.level===campaign!.selected);if(!node||!unlockedNode(campaign,campaign.world,node,assets.maps))return;start(assets.worlds[campaign.world].levels[node.level],campaign.resources,true);}
-function completeCampaignStage(){const s=simulation;if(!s||!campaign||s.status!=='complete')return;campaign=finishLevel(campaign,s.level.world,s.level.index,{diamonds:s.diamonds,redDiamonds:s.redDiamonds,lives:s.lives,health:s.health});saveCampaign();openMap(s.level.world);}
+function completionBonus(s:Simulation){
+  const totals=stageCollectibleTotals(s.level);
+  return Number(s.diamonds-s.initial.diamonds>=totals.diamonds)+Number(s.redDiamonds-s.initial.redDiamonds>=totals.redDiamonds)+Number(s.hits===0)+Number(s.retries===0);
+}
+function completeCampaignStage(){const s=simulation;if(!s||!campaign||s.status!=='complete')return;const firstClear=!campaign.completed[s.level.world].includes(s.level.index);campaign=finishLevel(campaign,s.level.world,s.level.index,{diamonds:s.diamonds,redDiamonds:s.redDiamonds,lives:Math.min(99,s.lives+(firstClear?completionBonus(s):0)),health:s.health});saveCampaign();openMap(s.level.world);}
 function advanceLevel(){
   const current=simulation;
   if(!current||current.status!=='complete')return;
+  if(resultPhase<5){resultPhase++;return;}
   if(campaignStage){completeCampaignStage();return;}
   const next=nextMainLevel(current.level,assets.worlds,assets.maps);
   if(!next)return;
-  start(next,{diamonds:current.diamonds,redDiamonds:current.redDiamonds,lives:current.lives,health:current.health});
+  start(next,{diamonds:current.diamonds,redDiamonds:current.redDiamonds,lives:Math.min(99,current.lives+completionBonus(current)),health:current.health});
 }
-function togglePause(){if(!simulation)return;paused=!paused;clock.reset();input.clear();$('pause').textContent=paused?'▷':'Ⅱ';saveSession();}
+function continueGameOver(){
+  const s=simulation;if(!s||s.status!=='dead')return;
+  const resources={diamonds:Math.max(0,s.diamonds-500),redDiamonds:s.redDiamonds,lives:5,health:4};
+  if(campaignStage&&campaign){campaign.resources=resources;saveCampaign();openMap(s.level.world);}
+  else start(s.level,resources);
+}
+function togglePause(){if(!simulation||simulation.status!=='playing')return;paused=!paused;clock.reset();input.clear();$('pause').textContent=paused?'▷':'Ⅱ';saveSession();}
 function saveSession(){if(simulation){try{localStorage.setItem(SESSION_KEY,JSON.stringify(simulation.replay()));}catch{report('Não foi possível salvar a sessão neste navegador. Exporte uma cópia.');}}}
 function downloadBlob(name:string,blob:Blob){const url=URL.createObjectURL(blob);const a=document.createElement('a');a.href=url;a.download=name;a.click();setTimeout(()=>URL.revokeObjectURL(url),1000);}
 function download(name:string,data:unknown){downloadBlob(name,new Blob([JSON.stringify(data)],{type:'application/json'}));}
+function drawIntro(){
+  const level=assets.worlds[0].levels[13];ctx.fillStyle='#000';ctx.fillRect(0,0,240,320);
+  ctx.save();ctx.beginPath();ctx.rect(0,42,240,236);ctx.clip();ctx.translate(-Math.min(36,introTick*2),42);
+  renderer.draw(ctx,level,introTick);ctx.restore();
+  sprites.animation(ctx,assets.sprite('demo-sprite-2'),0,introTick,17,50);
+  sprites.frame(ctx,assets.sprite('demo-sprite-0'),[2,1,3][introPage],17,50);
+  ctx.fillStyle='#2e2818';ctx.fillRect(7,90,226,38);ctx.strokeStyle='#c4a05b';ctx.strokeRect(7.5,90.5,225,37);
+  const lines=introPage===0?['The Great Temple','Of Angkor Wat...']:[introLines[introPage]];
+  lines.forEach((line,i)=>text(line,10,94+i*15));
+  text(assets.strings[53],5,315);text(`${introPage+1}/3`,231,315,'right');
+  $('game-status').textContent='Introdução original de Angkor Wat · toque para continuar';
+  $<HTMLButtonElement>('pause').disabled=true;$<HTMLButtonElement>('restart').disabled=true;$('next-level').hidden=true;
+}
+function drawResult(s:Simulation){
+  const totals=stageCollectibleTotals(s.level),collectedDiamonds=Math.max(0,s.diamonds-s.initial.diamonds),collectedRed=Math.max(0,s.redDiamonds-s.initial.redDiamonds);
+  ctx.fillStyle='#261707';ctx.fillRect(0,0,240,320);
+  text(stageTitle(assets.strings,s.level),120,10,'center');text(assets.strings[41],120,25,'center');
+  const rows:[string,string,()=>void,boolean][]=[
+    [assets.strings[109],`${collectedDiamonds}/${totals.diamonds}`,()=>sprites.frame(ctx,assets.sprite('cm-2'),0,7,69),collectedDiamonds>=totals.diamonds],
+    [assets.strings[114],`${collectedRed}/${totals.redDiamonds}`,()=>sprites.frame(ctx,assets.sprite('cm-2'),0,7,127,0,1),collectedRed>=totals.redDiamonds],
+    [assets.strings[43],String(s.hits),()=>sprites.animation(ctx,assets.sprite('o-0'),10,0,7,189),s.hits===0],
+    [assets.strings[44],String(s.retries),()=>sprites.animation(ctx,assets.sprite('o-0'),12,0,7,243),s.retries===0]
+  ];
+  rows.forEach(([label,value,icon,perfect],i)=>{if(resultPhase<=i)return;const y=69+i*58;icon();text(label,120,y,'center');text(value,120,y+12,'center');if(perfect&&resultPhase===5)sprites.module(ctx,assets.sprite('cm-4'),0,200,y+5);});
+  text(assets.strings[resultPhase===5?98:53],5,318);
+  $('game-status').textContent=`${stageTitle(assets.strings,s.level)} · conclusão ${resultPhase}/5`;
+  $<HTMLButtonElement>('pause').disabled=true;$<HTMLButtonElement>('restart').disabled=true;
+  $('next-level').hidden=false;$('next-level').textContent=resultPhase===5?(campaignStage?'Mapa →':'Próxima →'):'Continuar →';
+}
 function drawFront(){
+  if(scene==='intro'){drawIntro();return;}
   if(scene==='menu')front.drawMenu(ctx,menuSelected,!!campaign,sceneTick);
   else if(scene==='map'&&campaign)front.drawMap(ctx,campaign,sceneTick);
   else if(scene==='seal'&&campaign)front.drawSeal(ctx,campaign,sealSelected);
@@ -66,6 +112,17 @@ function hudNumber(hud:ReturnType<AssetManager['sprite']>,value:number,right:num
 }
 function drawGame(){
   if(scene!=='playing'||!simulation){drawFront();return;}
+  if(simulation.status==='complete'){drawResult(simulation);return;}
+  if(simulation.status==='dead'){
+    ctx.fillStyle='#000';ctx.fillRect(0,0,240,320);
+    text('GAME OVER',120,50,'center',1);
+    text(`YOU LOST ${Math.min(500,simulation.diamonds)} DIAMONDS`,120,160,'center');
+    text('CONTINUE',8,301);
+    $('game-status').textContent='GAME OVER · confirme para continuar';
+    $<HTMLButtonElement>('pause').disabled=true;$<HTMLButtonElement>('restart').disabled=false;
+    $('restart').setAttribute('aria-label','Continuar após game over');$('next-level').hidden=true;
+    return;
+  }
   const s=simulation;ctx.fillStyle='#091509';ctx.fillRect(0,0,240,320);
   ctx.save();ctx.beginPath();ctx.rect(0,40,240,240);ctx.clip();ctx.translate(-s.camera.x,40-s.camera.y);renderer.draw(ctx,s.level,s.tick,s);ctx.restore();
   const hud=assets.sprite('ui-2');sprites.frame(ctx,hud,0,120,320);sprites.frame(ctx,hud,1,120,320);
@@ -76,19 +133,23 @@ function drawGame(){
   sprites.module(ctx,hud,low?18:17,healthX,291);
   hudNumber(hud,s.diamonds,190,308);hudNumber(hud,s.redDiamonds,227,308);
   hudNumber(hud,s.lives,91,18);hudNumber(hud,s.goldKeys,167,18);hudNumber(hud,s.silverKeys,207,18);
-  if(paused||s.status!=='playing'){
+  if(stageIntroTicks>0){
+    const progress=60-stageIntroTicks,slide=progress<15?Math.round((15-progress)*16):stageIntroTicks<15?Math.round((15-stageIntroTicks)*16):0;
+    ctx.fillStyle='#2e2818e8';ctx.fillRect(8+slide,4,224,58);ctx.strokeStyle='#b09058';ctx.strokeRect(8.5+slide,4.5,223,57);
+    text(worldTitle(assets.strings,s.level.world),120+slide,11,'center');text(stageTitle(assets.strings,s.level),120+slide,37,'center');
+  }
+  if(paused){
     ctx.fillStyle='#000b';ctx.fillRect(0,96,240,115);
-    text(s.status==='dead'?'GAME OVER':s.status==='complete'?'FASE CONCLUIDA':'PAUSADO',120,124,'center',1);
-    text(s.status==='complete'?(campaignStage?'ENTER: MAPA':nextMainLevel(s.level,assets.worlds,assets.maps)?'ENTER: PROXIMA FASE':'FIM DA ROTA PRINCIPAL'):s.status==='playing'?'ESC PARA CONTINUAR':'R PARA REINICIAR',120,151,'center');
-    if(s.status==='complete'&&!campaignStage)text('ROTA PRINCIPAL EXPERIMENTAL',120,177,'center');
+    text('PAUSADO',120,124,'center',1);text('ESC PARA CONTINUAR',120,151,'center');
   }
   $('game-status').textContent=`${assets.strings[28+s.level.world]} / ${String(s.level.index+1).padStart(2,'0')} · ${paused?'pausado':'20 Hz'}`;
   $('pause').textContent=paused?'▷':'Ⅱ';
   $('pause').setAttribute('aria-label',paused?'Continuar':'Pausar');
+  $('restart').setAttribute('aria-label','Reiniciar no checkpoint');
   $<HTMLButtonElement>('pause').disabled=false;$<HTMLButtonElement>('restart').disabled=false;
   $('next-level').hidden=s.status!=='complete'||(!campaignStage&&!nextMainLevel(s.level,assets.worlds,assets.maps));
   $('next-level').textContent=campaignStage?'Mapa →':'Próxima →';
-  if(!lastError)$('debug-info').textContent=`tick ${s.tick} · posição ${s.player.x}, ${s.player.y}\ncâmera ${s.camera.x}, ${s.camera.y} · vida ${s.health}/4\n${s.status} · ${s.diamonds} diamantes · ${s.redDiamonds} vermelhos · chaves ${s.goldKeys}/${s.silverKeys}`;
+  if(!lastError)$('debug-info').textContent=`tick ${s.tick} · posição ${s.player.x}, ${s.player.y}\ncâmera ${s.camera.x}, ${s.camera.y} · vida ${s.health}/4 · ${s.lives} vidas\n${s.respawnTravel?'retorno ao checkpoint':s.status} · morte ${s.deathTicks} · ${s.diamonds} diamantes · ${s.redDiamonds} vermelhos · chaves ${s.goldKeys}/${s.silverKeys}`;
 }
 function showInspector(){inspectorVisible=true;$('inspector').hidden=false;inspectionDirty=true;drawInspector();$('inspector').scrollIntoView({behavior:'smooth',block:'start'});}
 function drawInspector(){
@@ -114,6 +175,7 @@ function drawInspector(){
 function updateSprite(){const s=assets.sprite(sprite.value);options(palette,s.palettes.map((_,i)=>({value:String(i),label:`Paleta ${i}`})));$('sprite-info').textContent=`${s.modules.length} módulos · ${s.frames.length} frames · ${s.animations.length} animações`;inspectionDirty=true;}
 async function importFile(file:File|null){if(!file)return;try{const data=validateReplay(JSON.parse(await file.text()),assets.worlds);simulation=restoreReplay(data,assets.worlds);scene='playing';campaignStage=false;paused=true;clock.reset();lastError='';saveSession();}catch(e){report(String(e));}}
 function backFront(){
+  if(scene==='intro'){openMap();return;}
   if(scene==='map'){scene='seal';sealSelected=campaign?.world??0;}
   else if(scene==='seal'||scene==='options'||scene==='help'||scene==='about'||scene==='confirm'||scene==='more'||scene==='exit')scene='menu';
   input.clear();frontActionHeld=false;frontCooldown=0;
@@ -129,8 +191,9 @@ function moveFront(direction:number){
   else if(scene==='confirm'&&(direction===2||direction===4))pageSelected=1-pageSelected;
 }
 function enterFront(){
+  if(scene==='intro'){if(++introPage>=introLines.length)openMap();return;}
   if(scene==='menu'){
-    if(menuSelected===0){if(campaign){scene='confirm';confirmExit=false;pageSelected=1;}else{campaign=newCampaign();saveCampaign();openMap();}}
+    if(menuSelected===0){if(campaign){scene='confirm';confirmExit=false;pageSelected=1;}else{campaign=newCampaign();saveCampaign();startIntro();}}
     else if(menuSelected===1&&campaign)openMap();
     else if(menuSelected===2){scene='options';pageSelected=0;}
     else if(menuSelected===3)scene='more';
@@ -141,11 +204,12 @@ function enterFront(){
   else if(scene==='seal'&&campaign&&unlockedWorld(campaign,sealSelected,assets.maps))openMap(sealSelected);
   else if(scene==='options'){if(pageSelected===0){soundEnabled=!soundEnabled;if(!soundEnabled)audio.stop();}else backFront();}
   else if(scene==='confirm'){
-    if(pageSelected===0){if(confirmExit){scene='exit';}else{campaign=newCampaign();saveCampaign();openMap();}}
+    if(pageSelected===0){if(confirmExit){scene='exit';}else{campaign=newCampaign();saveCampaign();startIntro();}}
     else scene='menu';
   }else backFront();
 }
 function stepFront(){
+  if(scene==='intro')introTick++;
   const frame=input.read();
   if(frontCooldown>0)frontCooldown--;
   if(frame.direction&&frontCooldown===0){moveFront(frame.direction);frontCooldown=4;}
@@ -153,11 +217,20 @@ function stepFront(){
   frontActionHeld=frame.action;
 }
 input.onCommand=code=>{if(!ready)return;if(scene!=='playing'){if(code==='Escape')backFront();return;}
-  if(code==='Escape')togglePause();else if(code==='KeyR'&&simulation)start(simulation.level,simulation.initial,campaignStage);
+  if(code==='Escape')togglePause();else if(code==='KeyR'&&simulation?.status==='dead')continueGameOver();
+  else if(code==='KeyR'&&simulation?.status==='playing'){paused=false;clock.reset();}
   else if(code==='Enter'&&simulation?.status==='complete')advanceLevel();
+  else if(code==='Enter'&&simulation?.status==='dead')continueGameOver();
   else if(code==='Period'&&simulation){paused=true;simulation.step({direction:0,action:false});}};
+document.querySelectorAll<HTMLButtonElement>('[data-command]').forEach(button=>button.onclick=()=>{
+  if(touchControls.editing)return;
+  if(button.dataset.command==='pause'){if(scene==='playing')togglePause();else if(scene!=='menu')backFront();}
+  else if(scene==='playing'){if(paused){if(campaignStage&&campaign)openMap(simulation?.level.world);else openMenu();}else togglePause();}
+  else backFront();
+});
 game.addEventListener('pointerup',event=>{
   if(!ready||scene==='playing')return;
+  if(scene==='intro'){enterFront();return;}
   const rect=game.getBoundingClientRect(),x=(event.clientX-rect.left)*240/rect.width,y=(event.clientY-rect.top)*320/rect.height;
   if(y>303&&x<26){backFront();return;}
   if(scene==='menu'){
@@ -173,8 +246,8 @@ game.addEventListener('pointerup',event=>{
     if(y>240){pageSelected=x<120?0:1;enterFront();}
   }else if(scene==='options'){pageSelected=y>235?1:0;enterFront();}else backFront();
 });
-$('play').onclick=()=>openMenu();$('restart').onclick=()=>{if(simulation)start(simulation.level,simulation.initial,campaignStage);};$('next-level').onclick=advanceLevel;$('pause').onclick=togglePause;
-$('fullscreen').onclick=async()=>{try{if(document.fullscreenElement)await document.exitFullscreen();else await game.parentElement!.requestFullscreen();}catch(e){report(`Tela cheia não disponível: ${String(e)}`);}};
+$('play').onclick=()=>openMenu();$('restart').onclick=()=>{if(simulation?.status==='dead')continueGameOver();else if(simulation?.status==='playing'){paused=false;input.queueReset();clock.reset();}};$('next-level').onclick=advanceLevel;$('pause').onclick=togglePause;
+$('fullscreen').onclick=async()=>{try{if(document.fullscreenElement)await document.exitFullscreen();else await $('game').closest('.player-panel')!.requestFullscreen();}catch(e){report(`Tela cheia não disponível: ${String(e)}`);}};
 world.onchange=updateLevels;level.onchange=updateLevelInfo;$('grid').onchange=()=>inspectionDirty=true;
 $('inspect').onclick=()=>{view='levels';showInspector();};$('test-level').onclick=()=>start(selectedLevel());
 sprite.onchange=()=>{updateSprite();showInspector();};palette.onchange=()=>inspectionDirty=true;
@@ -227,12 +300,12 @@ async function boot(){
     await assets.load();updateLevels();options(sprite,assets.manifest.sprites.map(id=>({value:id,label:id})));updateSprite();
     const names=['Switch','Riddle','Death','Chest 1','Chest 2','Hurt','Hammer','Mine','Working','Checkpoint','Enemy hurt','Break','Hook','Water','Boulder','Level clear','Worlds','Bavaria','Tibet','Title','Game over'];
     options($<HTMLSelectElement>('track'),assets.manifest.audio.map((id,i)=>({value:id,label:`${i} · ${names[i]}`})));
-    $('resource-line').textContent='41 FASES · 95 SPRITES · 21 MIDIS ORIGINAIS';$('loading').hidden=true;$<HTMLButtonElement>('play').disabled=false;ready=true;
+    $('resource-line').textContent=`41 FASES · ${assets.manifest.sprites.length} SPRITES · 21 MIDIS ORIGINAIS`;$('loading').hidden=true;$<HTMLButtonElement>('play').disabled=false;ready=true;
     $('play').innerHTML='Abrir menu do jogo <span>→</span>';
     try{const stored=localStorage.getItem(CAMPAIGN_KEY);if(stored)campaign=validateCampaign(JSON.parse(stored),assets.maps);}catch{localStorage.removeItem(CAMPAIGN_KEY);}
     menuSelected=campaign?1:0;
     function frame(time:number){
-      try{clock.advance(time,()=>{sceneTick++;if(scene==='playing'&&simulation&&!paused)simulation.step(input.read());else if(scene!=='playing')stepFront();});drawGame();drawInspector();}
+      try{clock.advance(time,()=>{sceneTick++;if(scene==='playing'&&simulation&&!paused){simulation.step(input.read());if(stageIntroTicks>0)stageIntroTicks--;}else if(scene!=='playing')stepFront();});drawGame();drawInspector();}
       catch(e){paused=true;report(`Falha de execução: ${String(e)}`);console.error(e);return;}
       requestAnimationFrame(frame);
     }

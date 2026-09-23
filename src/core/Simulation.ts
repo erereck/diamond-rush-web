@@ -4,7 +4,7 @@ import { ENGINE_REVISION, levelFingerprint } from './Compatibility.ts';
 import { animationFrameAt, BOULDER_BRACE_TICKS, BOULDER_PRESSURE_TICKS, CHEST_OPEN_DURATIONS, fireReach } from './PhaseOneRules.ts';
 export type Direction=0|1|2|3|4;
 export const DX=[0,0,1,0,-1], DY=[0,-1,0,1,0];
-export interface InputFrame {direction:Direction;action:boolean}
+export interface InputFrame {direction:Direction;action:boolean;reset?:boolean}
 export interface StageStart {diamonds:number;redDiamonds:number;lives:number;health:number}
 export interface Replay {version:3;target:'1.2.0-s700';engine:typeof ENGINE_REVISION;levelFingerprint:string;world:number;level:number;initial:StageStart;inputs:InputFrame[]}
 /** Tile cases which set var15=true in cGame.method_288. */
@@ -23,6 +23,8 @@ export class Simulation {
   opened=new Set<number>();events:string[]=[];inputs:InputFrame[]=[];
   chestFrames:Int16Array;checkpointOrder=-1;private savedCheckpoint!:CheckpointState;
   lives=5;hurtTicks=0;deathTicks=0;chestCell=-1;chestTicks=0;exitDirection:Direction=0;stonePressure=0;
+  respawnTravel=false;respawnFlash=0;respawnTarget={x:0,y:0};
+  enemySmoke:{cell:number;age:number}[]=[];hits=0;retries=0;
   goldKeys=0;silverKeys=0;gatePhases:Int16Array;gateCounts:Int16Array;unlockedGates=new Set<number>();
   permanentPickups=new Set<number>();
   pendingDirection:Direction=0;private actionHeld=false;private lastInputDirection:Direction=0;entranceGate=-1;
@@ -69,6 +71,7 @@ export class Simulation {
   hurt(amount:number,knockback:Direction=0){
     if(this.invulnerable||this.hurtTicks||this.deathTicks||this.chestCell>=0||this.status!=='playing')return;
     this.health=Math.max(0,this.health-amount);this.hurtTicks=8;this.invulnerable=40;
+    this.hits++;
     this.pendingDirection=0;this.setAnimation(10);this.events.push('hurt');
     if(knockback){
       // method_61 tries the direction behind the attacker, then rotates if blocked.
@@ -86,7 +89,8 @@ export class Simulation {
       unlockedGates:[...this.unlockedGates],goldKeys:this.goldKeys,silverKeys:this.silverKeys,
       x:this.player.x,y:this.player.y,diamonds:this.diamonds,redDiamonds:this.redDiamonds,opened:[...this.opened]};
   }
-  restoreCheckpoint(heal=false){
+  restoreCheckpoint(heal=false,travel=false){
+    const previousCamera={x:this.camera.x,y:this.camera.y};
     const save=this.savedCheckpoint;
     this.tiles.set(save.tiles);this.state.set(save.state);this.motion.set(save.motion);this.active.set(save.active);this.chestFrames.set(save.chestFrames);
     for(const i of this.permanentPickups)this.tiles[i]=-1;
@@ -95,11 +99,29 @@ export class Simulation {
     this.player={x:save.x,y:save.y,dx:0,dy:1,offset:0,direction:3};
     this.diamonds=save.diamonds;this.redDiamonds=save.redDiamonds;this.opened=new Set(save.opened);
     this.hurtTicks=0;this.deathTicks=0;this.chestCell=-1;this.chestTicks=0;this.exitDirection=0;this.pendingDirection=0;this.pushDelay=6;this.stonePressure=0;
-    if(heal){this.health=4;this.invulnerable=0;}
+    if(heal){this.health=4;this.invulnerable=40;}
     this.playerAnimation=2;this.animationTick=0;
     // method_347 reactivates the saved objects; it does not reset the global clock.
     for(let i=0;i<this.tiles.length;i++)if(this.tiles[i]>=0&&this.tiles[i]<80)this.wake(i%this.level.width,Math.floor(i/this.level.width));
-    this.camera.x=Math.max(0,save.x*24-120);this.camera.y=Math.max(0,save.y*24-120);this.events.push('respawn');
+    this.respawnTarget={x:Math.max(0,Math.min(this.level.width*24-240,save.x*24-120)),
+      y:Math.max(0,Math.min(this.level.height*24-240,save.y*24-120))};
+    this.camera.x=travel?previousCamera.x:this.respawnTarget.x;
+    this.camera.y=travel?previousCamera.y:this.respawnTarget.y;
+    this.respawnTravel=travel&&(this.camera.x!==this.respawnTarget.x||this.camera.y!==this.respawnTarget.y);
+    this.respawnFlash=this.respawnTravel?0:12;
+    this.events.push(this.respawnTravel?'respawn-start':'respawn');
+  }
+  /** S700 method_300 moves both camera axes toward the saved checkpoint by 8 px/tick. */
+  private travelToCheckpoint(){
+    for(const axis of ['x','y'] as const){const delta=this.respawnTarget[axis]-this.camera[axis];this.camera[axis]+=Math.sign(delta)*Math.min(8,Math.abs(delta));}
+    if(this.camera.x===this.respawnTarget.x&&this.camera.y===this.respawnTarget.y){
+      this.respawnTravel=false;this.respawnFlash=12;this.events.push('respawn');
+    }
+  }
+  manualReset(){
+    if(this.status!=='playing'||this.hurtTicks||this.deathTicks||this.respawnTravel)return;
+    if(this.index(this.player.x,this.player.y)===this.checkpoint&&this.player.offset===0)this.restoreCheckpoint(false,true);
+    else {this.health=0;this.hurtTicks=0;this.deathTicks=80;this.invulnerable=0;this.pendingDirection=0;this.setAnimation(19);this.events.push('death');}
   }
   setAnimation(n:number){if(n!==this.playerAnimation){this.playerAnimation=n;this.animationTick=0;}}
   /** Subset of method_351: normal gravity, diamonds, boulder support and delayed rolling. */
@@ -151,7 +173,7 @@ export class Simulation {
   updateSnake(x:number,y:number){
     const i=this.index(x,y);let s=this.state[i],dir=s&7,m=this.motion[i],tx=x,ty=y;
     const above=this.index(x,y-1);
-    if(above>=0&&[0,1].includes(this.tiles[above])&&this.motion[above]<=6&&(this.state[above]&7)===3){this.tiles[i]=-1;this.wake(x,y);return;}
+    if(above>=0&&[0,1].includes(this.tiles[above])&&this.motion[above]<=6&&(this.state[above]&7)===3){this.tiles[i]=-1;this.enemySmoke.push({cell:i,age:0});this.events.push('enemy-death');this.wake(x,y);return;}
     if(m<=0){
       this.wake(x,y);
       if(!dir){dir=(s&28672)>>12;m=21;s=s&~7|dir;if(this.enemyFree(x+DX[dir],y+DY[dir])){tx+=DX[dir];ty+=DY[dir];}else m=0;}
@@ -163,7 +185,12 @@ export class Simulation {
   }
   step(input:InputFrame){
     if(this.status!=='playing')return;
-    this.inputs.push({...input});this.events=[];this.tick++;this.animationTick++;if(this.invulnerable)this.invulnerable--;
+    this.inputs.push({...input});this.events=[];this.tick++;this.animationTick++;
+    this.enemySmoke=this.enemySmoke.filter(s=>++s.age<14);
+    if(input.reset){this.manualReset();return;}
+    if(this.respawnTravel){this.travelToCheckpoint();return;}
+    if(this.respawnFlash>0)this.respawnFlash--;
+    if(this.invulnerable)this.invulnerable--;
     if(this.tick%3===0)for(let i=0;i<this.gatePhases.length;i++){
       if(this.gatePhases[i]===1||this.gatePhases[i]===2){this.gatePhases[i]++;this.active[i]=24;this.events.push('gate-opening');}
     }
@@ -177,7 +204,7 @@ export class Simulation {
         else this.setAnimation(this.player.direction-1);
       }
     }else if(this.deathTicks>0&&--this.deathTicks===0){
-      if(--this.lives>=0)this.restoreCheckpoint(true);else {this.status='dead';return;}
+      if(--this.lives>=0){this.retries++;this.restoreCheckpoint(true,true);return;}else {this.status='dead';return;}
     }
     // method_304 precedes player movement; scan bottom-to-top, left-to-right, ±8.
     for(let y=Math.min(this.level.height-2,this.player.y+8);y>=Math.max(1,this.player.y-8);y--){
@@ -222,17 +249,20 @@ export class Simulation {
       this.chestTicks++;this.pendingDirection=0;
       if(animationFrameAt(CHEST_OPEN_DURATIONS,this.chestTicks,false)>=13&&!this.opened.has(this.chestCell)){
         this.opened.add(this.chestCell);
-        if(this.tiles[this.chestCell]===2){this.tiles[this.chestCell]=-1;this.redDiamonds++;}
-        else if(this.tiles[this.chestCell]===41){
-          this.tiles[this.chestCell]=-1;const amount=this.level.parameters[this.chestCell];this.diamonds+=amount===255?1:Math.max(1,amount);
-        }
+        const reward=this.tiles[this.chestCell];this.tiles[this.chestCell]=-1;
+        if(reward===2)this.redDiamonds++;
+        else if(reward===4)this.goldKeys++;
+        else if(reward===5)this.silverKeys++;
+        else if(reward===6)this.lives=Math.min(99,this.lives+1);
+        else if(reward===7)this.health=4;
+        else if(reward===41){const amount=this.level.parameters[this.chestCell];this.diamonds+=amount===255?1:Math.max(1,amount);}
         this.events.push('chest-reward');
       }
       if(this.chestTicks>=CHEST_OPEN_DURATIONS.reduce((a,b)=>a+b,0)){this.chestCell=-1;this.setAnimation(p.direction-1);}
       this.updateCamera();return;
     }
     if(this.hurtTicks||this.deathTicks){p.offset=Math.max(0,p.offset-6);this.pendingDirection=0;this.updateCamera();return;}
-    if(actionPressed&&this.index(p.x,p.y)===this.checkpoint&&p.offset===0){this.restoreCheckpoint();this.updateCamera();return;}
+    if(actionPressed&&this.index(p.x,p.y)===this.checkpoint&&p.offset===0){this.restoreCheckpoint(false,true);return;}
     const direction=this.exitDirection||input.direction||this.pendingDirection;
     if(p.offset>0)p.offset=Math.max(0,p.offset-6);
     else if(direction){
@@ -261,13 +291,14 @@ export class Simulation {
     }else {this.pushDelay=6;if(this.stonePressure===0)this.setAnimation(p.direction-1);}
     const i=this.index(p.x,p.y),t=this.tiles[i],o=this.level.objects[i];
     if(p.offset===0){
-      if(t===4||t===5){this.tiles[i]=-1;if(t===4)this.goldKeys++;else this.silverKeys++;this.events.push(t===4?'gold-key':'silver-key');}
-      if(t===6){this.tiles[i]=-1;this.permanentPickups.add(i);if(this.lives>=99){this.health=4;this.events.push('health');}else{this.lives++;this.events.push('extra-life');}}
-      if(t===7){this.tiles[i]=-1;this.health=4;this.events.push('health');}
+      const insideChest=[14,33].includes(o);
+      if(!insideChest&&(t===4||t===5)){this.tiles[i]=-1;if(t===4)this.goldKeys++;else this.silverKeys++;this.events.push(t===4?'gold-key':'silver-key');}
+      if(!insideChest&&t===6){this.tiles[i]=-1;this.permanentPickups.add(i);if(this.lives>=99){this.health=4;this.events.push('health');}else{this.lives++;this.events.push('extra-life');}}
+      if(!insideChest&&t===7){this.tiles[i]=-1;this.health=4;this.events.push('health');}
       if(o===4&&this.level.parameters[i]>this.checkpointOrder){this.checkpoint=i;this.checkpointOrder=this.level.parameters[i];this.captureCheckpoint();this.events.push('checkpoint');}
       if([14,33].includes(o)&&!this.opened.has(i)&&this.chestFrames[i]===0){
         this.chestCell=i;this.chestTicks=0;this.chestFrames[i]=1;this.setAnimation(40);this.events.push('chest');
-      }else if(t===2&&!this.opened.has(i)){this.tiles[i]=-1;this.redDiamonds++;this.events.push('red-diamond');}
+      }else if(!insideChest&&t===2&&!this.opened.has(i)){this.tiles[i]=-1;this.redDiamonds++;this.events.push('red-diamond');}
       if(o===5||o===28)this.exitDirection=p.direction;
       if(this.exitDirection&&(p.x>this.level.width+5||p.x< -5||p.y>this.level.height+5||p.y< -5)){this.status='complete';this.events.push('complete');}
     }
@@ -279,5 +310,5 @@ export class Simulation {
   }
   private updateCamera(){const p=this.player;this.camera.update(p.x*24-p.dx*p.offset,p.y*24-p.dy*p.offset,this.level.width,this.level.height);}
   replay():Replay{return {version:3,target:'1.2.0-s700',engine:ENGINE_REVISION,levelFingerprint:levelFingerprint(this.level),world:this.level.world,level:this.level.index,initial:{...this.initial},inputs:this.inputs.map(i=>({...i}))};}
-  snapshot(){return {tick:this.tick,player:{...this.player},camera:{x:this.camera.x,y:this.camera.y},tiles:[...this.tiles],state:[...this.state],motion:[...this.motion],active:[...this.active],diamonds:this.diamonds,redDiamonds:this.redDiamonds,goldKeys:this.goldKeys,silverKeys:this.silverKeys,gatePhases:[...this.gatePhases],gateCounts:[...this.gateCounts],unlockedGates:[...this.unlockedGates],permanentPickups:[...this.permanentPickups],health:this.health,invulnerable:this.invulnerable,status:this.status,playerAnimation:this.playerAnimation,animationTick:this.animationTick,pushDelay:this.pushDelay,checkpoint:this.checkpoint,checkpointOrder:this.checkpointOrder,opened:[...this.opened],chestFrames:[...this.chestFrames],chestCell:this.chestCell,chestTicks:this.chestTicks,lives:this.lives,hurtTicks:this.hurtTicks,deathTicks:this.deathTicks,exitDirection:this.exitDirection,stonePressure:this.stonePressure,pendingDirection:this.pendingDirection,lastInputDirection:this.lastInputDirection,actionHeld:this.actionHeld,entranceGate:this.entranceGate,savedCheckpoint:structuredClone(this.savedCheckpoint)};}
+  snapshot(){return {tick:this.tick,player:{...this.player},camera:{x:this.camera.x,y:this.camera.y},tiles:[...this.tiles],state:[...this.state],motion:[...this.motion],active:[...this.active],diamonds:this.diamonds,redDiamonds:this.redDiamonds,goldKeys:this.goldKeys,silverKeys:this.silverKeys,gatePhases:[...this.gatePhases],gateCounts:[...this.gateCounts],unlockedGates:[...this.unlockedGates],permanentPickups:[...this.permanentPickups],health:this.health,invulnerable:this.invulnerable,status:this.status,playerAnimation:this.playerAnimation,animationTick:this.animationTick,pushDelay:this.pushDelay,checkpoint:this.checkpoint,checkpointOrder:this.checkpointOrder,opened:[...this.opened],chestFrames:[...this.chestFrames],chestCell:this.chestCell,chestTicks:this.chestTicks,lives:this.lives,hurtTicks:this.hurtTicks,deathTicks:this.deathTicks,respawnTravel:this.respawnTravel,respawnFlash:this.respawnFlash,respawnTarget:{...this.respawnTarget},exitDirection:this.exitDirection,stonePressure:this.stonePressure,pendingDirection:this.pendingDirection,lastInputDirection:this.lastInputDirection,actionHeld:this.actionHeld,entranceGate:this.entranceGate,enemySmoke:this.enemySmoke.map(s=>({...s})),hits:this.hits,retries:this.retries,savedCheckpoint:structuredClone(this.savedCheckpoint)};}
 }

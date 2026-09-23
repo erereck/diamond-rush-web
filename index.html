@@ -6,7 +6,27 @@
     <section class="player-panel" aria-label="Jogo">
       <div class="stage"><canvas id="game" width="240" height="320" tabindex="0" aria-label="Diamond Rush. Use as setas ou WASD para mover, Escape para pausar."></canvas><div id="loading" role="status">Decodificando a aventura…</div></div>
       <div class="player-bar"><span id="game-status">Carregando recursos originais</span><button id="next-level" aria-label="Próxima fase" title="Seguir a rota principal" hidden>Próxima →</button><button id="pause" aria-label="Pausar">Ⅱ</button><button id="restart" aria-label="Reiniciar fase">↻</button><button id="fullscreen" aria-label="Tela cheia">⛶</button></div>
-      <div class="touch-controls"><div class="dpad"><button data-input="ArrowUp" aria-label="Cima">▲</button><button data-input="ArrowLeft" aria-label="Esquerda">◀</button><button data-input="ArrowDown" aria-label="Baixo">▼</button><button data-input="ArrowRight" aria-label="Direita">▶</button></div><button class="action" data-input="Space" aria-label="Selecionar ou agir" title="Selecionar no menu; agir durante a fase">●</button></div>
+      <div class="touch-suite" id="touch-suite">
+        <div class="touch-heading"><span>CONTROLES DE TOQUE</span><button id="touch-config" type="button" aria-expanded="false" aria-controls="touch-settings">⚙ Ajustar</button></div>
+        <div class="touch-deck" id="touch-deck" aria-label="Controles do jogo">
+          <div class="touch-group" data-control-group="pad" aria-label="Movimento">
+            <div class="dpad"><button data-input="ArrowUp" aria-label="Cima">▲</button><button data-input="ArrowLeft" aria-label="Esquerda">◀</button><button data-input="ArrowDown" aria-label="Baixo">▼</button><button data-input="ArrowRight" aria-label="Direita">▶</button></div>
+            <div class="touch-stick" data-stick role="button" tabindex="0" aria-label="Controle analógico de movimento" hidden><span></span></div>
+          </div>
+          <div class="touch-group touch-actions" data-control-group="action" aria-label="Ações"><button class="touch-action" data-input="Space" aria-label="Agir ou selecionar">◆<small>AGIR</small></button><button class="touch-confirm" data-input="Enter" aria-label="Confirmar ou continuar">OK</button></div>
+          <div class="touch-group touch-utility" data-control-group="utility" aria-label="Comandos"><button data-command="back" aria-label="Voltar">VOLTAR</button><button data-command="pause" aria-label="Pausar ou continuar">Ⅱ</button><button data-input="KeyR" aria-label="Reiniciar no checkpoint, custa uma vida fora do checkpoint">↻</button></div>
+        </div>
+        <div class="touch-settings" id="touch-settings" hidden>
+          <p>Arraste os grupos na área acima para escolher a posição.</p>
+          <div class="touch-presets"><button type="button" data-touch-preset="right">Destro</button><button type="button" data-touch-preset="left">Canhoto</button><button type="button" data-touch-preset="compact">Compacto</button></div>
+          <label>Direcional<select id="touch-mode"><option value="pad">Cruz direcional</option><option value="stick">Analógico</option></select></label>
+          <label>Tamanho <output id="touch-size-value">100%</output><input id="touch-size" type="range" min="75" max="125" step="5" value="100"></label>
+          <label>Opacidade <output id="touch-opacity-value">90%</output><input id="touch-opacity" type="range" min="45" max="100" step="5" value="90"></label>
+          <label>Zona morta do analógico <output id="touch-deadzone-value">25%</output><input id="touch-deadzone" type="range" min="15" max="50" step="5" value="25"></label>
+          <label class="touch-haptics"><input id="touch-haptics" type="checkbox" checked> Vibração curta ao tocar</label>
+          <button id="touch-reset" type="button">Restaurar padrão</button>
+        </div>
+      </div>
     </section>
     <aside>
       <p class="eyebrow">A AVENTURA ORIGINAL, NA WEB</p><h1>Mais uma<br> pedra no caminho.</h1>

@@ -21,7 +21,7 @@ export class LevelRenderer {
       const obj=level.objects[i];
       if(obj===4&&(sim?.checkpointOrder??-1)<=level.parameters[i])frame('cm-6',sim?.checkpoint===i?7:((tick>>1)%7),px,py);
       if(obj===5||obj===28)r.module(ctx,a.sprite('cm-0'),0,px,py);
-      if(obj===8||obj===9)r.module(ctx,a.sprite('gen2-8'),sim?.unlockedGates.has(i)?1:0,px,py,obj===8?1:0);
+      if(obj===8||obj===9)frame('gen2-8',sim?.unlockedGates.has(i)?1:0,px,py,obj===8?1:0);
       if(obj===7){
         const phase=sim?.gatePhases[i]??0,frameNumber=Math.max(0,phase-1);
         if(![8,9].includes(level.objects[i-level.width]))frame('cm-1',frameNumber,px,py);
@@ -48,24 +48,34 @@ export class LevelRenderer {
       } else if(t===6||t===7)r.module(ctx,a.sprite('cm-4'),t===6?0:1,px,py);
       else if(tileSprite[t]) {
         const id=tileSprite[t],s=a.sprite(id);
-        if(s.animations.length)anim(id,0,px,py);else if(s.frames.length)frame(id,0,px,py);else r.module(ctx,s,0,px,py);
+        if(s.animations.length)anim(id,0,px,py,0,0,t===16?0:tick);else if(s.frames.length)frame(id,0,px,py);else r.module(ctx,s,0,px,py);
         if(t===22||t===23)anim('gen1-0',0,t===22?x*24+24:x*24,y*24,0,t===23?1:0);
       } else if(t===79&&!sim)frame('o-0',0,px,py);
       if(debug&&t>=0&&t<80&&![0,1,2,4,5,6,7,10,12,19,43,79].includes(t)&&!tileSprite[t]) {
         ctx.fillStyle='#ed489d';ctx.fillRect(px,py,24,24);ctx.fillStyle='#100719';ctx.font='10px monospace';ctx.fillText(String(t),px+2,py+15);
       }
     }
-    if(sim) {
+    if(sim)for(const smoke of sim.enemySmoke)r.animation(ctx,a.sprite('cm-3'),0,Math.min(6,smoke.age>>1),(smoke.cell%level.width)*24,Math.floor(smoke.cell/level.width)*24);
+    if(sim&&!sim.respawnTravel) {
       const p=sim.player;
       if(sim.invulnerable%4<2){
         const hero=a.sprite('o-0'),af=r.animationFrame(hero,sim.playerAnimation,sim.animationTick);
         // cGame.method_159 adds each animation frame's X/Y before drawing the
         // hero. Left-facing frames are mirrored around x+24 or x+26.
         r.frame(ctx,hero,af.frame,p.x*24-p.dx*p.offset+af.x,p.y*24-p.dy*p.offset+af.y,af.flags);
-        if(sim.chestCell>=0&&sim.opened.has(sim.chestCell)&&
-          animationFrameAt(CHEST_OPEN_DURATIONS,sim.chestTicks,false)>13)
-          r.frame(ctx,a.sprite('cm-2'),0,p.x*24-p.dx*p.offset+af.x,p.y*24-p.dy*p.offset+af.y-24,0,
-            level.tiles[sim.chestCell]===41?0:1);
+        if(sim.chestCell>=0&&sim.opened.has(sim.chestCell)&&animationFrameAt(CHEST_OPEN_DURATIONS,sim.chestTicks,false)>13){
+          const prize=level.tiles[sim.chestCell],rx=p.x*24-p.dx*p.offset+af.x,ry=p.y*24-p.dy*p.offset+af.y-24;
+          if(prize===2||prize===41)r.frame(ctx,a.sprite('cm-2'),0,rx,ry,0,prize===2?1:0);
+          else if(prize===4||prize===5)r.module(ctx,a.sprite('gen0-2'),0,rx+6,ry,0,prize===5?1:0);
+          else if(prize===6||prize===7)r.module(ctx,a.sprite('cm-4'),prize===6?0:1,rx,ry);
+        }
+      }
+      if(sim.respawnFlash>0){
+        const x=p.x*24+12,y=p.y*24+9,t=12-sim.respawnFlash;
+        ctx.fillStyle=t%4<2?'#fff6a0':'#f4a728';
+        for(let n=0;n<8;n++){const angle=n*Math.PI/4+t*.12,radius=5+t*.7;
+          ctx.fillRect(Math.round(x+Math.cos(angle)*radius),Math.round(y+Math.sin(angle)*radius),2,2);
+        }
       }
     }
     // Original foreground tiles and vegetation render after the player (method_153).

@@ -33,5 +33,15 @@ for (let world=0;world<3;world++) {
   manifest.worlds.push({world,levels:w.levels.length});
 }
 copyFileSync(join(source,'mc'),join(dest,'font-map.bin'));
+// demoSpr.bin is a separate indexed sprite pack used by the opening dialogue.
+const demoSprites=readFileSync(join(source,'demoSpr.bin'));
+let demoOffset=2;
+for(let i=0;i<demoSprites.readUInt16LE(0);i++){
+  const id=demoSprites.readUInt16LE(demoOffset),length=demoSprites.readUInt32LE(demoOffset+2);
+  demoOffset+=6;
+  const name=`demo-sprite-${id}`;
+  json(`${name}.json`,decodeSprite(demoSprites.subarray(demoOffset,demoOffset+length),name));
+  manifest.sprites.push(name);demoOffset+=length;
+}
 json('manifest.json',manifest);
 console.log(`Extracted ${manifest.sprites.length} sprites; ${manifest.worlds.map(w=>w.levels).join('/')} levels; ${manifest.audio.length} MIDI tracks.`);

@@ -29,6 +29,12 @@ export class LevelRenderer {
       }
       if(sim?.entranceGate===i){frame('cm-1',2,px,py);frame('cm-1',5,px,py);}
     }
+    // cGame.method_181: the tutorial seal is a 5×5 composite in mmv.f,
+    // painted over otherwise empty map cells before moving entities and hero.
+    if(w===0&&level.index===13){
+      const seal=a.sprite('mmv-0');
+      for(let y=2;y<7;y++)for(let x=60;x<65;x++)r.frame(ctx,seal,4+(y-2)*5+x-60,x*24,y*24);
+    }
     const sparkle=((tick&63)>>1)<4?(tick&63)>>1:0;
     for(let y=0;y<level.height;y++)for(let x=0;x<level.width;x++) {
       const i=x+y*level.width,t=tile(i),motion=sim?.motion[i]??0;

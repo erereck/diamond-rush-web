@@ -15,8 +15,9 @@ import { CAMPAIGN_KEY, adjacentNode, finishLevel, newCampaign, unlockedNode, unl
 import type { Campaign } from './core/Campaign.ts';
 import { FrontEndRenderer, MENU_ITEMS } from './render/FrontEndRenderer.ts';
 import type { FrontScene } from './render/FrontEndRenderer.ts';
-import { introLines, stageCollectibleTotals, stageTitle, worldTitle } from './core/OriginalText.ts';
+import { stageCollectibleTotals, stageTitle, worldTitle } from './core/OriginalText.ts';
 import { LevelResults } from './core/LevelResults.ts';
+import { IntroSequence } from './core/IntroSequence.ts';
 const $=<T extends HTMLElement>(id:string)=>document.getElementById(id) as T;
 const game=$<HTMLCanvasElement>('game'), ctx=game.getContext('2d')!, inspection=$<HTMLCanvasElement>('inspection'), ic=inspection.getContext('2d')!;
 ctx.imageSmoothingEnabled=false;ic.imageSmoothingEnabled=false;
@@ -26,7 +27,7 @@ const touchControls=new MobileControls(input);
 const results=new LevelResults();
 let simulation:Simulation|null=null,paused=false,ready=false,sceneTick=0,view:'levels'|'sprites'|'audio'='levels',inspectionDirty=true,inspectorVisible=false,lastError='';
 let scene:FrontScene|'playing'|'intro'='menu',campaign:Campaign|null=null,menuSelected=0,sealSelected=0,pageSelected=0,soundEnabled=true,campaignStage=false,confirmExit=false,frontCooldown=0,frontActionHeld=false;
-let introPage=-1,introTick=0,introSimulation:Simulation|null=null,introWalkPixels=0,stageIntroTicks=0;
+let intro:IntroSequence|null=null,stageIntroTicks=0;
 const world=$<HTMLSelectElement>('world'),level=$<HTMLSelectElement>('level'),sprite=$<HTMLSelectElement>('sprite'),palette=$<HTMLSelectElement>('palette');
 const selectedLevel=()=>assets.worlds[Number(world.value)].levels[Number(level.value)];
 const text=(s:string,x:number,y:number,align:'left'|'center'|'right'='left',pal=0)=>sprites.text(ctx,assets.sprite('ui-1'),assets.fontMap,s,x,y,align,pal);
@@ -38,7 +39,7 @@ function updateLevels(){
 function updateLevelInfo(){const l=selectedLevel();$('level-info').textContent=`${l.width} × ${l.height} células · ${l.tiles.filter(t=>t===1).length} diamantes · ${[...new Set(l.tiles.filter(t=>t<80))].length} tipos de objeto. Dados originais; simulação parcial.`;inspectionDirty=true;}
 function saveCampaign(){if(campaign)try{localStorage.setItem(CAMPAIGN_KEY,JSON.stringify(campaign));}catch{report('Não foi possível salvar a campanha neste navegador.');}}
 function openMenu(){scene='menu';simulation=null;campaignStage=false;paused=false;audio.stop();input.clear();clock.reset();frontCooldown=0;menuSelected=campaign?1:0;}
-function startIntro(){scene='intro';introPage=-1;introTick=0;introSimulation=new Simulation(assets.worlds[0].levels[13]);introWalkPixels=introSimulation.player.x*24;input.clear();frontActionHeld=false;frontCooldown=0;game.focus();}
+function startIntro(){scene='intro';intro=new IntroSequence(assets.worlds[0].levels[13],assets.demoScripts);input.clear();frontActionHeld=false;frontCooldown=0;game.focus();}
 function openMap(world=campaign?.world??0){if(!campaign)return;campaign.world=world;campaign.selected=assets.maps[world].find(n=>n.level===campaign!.selected&&unlockedNode(campaign!,world,n,assets.maps))?.level??0;scene='map';simulation=null;campaignStage=false;paused=false;input.clear();clock.reset();frontCooldown=0;saveCampaign();game.focus();}
 function start(l=assets.worlds[0].levels[0],initial?:StageStart,fromCampaign=false){simulation=new Simulation(l,initial);scene='playing';campaignStage=fromCampaign;paused=false;stageIntroTicks=60;results.reset();clock.reset();input.clear();lastError='';$('pause').textContent='Ⅱ';$('play').innerHTML='Abrir menu do jogo <span>→</span>';$('next-level').hidden=true;game.focus();saveSession();}
 function startSelected(){if(!campaign)return;const node=assets.maps[campaign.world].find(n=>n.level===campaign!.selected);if(!node||!unlockedNode(campaign,campaign.world,node,assets.maps))return;start(assets.worlds[campaign.world].levels[node.level],campaign.resources,true);}
@@ -67,21 +68,30 @@ function saveSession(){if(simulation){try{localStorage.setItem(SESSION_KEY,JSON.
 function downloadBlob(name:string,blob:Blob){const url=URL.createObjectURL(blob);const a=document.createElement('a');a.href=url;a.download=name;a.click();setTimeout(()=>URL.revokeObjectURL(url),1000);}
 function download(name:string,data:unknown){downloadBlob(name,new Blob([JSON.stringify(data)],{type:'application/json'}));}
 function drawIntro(){
-  const level=assets.worlds[0].levels[13];ctx.fillStyle='#000';ctx.fillRect(0,0,240,320);
-  const sim=introSimulation!,walk=Math.min(introTick*6,introWalkPixels),cell=Math.ceil(walk/24);
-  sim.player.x=cell;sim.player.y=4;sim.player.dx=1;sim.player.dy=0;sim.player.offset=cell*24-walk;sim.player.direction=2;
-  sim.playerAnimation=introPage<0?5:1;sim.animationTick=introTick;
-  ctx.save();ctx.beginPath();ctx.rect(0,42,240,236);ctx.clip();ctx.translate(-Math.max(0,Math.min(36,walk-108)),42);
-  renderer.draw(ctx,level,introTick,sim);ctx.restore();
-  if(introPage>=0){
-    sprites.animation(ctx,assets.sprite('demo-sprite-2'),0,introTick,17,50);
-    sprites.frame(ctx,assets.sprite('demo-sprite-0'),[2,1,3][introPage],17,50);
-    ctx.fillStyle='#2e2818';ctx.fillRect(7,90,226,38);ctx.strokeStyle='#c4a05b';ctx.strokeRect(7.5,90.5,225,37);
-    const lines=introPage===0?['The Great Temple','Of Angkor Wat...']:[introLines[introPage]];
-    lines.forEach((line,i)=>text(line,10,94+i*15));
+  const sequence=intro!,sim=sequence.sim,dialogue=sequence.dialogue;
+  ctx.fillStyle='#000';ctx.fillRect(0,0,240,320);
+  ctx.save();ctx.beginPath();ctx.rect(0,42,240,236);ctx.clip();ctx.translate(-sequence.cameraX,42-sequence.cameraY);
+  renderer.draw(ctx,sim.level,sequence.tick,sim);
+  if(sequence.phase==='chest'&&sequence.phaseTicks>4){
+    const prize=assets.sprite('gen3-1');if(prize.frames.length)sprites.frame(ctx,prize,0,28*24,6*24-Math.min(20,(sequence.phaseTicks-4)*2));
   }
-  text(assets.strings[53],5,315);if(introPage>=0)text(`${introPage+1}/3`,231,315,'right');
-  $('game-status').textContent='Introdução original de Angkor Wat · toque para continuar';
+  ctx.restore();
+  if(sequence.portraitVisible){
+    const x=sequence.portraitX,y=sequence.portraitY;
+    ctx.fillStyle='#000';ctx.fillRect(x-3,y-3,109,45);
+    sprites.animation(ctx,assets.sprite(`demo-sprite-${sequence.portraitSprite}`),0,sequence.tick,x,y);
+    sprites.frame(ctx,assets.sprite('demo-sprite-0'),sequence.portraitFrame,x,y);
+    if(sequence.blinkFrame>=0)sprites.frame(ctx,assets.sprite('demo-sprite-1'),sequence.blinkFrame,x+90,y-6);
+  }
+  if(dialogue){
+    const x=dialogue.popup?6:7+dialogue.slide,y=dialogue.popup?229:90,height=dialogue.popup?35:dialogue.lines.length*16+7;
+    ctx.fillStyle='#2e2818';ctx.fillRect(x,y,226,height);ctx.strokeStyle='#c4a05b';ctx.strokeRect(x+.5,y+.5,225,height-1);
+    dialogue.lines.forEach((line,i)=>text(line,x+(dialogue.popup?16:3),y+4+i*15));
+    if((sequence.tick>>2)%2===0){ctx.fillStyle='#f3d276';ctx.beginPath();ctx.moveTo(x+211,y+height-11);ctx.lineTo(x+219,y+height-11);ctx.lineTo(x+215,y+height-7);ctx.fill();}
+  }
+  if(sequence.flash){ctx.fillStyle=sequence.flashColor;ctx.fillRect(0,0,240,320);}
+  text(assets.strings[53],5,315);
+  $('game-status').textContent=`Introdução de Angkor · ${dialogue?'toque para continuar':sequence.phase==='route'?'travessia do templo':sequence.phase==='chest'?'abrindo baú':`cena ${sequence.scriptId??'final'}`}`;
   $<HTMLButtonElement>('pause').disabled=true;$<HTMLButtonElement>('restart').disabled=true;$('next-level').hidden=true;
 }
 function drawResult(s:Simulation){
@@ -201,10 +211,7 @@ function moveFront(direction:number){
   else if(scene==='confirm'&&(direction===2||direction===4))pageSelected=1-pageSelected;
 }
 function enterFront(){
-  if(scene==='intro'){
-    if(introPage<0){introTick=Math.ceil(introWalkPixels/6);introPage=0;return;}
-    if(++introPage>=introLines.length)openMap();return;
-  }
+  if(scene==='intro'){intro?.press();return;}
   if(scene==='menu'){
     if(menuSelected===0){if(campaign){scene='confirm';confirmExit=false;pageSelected=1;}else{campaign=newCampaign();saveCampaign();startIntro();}}
     else if(menuSelected===1&&campaign)openMap();
@@ -223,8 +230,7 @@ function enterFront(){
 }
 function stepFront(){
   if(scene==='intro'){
-    introTick++;
-    if(introPage<0&&introTick*6>=introWalkPixels)introPage=0;
+    intro?.step();if(intro?.finished){openMap();return;}
   }
   const frame=input.read();
   if(frontCooldown>0)frontCooldown--;
@@ -246,8 +252,8 @@ document.querySelectorAll<HTMLButtonElement>('[data-command]').forEach(button=>b
 });
 game.addEventListener('pointerup',event=>{
   if(!ready||scene==='playing')return;
-  if(scene==='intro'){enterFront();return;}
   const rect=game.getBoundingClientRect(),x=(event.clientX-rect.left)*240/rect.width,y=(event.clientY-rect.top)*320/rect.height;
+  if(scene==='intro'){if(y>300&&x<75)backFront();else enterFront();return;}
   if(y>303&&x<26){backFront();return;}
   if(scene==='menu'){
     const items=MENU_ITEMS.filter(id=>id!==1||!!campaign),top=campaign?190:205,row=Math.floor((y-top+2)/15);

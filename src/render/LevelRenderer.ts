@@ -3,7 +3,8 @@ import type { LevelDefinition } from '../level/LevelParser.ts';
 import { SpriteRenderer } from './SpriteRenderer.ts';
 import type { Simulation } from '../core/Simulation.ts';
 import { animationFrameAt, CHEST_OPEN_DURATIONS, fallingDrawOffset } from '../core/PhaseOneRules.ts';
-const tileSprite:Record<number,string>={8:'gen0-5',11:'gen1-4',14:'gen1-2',16:'gen1-3',18:'gen3-9',22:'gen0-9',23:'gen0-9',28:'gen0-8',34:'gen2-4',35:'gen2-4',36:'gen0-8',37:'gen2-5',38:'gen2-6',39:'gen2-6',40:'gen2-7',42:'gen3-1',44:'gen3-4',45:'gen3-5',46:'gen3-7',47:'gen2-3',48:'gen3-2',49:'gen4-1'};
+import { spikeExtension, spikeReach } from '../core/LaterStageRules.ts';
+const tileSprite:Record<number,string>={8:'gen0-5',11:'gen1-4',14:'gen1-2',16:'gen1-3',18:'gen3-9',22:'gen0-9',23:'gen0-9',28:'gen1-1',34:'gen2-4',35:'gen2-4',36:'gen0-8',37:'gen2-5',38:'gen2-6',39:'gen2-6',40:'gen2-7',42:'gen3-1',44:'gen3-4',45:'gen3-5',46:'gen3-7',47:'gen2-3',48:'gen3-2',49:'gen4-1'};
 export class LevelRenderer {
   assets:AssetManager; sprites:SpriteRenderer;
   constructor(assets:AssetManager,sprites:SpriteRenderer){this.assets=assets;this.sprites=sprites;}
@@ -60,6 +61,20 @@ export class LevelRenderer {
         anim(id,w===1?0:Math.max(0,direction-1),px,py,t===43?1:w===2?2:0,0,tick>>1);
       } else if(t===6||t===7)r.module(ctx,a.sprite('cm-4'),t===6?0:1,px,py);
       else if(t===30)frame('gen0-7',Math.min(7,Math.floor(Math.max(0,(sim?.state[i]??0)-1)*7/16)),px,py);
+      else if(t===28){
+        const raw=sim?.state[i]??(level.parameters[i]>10?(Math.floor(level.parameters[i]/11)|8):level.parameters[i]),
+          down=(raw&7)===3,alternate=(raw&8)!==0,
+          extension=spikeExtension(tick,alternate),reach=spikeReach(tick,alternate);
+        for(let segment=0;segment<reach;segment++)
+          frame('gen1-1',down?segment:3-segment,px+3,py+(down?1:-1)*(extension-segment*24));
+      }
+      else if(t===44){
+        const phase=((sim?.state[i]??0)&56)>>3,age=sim?.motion[i]??0;
+        const animId=phase===1?1:phase===3?3:phase===4?4:0;
+        const frameIndex=phase===1?(age>>1)%2:phase===4?Math.min(2,age):0;
+        const sprite=a.sprite('gen3-4'),animation=sprite.animations[animId];
+        if(animation){const af=sprite.animationFrames[animation.start+frameIndex];frame('gen3-4',af.frame,px,py-(phase===3?age:0));}
+      }
       else if(tileSprite[t]) {
         const id=tileSprite[t],s=a.sprite(id);
         if(s.animations.length)anim(id,0,px,py,0,0,t===16?0:tick);else if(s.frames.length)frame(id,0,px,py);else r.module(ctx,s,0,px,py);

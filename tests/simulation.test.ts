@@ -10,6 +10,7 @@ import { nextMainLevel } from '../src/level/Progression.ts';
 import type { LevelDefinition } from '../src/level/LevelParser.ts';
 import { validateReplay, restoreReplay } from '../src/platform/Session.ts';
 import { animationFrameAt, CHEST_OPEN_DURATIONS, fallingDrawOffset, fireReach } from '../src/core/PhaseOneRules.ts';
+import { spikeExtension, spikeReach } from '../src/core/LaterStageRules.ts';
 import { decodeSprite } from '../src/assets/SpriteDecoder.ts';
 import { parsePack } from '../src/assets/Pack.ts';
 import { SpriteRenderer } from '../src/render/SpriteRenderer.ts';
@@ -73,6 +74,78 @@ test('later phase floor types follow the original walking collision cases',()=>{
     const level=fixture(['#####','#@  #','#####']);level.tiles[7]=tile;
     const sim=new Simulation(level);step(sim,2);assert.equal(sim.player.x,1,`tile ${tile}`);
   }
+});
+test('Scotland spike clocks reach two and three cells at the source ticks',()=>{
+  assert.equal(spikeExtension(15,false),0);
+  assert.equal(spikeReach(16,false),2);
+  assert.equal(spikeReach(31,false),3);
+  assert.equal(spikeReach(60,false),3);
+  assert.equal(spikeExtension(7,true),0);
+  assert.equal(spikeReach(8,true),2);
+  assert.equal(spikeReach(15,true),3);
+  assert.equal(spikeExtension(44,true),0);
+});
+test('Scotland spike tip damages the hero and a raised spike blocks crossing',()=>{
+  const level=fixture(['#####','#   #','#   #','# @ #','#####']);
+  level.world=1;level.tiles[7]=28;level.parameters[7]=3;
+  const sim=new Simulation(level);step(sim,0,30);assert.equal(sim.health,4);
+  step(sim);assert.equal(sim.health,2);assert.ok(sim.events.includes('hurt'));
+  const crossing=fixture(['#####','#   #','#@  #','#####']);
+  crossing.world=1;crossing.tiles[7]=28;crossing.parameters[7]=3;
+  const blocked=new Simulation(crossing);blocked.tick=29;step(blocked,2);
+  assert.equal(blocked.player.x,1);
+});
+test('Scotland rolling hazard prioritizes falling, then moves in its mapped direction',()=>{
+  const falling=fixture(['######','#    #','#    #','#  @ #','######']);
+  falling.world=1;falling.tiles[8]=14;falling.parameters[8]=2;
+  const down=new Simulation(falling);step(down);assert.equal(down.tile(2,2),14);
+  const rolling=fixture(['######','# @  #','######']);
+  rolling.world=1;rolling.tiles[7]=14;rolling.parameters[7]=2;
+  const right=new Simulation(rolling);step(right);assert.equal(right.tile(2,1),14);
+  assert.equal(right.health,3);
+  const leftLevel=fixture(['######','#@   #','######']);
+  leftLevel.world=1;leftLevel.tiles[8]=14;leftLevel.parameters[8]=4;
+  const left=new Simulation(leftLevel);step(left);assert.equal(left.tile(1,1),14);
+  assert.equal(left.state[left.index(1,1)]&8,8);
+});
+test('Scotland rolling hazard waits at walls but retries next to a moving obstacle',()=>{
+  const wall=fixture(['#####','# O##','#####']);
+  wall.world=1;wall.tiles[7]=14;
+  const blocked=new Simulation(wall);step(blocked);
+  assert.equal(blocked.state[7]>>8,20);
+  const moving=fixture(['######','# O   ','######']);
+  moving.world=1;moving.tiles[8]=14;moving.tiles[9]=16;
+  const retry=new Simulation(moving);step(retry);
+  assert.equal(retry.state[8]>>8,0);
+  assert.equal(retry.tile(2,1),14);
+});
+test('Tibet ceiling stone warns, falls, injures and shatters',()=>{
+  const level=fixture(['#####','#   #','#   #','# @ #','#####']);
+  level.world=2;level.tiles[7]=44;
+  const sim=new Simulation(level);step(sim);assert.equal(sim.state[7]&56,8);
+  step(sim,0,10);assert.equal(sim.state[7]&56,24);
+  step(sim);assert.equal(sim.tile(2,2),44);
+  step(sim,0,4);assert.equal(sim.health,4);
+  step(sim);assert.equal(sim.health,3);assert.equal(sim.state[sim.index(2,2)]&56,32);
+  step(sim,0,6);assert.equal(sim.tile(2,2),-1);
+});
+test('Tibet ceiling stone stops at solid ground and checkpoint restore resets it',()=>{
+  const level=fixture(['#####','#   #','#   #','# @ #','#####']);
+  level.world=2;level.tiles[7]=44;level.tiles[12]=80;
+  const sim=new Simulation(level);step(sim,0,4);assert.equal(sim.state[7],0);
+  sim.tiles[12]=-1;step(sim);assert.equal(sim.state[7]&56,8);
+  sim.restoreCheckpoint();assert.equal(sim.tile(2,2),80);assert.equal(sim.tile(2,1),44);assert.equal(sim.state[7],0);
+});
+test('canonical later maps initialize timed spikes and ceiling traps from parameters',()=>{
+  const scotland=new Simulation(worlds[1].levels[0]);
+  const spike=scotland.index(21,4);assert.equal(scotland.tile(21,4),28);
+  assert.equal(scotland.state[spike],11);assert.equal(scotland.active[spike],24);
+  const second=new Simulation(worlds[1].levels[1]);
+  const hazard=second.index(14,11);assert.equal(second.tile(14,11),14);
+  assert.equal(second.state[hazard],8);assert.equal(second.active[hazard],24);
+  const tibet=new Simulation(worlds[2].levels[0]);
+  const trap=tibet.index(27,2);assert.equal(tibet.tile(27,2),44);
+  assert.equal(tibet.state[trap],0);assert.equal(tibet.active[trap],24);
 });
 test('the later Angkor health pickup restores life without repeating',()=>{
   const level=fixture(['#####','#@  #','#####']);level.tiles[7]=7;

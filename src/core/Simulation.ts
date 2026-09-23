@@ -2,6 +2,7 @@ import type { LevelDefinition } from '../level/LevelParser.ts';
 import { Camera } from './Camera.ts';
 import { ENGINE_REVISION, levelFingerprint } from './Compatibility.ts';
 import { animationFrameAt, BOULDER_BRACE_TICKS, BOULDER_PRESSURE_TICKS, CHEST_OPEN_DURATIONS, fireReach, HAMMER_ATTACK_TICKS, HAMMER_BOUNCE_TICKS, HAMMER_IMPACT_TICK } from './PhaseOneRules.ts';
+import { spikeExtension, spikeReach } from './LaterStageRules.ts';
 export type Direction=0|1|2|3|4;
 export const DX=[0,0,1,0,-1], DY=[0,-1,0,1,0];
 export interface InputFrame {direction:Direction;action:boolean;reset?:boolean}
@@ -49,6 +50,9 @@ export class Simulation {
       if(t===0||t===1)this.active[i]=48;
       if(t===19||t===43){this.state[i]=p;this.active[i]=48;}
       if(t===22||t===23)this.active[i]=48;
+      if(t===14){this.state[i]=p===4?8:0;this.active[i]=24;}
+      if(t===28){this.state[i]=p<0?0:p>10?(Math.floor(p/11)|8):p;this.active[i]=24;}
+      if(t===44){this.state[i]=0;this.active[i]=24;}
     });
     // The equipment level lives in recordData[9], so revisiting its chest
     // after a campaign save must not award the same upgrade a second time.
@@ -238,6 +242,82 @@ export class Simulation {
     if(age>=16){this.tiles[i]=-1;this.state[i]=0;this.wake(x,y);}
     else {this.state[i]=age+1;this.active[i]=24;}
   }
+  /** cGame.method_338: timed spikes damage at the currently extended tip. */
+  updateSpikes(x:number,y:number){
+    const i=this.index(x,y),s=this.state[i],down=(s&7)===3,alternate=(s&8)!==0;
+    const reach=spikeReach(this.tick,alternate),tipY=y+(reach-1)*(down?1:-1);
+    if(this.isPlayer(x,tipY))this.hurt(2,down?3:1);
+    const tip=this.index(x,tipY);
+    if(tip>=0&&tip!==i&&![-1,28,32].includes(this.tiles[tip])){
+      if([19,43,45,46,49].includes(this.tiles[tip])){
+        this.enemySmoke.push({cell:tip,age:0});this.events.push('enemy-death');
+      }
+      this.tiles[tip]=-1;this.state[tip]=0;this.motion[tip]=0;
+      this.wake(x,tipY);this.events.push('spike-impact');
+    }
+    this.active[i]=24;
+  }
+  /** cGame.method_336: Scotland rolling hazard falls first, then travels sideways. */
+  updateRollingHazard(x:number,y:number){
+    const i=this.index(x,y),s=this.state[i],side=(s&8)?-1:1,
+      direction=(s&7) as Direction,cooldown=(s>>8)&255;
+    this.active[i]=24;
+    if(this.overlap(x,y,direction,this.motion[i]))this.hurt(1,direction);
+    if(cooldown>=20){
+      if(this.free(x,y+1)||this.free(x+side,y))this.state[i]=(s&~0xff00)|(19<<8);
+      return;
+    }
+    if(cooldown>0){this.state[i]=(s&~0xff00)|((cooldown-1)<<8);return;}
+    if(this.motion[i]>0){this.motion[i]=Math.max(0,this.motion[i]-6);return;}
+    let tx=x,ty=y,nextDirection:Direction=side<0?4:2;
+    if(this.free(x,y+1)){ty++;nextDirection=3;}
+    else if(this.free(x+side,y))tx+=side;
+    else {
+      // method_336 keeps retrying immediately beside moving obstacles.
+      this.state[i]=[16,19,43].includes(this.tile(x+side,y))?(s&~0xff07):(s&~0xff00)|(20<<8);
+      return;
+    }
+    const to=this.index(tx,ty),nextState=(s&~0xff07)|nextDirection;
+    this.moveObject(i,to,14,nextState,18);this.active[to]=24;
+    this.wake(tx,ty);
+    if(this.overlap(tx,ty,nextDirection,18))this.hurt(1,nextDirection);
+  }
+  /** cGame.method_314: a Tibet ceiling stone warns, drops, then shatters. */
+  updateCeilingTrap(x:number,y:number){
+    const i=this.index(x,y),phase=(this.state[i]&56)>>3;
+    this.active[i]=24;
+    if(phase===0){
+      if(this.player.x!==x||this.player.y<=y)return;
+      for(let row=y+1;row<this.level.height;row++){
+        if(this.player.y===row){this.state[i]=8;this.motion[i]=10;this.events.push('trap-trigger');return;}
+        if(this.tile(x,row)>=80||[0,30,34,35].includes(this.tile(x,row)))return;
+      }
+      return;
+    }
+    if(phase===1){
+      if(--this.motion[i]<=0){this.state[i]=27;this.motion[i]=0;this.events.push('trap-fall');}
+      return;
+    }
+    if(phase===3){
+      if(this.motion[i]>0){this.motion[i]-=5;return;}
+      const below=this.index(x,y+1);
+      if(below<0){this.state[i]=32;this.motion[i]=0;return;}
+      const target=this.tiles[below];
+      if(this.isPlayer(x,y+1)){this.hurt(1,3);this.state[i]=32;this.motion[i]=0;this.events.push('trap-impact');return;}
+      if(target===10){this.tiles[below]=-1;this.events.push('grass');}
+      else if(target===30){this.triggerBrick(x,y+1);this.state[i]=32;this.motion[i]=0;this.events.push('trap-impact');return;}
+      else if([19,43,45,46,49].includes(target)){
+        this.tiles[below]=-1;this.enemySmoke.push({cell:below,age:0});this.events.push('enemy-death');
+      }else if(target>=0){this.state[i]=32;this.motion[i]=0;this.events.push('trap-impact');return;}
+      this.tiles[i]=-1;this.state[i]=0;this.motion[i]=0;
+      this.tiles[below]=44;this.state[below]=27;this.motion[below]=19;this.active[below]=24;
+      this.wake(x,y+1);
+      return;
+    }
+    if(phase===4){
+      if((this.tick&1)===0&&++this.motion[i]>=3){this.tiles[i]=-1;this.state[i]=0;this.motion[i]=0;this.wake(x,y);}
+    }
+  }
   private freeze(x:number,y:number){
     const i=this.index(x,y),kind=this.tile(x,y);
     if(i<0||![1,19,43].includes(kind))return false;
@@ -334,6 +414,9 @@ export class Simulation {
         if(this.tiles[i]===0||this.tiles[i]===1||this.tiles[i]===9)this.updateFalling(x,y);
         else if(this.tiles[i]===19||this.tiles[i]===43)this.updateSnake(x,y);
         else if(this.tiles[i]===30)this.updateBrick(x,y);
+        else if(this.tiles[i]===14)this.updateRollingHazard(x,y);
+        else if(this.tiles[i]===28)this.updateSpikes(x,y);
+        else if(this.tiles[i]===44)this.updateCeilingTrap(x,y);
         else if(this.tiles[i]===22||this.tiles[i]===23){
           this.active[i]=24;const side=this.tiles[i]===23?-1:1;
           if(this.player.y===y)for(let n=0;n<=fireReach(this.tick);n++)if(this.player.x===x+n*side)this.hurt(1);
@@ -413,6 +496,12 @@ export class Simulation {
       // method_288: do not enter the trailing portion of a descending boulder.
       const belowTarget=this.index(x,y+1);
       if(p.dx&&this.tile(x,y+1)===0&&belowTarget>=0&&(this.state[belowTarget]&7)===3&&this.motion[belowTarget]>0)pass=false;
+      // method_288 also prevents walking into the swept path of an extended spike.
+      if(t===-1)for(const sy of [y-1,y+1]){
+        const spike=this.index(x,sy);
+        if(spike<0||this.tiles[spike]!==28)continue;
+        if(spikeExtension(this.tick,(this.state[spike]&8)!==0)>=24){pass=false;break;}
+      }
       if(t===0&&p.dx){
         this.pushDelay--;this.setAnimation(p.dx>0?8:9);
         if(this.pushDelay<0&&this.free(x+p.dx,y)&&this.motion[i]===0&&![19,43,45,49].includes(this.tile(x,y+1))){

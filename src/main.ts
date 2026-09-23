@@ -11,7 +11,7 @@ import { MobileControls } from './platform/MobileControls.ts';
 import { MidiPreview, parseMidi } from './platform/Midi.ts';
 import { SESSION_KEY, validateReplay, restoreReplay } from './platform/Session.ts';
 import { CanonicalSave } from './platform/CanonicalSave.ts';
-import { CAMPAIGN_KEY, adjacentNode, finishLevel, newCampaign, unlockedNode, unlockedWorld, validateCampaign } from './core/Campaign.ts';
+import { CAMPAIGN_KEY, REWARD_FLAGS, adjacentNode, finishLevel, newCampaign, pendingRewards, unlockedNode, unlockedWorld, validateCampaign } from './core/Campaign.ts';
 import type { Campaign } from './core/Campaign.ts';
 import { FrontEndRenderer, MENU_ITEMS } from './render/FrontEndRenderer.ts';
 import type { FrontScene } from './render/FrontEndRenderer.ts';
@@ -43,11 +43,14 @@ function startIntro(){scene='intro';intro=new IntroSequence(assets.worlds[0].lev
 function openMap(world=campaign?.world??0){if(!campaign)return;campaign.world=world;campaign.selected=assets.maps[world].find(n=>n.level===campaign!.selected&&unlockedNode(campaign!,world,n,assets.maps))?.level??0;scene='map';simulation=null;campaignStage=false;paused=false;input.clear();clock.reset();frontCooldown=0;saveCampaign();game.focus();}
 function start(l=assets.worlds[0].levels[0],initial?:StageStart,fromCampaign=false){simulation=new Simulation(l,initial);scene='playing';campaignStage=fromCampaign;paused=false;stageIntroTicks=60;results.reset();clock.reset();input.clear();lastError='';$('pause').textContent='Ⅱ';$('play').innerHTML='Abrir menu do jogo <span>→</span>';$('next-level').hidden=true;game.focus();saveSession();}
 function startSelected(){if(!campaign)return;const node=assets.maps[campaign.world].find(n=>n.level===campaign!.selected);if(!node||!unlockedNode(campaign,campaign.world,node,assets.maps))return;start(assets.worlds[campaign.world].levels[node.level],campaign.resources,true);}
-function completionBonus(s:Simulation){
+function eligibleRewards(s:Simulation){
   const totals=stageCollectibleTotals(s.level);
-  return Number(s.diamonds-s.initial.diamonds>=totals.diamonds)+Number(s.redDiamonds-s.initial.redDiamonds>=totals.redDiamonds)+Number(s.hits===0)+Number(s.retries===0);
+  return (s.diamonds-s.initial.diamonds===totals.diamonds+s.bonusDiamondTotal?4:0)|
+    (s.redDiamonds-s.initial.redDiamonds===totals.redDiamonds?8:0)|
+    (s.hits===0?16:0)|(s.retries===0?32:0);
 }
-function completeCampaignStage(){const s=simulation;if(!s||!campaign||s.status!=='complete')return;const firstClear=!campaign.completed[s.level.world].includes(s.level.index);campaign=finishLevel(campaign,s.level.world,s.level.index,{diamonds:s.diamonds,redDiamonds:s.redDiamonds,lives:Math.min(99,s.lives+(firstClear?completionBonus(s):0)),health:s.health,weaponTier:s.weaponTier});saveCampaign();openMap(s.level.world);}
+function completionBonus(s:Simulation){return pendingRewards(newCampaign(),s.level.world,s.level.index,eligibleRewards(s),s.lives).lives-s.lives;}
+function completeCampaignStage(){const s=simulation;if(!s||!campaign||s.status!=='complete')return;const awarded=pendingRewards(campaign,s.level.world,s.level.index,eligibleRewards(s),s.lives);campaign=finishLevel(campaign,s.level.world,s.level.index,{diamonds:s.diamonds,redDiamonds:s.redDiamonds,lives:awarded.lives,health:s.health,weaponTier:s.weaponTier},awarded.mask);saveCampaign();openMap(s.level.world);}
 function advanceLevel(){
   const current=simulation;
   if(!current||current.status!=='complete')return;
@@ -98,18 +101,19 @@ function drawIntro(){
 }
 function drawResult(s:Simulation){
   const phase=results.phase,ticks=results.ticks;
-  const totals=stageCollectibleTotals(s.level),collectedDiamonds=Math.max(0,s.diamonds-s.initial.diamonds),collectedRed=Math.max(0,s.redDiamonds-s.initial.redDiamonds);
+  const totals=stageCollectibleTotals(s.level);totals.diamonds+=s.bonusDiamondTotal;
+  const collectedDiamonds=Math.max(0,s.diamonds-s.initial.diamonds),collectedRed=Math.max(0,s.redDiamonds-s.initial.redDiamonds);
   ctx.fillStyle='#261707';ctx.fillRect(0,0,240,320);
   const titleSlide=phase===0?Math.min(0,-100+ticks*10):0;
   text(stageTitle(assets.strings,s.level),120+titleSlide,10,'center');text(assets.strings[41],120+(phase===0?Math.min(0,-340+ticks*10):0),25,'center');
-  const awardAvailable=!campaignStage||!campaign?.completed[s.level.world].includes(s.level.index);
+  const awardMask=pendingRewards(campaignStage&&campaign?campaign:newCampaign(),s.level.world,s.level.index,eligibleRewards(s),s.lives).mask;
   const rows:[string,string,(x:number)=>void,boolean][]=[
     [assets.strings[109],`${phase===1?Math.min(collectedDiamonds,ticks>>1):collectedDiamonds}/${totals.diamonds}`,x=>sprites.frame(ctx,assets.sprite('cm-2'),0,x,69),collectedDiamonds>=totals.diamonds],
     [assets.strings[114],`${collectedRed}/${totals.redDiamonds}`,x=>sprites.frame(ctx,assets.sprite('cm-2'),0,x,127,0,1),collectedRed>=totals.redDiamonds],
     [assets.strings[43],String(s.hits),x=>sprites.animation(ctx,assets.sprite('o-0'),10,0,x,189),s.hits===0],
     [assets.strings[44],String(s.retries),x=>sprites.animation(ctx,assets.sprite('o-0'),12,0,x,243),s.retries===0]
   ];
-  rows.forEach(([label,value,icon,perfect],i)=>{if(phase<=i)return;const y=69+i*58,slide=phase===i+1?Math.min(0,-100+ticks*10):0;icon(7+slide);text(label,120,y,'center');text(value,120,y+12,'center');if(awardAvailable&&perfect&&phase>i+1){sprites.module(ctx,assets.sprite('ui-4'),0,180,y+11);sprites.module(ctx,assets.sprite('cm-4'),0,200,y-6);}});
+  rows.forEach(([label,value,icon,perfect],i)=>{if(phase<=i)return;const y=69+i*58,slide=phase===i+1?Math.min(0,-100+ticks*10):0;icon(7+slide);text(label,120,y,'center');text(value,120,y+12,'center');if(perfect&&(awardMask&REWARD_FLAGS[i])&&phase>i+1){sprites.module(ctx,assets.sprite('ui-4'),0,180,y+11);sprites.module(ctx,assets.sprite('cm-4'),0,200,y-6);}});
   text(assets.strings[phase===5?98:53],5,318);
   $('game-status').textContent=`${stageTitle(assets.strings,s.level)} · conclusão ${phase}/5`;
   $<HTMLButtonElement>('pause').disabled=true;$<HTMLButtonElement>('restart').disabled=true;

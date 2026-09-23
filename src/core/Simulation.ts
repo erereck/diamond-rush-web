@@ -11,6 +11,7 @@ export interface Replay {version:3;target:'1.2.0-s700';engine:typeof ENGINE_REVI
 export const WALKABLE_TILES=new Set([-1,1,2,4,5,6,7,11,14,19,24,26,27,33,40,41,42,43,45,50,51,52,53]);
 interface CheckpointState {
   tiles:Int16Array; state:Int32Array; motion:Int16Array; active:Int16Array; chestFrames:Int16Array; frozenKinds:Int16Array;
+  objects:number[];parameters:number[];
   gatePhases:Int16Array;gateCounts:Int16Array;unlockedGates:number[];goldKeys:number;silverKeys:number;
   x:number;y:number;diamonds:number;redDiamonds:number;opened:number[];
 }
@@ -25,6 +26,7 @@ export class Simulation {
   lives=5;hurtTicks=0;deathTicks=0;chestCell=-1;chestTicks=0;exitDirection:Direction=0;stonePressure=0;
   respawnTravel=false;respawnFlash=0;respawnTarget={x:0,y:0};
   enemySmoke:{cell:number;age:number}[]=[];hits=0;retries=0;
+  bonusDiamondTotal=0;
   weaponTier:0|1|2|8=0;attackTicks=0;
   hook:{x:number;y:number;direction:2|4;ticks:number}|null=null;
   frozenKinds:Int16Array;permanentEquipmentChests=new Set<number>();
@@ -96,6 +98,7 @@ export class Simulation {
   }
   private captureCheckpoint(){
     this.savedCheckpoint={tiles:this.tiles.slice(),state:this.state.slice(),motion:this.motion.slice(),active:this.active.slice(),
+      objects:[...this.level.objects],parameters:[...this.level.parameters],
       chestFrames:this.chestFrames.slice(),frozenKinds:this.frozenKinds.slice(),gatePhases:this.gatePhases.slice(),gateCounts:this.gateCounts.slice(),
       unlockedGates:[...this.unlockedGates],goldKeys:this.goldKeys,silverKeys:this.silverKeys,
       x:this.player.x,y:this.player.y,diamonds:this.diamonds,redDiamonds:this.redDiamonds,opened:[...this.opened]};
@@ -104,6 +107,8 @@ export class Simulation {
     const previousCamera={x:this.camera.x,y:this.camera.y};
     const save=this.savedCheckpoint;
     this.tiles.set(save.tiles);this.state.set(save.state);this.motion.set(save.motion);this.active.set(save.active);this.chestFrames.set(save.chestFrames);this.frozenKinds.set(save.frozenKinds);
+    this.level.objects.splice(0,this.level.objects.length,...save.objects);
+    this.level.parameters.splice(0,this.level.parameters.length,...save.parameters);
     for(const i of this.permanentPickups)this.tiles[i]=-1;
     for(const i of this.permanentEquipmentChests){this.tiles[i]=-1;this.chestFrames[i]=3;}
     this.gatePhases.set(save.gatePhases);this.gateCounts.set(save.gateCounts);this.unlockedGates=new Set(save.unlockedGates);
@@ -417,8 +422,8 @@ export class Simulation {
     if(p.offset===0){
       const insideChest=[14,33].includes(o);
       if(!insideChest&&(t===4||t===5)){this.tiles[i]=-1;if(t===4)this.goldKeys++;else this.silverKeys++;this.events.push(t===4?'gold-key':'silver-key');}
-      if(!insideChest&&t===6){this.tiles[i]=-1;this.permanentPickups.add(i);if(this.lives>=99){this.health=4;this.events.push('health');}else{this.lives++;this.events.push('extra-life');}}
-      if(!insideChest&&t===7){this.tiles[i]=-1;this.health=4;this.events.push('health');}
+      if(!insideChest&&t===6){this.tiles[i]=-1;if(this.lives>=99)this.collectHealthOrDiamonds();else{this.permanentPickups.add(i);this.lives++;this.events.push('extra-life');}}
+      if(!insideChest&&t===7){this.tiles[i]=-1;this.collectHealthOrDiamonds();}
       if(o===4&&this.level.parameters[i]>this.checkpointOrder){this.checkpoint=i;this.checkpointOrder=this.level.parameters[i];this.captureCheckpoint();this.events.push('checkpoint');}
       if([14,33].includes(o)&&!this.opened.has(i)&&this.chestFrames[i]===0){
         this.chestCell=i;this.chestTicks=0;this.chestFrames[i]=1;this.setAnimation(40);this.events.push('chest');
@@ -433,6 +438,11 @@ export class Simulation {
     this.updateCamera();
   }
   private updateCamera(){const p=this.player;this.camera.update(p.x*24-p.dx*p.offset,p.y*24-p.dy*p.offset,this.level.width,this.level.height);}
+  /** cGame.method_322 converts a field health pickup into ten diamonds at full health. */
+  private collectHealthOrDiamonds(){
+    if(this.health===4){this.diamonds+=10;this.bonusDiamondTotal+=10;this.events.push('diamond');}
+    else {this.health=4;this.events.push('health');}
+  }
   replay():Replay{return {version:3,target:'1.2.0-s700',engine:ENGINE_REVISION,levelFingerprint:levelFingerprint(this.level),world:this.level.world,level:this.level.index,initial:{...this.initial},inputs:this.inputs.map(i=>({...i}))};}
-  snapshot(){return {tick:this.tick,player:{...this.player},camera:{x:this.camera.x,y:this.camera.y},tiles:[...this.tiles],state:[...this.state],motion:[...this.motion],active:[...this.active],frozenKinds:[...this.frozenKinds],diamonds:this.diamonds,redDiamonds:this.redDiamonds,goldKeys:this.goldKeys,silverKeys:this.silverKeys,gatePhases:[...this.gatePhases],gateCounts:[...this.gateCounts],unlockedGates:[...this.unlockedGates],permanentPickups:[...this.permanentPickups],permanentEquipmentChests:[...this.permanentEquipmentChests],weaponTier:this.weaponTier,attackTicks:this.attackTicks,hook:this.hook?{...this.hook}:null,health:this.health,invulnerable:this.invulnerable,status:this.status,playerAnimation:this.playerAnimation,animationTick:this.animationTick,pushDelay:this.pushDelay,checkpoint:this.checkpoint,checkpointOrder:this.checkpointOrder,opened:[...this.opened],chestFrames:[...this.chestFrames],chestCell:this.chestCell,chestTicks:this.chestTicks,lives:this.lives,hurtTicks:this.hurtTicks,deathTicks:this.deathTicks,respawnTravel:this.respawnTravel,respawnFlash:this.respawnFlash,respawnTarget:{...this.respawnTarget},exitDirection:this.exitDirection,stonePressure:this.stonePressure,pendingDirection:this.pendingDirection,lastInputDirection:this.lastInputDirection,actionHeld:this.actionHeld,entranceGate:this.entranceGate,enemySmoke:this.enemySmoke.map(s=>({...s})),hits:this.hits,retries:this.retries,savedCheckpoint:structuredClone(this.savedCheckpoint)};}
+  snapshot(){return {tick:this.tick,player:{...this.player},camera:{x:this.camera.x,y:this.camera.y},tiles:[...this.tiles],state:[...this.state],motion:[...this.motion],active:[...this.active],objects:[...this.level.objects],parameters:[...this.level.parameters],frozenKinds:[...this.frozenKinds],diamonds:this.diamonds,bonusDiamondTotal:this.bonusDiamondTotal,redDiamonds:this.redDiamonds,goldKeys:this.goldKeys,silverKeys:this.silverKeys,gatePhases:[...this.gatePhases],gateCounts:[...this.gateCounts],unlockedGates:[...this.unlockedGates],permanentPickups:[...this.permanentPickups],permanentEquipmentChests:[...this.permanentEquipmentChests],weaponTier:this.weaponTier,attackTicks:this.attackTicks,hook:this.hook?{...this.hook}:null,health:this.health,invulnerable:this.invulnerable,status:this.status,playerAnimation:this.playerAnimation,animationTick:this.animationTick,pushDelay:this.pushDelay,checkpoint:this.checkpoint,checkpointOrder:this.checkpointOrder,opened:[...this.opened],chestFrames:[...this.chestFrames],chestCell:this.chestCell,chestTicks:this.chestTicks,lives:this.lives,hurtTicks:this.hurtTicks,deathTicks:this.deathTicks,respawnTravel:this.respawnTravel,respawnFlash:this.respawnFlash,respawnTarget:{...this.respawnTarget},exitDirection:this.exitDirection,stonePressure:this.stonePressure,pendingDirection:this.pendingDirection,lastInputDirection:this.lastInputDirection,actionHeld:this.actionHeld,entranceGate:this.entranceGate,enemySmoke:this.enemySmoke.map(s=>({...s})),hits:this.hits,retries:this.retries,savedCheckpoint:structuredClone(this.savedCheckpoint)};}
 }

@@ -2,15 +2,23 @@ import type { Direction, StageStart } from './Simulation.ts';
 import type { MapNode } from '../level/LevelParser.ts';
 
 export const CAMPAIGN_KEY='diamond-rush:campaign:v1';
+export const REWARD_FLAGS=[4,8,16,32] as const;
 export interface Campaign {
   version:1;
   completed:number[][];
+  awards:number[][];
   world:number;
   selected:number;
   resources:StageStart;
 }
 export function newCampaign():Campaign {
-  return {version:1,completed:[[],[],[]],world:0,selected:0,resources:{diamonds:0,redDiamonds:0,lives:5,health:4,weaponTier:0}};
+  return {version:1,completed:[[],[],[]],awards:[[],[],[]],world:0,selected:0,resources:{diamonds:0,redDiamonds:0,lives:5,health:4,weaponTier:0}};
+}
+/** cGame.method_249(11): each first-time award adds one life, up to 99. */
+export function pendingRewards(c:Campaign,world:number,level:number,eligible:number,lives:number){
+  let mask=0;
+  for(const flag of REWARD_FLAGS)if(lives<99&&(eligible&flag)&&!((c.awards[world]?.[level]??0)&flag)){mask|=flag;lives++;}
+  return {mask,lives};
 }
 export function unlockedWorld(c:Campaign,world:number,maps:MapNode[][]):boolean {
   if(world===0)return true;
@@ -31,18 +39,24 @@ export function adjacentNode(c:Campaign,direction:Direction,maps:MapNode[][]):Ma
   directed.sort((a,b)=>Math.hypot(a.x-from.x,a.y-from.y)-Math.hypot(b.x-from.x,b.y-from.y));
   return directed[0]??null;
 }
-export function finishLevel(c:Campaign,world:number,level:number,resources:StageStart):Campaign {
+export function finishLevel(c:Campaign,world:number,level:number,resources:StageStart,awarded=0):Campaign {
   const completed=c.completed.map(levels=>[...levels]);
   if(!completed[world].includes(level))completed[world].push(level);
-  return {...c,completed,world,selected:level,resources:{...resources}};
+  const awards=c.awards.map(levels=>[...levels]);while(awards[world].length<=level)awards[world].push(0);
+  awards[world][level]|=awarded;
+  return {...c,completed,awards,world,selected:level,resources:{...resources}};
 }
 export function validateCampaign(value:unknown,maps:MapNode[][]):Campaign {
   if(!value||typeof value!=='object')throw new Error('Campanha inválida');
   const c=value as Campaign;
   if(c.version!==1||!Array.isArray(c.completed)||c.completed.length!==3)throw new Error('Versão da campanha inválida');
   for(let w=0;w<3;w++)if(!Array.isArray(c.completed[w])||c.completed[w].some(n=>!Number.isInteger(n)||!maps[w].some(node=>node.level===n)))throw new Error('Fases salvas inválidas');
+  // Older v1 saves tracked only completion. Treat their awards as claimed to
+  // preserve the life balance earned before per-category flags were stored.
+  const awards=c.awards??c.completed.map((levels,w)=>Array.from({length:Math.max(...maps[w].map(node=>node.level))+1},(_,level)=>levels.includes(level)?60:0));
+  if(!Array.isArray(awards)||awards.length!==3||awards.some((row,w)=>!Array.isArray(row)||row.some((flags,i)=>!maps[w].some(node=>node.level===i)||!Number.isInteger(flags)||flags<0||(flags&~60)!==0)))throw new Error('Recompensas salvas inválidas');
   if(!Number.isInteger(c.world)||c.world<0||c.world>2||!unlockedWorld(c,c.world,maps)||!maps[c.world].some(n=>n.level===c.selected&&unlockedNode(c,c.world,n,maps)))throw new Error('Mapa salvo inválido');
   const r=c.resources;
   if(!r||![r.diamonds,r.redDiamonds,r.lives,r.health].every(Number.isInteger)||r.diamonds<0||r.diamonds>65535||r.redDiamonds<0||r.redDiamonds>65535||r.lives<0||r.lives>99||r.health<1||r.health>4||![0,1,2,8].includes(r.weaponTier??0))throw new Error('Recursos salvos inválidos');
-  return {version:1,completed:c.completed.map(a=>[...new Set(a)]),world:c.world,selected:c.selected,resources:{...r,weaponTier:r.weaponTier??0}};
+  return {version:1,completed:c.completed.map(a=>[...new Set(a)]),awards:awards.map(row=>[...row]),world:c.world,selected:c.selected,resources:{...r,weaponTier:r.weaponTier??0}};
 }

@@ -139,7 +139,7 @@ export class IntroSequence {
       return false;
     }
     if(opcode===6)return r.ticks>=args[0];
-    if(opcode===10)return r.ticks>=4;
+    if(opcode===10)return r.ticks>1&&this.sim.player.offset<=0;
     if(opcode===11){this.portraitFrame=args[0];this.portraitSprite=args[1];return true;}
     if(opcode===12){this.portraitX=args[0];this.portraitY=args[1];this.portraitVisible=true;return r.ticks>=5;}
     if(opcode===13){

@@ -14,7 +14,8 @@ O Java aloca 1000 bytes, mas grava apenas `field_382` bytes usados. A reconstru�
 | 4–5 | Diamantes coletados, little-endian |
 | 6–7 | Diamantes vermelhos, little-endian |
 | 8 | Vida máxima; inicial 4 |
-| 9–13 | Estado/equipamentos/preferências; preservados sem mutadores nesta etapa |
+| 9 | Nível do equipamento (0/1/2/8), com getter e setter no codec |
+| 10–13 | Estado/preferências; preservados sem mutadores nesta etapa |
 | 14–19 | Três ponteiros u16 LE para os blocos dos mundos |
 
 Cada bloco de mundo contém: quantidade de fases (byte), maior fase liberada (byte), primeira fase secreta (byte), e um ponteiro u16 LE por fase. A primeira fase secreta é o menor índice dos nós de mapa de tipo 1, ou 100 quando não há nenhum. Nos recursos canônicos: 9 / 10 / 11.
@@ -25,6 +26,8 @@ O codec preserva bytes desconhecidos e cauda, valida limites e sobreposições, 
 
 ## Replay experimental
 
-JSON com `version: 2`, `target: "1.2.0-s700"`, `engine: "experimental-2"`, mundo, fase, impressão FNV-1a dos três planos/dimensões e entradas por tick. A impressão detecta diferenças de dados; não é assinatura de segurança. Entradas são reconstruídas executando a mesma simulação desde o começo. Máximo importado: 144000 ticks, ou duas horas a 20 Hz.
+JSON com `version: 3`, `target: "1.2.0-s700"`, `engine: "fidelity-7"`, mundo, fase, recursos iniciais (inclusive equipamento), impressão FNV-1a dos três planos/dimensões e entradas por tick. A impressão detecta diferenças de dados; não é assinatura de segurança. Entradas são reconstruídas executando a mesma simulação desde o começo. Máximo importado: 144000 ticks, ou duas horas a 20 Hz.
 
-Qualquer alteração semântica no motor exige alterar `ENGINE_REVISION`. Arquivos de outra revisão são rejeitados. O armazenamento local usa `diamond-rush:experimental-session:v2`; não altera saves anteriores. O replay não substitui o formato RMS nem comprova determinismo em relação ao Java.
+Qualquer alteração semântica no motor exige alterar `ENGINE_REVISION`. Arquivos de outra revisão são rejeitados. O armazenamento local usa `diamond-rush:experimental-session:v3`; não altera saves anteriores. O replay não substitui o formato RMS nem comprova determinismo em relação ao Java.
+
+O progresso do mapa usa outro JSON local, `diamond-rush:campaign:v1`. Ele agora guarda as quatro flags de recompensa de cada fase separadamente (4/8/16/32), como `method_249(11)`. Saves locais antigos não registravam essas flags: ao carregá-los, as quatro são consideradas recebidas nas fases já concluídas, para não duplicar vidas. O JSON de campanha continua independente do payload RMS canônico.

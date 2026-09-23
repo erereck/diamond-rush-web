@@ -1,6 +1,6 @@
 # Progresso e próximos marcos
 
-Estado em 22/09/2026. Fonte canônica S700 1.2.0. Referências Nokia e ferramentas são comparativas; não misturar regras de execução.
+Estado em 23/09/2026. Fonte canônica S700 1.2.0. Referências Nokia e ferramentas são comparativas; não misturar regras de execução.
 
 | Área | Estado | Limitação restante |
 |---|---|---|
@@ -11,12 +11,12 @@ Estado em 22/09/2026. Fonte canônica S700 1.2.0. Referências Nokia e ferrament
 | Relógio e câmera | Inteiros, 20 Hz, teste independente de refresh | Comparação de traces Java |
 | Controles | Teclado, toque, pausa, ação e retorno ao círculo também na introdução; gamepad implementado | Testar controle físico e calibrar escolha automática de alvos |
 | Movimento / pedras / coleta / cobras | Subconjunto experimental; chão transitável alinhado aos casos de `method_288`, giro visual da pedra, esquerda do herói, esmagamento sob pedra, patrulha e perseguição curta da cobra vermelha | Água, colisões especiais e demais regras |
-| Itens, chaves e portões | Chaves prateadas/douradas, vida extra, cura, fechaduras numeradas e abertura animada da passagem | Tempo fino das animações, interruptores e puzzles restantes |
+| Itens, chaves e portões | Chaves prateadas/douradas, vida extra, cura, conversão da cura em dez diamantes com vida cheia, fechaduras numeradas e abertura animada da passagem | Tempo fino das animações, interruptores e puzzles restantes |
 | Martelo, gancho e martelo de gelo | Baús canônicos concedem níveis 1/2/8; ação escolhe alvo próximo; martelo quebra tijolos/grama e atordoa cobras; gancho puxa objetos em linha horizontal; gelo congela diamantes/cobras; progresso persiste entre fases e checkpoints | Demais alvos e casos especiais de `method_230/231/240/263/333`, frames/tempos exatos e comparação por trace J2ME |
 | Fogo e baús de Angkor | Alcance, dano, abertura e prêmio visível; baús comuns concedem a quantidade codificada no mapa | Validar tempos por trace Java e efeitos de partículas/áudio |
 | Tijolos destrutíveis | Frame imóvel até impacto, quebra de 16 ticks e propagação aos vizinhos | Integrar com os projéteis e armas originais |
-| Checkpoint e morte | Snapshot/restore, vidas, dano e retorno após animação | Integrar com RMS, vida máxima e demais equipamentos |
-| Campanha / cenas / menus | Menu S700, mapas dos três mundos e abertura de Angkor índice 13 jogável entre seis gatilhos de `demo.f`, com física ativa durante as cenas; conclusão retorna ao mapa | Paridade fina dos eventos e animações J2ME, regras canônicas de desbloqueio, save RMS e demais cenas |
+| Checkpoint e morte | Snapshot/restore dos planos mutáveis, vidas, dano e retorno após animação | Integrar com RMS, vida máxima e demais equipamentos |
+| Campanha / cenas / menus | Menu S700, mapas dos três mundos e abertura de Angkor índice 13 jogável entre seis gatilhos de `demo.f`, com física ativa durante as cenas; conclusão retorna ao mapa; quatro recompensas por fase registradas individualmente | Paridade fina dos eventos e animações J2ME, regras canônicas de desbloqueio, save RMS e demais cenas |
 | Save RMS | Codec e modelo inicial, 994 bytes | Integração de campanha e save real de referência |
 | Replay de desenvolvimento | Versionado, validado e restaurável, inclusive equipamento inicial e puxão do gancho | Golden traces comparados ao original |
 | MIDI | Parsing das 21 faixas e prévia | Eventos de jogo, sintetizador/timbres equivalentes |

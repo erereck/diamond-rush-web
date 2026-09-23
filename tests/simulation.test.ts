@@ -80,6 +80,28 @@ test('the later Angkor health pickup restores life without repeating',()=>{
   assert.equal(sim.health,4);assert.equal(sim.tile(2,1),-1);
   sim.health=3;step(sim,0,5);assert.equal(sim.health,3);
 });
+test('full-health field pickups become ten diamonds, including a life at the 99 cap',()=>{
+  for(const pickup of [6,7]){
+    const level=fixture(['#####','#@  #','#####']);level.tiles[7]=pickup;
+    const sim=new Simulation(level,{diamonds:3,redDiamonds:0,lives:99,health:4});
+    step(sim,2,4);
+    assert.equal(sim.lives,99);assert.equal(sim.health,4);assert.equal(sim.diamonds,13);
+    assert.equal(sim.bonusDiamondTotal,10);assert.equal(sim.tile(2,1),-1);
+  }
+});
+test('a capped extra life heals before converting to diamonds',()=>{
+  const level=fixture(['#####','#@  #','#####']);level.tiles[7]=6;
+  const sim=new Simulation(level,{diamonds:0,redDiamonds:0,lives:99,health:2});
+  step(sim,2,4);
+  assert.equal(sim.health,4);assert.equal(sim.diamonds,0);assert.equal(sim.bonusDiamondTotal,0);
+});
+test('checkpoint return restores scripted object and parameter edits',()=>{
+  const level=fixture(['#####','#@  #','#####']);
+  const sim=new Simulation(level),i=sim.index(2,1),before=[sim.level.objects[i],sim.level.parameters[i]];
+  sim.level.objects[i]=14;sim.level.parameters[i]=37;
+  sim.restoreCheckpoint();
+  assert.deepEqual([sim.level.objects[i],sim.level.parameters[i]],before);
+});
 test('an extra life stays collected after checkpoint restore',()=>{
   const level=fixture(['#####','#@  #','#####']);level.tiles[7]=6;level.objects[6]=4;level.parameters[6]=0;
   const sim=new Simulation(level);step(sim,2,4);

@@ -2,7 +2,7 @@
 
 Em 24/09/2026, no Windows, Node 26.7 e navegador Chromium integrado:
 
-- `npm test`: 240 testes passaram, sem testes ignorados. Incluem codecs, todos os 95 sprites, 41 mapas, 21 MIDIs, hashes, relógio, câmera, movimento, pedras, limites de colisão, equipamento, replay e RMS.
+- `npm test`: 241 testes passaram, sem testes ignorados. Incluem codecs, todos os 95 sprites, 41 mapas, 21 MIDIs, hashes, relógio, câmera, movimento, pedras, limites de colisão, equipamento, replay e RMS.
 - `npm run build`: TypeScript e build de produção passaram.
 - Validação no navegador: 2664 combinações de módulo/paleta, 1888 combinações de frame/paleta e 41 mapas renderizados sem exceção. As três referências de animação inválidas `mmv` são documentadas, não corrigidas artificialmente.
 - Início de Angkor, pausa, movimento por teclado e avanço individual de tick verificados no navegador. Um toque curto capturado entre ticks foi aplicado na próxima leitura.
@@ -21,5 +21,7 @@ Em 24/09/2026, no Windows, Node 26.7 e navegador Chromium integrado:
 - A exportação/importação RMS foi testada ao longo da rota principal de Angkor, inclusive flags de fases normais e liberação do mundo seguinte. Revisitar uma fase agora soma os diamantes vermelhos ganhos à contagem anterior, como `method_108`.
 - Um segundo trace com pressão simulada mostrou que o Java espera no círculo após a caminhada automática: o jogador avança mais uma célula antes do primeiro diálogo. A câmera, o retrato e as três falas desse roteiro foram medidos; o teste web confere as transições nos ticks 41, 70, 90, 102 e 129, com pressão nas falas a cada 20 ticks.
 - Na build local, **New Game** parou no círculo sem abrir fala; uma pressão à direita iniciou o primeiro roteiro e mostrou o diálogo correto. O console do Chromium integrado permaneceu sem erros.
+- Com `--walk-chest`, o Java percorreu a rota até o primeiro aviso de baú. O teste web reproduz os estados medidos nos ticks 130–297: passagem por 32 células, dois diamantes, gatilho da fala no tick 258, passo roteirizado no 291 e edição do mapa no 296. O avanço da caixa de texto antes de completar sua entrada revelou um tempo variável de saída, corrigido no intérprete.
+- Depois do ajuste, uma origem local isolada abriu **New Game**, parou no círculo e mostrou o primeiro diálogo após a pressão à direita; não houve erro no console. As origens locais com saves anteriores não foram alteradas nessa conferência.
 
-Os testes de simulação verificam invariantes do subconjunto implementado. A comparação diferencial Java cobre a entrada e os marcos do primeiro roteiro; ainda não cobre as cenas seguintes ou um percurso inteiro. O validador de recursos detecta falhas de acesso/renderização, mas não prova que cada objeto tem o desenho, comportamento ou ordem exatos. Nenhum percurso completo de campanha foi aprovado.
+Os testes de simulação verificam invariantes do subconjunto implementado. A comparação diferencial Java cobre a entrada, o primeiro roteiro e a rota até o aviso do baú; ainda não cobre o baú aberto, as cenas seguintes ou um percurso inteiro. O validador de recursos detecta falhas de acesso/renderização, mas não prova que cada objeto tem o desenho, comportamento ou ordem exatos. Nenhum percurso completo de campanha foi aprovado.

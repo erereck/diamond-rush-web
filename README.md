@@ -58,6 +58,8 @@ O resultado é `trace-s700.csv` com 300 ticks. Os 21 primeiros estados da entrad
 
 Para medir o primeiro diálogo, acrescente `--auto-dialogue --ticks=250` e use outro diretório de saída. Esse modo simula uma pressão para caminhar do círculo até o gatilho e avança as falas a cada 20 ticks; o resultado adicional `demo-s700.csv` registra comandos e câmera. Os marcos conferidos ficam em `tests/fixtures/intro-first-trigger-s700.csv` e `tests/fixtures/intro-demo-timeline-s700.csv`. O Java espera o controle do jogador após a caminhada automática, antes de iniciar a primeira fala.
 
+Com `--walk-chest --ticks=298`, o mesmo capturador avança pelas células transitáveis até o primeiro aviso do baú. A amostra em `tests/fixtures/intro-chest-route-s700.csv` compara posições, deslocamento, dois diamantes coletados, início do roteiro e o passo comandado pelo Java. Esse modo usa uma rota fixa de pesquisa; não representa uma solução automática do tutorial completo.
+
 ## Estado real
 
 Concluídos nesta etapa: auditoria e hashes das fontes, decodificação dos packs/sprites/mapas/strings/MIDI, renderização de recursos, menu e mapa interativos com os sprites originais, progresso local de campanha, relógio fixo, câmera, controles, simulação inicial, replays versionados e codec estrutural do save original.

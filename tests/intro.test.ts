@@ -82,6 +82,37 @@ test('the first dialogue sequence follows measured Java command transitions',()=
   assert.equal(intro.section,1);
 });
 
+test('the route to the chest hint matches measured Java movement and pickups',()=>{
+  const rows=readFileSync(new URL('fixtures/intro-chest-route-s700.csv',import.meta.url),'utf8').trim().split(/\r?\n/).slice(1)
+    .map(line=>{const [tick,x,y,offset,diamonds,redDiamonds,lives,phase,scriptId]=line.split(',');
+      return {tick:Number(tick),x:Number(x),y:Number(y),offset:Number(offset),diamonds:Number(diamonds),redDiamonds:Number(redDiamonds),lives:Number(lives),phase,scriptId:scriptId?Number(scriptId):null};});
+  const waypoints=[[9,4],[9,6],[16,6],[16,5],[20,5],[20,6],[27,6],[27,5],[30,5],[30,7],[31,7]];
+  const intro=new IntroSequence(level,scripts);
+  let waypoint=0;
+  for(let tick=0;tick<=297;tick++){
+    if(tick>0){
+      if(tick%20===0&&intro.dialogue)intro.press();
+      let direction=0 as Direction;
+      if(tick>=22&&tick<=25)direction=2;
+      else if(tick>130&&intro.phase==='free'){
+        const p=intro.sim.player;
+        while(waypoint<waypoints.length&&p.x===waypoints[waypoint][0]&&p.y===waypoints[waypoint][1]&&p.offset===0)waypoint++;
+        if(waypoint<waypoints.length){const [x,y]=waypoints[waypoint];direction=(p.x<x?2:p.x>x?4:p.y<y?3:1) as Direction;}
+      }
+      intro.step({direction,action:false});
+    }
+    const row=rows.find(sample=>sample.tick===tick);
+    if(!row)continue;
+    const p=intro.sim.player;
+    assert.deepEqual([p.x,p.y,p.offset,intro.sim.diamonds,intro.sim.redDiamonds,intro.sim.lives,intro.phase,intro.scriptId],
+      [row.x,row.y,row.offset,row.diamonds,row.redDiamonds,row.lives,row.phase,row.scriptId],`Java route tick ${tick}`);
+  }
+  const hintCell=intro.sim.index(31,7);
+  assert.equal(intro.sim.level.objects[hintCell],0);
+  assert.equal(intro.sim.level.parameters[hintCell],10);
+  assert.equal(intro.section,2);
+});
+
 function walkTo(intro:IntroSequence,goalX:number,goalY:number){
   for(let tick=0;tick<30&&intro.phase==='opening';tick++)intro.step();
   assert.notEqual(intro.phase,'opening','source opening walk did not finish');

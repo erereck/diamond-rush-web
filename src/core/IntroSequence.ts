@@ -6,7 +6,7 @@ import type { DecodedSprite } from '../assets/SpriteDecoder.ts';
 
 interface RunningCommand {
   command:DemoCommand;ticks:number;startX:number;startY:number;page:number;children?:RunningCommand[];done?:boolean;
-  blinkRemaining?:number;blinkOn?:boolean;closingTicks?:number;
+  blinkRemaining?:number;blinkOn?:boolean;closingTicks?:number;closingStart?:number;
 }
 export function wrapDemoText(value:string,maxCharacters:number):string[]{
   const lines:string[]=[];let line='';
@@ -83,7 +83,7 @@ export class IntroSequence {
     if(!running)return null;
     const popup=running.command.opcode===27,lines=this.wrap(running.command.text??'',popup);
     return {lines:lines.slice(running.page,running.page+(popup?2:running.command.args[0])),popup,
-      slide:running.closingTicks===undefined?Math.min(0,-240+running.ticks*30):Math.min(270,7+running.closingTicks*30)};
+      slide:running.closingTicks===undefined?Math.min(0,-240+running.ticks*30):Math.min(263,running.closingStart!+running.closingTicks*30)};
   }
   private findDialogue(r:RunningCommand|null):RunningCommand|null{
     if(!r||r.done)return null;
@@ -165,7 +165,8 @@ export class IntroSequence {
   }
   private scriptedDirection(r:RunningCommand):Direction{
     if(r.done)return 0;
-    if(r.command.opcode===10)return r.command.args[0] as Direction;
+    // The source releases direction for the final settled tick of a walk command.
+    if(r.command.opcode===10)return r.ticks>=4&&this.sim.player.offset===0?0:r.command.args[0] as Direction;
     if(r.command.opcode===0)r.children??=r.command.children!.map(c=>this.running(c));
     for(const child of r.children??[]){const direction=this.scriptedDirection(child);if(direction)return direction;}
     return 0;
@@ -188,18 +189,20 @@ export class IntroSequence {
       return r.ticks>=duration+2;
     }
     if(opcode===2||opcode===27){
-      if(r.closingTicks!==undefined){this.pressed=false;return ++r.closingTicks>=9;}
+      if(r.closingTicks!==undefined){this.pressed=false;return r.closingStart!+(++r.closingTicks)*30>=263;}
       if(this.pressed){
         this.pressed=false;
-        if(r.ticks<8){r.ticks=8;return false;}
         const lines=this.wrap(r.command.text??'',opcode===27),perPage=opcode===27?2:args[0];
         if(r.page+perPage<lines.length){r.page+=perPage;return false;}
+        // Dialogue can be dismissed before it has fully slid in. The Java
+        // continues from its current X instead of jumping to the open position.
+        r.closingStart=Math.min(0,-240+(r.ticks-1)*30);
         r.closingTicks=1;return false;
       }
       return false;
     }
     if(opcode===6)return r.ticks>=args[0];
-    if(opcode===10)return r.ticks>1&&this.sim.player.offset<=0;
+    if(opcode===10)return r.ticks>4&&this.sim.player.offset<=0;
     if(opcode===11){this.portraitFrame=args[0];this.portraitSprite=args[1];return true;}
     if(opcode===12){
       this.portraitX=args[0];this.portraitY=args[1];

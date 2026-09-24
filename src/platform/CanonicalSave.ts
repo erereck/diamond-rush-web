@@ -52,9 +52,16 @@ export class CanonicalSave {
   get diamonds(){return this.u16(4);}
   get redDiamonds(){return this.u16(6);}
   get maxHealth(){return this.data[8];}
+  get worldFlags(){return this.data[2];}
   /** recordData[9]: 0 = none, 1 = hammer, 2 = hook, 8 = ice hammer. */
   get weaponTier(){return this.data[9];}
   setWeaponTier(tier:0|1|2|8){if(![0,1,2,8].includes(tier))throw new Error('RMS: equipamento inválido.');this.data[9]=tier;}
+  setResources(lives:number,diamonds:number,redDiamonds:number,tier:0|1|2|8){
+    if(!Number.isInteger(lives)||lives<0||lives>99||![diamonds,redDiamonds].every(n=>Number.isInteger(n)&&n>=0&&n<=65535))throw new Error('RMS: recursos inválidos.');
+    this.data[3]=lives;this.data[4]=diamonds&255;this.data[5]=diamonds>>8;
+    this.data[6]=redDiamonds&255;this.data[7]=redDiamonds>>8;this.setWeaponTier(tier);
+  }
+  unlockWorld(world:1|2){this.data[2]|=world===1?8:16;}
   export(){return this.data.slice();}
   setLevelStatus(world:number,level:number,status:number){
     if(!Number.isInteger(status)||status<0||status>255)throw new Error('RMS: status inválido.');

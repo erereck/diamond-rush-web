@@ -10,7 +10,7 @@ export type Direction=0|1|2|3|4;
 export const DX=[0,0,1,0,-1], DY=[0,-1,0,1,0];
 export interface DemoEdit {cell:number;object?:number;parameter?:number;state?:number}
 export interface InputFrame {direction:Direction;action:boolean;reset?:boolean;demoEdits?:DemoEdit[]}
-export interface StageStart {diamonds:number;redDiamonds:number;lives:number;health:number;weaponTier?:0|1|2|8}
+export interface StageStart {diamonds:number;redDiamonds:number;lives:number;health:number;weaponTier?:0|1|2|8;openedChests?:number[]}
 export interface Replay {version:3;target:'1.2.0-s700';engine:typeof ENGINE_REVISION;levelFingerprint:string;world:number;level:number;initial:StageStart;inputs:InputFrame[]}
 /** Tile cases which set var15=true in cGame.method_288. */
 export const WALKABLE_TILES=new Set([-1,1,2,4,5,6,7,11,14,19,24,26,27,33,40,41,42,43,45,50,51,52,53]);
@@ -45,7 +45,7 @@ export class Simulation {
   boss:AngkorBoss|BavariaBoss|TibetBoss|null=null;
   constructor(level:LevelDefinition,initial:StageStart={diamonds:0,redDiamonds:0,lives:5,health:4}){
     this.initialLevelFingerprint=levelFingerprint(level);
-    this.initial={...initial};this.diamonds=initial.diamonds;this.redDiamonds=initial.redDiamonds;
+    this.initial={...initial,...(initial.openedChests?{openedChests:[...initial.openedChests]}:{})};this.diamonds=initial.diamonds;this.redDiamonds=initial.redDiamonds;
     this.lives=initial.lives;this.health=initial.health;this.weaponTier=initial.weaponTier??0;
     this.level={...level,tiles:[...level.tiles],parameters:[...level.parameters],objects:[...level.objects]};
     if(level.world===0&&level.index===8)this.boss=new AngkorBoss();
@@ -64,7 +64,8 @@ export class Simulation {
       if(t===34){this.tiles[i]=-1;this.level.objects[i]=15;}
       if(t===35)this.level.objects[i]=255;
       if(t===0||t===1)this.active[i]=48;
-      if(t===19||t===43){this.state[i]=p;this.active[i]=48;}
+      if(t===19||t===43||t===49){this.state[i]=p;this.active[i]=48;}
+      if(t===45||t===46){this.state[i]=0;this.motion[i]=0;this.active[i]=24;}
       if(t===22||t===23)this.active[i]=48;
       if(t===14){this.state[i]=p===4?8:0;this.active[i]=24;}
       if(t===16){this.state[i]=p<0?2:p;this.active[i]=24;}
@@ -85,6 +86,9 @@ export class Simulation {
       if(required&&this.weaponTier>=required&&[14,33].includes(level.objects[i])){
         this.tiles[i]=-1;this.chestFrames[i]=3;this.opened.add(i);this.permanentEquipmentChests.add(i);
       }
+    }
+    for(const i of initial.openedChests??[])if(i>=0&&i<this.tiles.length&&[14,33].includes(level.objects[i])){
+      this.tiles[i]=-1;this.chestFrames[i]=3;this.opened.add(i);
     }
     // cGame.method_294/296: each numbered door waits for its matching locks.
     for(let i=0;i<this.tiles.length;i++)if(this.level.objects[i]===7){
@@ -260,6 +264,92 @@ export class Simulation {
     }else {m=Math.max(0,m-3);this.motion[i]=m;}
     if(this.overlap(tx,ty,dir,Math.max(0,m)))this.hurt(1,dir as Direction);
   }
+  /** cGame.method_206: Tibet's ice creature changes direction on AF completion. */
+  updateIceCreature(x:number,y:number){
+    const i=this.index(x,y),above=this.index(x,y-1);
+    if(above>=0&&[0,1].includes(this.tiles[above])&&this.motion[above]<=6&&(this.state[above]&7)===3){
+      this.tiles[i]=-1;this.enemySmoke.push({cell:i,age:0});this.events.push('enemy-death');this.wake(x,y);return;
+    }
+    const durations=[16,16,6,6,12,12,12,12,12,12,100];
+    const state=this.state[i],phase=state&15,age=((state&2088960)>>13)+1;
+    const duration=durations[phase]??16;
+    this.active[i]=24;this.motion[i]=phase>=4&&phase<=9?12:0;
+    if(age>duration/2&&phase!==10&&this.overlap(x,y,0,0))this.hurt(1);
+    if(age<duration){this.state[i]=(state&~2088960)|(age<<13);return;}
+    const gapX=x-this.player.x,gapY=y-this.player.y;
+    const horizontal:Direction=gapX>0?4:gapX<0?2:0;
+    const vertical:Direction=gapY>0?1:gapY<0?3:0;
+    let direction:Direction=0;
+    if(Math.abs(gapX)>Math.abs(gapY)&&horizontal&&this.free(x+DX[horizontal],y))direction=horizontal;
+    if(!direction&&vertical&&this.free(x,y+DY[vertical]))direction=vertical;
+    if(!direction&&horizontal&&this.free(x+DX[horizontal],y))direction=horizontal;
+    const facingLeft=[0,3,4,7,9].includes(phase);
+    let nextPhase=direction===4?3:2,tx=x,ty=y;
+    if(facingLeft===(direction===4)){
+      tx=x+DX[direction];ty=y+DY[direction];
+      nextPhase=direction===4?9:direction===3?facingLeft?7:8:direction===1?facingLeft?4:5:direction===2?6:facingLeft?0:1;
+      if(!direction||!this.free(tx,ty)){tx=x;ty=y;nextPhase=0;}
+    }
+    const to=this.index(tx,ty);
+    this.moveObject(i,to,45,(state&7168)|nextPhase,0);this.wake(tx,ty);
+  }
+  /** cGame.method_312: the Tibet shooter falls between ledges and aims a dart. */
+  updateIceShooter(x:number,y:number){
+    const i=this.index(x,y),above=this.index(x,y-1),state=this.state[i],phase=state&31;
+    if(above>=0&&[0,1].includes(this.tiles[above])&&this.motion[above]<=6&&(this.state[above]&7)===3){
+      this.tiles[i]=-1;this.enemySmoke.push({cell:i,age:0});this.events.push('enemy-death');this.wake(x,y);return;
+    }
+    this.active[i]=24;
+    if(phase===8||phase===9){
+      this.motion[i]-=6;
+      if(this.motion[i]>0){if(this.overlap(x,y,3,this.motion[i]))this.hurt(1);return;}
+      if(this.free(x,y+1)&&!this.isPlayer(x,y+1)){
+        this.moveObject(i,this.index(x,y+1),46,phase,18);this.wake(x,y+1);
+      }else {this.state[i]=phase===8?10:11;this.motion[i]=0;}
+      return;
+    }
+    if(this.free(x,y+1)&&!this.isPlayer(x,y+1)){
+      this.moveObject(i,this.index(x,y+1),46,(phase&1)?9:8,18);this.wake(x,y+1);return;
+    }
+    if(this.overlap(x,y,0,0))this.hurt(1);
+    const durations=[14,14,14,14,8,8,8,8,1,1,4,4,14,14,14,1,1,1];
+    const age=((state&8160)>>5)+1,duration=durations[phase]??14;
+    const firstFrame=phase>=4&&phase<=7?2:0;
+    if(firstFrame&&age===firstFrame){
+      const direction:Direction=phase===4?4:phase===5?2:1;
+      const tx=x+DX[direction],ty=y+DY[direction],to=this.index(tx,ty);
+      if(to>=0&&this.free(tx,ty)){
+        this.tiles[to]=21;this.state[to]=direction;this.motion[to]=18;this.active[to]=48;
+        this.wake(tx,ty);this.events.push('enemy-shot');
+      }
+    }
+    if(age<=duration){this.state[i]=(state&~8160)|(age<<5);return;}
+    const gapX=this.player.x-x,gapY=this.player.y-y;
+    const nextPhase=Math.abs(gapX)>Math.abs(gapY)?gapX<0?4:5:gapY<0?gapX<0?6:7:gapX<0?0:1;
+    this.state[i]=nextPhase;this.motion[i]=0;
+  }
+  /** cGame.method_334: a Tibet dart crosses cells and bursts at an obstacle. */
+  updateIceDart(x:number,y:number){
+    const i=this.index(x,y),state=this.state[i],direction=(state&7) as Direction;
+    this.active[i]=24;
+    if(state&8){if(++this.motion[i]>=8){this.tiles[i]=-1;this.state[i]=0;this.motion[i]=0;this.wake(x,y);}return;}
+    if(this.overlap(x,y,direction,Math.max(0,this.motion[i])))this.hurt(1);
+    if(this.motion[i]>0){this.motion[i]=Math.max(0,this.motion[i]-12);return;}
+    const tx=x+DX[direction],ty=y+DY[direction],to=this.index(tx,ty);
+    if(to>=0&&this.free(tx,ty)){
+      this.moveObject(i,to,21,direction,direction===4?12:24);this.wake(tx,ty);
+      if(this.overlap(tx,ty,direction,this.motion[to]))this.hurt(1);
+      return;
+    }
+    if(to>=0){
+      if(this.tiles[to]===10){this.state[to]=1;this.active[to]=24;this.events.push('grass');}
+      if(this.tiles[to]===30)this.triggerBrick(tx,ty);
+      if([19,43,45,46,49].includes(this.tiles[to])){
+        this.tiles[to]=-1;this.enemySmoke.push({cell:to,age:0});this.events.push('enemy-death');this.wake(tx,ty);
+      }
+    }
+    this.state[i]=direction|8;this.motion[i]=0;this.events.push('dart-impact');
+  }
   triggerBrick(x:number,y:number){
     const i=this.index(x,y);
     if(i<0||this.tiles[i]!==30||this.state[i]>0)return;
@@ -369,7 +459,7 @@ export class Simulation {
   }
   private freeze(x:number,y:number){
     const i=this.index(x,y),kind=this.tile(x,y);
-    if(i<0||![1,19,43,45].includes(kind))return false;
+    if(i<0||![1,19,43,45,46,49].includes(kind))return false;
     this.frozenKinds[i]=kind;this.tiles[i]=9;this.state[i]=0;this.motion[i]=0;this.active[i]=24;
     this.events.push('freeze');this.wake(x,y);return true;
   }
@@ -377,7 +467,7 @@ export class Simulation {
     const i=this.index(x,y),kind=this.frozenKinds[i];if(i<0||kind<0)return;
     this.tiles[i]=kind;this.frozenKinds[i]=-1;
     // method_231 restores snakes through method_233, leaving them stunned.
-    this.state[i]=[19,43,45].includes(kind)?120|(this.isPlayer(x,y-1)?2:1):0;
+    this.state[i]=kind===45?10:kind===49?(this.isPlayer(x,y-1)?2:1):[19,43].includes(kind)?120|(this.isPlayer(x,y-1)?2:1):0;
     this.motion[i]=0;
     this.active[i]=48;this.events.push('thaw');this.wake(x,y);
   }
@@ -415,7 +505,7 @@ export class Simulation {
     const adjacent:[Direction,number,number][]=[direction,1,2,3,4]
       .filter((side,index,sides)=>side!==0&&sides.indexOf(side)===index)
       .map(side=>[side as Direction,p.x+DX[side],p.y+DY[side]]);
-    const aimed=adjacent.find(([,x,y])=>[9,10,18,19,30,43,45].includes(this.tile(x,y)));
+    const aimed=adjacent.find(([,x,y])=>[9,10,18,19,30,43,45,46,49].includes(this.tile(x,y)));
     const target=forwardHook??(!aimed&&this.weaponTier>=2?hookDirections.map(side=>this.hookTarget(side)).find(Boolean):null);
     if(target){
       p.direction=target.direction;this.hook=target;this.attackTicks=4+Math.abs(target.x-p.x)*4;
@@ -462,7 +552,10 @@ export class Simulation {
         const i=this.index(x,y);if(this.active[i]<=0)continue;this.active[i]-=6;
         if(this.hook?.x===x&&this.hook.y===y){this.active[i]=24;continue;}
         if(this.tiles[i]===0||this.tiles[i]===1||this.tiles[i]===9)this.updateFalling(x,y);
-        else if(this.tiles[i]===19||this.tiles[i]===43)this.updateSnake(x,y);
+        else if(this.tiles[i]===19||this.tiles[i]===43||this.tiles[i]===49)this.updateSnake(x,y);
+        else if(this.tiles[i]===45)this.updateIceCreature(x,y);
+        else if(this.tiles[i]===46)this.updateIceShooter(x,y);
+        else if(this.tiles[i]===21)this.updateIceDart(x,y);
         else if(this.tiles[i]===30)this.updateBrick(x,y);
         else if(this.tiles[i]===14)this.updateRollingHazard(x,y);
         else if(this.tiles[i]===16)this.updateCrusher(x,y);

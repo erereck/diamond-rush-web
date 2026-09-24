@@ -1,5 +1,6 @@
 import type { Direction, StageStart } from './Simulation.ts';
 import type { MapNode } from '../level/LevelParser.ts';
+import { CanonicalSave } from '../platform/CanonicalSave.ts';
 
 export const CAMPAIGN_KEY='diamond-rush:campaign:v1';
 export const REWARD_FLAGS=[4,8,16,32] as const;
@@ -8,12 +9,14 @@ export interface Campaign {
   completed:number[][];
   secretUnlocked:number[][];
   awards:number[][];
+  worldAccess?:boolean[];
+  canonicalRecord?:number[];
   world:number;
   selected:number;
   resources:StageStart;
 }
 export function newCampaign():Campaign {
-  return {version:1,completed:[[],[],[]],secretUnlocked:[[],[],[]],awards:[[],[],[]],world:0,selected:0,resources:{diamonds:0,redDiamonds:0,lives:5,health:4,weaponTier:0}};
+  return {version:1,completed:[[],[],[]],secretUnlocked:[[],[],[]],awards:[[],[],[]],worldAccess:[true,false,false],world:0,selected:0,resources:{diamonds:0,redDiamonds:0,lives:5,health:4,weaponTier:0}};
 }
 /** cGame.method_249(11): each first-time award adds one life, up to 99. */
 export function pendingRewards(c:Campaign,world:number,level:number,eligible:number,lives:number){
@@ -23,6 +26,7 @@ export function pendingRewards(c:Campaign,world:number,level:number,eligible:num
 }
 export function unlockedWorld(c:Campaign,world:number,maps:MapNode[][]):boolean {
   if(world===0)return true;
+  if(c.worldAccess?.[world])return true;
   const previous=maps[world-1]?.filter(n=>n.type===0).sort((a,b)=>b.level-a.level)[0];
   return !!previous&&c.completed[world-1].includes(previous.level);
 }
@@ -75,9 +79,16 @@ export function validateCampaign(value:unknown,maps:MapNode[][]):Campaign {
   // preserve the life balance earned before per-category flags were stored.
   const awards=c.awards??c.completed.map((levels,w)=>Array.from({length:Math.max(...maps[w].map(node=>node.level))+1},(_,level)=>levels.includes(level)?60:0));
   if(!Array.isArray(awards)||awards.length!==3||awards.some((row,w)=>!Array.isArray(row)||row.some((flags,i)=>!maps[w].some(node=>node.level===i)||!Number.isInteger(flags)||flags<0||(flags&~60)!==0)))throw new Error('Recompensas salvas inválidas');
-  const normalized={...c,secretUnlocked};
+  const worldAccess=c.worldAccess??[true,false,false];
+  if(!Array.isArray(worldAccess)||worldAccess.length!==3||worldAccess.some(v=>typeof v!=='boolean')||!worldAccess[0])throw new Error('Mundos salvos inválidos');
+  if(c.canonicalRecord!==undefined&&(!Array.isArray(c.canonicalRecord)||c.canonicalRecord.length<20||c.canonicalRecord.length>1000||c.canonicalRecord.some(b=>!Number.isInteger(b)||b<0||b>255)))throw new Error('Record RMS salvo inválido');
+  if(c.canonicalRecord){
+    const record=new CanonicalSave(Uint8Array.from(c.canonicalRecord));
+    if(record.worlds.some((w,i)=>w.levels.length!==Math.max(...maps[i].map(node=>node.level))+1))throw new Error('Record RMS de outra versão');
+  }
+  const normalized={...c,secretUnlocked,worldAccess};
   if(!Number.isInteger(c.world)||c.world<0||c.world>2||!unlockedWorld(normalized,c.world,maps)||!maps[c.world].some(n=>n.level===c.selected&&unlockedNode(normalized,c.world,n,maps)))throw new Error('Mapa salvo inválido');
   const r=c.resources;
   if(!r||![r.diamonds,r.redDiamonds,r.lives,r.health].every(Number.isInteger)||r.diamonds<0||r.diamonds>65535||r.redDiamonds<0||r.redDiamonds>65535||r.lives<0||r.lives>99||r.health<1||r.health>4||![0,1,2,8].includes(r.weaponTier??0))throw new Error('Recursos salvos inválidos');
-  return {version:1,completed:c.completed.map(a=>[...new Set(a)]),secretUnlocked:secretUnlocked.map(a=>[...new Set(a)]),awards:awards.map(row=>[...row]),world:c.world,selected:c.selected,resources:{...r,weaponTier:r.weaponTier??0}};
+  return {version:1,completed:c.completed.map(a=>[...new Set(a)]),secretUnlocked:secretUnlocked.map(a=>[...new Set(a)]),awards:awards.map(row=>[...row]),worldAccess:[...worldAccess],canonicalRecord:c.canonicalRecord?[...c.canonicalRecord]:undefined,world:c.world,selected:c.selected,resources:{...r,weaponTier:r.weaponTier??0}};
 }

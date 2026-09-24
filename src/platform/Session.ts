@@ -17,6 +17,9 @@ export function validateReplay(value:unknown,worlds:WorldDefinition[]):Replay {
     !Number.isInteger(initial.health)||initial.health<1||initial.health>4||![0,1,2,8].includes(initial.weaponTier??0))
     throw new Error('Estado inicial da fase inválido.');
   const cellCount=worlds[r.world].levels[r.level].tiles.length;
+  if(initial.openedChests!==undefined&&(!Array.isArray(initial.openedChests)||initial.openedChests.length>128||
+    initial.openedChests.some(cell=>!Number.isInteger(cell)||cell<0||cell>=cellCount||![14,33].includes(worlds[r.world].levels[r.level].objects[cell]))))
+    throw new Error('Baús iniciais inválidos no replay.');
   for(const input of r.inputs){
     if(!input||!Number.isInteger(input.direction)||input.direction<0||input.direction>4||typeof input.action!=='boolean'||(input.reset!==undefined&&typeof input.reset!=='boolean'))throw new Error('Entrada inválida no replay.');
     if(input.demoEdits!==undefined&&(!Array.isArray(input.demoEdits)||input.demoEdits.length>8||input.demoEdits.some(edit=>

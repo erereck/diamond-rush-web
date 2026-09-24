@@ -59,6 +59,8 @@ export class LevelRenderer {
         if(kind===1)frame('cm-2',0,px,py);
         else if(kind===19||kind===43)anim(w===1?'gen1-7':'gen1-5',0,px,py,kind===43?1:w===2?2:0);
         else if(kind===45)anim('gen3-5',0,px,py);
+        else if(kind===46)frame('gen3-7',0,px,py);
+        else if(kind===49)anim('gen4-1',0,px,py);
         ctx.fillStyle='#80d9ffe0';ctx.fillRect(px,py,24,24);ctx.strokeStyle='#eefbff';ctx.strokeRect(px+.5,py+.5,23,23);
       }
       else if(t===19||t===43) {
@@ -112,6 +114,12 @@ export class LevelRenderer {
           const af=sprite.animationFrames[animation.start+crusherFrameIndex(durations,sim.motion[i])];
           frame('gen1-3',af.frame,x*24+af.x,y*24);
         }
+      }
+      else if(t===21){
+        const state=sim?.state[i]??0,direction=state&7;
+        if(state&8){const animation=direction===4?12:direction===2?13:14;
+          anim('gen3-7',animation,x*24,y*24,0,0,Math.max(0,motion));}
+        else frame('gen3-7',direction===4?0:direction===2?1:2,px,py);
       }
       else if(t===14){
         const visual=rollingStoneVisual(sim?.state[i]??level.parameters[i],motion,tick,x>0&&tile(i-1)>=0);

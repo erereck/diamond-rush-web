@@ -161,11 +161,13 @@ test('source tile 34 loads as an open bridge in later worlds',()=>{
 test('Tibet floor switches open the bridge and spawn the original ice target',()=>{
   const s=makeTibet(),boss=s.boss!;assert.ok(boss instanceof TibetBoss);
   s.player.x=14;s.player.y=22;s.player.direction=4;
-  s.step({direction:0,action:true});idle(s,45);
+  s.step({direction:0,action:true});
+  for(let n=0;n<45&&!s.events.includes('tibet-bridge');n++)idle(s);
+  assert.equal(s.tile(10,19),45);
+  idle(s,37);
   assert.equal(boss.bridgePosition,9);
   assert.equal(s.tile(13,16),34);assert.equal(s.tile(22,16),-1);
   assert.equal(s.object(13,16),255);assert.equal(s.object(22,16),16);
-  assert.equal(s.tile(10,19),45);
   boss.flipBridge(s);idle(s,45);
   assert.equal(boss.bridgePosition,0);
   assert.equal(s.tile(13,16),-1);assert.equal(s.tile(22,16),35);

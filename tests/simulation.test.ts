@@ -18,8 +18,8 @@ import { LevelRenderer } from '../src/render/LevelRenderer.ts';
 import type { AssetManager } from '../src/assets/AssetManager.ts';
 import { introLines, stageCollectibleTotals, stageTitle } from '../src/core/OriginalText.ts';
 function fixture(rows:string[]):LevelDefinition{
-  const tiles=rows.flatMap(row=>[...row].map(c=>({'#':80,' ':255,'@':79,'O':0,'*':1,g:10,S:19,V:43,B:30} as Record<string,number>)[c]));
-  return {world:0,index:0,width:rows[0].length,height:rows.length,offset:0,tiles,parameters:tiles.map(t=>t===19||t===43?2:255),objects:tiles.map(()=>255)};
+  const tiles=rows.flatMap(row=>[...row].map(c=>({'#':80,' ':255,'@':79,'O':0,'*':1,g:10,S:19,V:43,I:45,Q:46,T:49,B:30} as Record<string,number>)[c]));
+  return {world:0,index:0,width:rows[0].length,height:rows.length,offset:0,tiles,parameters:tiles.map(t=>[19,43,49].includes(t)?2:255),objects:tiles.map(()=>255)};
 }
 const step=(s:Simulation,d:Direction=0,n=1)=>{for(let i=0;i<n;i++)s.step({direction:d,action:false});};
 test('display refresh rates do not alter 20 Hz simulation cadence',()=>{
@@ -317,6 +317,38 @@ test('red snakes patrol with the same cell movement and can be crushed',()=>{
   sim.updateSnake(4,1);
   assert.equal(sim.tiles[to],-1);
   assert.deepEqual(sim.enemySmoke,[{cell:to,age:0}]);
+});
+test('Tibet tile 49 uses the source snake patrol, collision and falling-stone death',()=>{
+  const sim=new Simulation(fixture(['########','# @T   #','#      #','########']));
+  const from=sim.index(3,1),to=sim.index(4,1);
+  step(sim);
+  assert.equal(sim.tiles[from],-1);assert.equal(sim.tiles[to],49);
+  const stone=sim.index(4,0);sim.tiles[stone]=0;sim.state[stone]=3;sim.motion[stone]=6;
+  sim.updateSnake(4,1);
+  assert.equal(sim.tiles[to],-1);assert.deepEqual(sim.enemySmoke,[{cell:to,age:0}]);
+});
+test('Tibet ice creature advances on its source animation boundary',()=>{
+  const sim=new Simulation(fixture(['########','# @I   #','########']));
+  step(sim,0,15);assert.equal(sim.tile(3,1),45);
+  step(sim);assert.equal(sim.tile(3,1),-1);assert.equal(sim.tile(2,1),45);
+  assert.equal(sim.state[sim.index(2,1)]&15,9);
+});
+test('Tibet shooter drops to a ledge and then fires a moving dart',()=>{
+  const falling=new Simulation(fixture(['########','#@ Q   #','#      #','#  #   #','########']));
+  step(falling);assert.equal(falling.tile(3,2),46);assert.equal(falling.state[falling.index(3,2)]&31,8);
+  step(falling,0,3);assert.equal(falling.state[falling.index(3,2)]&31,10);
+  const firing=new Simulation(fixture(['########','# @ Q  #','########']));
+  let shot=false;for(let n=0;n<25;n++){step(firing);shot ||= firing.events.includes('enemy-shot');}
+  assert.equal(shot,true);assert.ok(firing.health<4);
+});
+test('ice hammer freezes and restores both later Tibet enemy kinds',()=>{
+  for(const [symbol,kind] of [['Q',46],['T',49]] as const){
+    const sim=new Simulation(fixture(['#####',symbol==='T'?'#@T##':'#@Q #','#####']),{diamonds:0,redDiamonds:0,lives:5,health:4,weaponTier:8});
+    sim.player.direction=2;sim.step({direction:0,action:true});step(sim,0,12);
+    assert.equal(sim.tile(2,1),9);assert.equal(sim.frozenKinds[sim.index(2,1)],kind);
+    sim.step({direction:0,action:true});step(sim,0,3);
+    assert.equal(sim.tile(2,1),kind);assert.equal(sim.frozenKinds[sim.index(2,1)],-1);
+  }
 });
 test('a falling boulder starts the original breakable-brick chain',()=>{
   const sim=new Simulation(fixture(['########','#  O   #','#  BB  #','#  @   #','########']));

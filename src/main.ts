@@ -11,6 +11,7 @@ import { MobileControls } from './platform/MobileControls.ts';
 import { MidiPreview, parseMidi } from './platform/Midi.ts';
 import { SESSION_KEY, validateReplay, restoreReplay } from './platform/Session.ts';
 import { CanonicalSave } from './platform/CanonicalSave.ts';
+import { campaignFromRecord, campaignRecord, campaignStageStart } from './platform/CanonicalCampaign.ts';
 import { CAMPAIGN_KEY, REWARD_FLAGS, adjacentNode, finishLevel, newCampaign, pendingRewards, unlockedNode, unlockedWorld, validateCampaign } from './core/Campaign.ts';
 import type { Campaign } from './core/Campaign.ts';
 import { FrontEndRenderer, MENU_ITEMS } from './render/FrontEndRenderer.ts';
@@ -38,7 +39,7 @@ function updateLevels(){
   const w=Number(world.value);options(level,assets.worlds[w].levels.map(l=>({value:String(l.index),label:l.index===13&&w===0?'13 · Introdução':`${String(l.index).padStart(2,'0')} · ${l.width} × ${l.height}`})));inspectionDirty=true;updateLevelInfo();
 }
 function updateLevelInfo(){const l=selectedLevel();$('level-info').textContent=`${l.width} × ${l.height} células · ${l.tiles.filter(t=>t===1).length} diamantes · ${[...new Set(l.tiles.filter(t=>t<80))].length} tipos de objeto. Dados originais; simulação parcial.`;inspectionDirty=true;}
-function saveCampaign(){if(campaign)try{localStorage.setItem(CAMPAIGN_KEY,JSON.stringify(campaign));}catch{report('Não foi possível salvar a campanha neste navegador.');}}
+function saveCampaign(){if(campaign)try{campaign.canonicalRecord=[...campaignRecord(campaign,assets.worlds,assets.maps).export()];localStorage.setItem(CAMPAIGN_KEY,JSON.stringify(campaign));}catch{report('Não foi possível salvar a campanha neste navegador.');}}
 function openMenu(){scene='menu';simulation=null;campaignStage=false;paused=false;audio.stop();input.clear();clock.reset();frontCooldown=0;menuSelected=campaign?1:0;}
 function startIntro(){scene='intro';intro=new IntroSequence(assets.worlds[0].levels[13],assets.demoScripts,undefined,undefined,assets.sprite('ui-1'),assets.fontMap);paused=false;input.clear();frontActionHeld=false;frontCooldown=0;game.focus();}
 function startStageDemo(id:number){
@@ -53,7 +54,7 @@ function stageDemoTrigger(){
 }
 function openMap(world=campaign?.world??0){if(!campaign)return;campaign.world=world;campaign.selected=assets.maps[world].find(n=>n.level===campaign!.selected&&unlockedNode(campaign!,world,n,assets.maps))?.level??0;scene='map';simulation=null;campaignStage=false;paused=false;input.clear();clock.reset();frontCooldown=0;saveCampaign();game.focus();}
 function start(l=assets.worlds[0].levels[0],initial?:StageStart,fromCampaign=false){simulation=new Simulation(l,initial);scene='playing';campaignStage=fromCampaign;paused=false;stageIntroTicks=60;results.reset();clock.reset();input.clear();lastError='';$('pause').textContent='Ⅱ';$('play').innerHTML='Abrir menu do jogo <span>→</span>';$('next-level').hidden=true;game.focus();saveSession();}
-function startSelected(){if(!campaign)return;const node=assets.maps[campaign.world].find(n=>n.level===campaign!.selected);if(!node||!unlockedNode(campaign,campaign.world,node,assets.maps))return;start(assets.worlds[campaign.world].levels[node.level],campaign.resources,true);}
+function startSelected(){if(!campaign)return;const node=assets.maps[campaign.world].find(n=>n.level===campaign!.selected);if(!node||!unlockedNode(campaign,campaign.world,node,assets.maps))return;start(assets.worlds[campaign.world].levels[node.level],campaignStageStart(campaign,assets.worlds,assets.maps,campaign.world,node.level),true);}
 function eligibleRewards(s:Simulation){
   const totals=stageCollectibleTotals(s.level);
   return (s.diamonds-s.initial.diamonds===totals.diamonds+s.bonusDiamondTotal?4:0)|
@@ -61,7 +62,7 @@ function eligibleRewards(s:Simulation){
     (s.hits===0?16:0)|(s.retries===0?32:0);
 }
 function completionBonus(s:Simulation){return pendingRewards(newCampaign(),s.level.world,s.level.index,eligibleRewards(s),s.lives).lives-s.lives;}
-function completeCampaignStage(){const s=simulation;if(!s||!campaign||s.status!=='complete')return;const awarded=pendingRewards(campaign,s.level.world,s.level.index,eligibleRewards(s),s.lives);campaign=finishLevel(campaign,s.level.world,s.level.index,{diamonds:s.diamonds,redDiamonds:s.redDiamonds,lives:awarded.lives,health:s.health,weaponTier:s.weaponTier},awarded.mask,s.exitObject===28,assets.maps);saveCampaign();openMap(s.level.world);}
+function completeCampaignStage(){const s=simulation;if(!s||!campaign||s.status!=='complete')return;const awarded=pendingRewards(campaign,s.level.world,s.level.index,eligibleRewards(s),s.lives);campaign=finishLevel(campaign,s.level.world,s.level.index,{diamonds:s.diamonds,redDiamonds:s.redDiamonds,lives:awarded.lives,health:s.health,weaponTier:s.weaponTier},awarded.mask,s.exitObject===28,assets.maps);campaign.canonicalRecord=[...campaignRecord(campaign,assets.worlds,assets.maps,s).export()];saveCampaign();openMap(s.level.world);}
 function advanceLevel(){
   const current=simulation;
   if(!current||current.status!=='complete')return;
@@ -348,11 +349,13 @@ function showRms(save:CanonicalSave){
     save.worlds.map((w,i)=>`${assets.strings[28+i]}: ${w.levels.length} fases · liberada ${w.unlocked} · primeira secreta ${w.firstSecret}`).join('\n');
 }
 $('rms-template').onclick=()=>{try{const save=CanonicalSave.create(assets.worlds,assets.maps);showRms(save);}catch(e){report(String(e));}};
-$('export-rms').onclick=()=>{try{const save=CanonicalSave.create(assets.worlds,assets.maps);showRms(save);downloadBlob('DiamondRush-record-1.bin',new Blob([save.export() as Uint8Array<ArrayBuffer>],{type:'application/octet-stream'}));}catch(e){report(String(e));}};
-$('inspect-rms').onclick=()=>$<HTMLInputElement>('rms-file').click();
+let importRmsAsCampaign=false;
+$('export-rms').onclick=()=>{try{const save=campaign?campaignRecord(campaign,assets.worlds,assets.maps):CanonicalSave.create(assets.worlds,assets.maps);showRms(save);downloadBlob('DiamondRush-record-1.bin',new Blob([save.export() as Uint8Array<ArrayBuffer>],{type:'application/octet-stream'}));}catch(e){report(String(e));}};
+$('inspect-rms').onclick=()=>{importRmsAsCampaign=false;$<HTMLInputElement>('rms-file').click();};
+$('load-rms').onclick=()=>{importRmsAsCampaign=true;$<HTMLInputElement>('rms-file').click();};
 $<HTMLInputElement>('rms-file').onchange=async e=>{
   const element=e.target as HTMLInputElement,file=element.files?.[0];if(!file)return;
-  try{if(file.size>1000)throw new Error('Forneça o payload do record 1, com até 1000 bytes; contêiner RMS não é aceito.');showRms(new CanonicalSave(new Uint8Array(await file.arrayBuffer())));}catch(error){$('rms-info').textContent=String(error);}finally{element.value='';}
+  try{if(file.size>1000)throw new Error('Forneça o payload do record 1, com até 1000 bytes; contêiner RMS não é aceito.');const save=new CanonicalSave(new Uint8Array(await file.arrayBuffer()));showRms(save);if(importRmsAsCampaign){const imported=campaignFromRecord(save,assets.worlds,assets.maps);campaign=validateCampaign(imported,assets.maps);saveCampaign();openMap(campaign.world);}}catch(error){$('rms-info').textContent=String(error);}finally{element.value='';}
 };
 inspection.onpointermove=e=>{if(view!=='levels')return;const rect=inspection.getBoundingClientRect(),x=Math.floor((e.clientX-rect.left)*inspection.width/rect.width/24),y=Math.floor((e.clientY-rect.top)*inspection.height/rect.height/24),l=selectedLevel(),i=x+y*l.width;$('hover-info').textContent=`(${x}, ${y}) · tile ${l.tiles[i]} · parâmetro ${l.parameters[i]} · objeto ${l.objects[i]}`;};
 document.addEventListener('visibilitychange',()=>{if(document.hidden){paused=true;clock.reset();input.clear();audio.stop();saveSession();}});

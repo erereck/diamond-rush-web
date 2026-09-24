@@ -27,7 +27,7 @@ No **Laboratório de preservação** é possível:
 - Ouvir as 21 faixas MIDI com timbres de prévia.
 - Pausar, avançar um tick e exportar/importar replays de desenvolvimento.
 - Renderizar todos os recursos para detectar erros de acesso.
-- Inspecionar e exportar o modelo do record 1 do save RMS original.
+- Inspecionar, importar e exportar o record 1 do save RMS original; a campanha sincroniza recursos, progresso e baús com esse formato.
 
 O navegador salva o progresso do mapa e os recursos obtidos ao concluir uma fase. **Continue** retorna ao mapa; a partida dentro de uma fase não é retomada automaticamente. As saídas secretas revelam seus próprios ramos; concluir uma fase pela saída comum não os abre. O replay experimental exportável continua separado do progresso do mapa e do save canônico RMS. Replays de versões anteriores do motor são rejeitados para evitar restauração divergente.
 
@@ -68,9 +68,9 @@ O chefe de Bavaria também aparece na câmara final. Ele desperta quando o heró
 
 O guardião de Tibet agora usa `mm1.f` e cinco segmentos de vida. O martelo de gelo congela os inimigos da arena em blocos empurráveis; os blocos em queda ferem o chefe. Os interruptores alternam as barreiras de gelo e criam novos alvos, enquanto o ataque forte desperta as pedras suspensas do teto, que não reaparecem após cair. Movimento, alcance das investidas, reação aos blocos, derrota e reinício seguem `cGame.method_281/282`. A entrada da arena segue a inicialização original: tile 34 abre como passagem e tile 35 permanece fechado. O percurso desde o início da fase até despertar o chefe foi testado no navegador; um teste de simulação também congela o inimigo real, puxa o bloco da borda com o gancho e confirma o dano. Ainda faltam validar a solução completa de cinco golpes sem intervenções de teste e seus tempos quadro a quadro.
 
-Esses sistemas ainda são um subconjunto: faltam alvos e interações especiais, tempos exatos de algumas animações, água, outros puzzles e integração plena com o save RMS. Algumas representações de objetos são provisórias. Uma fase carregar não significa que pode ser concluída corretamente.
+Esses sistemas ainda são um subconjunto: faltam alvos e interações especiais, tempos exatos de algumas animações, água, outros puzzles e compras/vida máxima do save RMS. Algumas representações de objetos são provisórias. Uma fase carregar não significa que pode ser concluída corretamente.
 
-Nas fases posteriores, os obstáculos rolantes de Bavaria já caem e percorrem o cenário no sentido codificado pelo mapa; armadilhas duplas atacam após a aproximação do herói. Seus espinhos avançam em dois ciclos independentes, com o sprite correto da referência S700. No Tibet, pedras suspensas são acionadas pela passagem sob elas, avisam antes de cair, atingem o herói ou outros objetos e desaparecem no impacto. Esses estados também são restaurados no checkpoint e reproduzidos nos replays. Outras armadilhas e inimigos dessas fases ainda precisam ser portados.
+Nas fases posteriores, os obstáculos rolantes de Bavaria já caem e percorrem o cenário no sentido codificado pelo mapa; armadilhas duplas atacam após a aproximação do herói. Seus espinhos avançam em dois ciclos independentes, com o sprite correto da referência S700. No Tibet, pedras suspensas são acionadas pela passagem sob elas, avisam antes de cair, atingem o herói ou outros objetos e desaparecem no impacto. Os inimigos 45 e 49 agora se movem; o 46 cai entre plataformas e dispara o projétil 21. O martelo de gelo congela e descongela os três tipos. Esses estados também são restaurados no checkpoint e reproduzidos nos replays. Interações especiais, água e outras armadilhas ainda precisam ser portadas.
 
 Um JAR original fornecido para a pesquisa teve seus 40 recursos comparados byte a byte com a referência S700: todos coincidem. O binário fica apenas na área local de pesquisa, fora deste repositório. A identidade do bytecode com a decompilação e o modelo de aparelho não são comprovados apenas por essa comparação. Veja [`docs/ORIGINAL_JAR.md`](docs/ORIGINAL_JAR.md), [`docs/FIDELITY_REVIEW.md`](docs/FIDELITY_REVIEW.md), `docs/STATUS.md` e `docs/VERIFICATION.md`.
 

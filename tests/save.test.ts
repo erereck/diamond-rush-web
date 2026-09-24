@@ -2,6 +2,10 @@ import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
 import { CanonicalSave } from '../src/platform/CanonicalSave.ts';
+import { campaignFromRecord, campaignRecord, campaignStageStart } from '../src/platform/CanonicalCampaign.ts';
+import { finishLevel, newCampaign } from '../src/core/Campaign.ts';
+import { Simulation } from '../src/core/Simulation.ts';
+import { restoreReplay } from '../src/platform/Session.ts';
 import { parseWorld,parseWorldMap } from '../src/level/LevelParser.ts';
 import type { WorldDefinition } from '../src/level/LevelParser.ts';
 
@@ -51,4 +55,32 @@ test('canonical 41-level save retains every chest in row-major order',()=>{
   }
   save.unlockThrough(0,3);save.unlockThrough(0,1);assert.equal(new CanonicalSave(save.export()).worlds[0].unlocked,3);
   assert.deepEqual(new CanonicalSave(save.export()).export(),save.export());
+});
+
+test('campaign progress round-trips through the original record without losing unknown bytes',()=>{
+  const res=new URL('../../../work/reference-s700/res/',import.meta.url),read=(name:string)=>readFileSync(new URL(name,res));
+  const worlds=[0,1,2].map(i=>parseWorld(read(`w${i}.bin`),i));
+  const maps=['map_angkor.out','map_scotland.out','map_tibet.out'].map(n=>parseWorldMap(read(n),n));
+  const template=CanonicalSave.create(worlds,maps).export();template[12]=173;
+  let campaign=newCampaign();campaign.canonicalRecord=[...template];
+  campaign=finishLevel(campaign,0,6,{diamonds:120,redDiamonds:3,lives:9,health:4,weaponTier:2},4|16,true,maps);
+  const stage=new Simulation(worlds[0].levels[6],{diamonds:110,redDiamonds:2,lives:7,health:4,weaponTier:2});
+  stage.redDiamonds=3;
+  const chest=stage.level.objects.findIndex(o=>o===14||o===33);assert.ok(chest>=0);stage.opened.add(chest);
+  const save=campaignRecord(campaign,worlds,maps,stage),bytes=save.export();
+  assert.equal(bytes[12],173);assert.equal(save.lives,9);assert.equal(save.diamonds,120);assert.equal(save.weaponTier,2);
+  assert.equal(save.worlds[0].levels[6].flags&22,22);
+  assert.equal(save.worlds[0].levels[6].status,1);
+  assert.equal(save.worlds[0].levels[6].openedChests,1);
+  const restored=campaignFromRecord(new CanonicalSave(bytes),worlds,maps);
+  assert.equal(restored.completed[0].includes(6),true);
+  assert.equal(restored.secretUnlocked[0].includes(9),true);
+  assert.equal(restored.awards[0][6],20);
+  assert.deepEqual(campaignRecord(restored,worlds,maps).export(),bytes);
+  const initial=campaignStageStart(restored,worlds,maps,0,6);
+  assert.deepEqual(initial.openedChests,[chest]);
+  const revisited=new Simulation(worlds[0].levels[6],initial);
+  assert.equal(revisited.tiles[chest],-1);assert.equal(revisited.chestFrames[chest],3);
+  assert.equal(revisited.opened.has(chest),true);
+  assert.equal(restoreReplay(revisited.replay(),worlds).tiles[chest],-1);
 });

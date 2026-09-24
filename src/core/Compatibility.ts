@@ -1,6 +1,6 @@
 import type { LevelDefinition } from '../level/LevelParser.ts';
 /** Bump whenever simulation semantics change: previous input streams may diverge. */
-export const ENGINE_REVISION='fidelity-17' as const;
+export const ENGINE_REVISION='fidelity-18' as const;
 /** FNV-1a identifies level data for replay compatibility; it is not a security hash. */
 export function levelFingerprint(level:LevelDefinition){
   let hash=0x811c9dc5;

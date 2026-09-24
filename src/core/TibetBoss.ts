@@ -56,7 +56,6 @@ export class TibetBoss {
       }
     }
     if(sim.tick>=this.ceilingPulseAt+80){
-      for(let x=14;x<=21;x++){const i=sim.index(x,15);if(i>=0){sim.tiles[i]=44;sim.state[i]=0;sim.motion[i]=0;sim.active[i]=24;sim.wake(x,15);}}
       this.ceilingPulseAt=0;
     }
   }
@@ -66,8 +65,12 @@ export class TibetBoss {
     for(let y=21;y<=22;y++)for(let x=center-1;x<=center+1;x++){
       const i=sim.index(x,y);if(i<0||sim.tiles[i]!==9)continue;
       if((sim.state[i]&7)===3){
-        this.health--;this.phase=[0,2,4,6].includes(this.phase)?2:3;
-        this.age=0;this.setAnimation(this.phase);sim.events.push('boss-hurt');
+        this.health--;
+        // method_282 only interrupts the four walking/normal-attack phases.
+        // A heavy ceiling attack continues after an ice-block impact.
+        if([0,2,4,6].includes(this.phase)){this.phase=2;this.age=0;this.setAnimation(2);}
+        else if([1,3,5,7].includes(this.phase)){this.phase=3;this.age=0;this.setAnimation(3);}
+        sim.events.push('boss-hurt');
       }
       sim.tiles[i]=30;sim.state[i]=4;sim.motion[i]=0;sim.frozenKinds[i]=-1;sim.active[i]=24;
       sim.wake(x,y);sim.events.push('boss-stone');
@@ -118,9 +121,12 @@ export class TibetBoss {
         case 10:case 11:
           if(ended){
             if(sim.tick>this.attackAt)this.phase=this.phase===10?13:14;
-            else if(playerY>=504&&Math.abs(playerX-center)<=48)this.phase=this.phase===10?6:7;
-            else this.phase=this.phase===10?4:5;
-            nextAnim=this.phase;
+            else if(playerY<504)this.phase=this.phase===10?4:5;
+            else if(this.phase===10&&playerX>=center-48)this.phase=6;
+            else if(this.phase===11&&playerX<=center+48)this.phase=7;
+            // The source leaves the charge state unchanged if the hero is
+            // behind its reach; the next update checks again.
+            if(this.phase!==10&&this.phase!==11)nextAnim=this.phase;
           }else this.x+=this.phase===10?-2:2;
           break;
       }

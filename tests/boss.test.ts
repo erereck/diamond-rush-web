@@ -179,6 +179,20 @@ test('the ice hammer freezes a real Tibet arena creature into a movable block',(
   assert.equal(s.tile(23,16),9);assert.equal(s.frozenKinds[s.index(23,16)],45);
 });
 
+test('a real frozen creature can be hooked from its ledge onto the Tibet guardian',()=>{
+  const s=makeTibet(),boss=s.boss!;assert.ok(boss instanceof TibetBoss);
+  s.player.x=14;s.player.y=22;s.player.direction=4;
+  s.step({direction:0,action:true});idle(s,45);
+  assert.equal(s.tile(22,16),-1);
+  s.player.x=22;s.player.y=16;s.player.direction=2;
+  s.step({direction:0,action:true});idle(s,15);
+  assert.equal(s.tile(23,16),9);
+  boss.x=480;boss.phase=13;boss.animation=13;boss.animationAge=0;
+  s.player.x=20;s.player.y=16;s.player.direction=2;
+  s.step({direction:0,action:true});idle(s,55);
+  assert.equal(boss.health,4);
+});
+
 test('a falling ice block wounds Tibet guardian; five hits finish the fight',()=>{
   const s=makeTibet(),boss=s.boss!;assert.ok(boss instanceof TibetBoss);
   s.player.x=14;s.player.y=22;boss.phase=4;boss.animation=4;
@@ -198,6 +212,30 @@ test('Tibet heavy attack schedules the staggered ceiling stones',()=>{
   s.tick=boss.ceilingPulseAt+7;boss.step(s);
   assert.equal(s.state[s.index(14,15)]&56,8);
   assert.ok(s.events.includes('boss-ceiling'));
+});
+
+test('Tibet charge follows the original one-sided reach and heavy attacks survive a block hit',()=>{
+  const s=makeTibet(),boss=s.boss!;assert.ok(boss instanceof TibetBoss);
+  s.tick=1;boss.attackAt=10000;boss.x=408;boss.phase=10;boss.animation=10;boss.animationAge=9;
+  s.player.x=22;s.player.y=22;
+  boss.step(s);assert.equal(boss.phase,6);
+  boss.phase=11;boss.animation=11;boss.animationAge=9;
+  s.player.x=10;s.player.y=22;
+  boss.step(s);assert.equal(boss.phase,7);
+  boss.phase=13;boss.animation=13;boss.animationAge=0;boss.x=360;
+  s.player.y=16;
+  const i=s.index(16,21);s.tiles[i]=9;s.state[i]=3;
+  boss.step(s);
+  assert.equal(boss.health,4);assert.equal(boss.phase,13);
+});
+
+test('Tibet ceiling stones do not regenerate after their one-time fall',()=>{
+  const s=makeTibet(),boss=s.boss!;assert.ok(boss instanceof TibetBoss);
+  const i=s.index(14,15);s.tiles[i]=-1;
+  boss.ceilingPulseAt=10;s.tick=90;
+  boss.step(s);
+  assert.equal(s.tile(14,15),-1);
+  assert.equal(boss.ceilingPulseAt,0);
 });
 
 test('the Tibet fight and switch state reproduce from an input replay',()=>{

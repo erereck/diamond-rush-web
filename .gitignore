@@ -3,3 +3,7 @@ dist/
 public/assets/
 .DS_Store
 *.log
+# FreeJ2ME runtime files if a local trace is run from the checkout.
+config/
+freej2me_system/
+rms/

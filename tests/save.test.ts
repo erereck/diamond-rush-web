@@ -3,7 +3,7 @@ import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
 import { CanonicalSave } from '../src/platform/CanonicalSave.ts';
 import { campaignFromRecord, campaignRecord, campaignStageStart } from '../src/platform/CanonicalCampaign.ts';
-import { finishLevel, newCampaign } from '../src/core/Campaign.ts';
+import { finishLevel, newCampaign, unlockedNode, unlockedWorld } from '../src/core/Campaign.ts';
 import { Simulation } from '../src/core/Simulation.ts';
 import { restoreReplay } from '../src/platform/Session.ts';
 import { parseWorld,parseWorldMap } from '../src/level/LevelParser.ts';
@@ -83,4 +83,33 @@ test('campaign progress round-trips through the original record without losing u
   assert.equal(revisited.tiles[chest],-1);assert.equal(revisited.chestFrames[chest],3);
   assert.equal(revisited.opened.has(chest),true);
   assert.equal(restoreReplay(revisited.replay(),worlds).tiles[chest],-1);
+  // method_108 accumulates red diamonds across visits instead of replacing
+  // the count stored in the level's RMS record.
+  revisited.redDiamonds++;
+  assert.equal(campaignRecord(restored,worlds,maps,revisited).worlds[0].levels[6].status,2);
+});
+
+test('Angkor main route stays unlocked after each original RMS round-trip',()=>{
+  const res=new URL('../../../work/reference-s700/res/',import.meta.url),read=(name:string)=>readFileSync(new URL(name,res));
+  const worlds=[0,1,2].map(i=>parseWorld(read(`w${i}.bin`),i));
+  const maps=['map_angkor.out','map_scotland.out','map_tibet.out'].map(n=>parseWorldMap(read(n),n));
+  const sourceUnlocked=CanonicalSave.create(worlds,maps);
+  sourceUnlocked.addLevelFlags(0,1,64);
+  const imported=campaignFromRecord(sourceUnlocked,worlds,maps);
+  assert.equal(imported.completed[0].includes(0),false);
+  assert.equal(unlockedNode(imported,0,maps[0].find(n=>n.level===1)!,maps),true);
+  let campaign=newCampaign();
+  for(let level=0;level<=8;level++){
+    const node=maps[0].find(n=>n.level===level)!;
+    assert.equal(unlockedNode(campaign,0,node,maps),true,`Angkor ${level} should be accessible`);
+    campaign=finishLevel(campaign,0,level,campaign.resources,0,false,maps);
+    const save=campaignRecord(campaign,worlds,maps);
+    assert.ok(save.worlds[0].levels[level].flags&2);
+    if(level<8)assert.ok(save.worlds[0].levels[level+1].flags&64,`Angkor ${level+1} must carry the source unlock flag`);
+    campaign=campaignFromRecord(save,worlds,maps);
+  }
+  assert.equal(unlockedWorld(campaign,1,maps),true);
+  const secret=finishLevel(campaign,0,6,campaign.resources,0,true,maps);
+  const restored=campaignFromRecord(campaignRecord(secret,worlds,maps),worlds,maps);
+  assert.equal(unlockedNode(restored,0,maps[0].find(n=>n.level===9)!,maps),true);
 });

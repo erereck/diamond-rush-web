@@ -39,7 +39,7 @@ export function wrapDemoTextPixels(value:string,maxWidth:number,font:DecodedSpri
   return lines;
 }
 const STOPS=[
-  {id:29,x:6,y:4}, // first encounter and three opening lines
+  {id:29,x:5,y:4}, // the source stops at the first circle after walking in
   {id:10,x:31,y:7}, // chest hint
   {id:11,x:28,y:6}, // compass in the chest
   {id:13,x:37,y:7}, // pushing-rock lesson
@@ -53,7 +53,7 @@ export class IntroSequence {
   readonly sim:Simulation;readonly scripts:Map<number,DemoScript>;
   readonly stops:readonly {id:number;x:number;y:number}[];readonly standalone:boolean;
   readonly font?:DecodedSprite;readonly fontMap?:Uint8Array;
-  section=0;phase:'free'|'script'|'done'='free';
+  section=0;phase:'opening'|'free'|'script'|'done'='free';
   commandIndex=0;active:RunningCommand|null=null;tick=0;
   cameraX=0;cameraY=0;
   portraitVisible=false;portraitFrame=2;portraitSprite=2;portraitX=17;portraitY=50;portraitRevealTicks=0;blinkFrame=-1;flashColor='#fff';flash=false;
@@ -64,7 +64,14 @@ export class IntroSequence {
     this.stops=this.standalone?[{id:scriptId!,x:0,y:0}]:STOPS;
     for(const stop of this.stops)if(!scripts.has(stop.id))throw new Error(`Missing original demo script ${stop.id}`);
     const copy={...level,tiles:[...level.tiles],parameters:[...level.parameters],objects:[...level.objects]};
-    this.sim=sim??new Simulation(copy);this.scripts=scripts;this.font=font;this.fontMap=fontMap;this.phase=this.standalone?'script':'free';this.followHero();
+    this.sim=sim??new Simulation(copy);this.scripts=scripts;this.font=font;this.fontMap=fontMap;
+    this.phase=this.standalone?'script':'opening';
+    if(!this.standalone){
+      // S700 starts the tutorial five cells left of the map's checkpoint.
+      // The normal movement step covers the 18/12/6/0 pixel offsets.
+      this.sim.player.x=0;this.sim.player.y=4;this.sim.player.offset=0;this.sim.player.direction=0;
+    }
+    this.followHero();
   }
   get heroX(){const p=this.sim.player;return p.x*24-p.dx*p.offset;}
   get heroY(){const p=this.sim.player;return p.y*24-p.dy*p.offset;}
@@ -90,6 +97,11 @@ export class IntroSequence {
   }
   step(input:InputFrame=NO_INPUT){
     if(this.phase==='done')return;
+    if(this.phase==='opening'){
+      this.sim.step({direction:2,action:false});this.tick=this.sim.tick;this.followHero();
+      if(this.sim.player.x===5&&this.sim.player.offset===0)this.startScript();
+      return;
+    }
     if(this.phase==='free'){
       if(input.reset)this.recoveryAfterReset=this.recoveryAtPlayer()??this.recoveryAfterReset;
       this.sim.step(input);this.tick=this.sim.tick;this.followHero();

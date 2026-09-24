@@ -37,7 +37,24 @@ test('the complete spoken introduction follows demo.f order without invented dia
   ]);
 });
 
+test('the opening walk matches the first 21 measured Java S700 ticks',()=>{
+  const rows=readFileSync(new URL('fixtures/intro-opening-s700.csv',import.meta.url),'utf8').trim().split(/\r?\n/).slice(1)
+    .map(line=>line.split(',').map(Number));
+  const intro=new IntroSequence(level,scripts);
+  for(const [tick,world,stage,x,y,offset,direction,diamonds,redDiamonds,lives,gameState] of rows){
+    if(tick>0)intro.step();
+    const p=intro.sim.player;
+    assert.deepEqual([intro.tick,intro.sim.level.world,intro.sim.level.index,p.x,p.y,p.offset,p.direction,intro.sim.diamonds,intro.sim.redDiamonds,intro.sim.lives],
+      [tick,world,stage,x,y,offset,direction,diamonds,redDiamonds,lives],`Java opening tick ${tick}`);
+    assert.equal(gameState,1);
+  }
+  assert.equal(intro.phase,'script');
+  assert.equal(intro.scriptId,29);
+});
+
 function walkTo(intro:IntroSequence,goalX:number,goalY:number){
+  for(let tick=0;tick<30&&intro.phase==='opening';tick++)intro.step();
+  assert.notEqual(intro.phase,'opening','source opening walk did not finish');
   const sim=intro.sim,w=sim.level.width,start=sim.index(sim.player.x,sim.player.y),goal=sim.index(goalX,goalY);
   const queue=[start],seen=new Set([start]),prev=new Map<number,number>();
   for(let at=0;at<queue.length&&!seen.has(goal);at++)for(const [dx,dy] of [[1,0],[-1,0],[0,1],[0,-1]]){
@@ -64,7 +81,7 @@ function finishScript(intro:IntroSequence,dialogue:Set<string>){
 
 test('the introduction is freely controlled between all six original scenes',()=>{
   const intro=new IntroSequence(level,scripts),seen:number[]=[],dialogue=new Set<string>();
-  for(const [id,x,y] of [[29,6,4],[10,31,7],[11,28,6],[13,37,7],[16,46,7],[28,57,8]]){
+  for(const [id,x,y] of [[29,5,4],[10,31,7],[11,28,6],[13,37,7],[16,46,7],[28,57,8]]){
     if(id===16||id===28){
       // The rock lesson intentionally blocks this corridor. Use the same
       // checkpoint return the following dialogue teaches the player about.
@@ -106,7 +123,7 @@ test('tutorial chamber paints the original 5×5 seal composite from mmv.f',()=>{
 
 test('scripted steps use the normal collision and movement state',()=>{
   const intro=new IntroSequence(level,scripts);
-  walkTo(intro,6,4);
+  walkTo(intro,5,4);
   for(let i=0;i<100&&intro.phase==='script';i++){intro.press();intro.step();}
   walkTo(intro,31,7);
   assert.equal(intro.scriptId,10);
@@ -118,7 +135,7 @@ test('scripted steps use the normal collision and movement state',()=>{
 
 test('lethal damage during a scene interrupts it and returns to the checkpoint',()=>{
   const intro=new IntroSequence(level,scripts);
-  walkTo(intro,6,4);
+  walkTo(intro,5,4);
   for(let i=0;i<10;i++)intro.step();
   assert.equal(intro.phase,'script');
   intro.sim.hurt(4);
@@ -136,7 +153,7 @@ test('portrait reveal and hint flash follow the source command phases',()=>{
     {opcode:11,args:[2,2]},{opcode:12,args:[17,50]},{opcode:18,args:[1,255,255,255]},{opcode:15,args:[]}
   ]};altered.set(29,opening);
   const intro=new IntroSequence(level,altered);
-  walkTo(intro,6,4);assert.equal(intro.scriptId,29);
+  walkTo(intro,5,4);assert.equal(intro.scriptId,29);
   intro.step();
   for(let tick=1;tick<=5;tick++){
     intro.step();assert.equal(intro.portraitRevealTicks,tick);
@@ -151,7 +168,7 @@ test('portrait reveal and hint flash follow the source command phases',()=>{
 test('the two original recovery demos run after resetting from the blocked-path lessons',()=>{
   for(const [marker,section,recovery] of [[13,4,15],[16,5,17]]){
     const intro=new IntroSequence(level,scripts);
-    intro.section=section;
+    intro.section=section;intro.phase='free';
     const i=level.parameters.findIndex((p,j)=>p===marker&&level.objects[j]===0);
     assert(i>=0);
     intro.sim.player.x=i%level.width;intro.sim.player.y=Math.floor(i/level.width);

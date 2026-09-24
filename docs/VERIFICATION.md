@@ -2,7 +2,7 @@
 
 Em 24/09/2026, no Windows, Node 26.7 e navegador Chromium integrado:
 
-- `npm test`: 237 testes passaram, sem testes ignorados. Incluem codecs, todos os 95 sprites, 41 mapas, 21 MIDIs, hashes, relógio, câmera, movimento, pedras, limites de colisão, equipamento, replay e RMS.
+- `npm test`: 239 testes passaram, sem testes ignorados. Incluem codecs, todos os 95 sprites, 41 mapas, 21 MIDIs, hashes, relógio, câmera, movimento, pedras, limites de colisão, equipamento, replay e RMS.
 - `npm run build`: TypeScript e build de produção passaram.
 - Validação no navegador: 2664 combinações de módulo/paleta, 1888 combinações de frame/paleta e 41 mapas renderizados sem exceção. As três referências de animação inválidas `mmv` são documentadas, não corrigidas artificialmente.
 - Início de Angkor, pausa, movimento por teclado e avanço individual de tick verificados no navegador. Um toque curto capturado entre ticks foi aplicado na próxima leitura.
@@ -17,5 +17,8 @@ Em 24/09/2026, no Windows, Node 26.7 e navegador Chromium integrado:
 - Os mapas canônicos contêm os baús de martelo, gancho e martelo de gelo nas fases esperadas. Testes exercitam a coleta permanente, o ataque em tijolos/cobras, a mira automática, o puxão dos dois lados, gelo em cobras/diamantes, a queda do bloco congelado, perseguição da cobra vermelha, persistência na campanha, byte correspondente no codec RMS e replay determinístico com gancho.
 - A build local atual abriu no Chromium integrado sem erros de console. O menu S700 foi conferido visualmente. No laboratório, iniciar Angkor 4 com **Martelo de gelo** exibiu o equipamento ativo e aceitou o comando de ataque. Os efeitos das armas ainda não foram comparados visualmente com a execução J2ME original.
 - Nesta rodada, a build local abriu no navegador integrado com o menu S700 visível, o laboratório exibiu os controles de importação/exportação do record 1 RMS e o console não registrou erros. Testes novos cobriram a patrulha do inimigo 49, o movimento do inimigo 45, a queda e o projétil do inimigo 46, congelamento/descongelamento e persistência RMS de baús e progresso. A compilação de produção passou.
+- A decompilação S700 fixada foi recompilada e executada no FreeJ2ME com um hook local em `cGame.method_304`. O trace registrou 300 ticks da introdução; os primeiros 21 estados de posição, deslocamento, direção, coleta e vidas foram comparados ao port e coincidiram. O procedimento reproduzível está em `tools/trace-s700.ts`; a amostra medida está em `tests/fixtures/intro-opening-s700.csv`.
+- A exportação/importação RMS foi testada ao longo da rota principal de Angkor, inclusive flags de fases normais e liberação do mundo seguinte. Revisitar uma fase agora soma os diamantes vermelhos ganhos à contagem anterior, como `method_108`.
+- No navegador integrado, uma origem local isolada abriu **New Game**, mostrou o herói caminhando da esquerda até o círculo e apresentou o primeiro diálogo. O console não registrou erros.
 
-Os testes de simulação verificam invariantes do subconjunto implementado. Não são comparação diferencial contra execução Java. O validador de recursos detecta falhas de acesso/renderização, mas não prova que cada objeto tem o desenho, comportamento ou ordem exatos. Nenhum percurso completo de campanha foi aprovado.
+Os testes de simulação verificam invariantes do subconjunto implementado. A comparação diferencial Java cobre somente os 21 estados iniciais da abertura, ainda não as cenas seguintes ou um percurso inteiro. O validador de recursos detecta falhas de acesso/renderização, mas não prova que cada objeto tem o desenho, comportamento ou ordem exatos. Nenhum percurso completo de campanha foi aprovado.

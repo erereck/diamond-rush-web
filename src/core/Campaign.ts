@@ -8,6 +8,7 @@ export interface Campaign {
   version:1;
   completed:number[][];
   secretUnlocked:number[][];
+  explicitUnlocked?:number[][];
   awards:number[][];
   worldAccess?:boolean[];
   canonicalRecord?:number[];
@@ -16,7 +17,7 @@ export interface Campaign {
   resources:StageStart;
 }
 export function newCampaign():Campaign {
-  return {version:1,completed:[[],[],[]],secretUnlocked:[[],[],[]],awards:[[],[],[]],worldAccess:[true,false,false],world:0,selected:0,resources:{diamonds:0,redDiamonds:0,lives:5,health:4,weaponTier:0}};
+  return {version:1,completed:[[],[],[]],secretUnlocked:[[],[],[]],explicitUnlocked:[[],[],[]],awards:[[],[],[]],worldAccess:[true,false,false],world:0,selected:0,resources:{diamonds:0,redDiamonds:0,lives:5,health:4,weaponTier:0}};
 }
 /** cGame.method_249(11): each first-time award adds one life, up to 99. */
 export function pendingRewards(c:Campaign,world:number,level:number,eligible:number,lives:number){
@@ -34,6 +35,7 @@ export function unlockedNode(c:Campaign,world:number,node:MapNode,maps:MapNode[]
   if(!unlockedWorld(c,world,maps))return false;
   if(node.type===0&&node.level===0)return true;
   if(c.completed[world].includes(node.level))return true;
+  if(c.explicitUnlocked?.[world]?.includes(node.level))return true;
   if(node.type===1)return c.secretUnlocked[world].includes(node.level);
   return maps[world].some(other=>c.completed[world].includes(other.level)&&other.links.some(link=>link.x===node.x&&link.y===node.y));
 }
@@ -75,6 +77,8 @@ export function validateCampaign(value:unknown,maps:MapNode[][]):Campaign {
       previous.links.some(link=>link.x===node.x&&link.y===node.y))
   )).map(node=>node.level));
   if(!Array.isArray(secretUnlocked)||secretUnlocked.length!==3||secretUnlocked.some((row,w)=>!Array.isArray(row)||row.some(level=>!Number.isInteger(level)||!maps[w].some(node=>node.type===1&&node.level===level))))throw new Error('Fases secretas salvas inválidas');
+  const explicitUnlocked=c.explicitUnlocked??[[],[],[]];
+  if(!Array.isArray(explicitUnlocked)||explicitUnlocked.length!==3||explicitUnlocked.some((row,w)=>!Array.isArray(row)||row.some(level=>!Number.isInteger(level)||!maps[w].some(node=>node.level===level))))throw new Error('Fases liberadas salvas inválidas');
   // Older v1 saves tracked only completion. Treat their awards as claimed to
   // preserve the life balance earned before per-category flags were stored.
   const awards=c.awards??c.completed.map((levels,w)=>Array.from({length:Math.max(...maps[w].map(node=>node.level))+1},(_,level)=>levels.includes(level)?60:0));
@@ -86,9 +90,9 @@ export function validateCampaign(value:unknown,maps:MapNode[][]):Campaign {
     const record=new CanonicalSave(Uint8Array.from(c.canonicalRecord));
     if(record.worlds.some((w,i)=>w.levels.length!==Math.max(...maps[i].map(node=>node.level))+1))throw new Error('Record RMS de outra versão');
   }
-  const normalized={...c,secretUnlocked,worldAccess};
+  const normalized={...c,secretUnlocked,explicitUnlocked,worldAccess};
   if(!Number.isInteger(c.world)||c.world<0||c.world>2||!unlockedWorld(normalized,c.world,maps)||!maps[c.world].some(n=>n.level===c.selected&&unlockedNode(normalized,c.world,n,maps)))throw new Error('Mapa salvo inválido');
   const r=c.resources;
   if(!r||![r.diamonds,r.redDiamonds,r.lives,r.health].every(Number.isInteger)||r.diamonds<0||r.diamonds>65535||r.redDiamonds<0||r.redDiamonds>65535||r.lives<0||r.lives>99||r.health<1||r.health>4||![0,1,2,8].includes(r.weaponTier??0))throw new Error('Recursos salvos inválidos');
-  return {version:1,completed:c.completed.map(a=>[...new Set(a)]),secretUnlocked:secretUnlocked.map(a=>[...new Set(a)]),awards:awards.map(row=>[...row]),worldAccess:[...worldAccess],canonicalRecord:c.canonicalRecord?[...c.canonicalRecord]:undefined,world:c.world,selected:c.selected,resources:{...r,weaponTier:r.weaponTier??0}};
+  return {version:1,completed:c.completed.map(a=>[...new Set(a)]),secretUnlocked:secretUnlocked.map(a=>[...new Set(a)]),explicitUnlocked:explicitUnlocked.map(a=>[...new Set(a)]),awards:awards.map(row=>[...row]),worldAccess:[...worldAccess],canonicalRecord:c.canonicalRecord?[...c.canonicalRecord]:undefined,world:c.world,selected:c.selected,resources:{...r,weaponTier:r.weaponTier??0}};
 }

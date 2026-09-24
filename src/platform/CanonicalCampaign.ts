@@ -1,6 +1,6 @@
 import type { WorldDefinition, MapNode } from '../level/LevelParser.ts';
 import type { Campaign } from '../core/Campaign.ts';
-import { newCampaign, unlockedWorld } from '../core/Campaign.ts';
+import { newCampaign, unlockedNode, unlockedWorld } from '../core/Campaign.ts';
 import type { Simulation } from '../core/Simulation.ts';
 import type { StageStart } from '../core/Simulation.ts';
 import { CanonicalSave } from './CanonicalSave.ts';
@@ -18,12 +18,16 @@ export function campaignRecord(c:Campaign,worlds:WorldDefinition[],maps:MapNode[
     )).map(n=>n.level));
     save.unlockThrough(w,maxNormal);
     for(const level of c.completed[w])save.addLevelFlags(w,level,2);
-    for(const level of c.secretUnlocked[w])save.addLevelFlags(w,level,64);
+    // method_252 also sets flag 64 on newly accessible normal stages.
+    for(const node of maps[w])if(node.level>0&&unlockedNode(c,w,node,maps))save.addLevelFlags(w,node.level,64);
     for(let level=0;level<c.awards[w].length;level++)if(c.awards[w][level])save.addLevelFlags(w,level,c.awards[w][level]);
   }
   if(stage){
     const {world,index}=stage.level;
-    save.setLevelStatus(world,index,Math.min(255,Math.max(0,stage.redDiamonds-stage.initial.redDiamonds)));
+    // cGame.method_108 adds this visit's red diamonds to recordData's
+    // existing per-level count; revisiting must not erase earlier progress.
+    const earned=Math.max(0,stage.redDiamonds-stage.initial.redDiamonds);
+    save.setLevelStatus(world,index,Math.min(255,save.worlds[world].levels[index].status+earned));
     for(const cell of stage.opened)if([14,33].includes(worlds[world].levels[index].objects[cell]))
       save.openChest(world,index,cell%stage.level.width,Math.floor(cell/stage.level.width));
   }
@@ -57,6 +61,7 @@ export function campaignFromRecord(save:CanonicalSave,worlds:WorldDefinition[],m
   const c=newCampaign();
   c.completed=save.worlds.map(w=>w.levels.flatMap((l,i)=>l.flags&2?[i]:[]));
   c.secretUnlocked=save.worlds.map((w,i)=>w.levels.flatMap((l,j)=>l.flags&64&&maps[i].some(n=>n.level===j&&n.type===1)?[j]:[]));
+  c.explicitUnlocked=save.worlds.map(w=>w.levels.flatMap((l,i)=>l.flags&64?[i]:[]));
   c.awards=save.worlds.map(w=>w.levels.map(l=>l.flags&60));
   c.worldAccess=[true,!!(save.worldFlags&8),!!(save.worldFlags&16)];
   c.world=c.worldAccess[2]?2:c.worldAccess[1]?1:0;

@@ -48,6 +48,14 @@ Se o clone já existe, não repita `git clone`. Para outra localização: `npm r
 
 `npm run audit` também requer os dois clones comparativos descritos em `docs/VERSION_MATRIX.md`. O resultado dessa auditoria já está salvo em `docs/*INVENTORY.json` e `docs/RESOURCE_COMPARISON.json`.
 
+Para medir estados da abertura no Java S700, `tools/trace-s700.ts` copia a decompilação fixada para um diretório temporário, injeta um hook de log, recompila com JDK 21 e a executa no FreeJ2ME. Exemplo com caminhos locais:
+
+```powershell
+node tools/trace-s700.ts ../../work/reference-s700 ../../work/reference-runtime/jdk/jdk-21.0.12.1+1/bin ../../work/reference-runtime/freej2me/freej2me.jar ../../work/reference-runtime/reproduced
+```
+
+O resultado é `trace-s700.csv` com 300 ticks. Os 21 primeiros estados da entrada de Angkor estão em `tests/fixtures/intro-opening-s700.csv` e são comparados automaticamente com o port. O trace executa a decompilação recompilada, não o JAR original; ainda não demonstra equivalência do bytecode nem fidelidade das cenas completas. O runtime local usado foi [Eclipse Temurin 21](https://adoptium.net/temurin/releases?version=21) e [FreeJ2ME-Plus](https://github.com/TASEmulators/freej2me-plus), ambos externos ao repositório.
+
 ## Estado real
 
 Concluídos nesta etapa: auditoria e hashes das fontes, decodificação dos packs/sprites/mapas/strings/MIDI, renderização de recursos, menu e mapa interativos com os sprites originais, progresso local de campanha, relógio fixo, câmera, controles, simulação inicial, replays versionados e codec estrutural do save original.

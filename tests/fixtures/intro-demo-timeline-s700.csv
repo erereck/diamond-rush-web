@@ -1,0 +1,6 @@
+tick,sourceCommandIndex,opcode,cameraX,phase
+41,4,2,36,script
+70,6,2,36,script
+90,8,16,36,script
+102,9,2,36,script
+129,0,-1,,free

@@ -1,7 +1,7 @@
 /**
  * Rebuild a locally checked-out S700 decompilation with an isolated trace hook.
  * The original Java sources and the emulator stay outside this repository.
- * Usage: node tools/trace-s700.ts <reference-s700> <jdk-bin> <freej2me.jar> <output-dir>
+ * Usage: node tools/trace-s700.ts <reference-s700> <jdk-bin> <freej2me.jar> <output-dir> [--auto-dialogue] [--ticks=N]
  */
 import { copyFileSync, mkdirSync, readFileSync, readdirSync, writeFileSync } from 'node:fs';
 import { spawnSync } from 'node:child_process';
@@ -10,9 +10,13 @@ import { pathToFileURL } from 'node:url';
 
 const [referenceArg,jdkArg,emulatorArg,outputArg]=process.argv.slice(2);
 if(!referenceArg||!jdkArg||!emulatorArg||!outputArg){
-  console.error('Usage: node tools/trace-s700.ts <reference-s700> <jdk-bin> <freej2me.jar> <output-dir>');
+  console.error('Usage: node tools/trace-s700.ts <reference-s700> <jdk-bin> <freej2me.jar> <output-dir> [--auto-dialogue] [--ticks=N]');
   process.exit(2);
 }
+const options=process.argv.slice(6),autoDialogue=options.includes('--auto-dialogue');
+const ticksArg=options.find(arg=>arg.startsWith('--ticks='));
+const tickLimit=ticksArg?Number(ticksArg.slice(8)):300;
+if(!Number.isInteger(tickLimit)||tickLimit<21||tickLimit>2000||options.some(arg=>arg!=='--auto-dialogue'&&!arg.startsWith('--ticks=')))throw new Error('Invalid trace options');
 const reference=resolve(referenceArg),jdk=resolve(jdkArg),emulator=resolve(emulatorArg),output=resolve(outputArg);
 const source=join(reference,'src'),resources=join(reference,'res'),traceSource=join(output,'src'),classes=join(output,'classes');
 mkdirSync(traceSource,{recursive:true});mkdirSync(classes,{recursive:true});
@@ -29,7 +33,12 @@ replaceOnce('private void method_304() {',`private int traceTicks;
   private void method_304() {
     if (Boolean.getBoolean("diamond.trace")) {
       System.out.println("DRTRACE," + traceTicks + "," + currentWorld + "," + currentLevel + "," + playerXPos + "," + playerYPos + "," + field_232 + "," + field_197 + "," + collectedDiamonds + "," + collectedRedDiamonds + "," + playerLifeCount + "," + gameState);
-      if (++traceTicks >= 300) System.exit(0);
+      if (field_354 != null && field_354.field_45 != null) {
+        int opcode = field_354.field_45[0] & 255;
+        int page = opcode == 2 ? (field_354.field_45[9] & 255) : (opcode == 27 ? (field_354.field_45[6] & 255) : -1);
+        System.out.println("DRDEMO," + traceTicks + "," + field_354.field_43 + "," + opcode + "," + field_354.field_46 + "," + page + "," + field_354.field_47 + "," + field_201 + "," + field_202);
+      }
+      if (++traceTicks >= ${tickLimit}) System.exit(0);
     }
 `);
 replaceOnce('this.method_67();',`if (Boolean.getBoolean("diamond.trace") && gameState == 7) field_261 = true;
@@ -37,6 +46,17 @@ replaceOnce('this.method_67();',`if (Boolean.getBoolean("diamond.trace") && game
           if (Boolean.getBoolean("diamond.trace") && gameState == 4 && !traceStarted) {
             traceStarted = true;
             this.method_218();
+          }
+          if (${autoDialogue} && gameState == 1 && traceTicks >= 21 && field_195 == 0 && field_354 == null && playerXPos < 6) {
+            keysPressed = SKEY_NUM6;
+            noKeysPressed = false;
+          } else if (${autoDialogue} && playerXPos >= 6 && field_354 == null) {
+            keysPressed = 0;
+          }
+          if (${autoDialogue} && field_354 != null && field_354.field_45 != null &&
+              (field_354.field_45[0] == 2 || field_354.field_45[0] == 27) && traceTicks > 0 && traceTicks % 20 == 0) {
+            field_354.field_44 = 0L;
+            field_354.method_21();
           }
           this.method_67();`);
 writeFileSync(gamePath,game);
@@ -57,7 +77,9 @@ const result=run(exe('java'),['-Ddiamond.trace=true','-Dfile.encoding=ISO_8859_1
 writeFileSync(join(output,'emulator.log'),result.stdout);
 writeFileSync(join(output,'emulator-error.log'),result.stderr);
 const rows=result.stdout.split(/\r?\n/).filter(line=>line.startsWith('DRTRACE,')).map(line=>line.slice(8));
-if(rows.length!==300)throw new Error(`Expected 300 Java ticks, received ${rows.length}; inspect ${join(output,'emulator.log')}`);
+if(rows.length!==tickLimit)throw new Error(`Expected ${tickLimit} Java ticks, received ${rows.length}; inspect ${join(output,'emulator.log')}`);
 const csv='tick,world,level,x,y,offset,direction,diamonds,redDiamonds,lives,gameState\n'+rows.join('\n')+'\n';
 writeFileSync(join(output,'trace-s700.csv'),csv);
+const demoRows=result.stdout.split(/\r?\n/).filter(line=>line.startsWith('DRDEMO,')).map(line=>line.slice(7));
+writeFileSync(join(output,'demo-s700.csv'),'tick,commandIndex,opcode,commandTick,page,portrait,cameraX,cameraY\n'+demoRows.join('\n')+'\n');
 console.log(`Captured ${rows.length} Java S700 ticks: ${join(output,'trace-s700.csv')}`);

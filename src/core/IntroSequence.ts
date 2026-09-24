@@ -6,7 +6,7 @@ import type { DecodedSprite } from '../assets/SpriteDecoder.ts';
 
 interface RunningCommand {
   command:DemoCommand;ticks:number;startX:number;startY:number;page:number;children?:RunningCommand[];done?:boolean;
-  blinkRemaining?:number;blinkOn?:boolean;
+  blinkRemaining?:number;blinkOn?:boolean;closingTicks?:number;
 }
 export function wrapDemoText(value:string,maxCharacters:number):string[]{
   const lines:string[]=[];let line='';
@@ -39,7 +39,7 @@ export function wrapDemoTextPixels(value:string,maxWidth:number,font:DecodedSpri
   return lines;
 }
 const STOPS=[
-  {id:29,x:5,y:4}, // the source stops at the first circle after walking in
+  {id:29,x:6,y:4}, // first dialogue triggers one cell after the automatic entrance
   {id:10,x:31,y:7}, // chest hint
   {id:11,x:28,y:6}, // compass in the chest
   {id:13,x:37,y:7}, // pushing-rock lesson
@@ -82,7 +82,8 @@ export class IntroSequence {
     const running=this.findDialogue(this.active);
     if(!running)return null;
     const popup=running.command.opcode===27,lines=this.wrap(running.command.text??'',popup);
-    return {lines:lines.slice(running.page,running.page+(popup?2:running.command.args[0])),popup,slide:Math.min(0,-240+running.ticks*30)};
+    return {lines:lines.slice(running.page,running.page+(popup?2:running.command.args[0])),popup,
+      slide:running.closingTicks===undefined?Math.min(0,-240+running.ticks*30):Math.min(270,7+running.closingTicks*30)};
   }
   private findDialogue(r:RunningCommand|null):RunningCommand|null{
     if(!r||r.done)return null;
@@ -99,7 +100,7 @@ export class IntroSequence {
     if(this.phase==='done')return;
     if(this.phase==='opening'){
       this.sim.step({direction:2,action:false});this.tick=this.sim.tick;this.followHero();
-      if(this.sim.player.x===5&&this.sim.player.offset===0)this.startScript();
+      if(this.sim.player.x===5&&this.sim.player.offset===0)this.phase='free';
       return;
     }
     if(this.phase==='free'){
@@ -182,15 +183,18 @@ export class IntroSequence {
       const duration=Math.max(1,args[2]),t=Math.min(1,r.ticks/duration),maxX=this.sim.level.width*24-240,maxY=this.sim.level.height*24-240;
       this.cameraX=Math.max(0,Math.min(maxX,Math.trunc(r.startX+(args[0]*24-108-r.startX)*t)));
       this.cameraY=Math.max(0,Math.min(maxY,Math.trunc(r.startY+(args[1]*24-108-r.startY)*t)));
-      return r.ticks>=duration;
+      // DemoInterpreter marks the command complete only after field_46
+      // exceeds its duration; the next command begins on the following tick.
+      return r.ticks>=duration+2;
     }
     if(opcode===2||opcode===27){
+      if(r.closingTicks!==undefined){this.pressed=false;return ++r.closingTicks>=9;}
       if(this.pressed){
         this.pressed=false;
         if(r.ticks<8){r.ticks=8;return false;}
         const lines=this.wrap(r.command.text??'',opcode===27),perPage=opcode===27?2:args[0];
         if(r.page+perPage<lines.length){r.page+=perPage;return false;}
-        return true;
+        r.closingTicks=1;return false;
       }
       return false;
     }
@@ -199,7 +203,7 @@ export class IntroSequence {
     if(opcode===11){this.portraitFrame=args[0];this.portraitSprite=args[1];return true;}
     if(opcode===12){
       this.portraitX=args[0];this.portraitY=args[1];
-      if(r.ticks<=5){this.portraitRevealTicks=r.ticks;return false;}
+      if(r.ticks<=6){this.portraitRevealTicks=r.ticks;return false;}
       this.portraitRevealTicks=0;this.portraitVisible=true;return true;
     }
     if(opcode===13){
@@ -218,7 +222,7 @@ export class IntroSequence {
       }
       if(opcode===18)this.flash=!!r.blinkOn;
       else this.blinkFrame=r.blinkOn?args[0]:-1;
-      if(r.blinkRemaining<=0){
+      if(r.blinkRemaining<=0&&r.ticks>=(opcode===18?args[0]:args[1])*4){
         if(opcode===18)this.flash=false;
         else this.blinkFrame=opcode===16?args[0]:-1;
         return true;

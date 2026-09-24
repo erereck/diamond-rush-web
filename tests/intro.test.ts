@@ -48,8 +48,38 @@ test('the opening walk matches the first 21 measured Java S700 ticks',()=>{
       [tick,world,stage,x,y,offset,direction,diamonds,redDiamonds,lives],`Java opening tick ${tick}`);
     assert.equal(gameState,1);
   }
+  assert.equal(intro.phase,'free');
+  assert.equal(intro.scriptId,null);
+  intro.step();
+  assert.deepEqual([intro.sim.player.x,intro.sim.player.y,intro.sim.player.offset],[5,4,0]);
+  assert.equal(intro.phase,'free','the Java waits for player input at the circle');
+  const trigger=readFileSync(new URL('fixtures/intro-first-trigger-s700.csv',import.meta.url),'utf8').trim().split(/\r?\n/).slice(1)
+    .map(line=>line.split(',').map(Number));
+  for(const [tick,x,y,offset] of trigger){
+    intro.step({direction:2,action:false});
+    assert.deepEqual([intro.tick,intro.sim.player.x,intro.sim.player.y,intro.sim.player.offset],[tick,x,y,offset]);
+  }
   assert.equal(intro.phase,'script');
   assert.equal(intro.scriptId,29);
+});
+
+test('the first dialogue sequence follows measured Java command transitions',()=>{
+  const events=readFileSync(new URL('fixtures/intro-demo-timeline-s700.csv',import.meta.url),'utf8').trim().split(/\r?\n/).slice(1)
+    .map(line=>{const [tick,index,opcode,cameraX,phase]=line.split(',');return {tick:Number(tick),index:Number(index),opcode:Number(opcode),cameraX,phase};});
+  const intro=new IntroSequence(level,scripts);
+  for(let tick=0;tick<=129;tick++){
+    if(tick>0){
+      if([60,80,100,120].includes(tick)&&intro.dialogue)intro.press();
+      intro.step({direction:tick>=22&&tick<=25?2:0,action:false});
+    }
+    const event=events.find(row=>row.tick===tick);
+    if(!event)continue;
+    assert.equal(intro.active?.command.opcode??-1,event.opcode,`Java demo tick ${tick}`);
+    if(event.opcode>=0)assert.equal(intro.commandIndex+1,event.index);
+    if(event.cameraX)assert.equal(intro.cameraX,Number(event.cameraX));
+    assert.equal(intro.phase,event.phase);
+  }
+  assert.equal(intro.section,1);
 });
 
 function walkTo(intro:IntroSequence,goalX:number,goalY:number){
@@ -81,7 +111,7 @@ function finishScript(intro:IntroSequence,dialogue:Set<string>){
 
 test('the introduction is freely controlled between all six original scenes',()=>{
   const intro=new IntroSequence(level,scripts),seen:number[]=[],dialogue=new Set<string>();
-  for(const [id,x,y] of [[29,5,4],[10,31,7],[11,28,6],[13,37,7],[16,46,7],[28,57,8]]){
+  for(const [id,x,y] of [[29,6,4],[10,31,7],[11,28,6],[13,37,7],[16,46,7],[28,57,8]]){
     if(id===16||id===28){
       // The rock lesson intentionally blocks this corridor. Use the same
       // checkpoint return the following dialogue teaches the player about.
@@ -123,7 +153,7 @@ test('tutorial chamber paints the original 5×5 seal composite from mmv.f',()=>{
 
 test('scripted steps use the normal collision and movement state',()=>{
   const intro=new IntroSequence(level,scripts);
-  walkTo(intro,5,4);
+  walkTo(intro,6,4);
   for(let i=0;i<100&&intro.phase==='script';i++){intro.press();intro.step();}
   walkTo(intro,31,7);
   assert.equal(intro.scriptId,10);
@@ -135,7 +165,7 @@ test('scripted steps use the normal collision and movement state',()=>{
 
 test('lethal damage during a scene interrupts it and returns to the checkpoint',()=>{
   const intro=new IntroSequence(level,scripts);
-  walkTo(intro,5,4);
+  walkTo(intro,6,4);
   for(let i=0;i<10;i++)intro.step();
   assert.equal(intro.phase,'script');
   intro.sim.hurt(4);
@@ -153,9 +183,9 @@ test('portrait reveal and hint flash follow the source command phases',()=>{
     {opcode:11,args:[2,2]},{opcode:12,args:[17,50]},{opcode:18,args:[1,255,255,255]},{opcode:15,args:[]}
   ]};altered.set(29,opening);
   const intro=new IntroSequence(level,altered);
-  walkTo(intro,5,4);assert.equal(intro.scriptId,29);
+  walkTo(intro,6,4);assert.equal(intro.scriptId,29);
   intro.step();
-  for(let tick=1;tick<=5;tick++){
+  for(let tick=1;tick<=6;tick++){
     intro.step();assert.equal(intro.portraitRevealTicks,tick);
     assert.equal(intro.portraitVisible,false);
   }

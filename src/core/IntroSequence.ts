@@ -8,6 +8,7 @@ interface RunningCommand {
   command:DemoCommand;ticks:number;startX:number;startY:number;page:number;children?:RunningCommand[];done?:boolean;
   blinkRemaining?:number;blinkOn?:boolean;closingTicks?:number;closingStart?:number;
   walkComplete?:boolean;
+  skipped?:boolean;
 }
 export function wrapDemoText(value:string,maxCharacters:number):string[]{
   const lines:string[]=[];let line='';
@@ -59,9 +60,11 @@ export class IntroSequence {
   cameraX=0;cameraY=0;
   portraitVisible=false;portraitFrame=2;portraitSprite=2;portraitX=17;portraitY=50;portraitRevealTicks=0;blinkFrame=-1;flashColor='#fff';flash=false;
   private pressed=false;
+  private completedCommand:RunningCommand|null=null;
   private auxiliaryScriptId:number|null=null;private recoveryAfterReset:number|null=null;
   private rockLessonPending=false;private blockedLessonPending=false;
   private recoveryRestoreTick=-1;
+  private recoveryTravelQueued=false;
   constructor(level:LevelDefinition,scripts:Map<number,DemoScript>,sim?:Simulation,scriptId?:number,font?:DecodedSprite,fontMap?:Uint8Array){
     this.standalone=scriptId!==undefined;
     this.stops=this.standalone?[{id:scriptId!,x:0,y:0}]:STOPS;
@@ -80,32 +83,46 @@ export class IntroSequence {
   get heroY(){const p=this.sim.player;return p.y*24-p.dy*p.offset;}
   get scriptId(){return this.phase==='script'?(this.auxiliaryScriptId??this.stops[this.section].id):null;}
   get finished(){return this.phase==='done';}
-  get commandTick(){return this.active?.ticks??0;}
+  get commandTick(){return this.active?.ticks??this.completedCommand?.ticks??0;}
+  get portraitRevealRect(){
+    if(this.portraitRevealTicks<=0)return null;
+    // DemoInterpreter.method_19 runs after the game's 40 px translation is
+    // removed and clamps the growth to five, including its sixth wait tick.
+    const t=Math.min(5,this.portraitRevealTicks),p=this.sim.player;
+    return {x:Math.trunc(((p.x*24-this.cameraX)*(5-t)+this.portraitX*t)/5),
+      y:Math.trunc(((p.y*24-this.cameraY)*(5-t)+this.portraitY*t)/5),
+      width:Math.trunc(102*t/5),height:Math.trunc(38*t/5)};
+  }
   get dialogue():{lines:string[];popup:boolean;slide:number;y:number}|null{
-    const running=this.findDialogue(this.active);
+    const running=this.findDialogue(this.active??this.completedCommand);
     if(!running)return null;
     const popup=running.command.opcode===27,lines=this.wrap(running.command.text??'',popup);
     return {lines:lines.slice(running.page,running.page+(popup?2:running.command.args[0])),popup,y:popup?229:running.command.args[1],
       slide:popup?0:running.closingTicks===undefined?Math.min(0,-240+running.ticks*30):Math.min(263,running.closingStart!+running.closingTicks*30)};
   }
   private findDialogue(r:RunningCommand|null):RunningCommand|null{
-    if(!r||r.done)return null;
+    if(!r)return null;
     if(r.command.opcode===2||r.command.opcode===27)return r;
     for(const child of r.children??[]){const found=this.findDialogue(child);if(found)return found;}
     return null;
   }
   press(){
     if(this.dialogue){
+      // The Java still draws completed parallel/last commands for this frame.
+      // Their text is no longer waiting for input.
+      const running=this.findDialogue(this.active);
+      if(!running||running.done)return;
       // DemoInterpreter.method_20 ignores hint presses while animation 47
       // presents the newly acquired equipment/compass (cGame.field_367).
       if(this.dialogue.popup&&this.sim.playerAnimation===47)return;
       this.pressed=true;return;
     }
     // The original softkey can skip the current automatic animation.
-    if(this.phase==='script'&&this.active&&[1,6,12,16,17,18].includes(this.active.command.opcode))this.active.ticks=10000;
+    if(this.phase==='script'&&this.active&&[1,6,12,16,17,18].includes(this.active.command.opcode))this.active.skipped=true;
   }
   step(input:InputFrame=NO_INPUT){
     if(this.phase==='done')return;
+    this.completedCommand=null;
     this.rememberLesson();this.recoverLesson();
     if(this.phase==='opening'){
       this.sim.step({direction:2,action:false});this.tick=this.sim.tick;this.followHero();
@@ -127,7 +144,12 @@ export class IntroSequence {
     if(this.phase!=='script')return;
     const commands=this.scripts.get(this.scriptId!)!.commands;
     if(!this.active){
-      if(this.commandIndex>=commands.length){this.nextSection();return;}
+      if(this.commandIndex>=commands.length){
+        this.nextSection();
+        // Removing the demo does not consume a simulation frame. Gravity and
+        // the checkpoint camera keep updating on this same source tick.
+        this.sim.step(NO_INPUT);this.tick=this.sim.tick;this.followHero();return;
+      }
       this.active=this.running(commands[this.commandIndex]);
     }
     // The same physics and collision path runs while the hero is scripted.
@@ -139,8 +161,12 @@ export class IntroSequence {
       this.phase=this.standalone?'done':'free';this.active=null;this.portraitVisible=false;this.portraitRevealTicks=0;this.pressed=false;
       return;
     }
-    if(this.sim.hurtTicks>0||this.sim.respawnTravel)return;
-    if(this.stepCommand(this.active)){this.active=null;this.commandIndex++;}
+    if(this.sim.hurtTicks>0)return;
+    if(this.sim.respawnTravel||this.sim.events.includes('respawn'))this.followHero();
+    if(this.stepCommand(this.active)){
+      this.completedCommand=this.active;this.completedCommand.done=true;
+      this.active=null;this.commandIndex++;
+    }
   }
   private wrap(value:string,popup:boolean){
     return this.font&&this.fontMap?wrapDemoTextPixels(value,popup?196:222,this.font,this.fontMap):wrapDemoText(value,popup?23:18);
@@ -164,9 +190,12 @@ export class IntroSequence {
     if(this.standalone)return false;
     if(this.recoveryRestoreTick!==this.sim.tick&&this.sim.events.some(event=>event==='respawn-start'||event==='respawn')){
       this.recoveryRestoreTick=this.sim.tick;
+      const endOfHandledTravel=this.sim.events.includes('respawn')&&this.recoveryTravelQueued;
+      if(this.sim.events.includes('respawn-start'))this.recoveryTravelQueued=true;
+      if(this.sim.events.includes('respawn'))this.recoveryTravelQueued=false;
       // method_347 consumes the sticky lesson flags, including when the hero
       // left the trigger, and clears these objects in the saved map (field_349).
-      const recovery=this.recoveryAfterReset!==null?null:this.rockLessonPending?15:this.blockedLessonPending?17:null;
+      const recovery=endOfHandledTravel||this.recoveryAfterReset!==null?null:this.rockLessonPending?15:this.blockedLessonPending?17:null;
       if(recovery!==null){
         if(recovery===15)this.rockLessonPending=false;else this.blockedLessonPending=false;
         this.recoveryAfterReset=recovery;
@@ -177,7 +206,7 @@ export class IntroSequence {
         }
       }
     }
-    if(this.recoveryAfterReset!==null&&this.sim.events.includes('respawn')){
+    if(this.recoveryAfterReset!==null&&this.sim.events.some(event=>event==='respawn-start'||event==='respawn')){
       this.auxiliaryScriptId=this.recoveryAfterReset;this.recoveryAfterReset=null;this.startScript();return true;
     }
     return false;
@@ -205,11 +234,14 @@ export class IntroSequence {
     for(const child of r.children??[]){const direction=this.scriptedDirection(child);if(direction)return direction;}
     return 0;
   }
-  private hasWalk(r:RunningCommand):boolean{return !r.done&&(r.command.opcode===10||(r.children??[]).some(child=>this.hasWalk(child)));}
+  // Compound commands keep calling the walk's camera update after its movement
+  // has finished, until the parallel dialogue also completes (method_27).
+  private hasWalk(r:RunningCommand):boolean{return r.command.opcode===10||(r.children??[]).some(child=>this.hasWalk(child));}
   private followHero(){this.cameraX=this.sim.camera.x;this.cameraY=this.sim.camera.y;}
   private running(command:DemoCommand):RunningCommand{return {command,ticks:0,startX:command.opcode===13?this.portraitX:this.cameraX,startY:command.opcode===13?this.portraitY:this.cameraY,page:0};}
   private stepCommand(r:RunningCommand):boolean{
     const {opcode,args}=r.command;r.ticks++;
+    if(r.skipped)return true;
     if(opcode===0){
       r.children??=r.command.children!.map(c=>this.running(c));
       for(const child of r.children)if(!child.done)child.done=this.stepCommand(child);
@@ -255,20 +287,21 @@ export class IntroSequence {
     }
     if(opcode===13){
       const t=Math.min(1,r.ticks/Math.max(1,args[2]));
-      this.portraitX=Math.round(r.startX+(args[0]-r.startX)*t);this.portraitY=Math.round(r.startY+(args[1]-r.startY)*t);
+      this.portraitX=Math.trunc(r.startX+(args[0]-r.startX)*t);this.portraitY=Math.trunc(r.startY+(args[1]-r.startY)*t);
       return r.ticks>=args[2]+2;
     }
     if(opcode===14){this.portraitVisible=true;return true;}
-    if(opcode===15){this.portraitVisible=false;this.portraitRevealTicks=0;this.blinkFrame=-1;return true;}
+    if(opcode===15){this.portraitVisible=false;this.portraitRevealTicks=0;return true;}
     if(opcode===16||opcode===17||opcode===18){
       r.blinkRemaining??=opcode===18?args[0]:args[1];r.blinkOn??=false;
       if(opcode===18)this.flashColor=`#${args.slice(1).map(n=>n.toString(16).padStart(2,'0')).join('')}`;
-      if(r.ticks%2===1){
-        if(r.blinkOn){r.blinkOn=false;r.blinkRemaining--;}
-        else if(r.blinkRemaining>0)r.blinkOn=true;
+      // field_46 starts at zero; toggling occurs on odd source ticks, so the
+      // first visible flash is the command's second completed update.
+      if(r.ticks%2===0){
+        if(r.blinkOn){r.blinkOn=false;r.blinkRemaining--;this.blinkFrame=-1;}
+        else if(r.blinkRemaining>0){r.blinkOn=true;if(opcode!==18)this.blinkFrame=args[0];}
       }
       if(opcode===18)this.flash=!!r.blinkOn;
-      else this.blinkFrame=r.blinkOn?args[0]:-1;
       if(r.blinkRemaining<=0&&r.ticks>=(opcode===18?args[0]:args[1])*4){
         if(opcode===18)this.flash=false;
         else this.blinkFrame=opcode===16?args[0]:-1;

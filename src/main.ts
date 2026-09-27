@@ -89,11 +89,9 @@ function drawIntro(){
   ctx.save();ctx.beginPath();ctx.rect(0,42,240,236);ctx.clip();ctx.translate(-sequence.cameraX,42-sequence.cameraY);
   renderer.draw(ctx,sim.level,sequence.tick,sim);
   ctx.restore();
-  if(sequence.portraitRevealTicks>0){
-    const t=sequence.portraitRevealTicks,p=sim.player;
-    const x=Math.trunc(((p.x*24-sequence.cameraX)*(5-t)+sequence.portraitX*t)/5);
-    const y=Math.trunc(((p.y*24-sequence.cameraY+40)*(5-t)+sequence.portraitY*t)/5);
-    ctx.fillStyle='#fff';ctx.fillRect(x,y,Math.trunc(102*t/5),Math.trunc(38*t/5));
+  const reveal=sequence.portraitRevealRect;
+  if(reveal){
+    ctx.fillStyle='#fff';ctx.fillRect(reveal.x,reveal.y,reveal.width,reveal.height);
   }
   if(sequence.portraitVisible){
     const x=sequence.portraitX,y=sequence.portraitY;

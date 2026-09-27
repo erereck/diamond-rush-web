@@ -1,0 +1,491 @@
+{
+  "reference": "5e05c42aa1aae3377790600eb6d27497101b79e7",
+  "scenario": "Isolated at tick 768 of the continuous chest/rock/reset route",
+  "scriptId": 16,
+  "start": 768,
+  "end": 893,
+  "hero": {
+    "tick": 768,
+    "animation": 1,
+    "frame": 0,
+    "time": 1,
+    "itemSprite": -1,
+    "itemFrame": -1,
+    "reward": -1,
+    "chestTile": -1,
+    "chestFrame": 2
+  },
+  "player": {
+    "tick": 768,
+    "world": 0,
+    "level": 13,
+    "x": 46,
+    "y": 7,
+    "offset": 0,
+    "direction": 0,
+    "diamonds": 2,
+    "redDiamonds": 0,
+    "lives": 4,
+    "gameState": 1
+  },
+  "scene": {
+    "tick": 768,
+    "scriptId": 16,
+    "cameraX": 972,
+    "cameraY": 24,
+    "returning": 0,
+    "health": 4,
+    "checkpointX": 36,
+    "checkpointY": 7,
+    "portraitX": 0,
+    "portraitY": 0,
+    "blinkFrame": -1,
+    "portraitVisible": 0,
+    "portraitFrame": 0,
+    "flash": 0
+  },
+  "cells": [
+    {
+      "tick": 768,
+      "x": 36,
+      "y": 6,
+      "tile": 81,
+      "state": -1,
+      "motion": 0,
+      "object": 255,
+      "parameter": -1,
+      "active": 0
+    },
+    {
+      "tick": 768,
+      "x": 36,
+      "y": 7,
+      "tile": -1,
+      "state": 1,
+      "motion": 0,
+      "object": 4,
+      "parameter": 1,
+      "active": 0
+    },
+    {
+      "tick": 768,
+      "x": 37,
+      "y": 7,
+      "tile": -1,
+      "state": 13,
+      "motion": 0,
+      "object": 255,
+      "parameter": -1,
+      "active": 0
+    },
+    {
+      "tick": 768,
+      "x": 38,
+      "y": 5,
+      "tile": 10,
+      "state": 0,
+      "motion": 0,
+      "object": 255,
+      "parameter": -1,
+      "active": 0
+    },
+    {
+      "tick": 768,
+      "x": 39,
+      "y": 5,
+      "tile": 0,
+      "state": 0,
+      "motion": 0,
+      "object": 255,
+      "parameter": -1,
+      "active": 0
+    },
+    {
+      "tick": 768,
+      "x": 39,
+      "y": 6,
+      "tile": 88,
+      "state": -1,
+      "motion": 0,
+      "object": 255,
+      "parameter": -1,
+      "active": 0
+    },
+    {
+      "tick": 768,
+      "x": 39,
+      "y": 7,
+      "tile": -1,
+      "state": -1,
+      "motion": 0,
+      "object": 255,
+      "parameter": -1,
+      "active": 0
+    },
+    {
+      "tick": 768,
+      "x": 40,
+      "y": 5,
+      "tile": -1,
+      "state": -1,
+      "motion": 0,
+      "object": 255,
+      "parameter": -1,
+      "active": 0
+    },
+    {
+      "tick": 768,
+      "x": 40,
+      "y": 6,
+      "tile": -1,
+      "state": -1,
+      "motion": 0,
+      "object": 255,
+      "parameter": -1,
+      "active": 0
+    },
+    {
+      "tick": 768,
+      "x": 40,
+      "y": 7,
+      "tile": -1,
+      "state": -1,
+      "motion": 0,
+      "object": 255,
+      "parameter": -1,
+      "active": 0
+    },
+    {
+      "tick": 768,
+      "x": 42,
+      "y": 8,
+      "tile": -1,
+      "state": -1,
+      "motion": 0,
+      "object": 255,
+      "parameter": -1,
+      "active": 0
+    },
+    {
+      "tick": 768,
+      "x": 43,
+      "y": 7,
+      "tile": -1,
+      "state": 1,
+      "motion": 0,
+      "object": 32,
+      "parameter": 7,
+      "active": 24
+    },
+    {
+      "tick": 768,
+      "x": 44,
+      "y": 5,
+      "tile": -1,
+      "state": 131075,
+      "motion": 0,
+      "object": 255,
+      "parameter": -1,
+      "active": 30
+    },
+    {
+      "tick": 768,
+      "x": 44,
+      "y": 6,
+      "tile": 0,
+      "state": -2147352576,
+      "motion": 0,
+      "object": 255,
+      "parameter": -1,
+      "active": 30
+    },
+    {
+      "tick": 768,
+      "x": 44,
+      "y": 7,
+      "tile": 0,
+      "state": -2147352448,
+      "motion": 0,
+      "object": 32,
+      "parameter": 5,
+      "active": 30
+    },
+    {
+      "tick": 768,
+      "x": 45,
+      "y": 5,
+      "tile": 0,
+      "state": -2147483648,
+      "motion": 0,
+      "object": 255,
+      "parameter": -1,
+      "active": 24
+    },
+    {
+      "tick": 768,
+      "x": 45,
+      "y": 6,
+      "tile": 0,
+      "state": 0,
+      "motion": 0,
+      "object": 255,
+      "parameter": -1,
+      "active": 48
+    },
+    {
+      "tick": 768,
+      "x": 45,
+      "y": 7,
+      "tile": -1,
+      "state": 1,
+      "motion": 0,
+      "object": 32,
+      "parameter": 3,
+      "active": 48
+    },
+    {
+      "tick": 768,
+      "x": 46,
+      "y": 7,
+      "tile": -1,
+      "state": 16,
+      "motion": 0,
+      "object": 255,
+      "parameter": -1,
+      "active": 48
+    },
+    {
+      "tick": 768,
+      "x": 48,
+      "y": 5,
+      "tile": 0,
+      "state": 0,
+      "motion": 0,
+      "object": 255,
+      "parameter": -1,
+      "active": 0
+    },
+    {
+      "tick": 768,
+      "x": 50,
+      "y": 7,
+      "tile": -1,
+      "state": -1,
+      "motion": 0,
+      "object": 255,
+      "parameter": -1,
+      "active": 0
+    },
+    {
+      "tick": 768,
+      "x": 51,
+      "y": 5,
+      "tile": 0,
+      "state": 0,
+      "motion": 0,
+      "object": 255,
+      "parameter": -1,
+      "active": 0
+    },
+    {
+      "tick": 768,
+      "x": 50,
+      "y": 8,
+      "tile": -1,
+      "state": -1,
+      "motion": 0,
+      "object": 255,
+      "parameter": -1,
+      "active": 0
+    },
+    {
+      "tick": 768,
+      "x": 58,
+      "y": 8,
+      "tile": -1,
+      "state": -1,
+      "motion": 0,
+      "object": 255,
+      "parameter": -1,
+      "active": 48
+    },
+    {
+      "tick": 768,
+      "x": 59,
+      "y": 8,
+      "tile": -1,
+      "state": -1,
+      "motion": 0,
+      "object": 255,
+      "parameter": -1,
+      "active": 48
+    },
+    {
+      "tick": 768,
+      "x": 60,
+      "y": 8,
+      "tile": -1,
+      "state": -1,
+      "motion": 0,
+      "object": 255,
+      "parameter": -1,
+      "active": 48
+    },
+    {
+      "tick": 768,
+      "x": 61,
+      "y": 8,
+      "tile": -1,
+      "state": -1,
+      "motion": 0,
+      "object": 255,
+      "parameter": -1,
+      "active": 48
+    },
+    {
+      "tick": 768,
+      "x": 62,
+      "y": 8,
+      "tile": -1,
+      "state": -1,
+      "motion": 0,
+      "object": 255,
+      "parameter": -1,
+      "active": 48
+    },
+    {
+      "tick": 768,
+      "x": 62,
+      "y": 7,
+      "tile": 10,
+      "state": 0,
+      "motion": 0,
+      "object": 255,
+      "parameter": -1,
+      "active": 48
+    },
+    {
+      "tick": 768,
+      "x": 61,
+      "y": 7,
+      "tile": 10,
+      "state": 0,
+      "motion": 0,
+      "object": 255,
+      "parameter": -1,
+      "active": 48
+    },
+    {
+      "tick": 768,
+      "x": 61,
+      "y": 6,
+      "tile": -1,
+      "state": -1,
+      "motion": 0,
+      "object": 255,
+      "parameter": -1,
+      "active": 48
+    },
+    {
+      "tick": 768,
+      "x": 61,
+      "y": 5,
+      "tile": -1,
+      "state": -1,
+      "motion": 0,
+      "object": 255,
+      "parameter": -1,
+      "active": 0
+    },
+    {
+      "tick": 768,
+      "x": 61,
+      "y": 4,
+      "tile": -1,
+      "state": -1,
+      "motion": 0,
+      "object": 255,
+      "parameter": -1,
+      "active": 0
+    },
+    {
+      "tick": 768,
+      "x": 60,
+      "y": 4,
+      "tile": -1,
+      "state": -1,
+      "motion": 0,
+      "object": 255,
+      "parameter": -1,
+      "active": 48
+    },
+    {
+      "tick": 768,
+      "x": 60,
+      "y": 3,
+      "tile": -1,
+      "state": -1,
+      "motion": 0,
+      "object": 255,
+      "parameter": -1,
+      "active": 48
+    },
+    {
+      "tick": 768,
+      "x": 61,
+      "y": 3,
+      "tile": -1,
+      "state": -1,
+      "motion": 0,
+      "object": 255,
+      "parameter": -1,
+      "active": 0
+    }
+  ],
+  "comparedCells": [
+    [
+      43,
+      7
+    ],
+    [
+      44,
+      5
+    ],
+    [
+      44,
+      6
+    ],
+    [
+      44,
+      7
+    ],
+    [
+      45,
+      5
+    ],
+    [
+      45,
+      6
+    ],
+    [
+      45,
+      7
+    ],
+    [
+      48,
+      5
+    ],
+    [
+      50,
+      7
+    ],
+    [
+      50,
+      8
+    ],
+    [
+      51,
+      5
+    ]
+  ]
+}

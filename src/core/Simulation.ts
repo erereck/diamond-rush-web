@@ -1,7 +1,7 @@
 import type { LevelDefinition } from '../level/LevelParser.ts';
 import { Camera } from './Camera.ts';
 import { ENGINE_REVISION, levelFingerprint } from './Compatibility.ts';
-import { animationFrameAt, BOULDER_BRACE_TICKS, BOULDER_PRESSURE_TICKS, CHEST_OPEN_DURATIONS, GRASS_DESTRUCTION_FRAMES, ITEM_PRESENTATION_TICKS, fireReach, HAMMER_ATTACK_TICKS, HAMMER_BOUNCE_TICKS, HAMMER_IMPACT_TICK } from './PhaseOneRules.ts';
+import { animationFrameAt, BOULDER_BRACE_TICKS, BOULDER_PRESSURE_TICKS, CHEST_OPEN_DURATIONS, GRASS_DESTRUCTION_FRAMES, ITEM_PRESENTATION_TICKS, MANUAL_RESET_TICKS, fireReach, HAMMER_ATTACK_TICKS, HAMMER_BOUNCE_TICKS, HAMMER_IMPACT_TICK } from './PhaseOneRules.ts';
 import { spikeExtension, spikeReach } from './LaterStageRules.ts';
 import { AngkorBoss } from './AngkorBoss.ts';
 import { BavariaBoss } from './BavariaBoss.ts';
@@ -125,8 +125,10 @@ export class Simulation {
   tile(x:number,y:number){const i=this.index(x,y);return i<0?80:this.tiles[i];}
   object(x:number,y:number){const i=this.index(x,y);return i<0?255:i===this.entranceGate?7:this.level.objects[i];}
   isPlayer(x:number,y:number){return this.player.x===x&&this.player.y===y;}
-  free(x:number,y:number){return this.tile(x,y)===-1&&![14,33,5,28,32].includes(this.object(x,y))&&!(this.object(x,y)===7&&this.gatePhases[this.index(x,y)]<2);}
-  enemyFree(x:number,y:number){return this.tile(x,y)===-1&&![14,33,4,32,7].includes(this.object(x,y));}
+  /** method_309: grass debris is only foreground; it cannot support a stone. */
+  free(x:number,y:number){return this.tile(x,y)===-1&&![14,33,5,28].includes(this.object(x,y));}
+  /** method_310: enemies also avoid circles and grass destruction effects. */
+  enemyFree(x:number,y:number){return this.tile(x,y)===-1&&![14,33,4,32].includes(this.object(x,y))&&!(this.object(x,y)===7&&this.gatePhases[this.index(x,y)]<2);}
   wake(x:number,y:number){for(let dy=-1;dy<=1;dy++)for(let dx=-1;dx<=1;dx++){const i=this.index(x+dx,y+dy);if(i>=0)this.active[i]=48;}}
   hurt(amount:number,knockback:Direction=0){
     if(this.invulnerable||this.hurtTicks||this.deathTicks||this.chestCell>=0||this.status!=='playing')return;
@@ -188,7 +190,7 @@ export class Simulation {
   manualReset(){
     if(this.status!=='playing'||this.hurtTicks||this.deathTicks||this.respawnTravel)return;
     if(this.index(this.player.x,this.player.y)===this.checkpoint&&this.player.offset===0)this.restoreCheckpoint(false,true);
-    else {this.health=0;this.hurtTicks=0;this.deathTicks=80;this.invulnerable=0;this.pendingDirection=0;this.setAnimation(19);this.events.push('death');}
+    else {this.hurtTicks=0;this.deathTicks=MANUAL_RESET_TICKS;this.invulnerable=0;this.pendingDirection=0;this.setAnimation(19);this.events.push('death');}
   }
   setAnimation(n:number){if(n!==this.playerAnimation){this.playerAnimation=n;this.animationTick=0;}}
   private setLocomotionAnimation(n:number){
@@ -543,14 +545,14 @@ export class Simulation {
   step(input:InputFrame){
     if(this.status!=='playing')return;
     this.inputs.push({...input});this.events=[];this.tick++;this.animationTick++;
-    if(input.scriptedView){
+    if(input.scriptedView&&!this.respawnTravel){
       this.camera.x=input.scriptedView.x;this.camera.y=input.scriptedView.y;
       if(input.scriptedView.follow){const p=this.player;this.camera.update(p.x*24-p.dx*p.offset,p.y*24-p.dy*p.offset,this.level.width,this.level.height);}
     }
     this.enemySmoke=this.enemySmoke.filter(s=>++s.age<14);
     // cGame uses animation-frame indices for cm.f/7 effects, ignoring duration.
     this.itemSparkles=this.itemSparkles.filter(s=>++s.age<[10,10,10,10,9][s.kind]);
-    if(input.reset){this.manualReset();return;}
+    if(input.reset){this.manualReset();if(this.deathTicks)this.updateCamera();return;}
     if(this.respawnTravel){this.travelToCheckpoint();return;}
     if(this.respawnFlash>0)this.respawnFlash--;
     if(this.invulnerable)this.invulnerable--;
@@ -702,7 +704,8 @@ export class Simulation {
       }
       if((t===0||t===9)&&p.dx){
         this.pushDelay--;this.setLocomotionAnimation(p.dx>0?8:9);
-        if(this.pushDelay<0&&this.free(x+p.dx,y)&&this.motion[i]===0&&![19,43,45,49].includes(this.tile(x,y+1))){
+        const destination=this.index(x+p.dx,y);
+        if(this.pushDelay<0&&this.free(x+p.dx,y)&&!(this.object(x+p.dx,y)===7&&this.gatePhases[destination]<2)&&this.motion[i]===0&&![19,43,45,49].includes(this.tile(x,y+1))){
           this.moveObject(i,this.index(x+p.dx,y),t,(this.state[i]&~(7|3072|512))|p.direction| (p.dx>0?1024:2048),18);this.wake(x+p.dx,y);pass=true;
         }
       }else this.pushDelay=input.scripted?0:6;

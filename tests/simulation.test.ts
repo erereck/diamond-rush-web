@@ -59,7 +59,8 @@ test('grass debris plays every original foreground frame in all three worlds and
     assert.equal(animation.count,GRASS_DESTRUCTION_FRAMES[world]);
     step(sim,2);step(sim);
     assert.equal(sim.tiles[cell],-1);assert.equal(sim.level.objects[cell],32);assert.equal(sim.level.parameters[cell],0);
-    assert.equal(sim.free(2,1),false,'debris temporarily blocks a falling/pushed object');
+    assert.equal(sim.free(2,1),true,'foreground debris cannot support a falling stone');
+    assert.equal(sim.enemyFree(2,1),false,'enemies avoid the destruction effect');
     draws.length=0;
     for(let tick=0;tick<20&&sim.level.objects[cell]===32;tick++){
       renderer.draw({} as CanvasRenderingContext2D,sim.level,sim.tick,sim);step(sim);
@@ -512,8 +513,9 @@ test('death restores checkpoint and camera travels 8 pixels per tick before hero
 test('manual reset costs a life away from checkpoint and survives replay restoration',()=>{
   const level=fixture(['#######','#@    #','#######']);
   const s=new Simulation(level);step(s,2,4);s.step({direction:0,action:false,reset:true});
-  assert.equal(s.deathTicks,80);assert.equal(s.health,0);
-  step(s,0,80);assert.equal(s.lives,4);
+  assert.equal(s.deathTicks,42);assert.equal(s.health,4);
+  step(s,0,41);assert.equal(s.lives,5);
+  step(s);assert.equal(s.lives,4);
   assert.deepEqual(restoreReplay(validateReplay(s.replay(),[{version:0,world:0,levels:[level]}]),[{version:0,world:0,levels:[level]}]).snapshot(),s.snapshot());
 });
 test('a boulder held overhead plays the bracing animation then crushes the hero',()=>{

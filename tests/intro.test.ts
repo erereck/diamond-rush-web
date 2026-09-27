@@ -181,6 +181,68 @@ test('the rock lesson matches measured Java movement, command timing and stone f
   }
 });
 
+for(const name of ['intro-checkpoint-lesson-s700','intro-seal-scene-s700'])test(`${name} follows every measured Java scene state`,()=>{
+  const initial=JSON.parse(readFileSync(new URL(`fixtures/${name}.json`,import.meta.url),'utf8')) as {
+    scriptId:number;start:number;hero:{animation:number;frame:number;time:number};player:{x:number;y:number;offset:number};
+    scene:{cameraX:number;cameraY:number;portraitX:number;portraitY:number;portraitFrame:number};
+    cells:{x:number;y:number;tile:number;state:number;motion:number;object:number;parameter:number;active:number}[];
+    comparedCells:[number,number][];
+  };
+  const font=decodeSprite(parsePack(resource('ui.f'),'ui.f')[1].data,'ui-1');
+  const hero=decodeSprite(parsePack(resource('o.f'),'o.f')[0].data,'o-0');
+  const intro=new IntroSequence(level,scripts,undefined,initial.scriptId,font,resource('mc')),sim=intro.sim;
+  sim.tick=initial.start;sim.player={...initial.player,dx:1,dy:0,direction:2};
+  sim.playerAnimation=initial.hero.animation;
+  const initialAnimation=hero.animations[initial.hero.animation];
+  sim.animationTick=hero.animationFrames.slice(initialAnimation.start,initialAnimation.start+initial.hero.frame).reduce((sum,af)=>sum+af.duration,0)+initial.hero.time;
+  sim.camera.x=intro.cameraX=initial.scene.cameraX;sim.camera.y=intro.cameraY=initial.scene.cameraY;
+  intro.portraitX=initial.scene.portraitX;intro.portraitY=initial.scene.portraitY;intro.portraitFrame=initial.scene.portraitFrame;
+  for(const c of initial.cells){const i=sim.index(c.x,c.y);sim.tiles[i]=c.tile;sim.state[i]=c.state;sim.motion[i]=c.motion;sim.active[i]=c.active;sim.level.objects[i]=c.object;sim.level.parameters[i]=c.parameter<0?255:c.parameter;}
+  const rows=readFileSync(new URL(`fixtures/${name}.csv`,import.meta.url),'utf8').trim().split(/\r?\n/).slice(1).map(line=>line.split(',').map(Number));
+  for(const [tick,x,y,offset,index,opcode,cameraX,cameraY,animation,frame,time,portraitX,portraitY,blink,visible,portrait,flash,page,...map] of rows){
+    if(tick%20===0&&intro.dialogue)intro.press();
+    intro.step();
+    assert.deepEqual([sim.player.x,sim.player.y,sim.player.offset],[x,y,offset],`Java ${initial.scriptId} hero tick ${tick}`);
+    const active=intro.active?.command??scripts.get(initial.scriptId)!.commands[intro.commandIndex-1];
+    assert.equal(active.opcode,opcode,`Java ${initial.scriptId} opcode tick ${tick}`);
+    assert.equal(intro.active?intro.commandIndex+1:intro.commandIndex,index,`Java ${initial.scriptId} command tick ${tick}`);
+    assert.deepEqual([intro.cameraX,intro.cameraY],[cameraX,cameraY],`Java ${initial.scriptId} camera tick ${tick}`);
+    const a=hero.animations[sim.playerAnimation],durations=hero.animationFrames.slice(a.start,a.start+a.count).map(af=>af.duration),shown=animationFrameAt(durations,sim.animationTick);
+    const shownTime=sim.animationTick%durations.reduce((a,b)=>a+b,0)-durations.slice(0,shown).reduce((a,b)=>a+b,0);
+    assert.deepEqual([sim.playerAnimation,shown,shownTime],[animation,frame,time],`Java ${initial.scriptId} animation tick ${tick}`);
+    assert.deepEqual([intro.portraitX,intro.portraitY,intro.blinkFrame,Number(intro.portraitVisible),intro.portraitFrame,Number(intro.flash)],
+      [portraitX,portraitY,blink,visible,portrait,flash],`Java ${initial.scriptId} portrait tick ${tick}`);
+    if(intro.active?.command.opcode===2||intro.active?.command.opcode===27)assert.equal(intro.active.page,page,`Java ${initial.scriptId} page tick ${tick}`);
+    assert.deepEqual(initial.comparedCells.flatMap(([cx,cy])=>{const i=sim.index(cx,cy);return [sim.tiles[i],sim.motion[i],sim.level.objects[i],sim.level.parameters[i]];}),map,`Java ${initial.scriptId} map tick ${tick}`);
+  }
+  intro.step();assert.equal(intro.finished,true);
+});
+
+test('manual death and the life-cost hint follow the measured Java checkpoint return',()=>{
+  const intro=new IntroSequence(level,scripts),sim=intro.sim;
+  intro.phase='free';intro.section=4;
+  sim.player.x=36;sim.player.y=7;intro.step();
+  sim.player.x=46;sim.player.y=7;intro.step();finishScript(intro,new Set());
+  // Isolate the return at the end of demo 16, with a genuine saved circle and
+  // pending recovery flag. The fixture measures the Java * key at tick 894.
+  sim.tick=893;sim.player={x:49,y:5,dx:1,dy:0,offset:0,direction:2};sim.lives=4;sim.health=4;
+  sim.camera.x=intro.cameraX=756;sim.camera.y=intro.cameraY=24;
+  const hero=decodeSprite(parsePack(resource('o.f'),'o.f')[0].data,'o-0');
+  const rows=readFileSync(new URL('fixtures/intro-checkpoint-return-s700.csv',import.meta.url),'utf8').trim().split(/\r?\n/).slice(1).map(line=>line.split(',').map(Number));
+  for(const [tick,x,y,offset,lives,health,cameraX,cameraY,returning,animation,frame,time,hint] of rows){
+    if(tick%20===0&&intro.dialogue)intro.press();
+    intro.step({direction:0,action:false,reset:tick===894});
+    assert.deepEqual([sim.player.x,sim.player.y,sim.player.offset,sim.lives,sim.health,sim.camera.x,sim.camera.y,Number(sim.respawnTravel)],
+      [x,y,offset,lives,health,cameraX,cameraY,returning],`Java checkpoint return tick ${tick}`);
+    const a=hero.animations[sim.playerAnimation],durations=hero.animationFrames.slice(a.start,a.start+a.count).map(af=>af.duration),shown=animationFrameAt(durations,sim.animationTick);
+    const shownTime=sim.animationTick%durations.reduce((a,b)=>a+b,0)-durations.slice(0,shown).reduce((a,b)=>a+b,0);
+    assert.deepEqual([sim.playerAnimation,shown,shownTime],[animation,frame,time],`Java return animation tick ${tick}`);
+    assert.equal(Number(intro.dialogue!==null),hint,`Java recovery hint tick ${tick}`);
+    assert.deepEqual([intro.cameraX,intro.cameraY],[cameraX,cameraY],`Java recovery viewport tick ${tick}`);
+  }
+  assert.equal(intro.section,5);assert.equal(sim.object(46,7),255);assert.equal(sim.object(50,7),255);
+});
+
 function walkTo(intro:IntroSequence,goalX:number,goalY:number){
   for(let tick=0;tick<30&&intro.phase==='opening';tick++)intro.step();
   assert.notEqual(intro.phase,'opening','source opening walk did not finish');
@@ -216,7 +278,7 @@ test('source waits include their final ticks and portrait motion starts at the p
   const intro=new IntroSequence(level,altered,undefined,29);
   for(let tick=0;tick<6;tick++){intro.step();assert.equal(intro.commandIndex,0);}
   intro.step();assert.equal(intro.commandIndex,1);
-  intro.step();assert.deepEqual([intro.portraitX,intro.portraitY],[30,58]);
+  intro.step();assert.deepEqual([intro.portraitX,intro.portraitY],[29,58]);
   for(let tick=0;tick<5;tick++){intro.step();assert.equal(intro.commandIndex,1);}
   intro.step();assert.equal(intro.commandIndex,2);
   intro.step();assert.equal(intro.dialogue?.y,230);
@@ -229,11 +291,11 @@ test('the introduction is freely controlled between all six original scenes',()=
       // The rock lesson intentionally blocks this corridor. Use the same
       // checkpoint return the following dialogue teaches the player about.
       intro.sim.manualReset();
-      for(let i=0;i<200&&(intro.sim.deathTicks>0||intro.sim.respawnTravel||intro.sim.player.x!==36);i++)intro.step();
-      assert.equal(intro.sim.player.x,36);
-      for(let i=0;i<2&&intro.phase==='free';i++)intro.step();
+      for(let i=0;i<200&&Number(intro.scriptId)!==(id===16?15:17);i++)intro.step();
       assert.equal(intro.scriptId,id===16?15:17);
       finishScript(intro,dialogue);
+      for(let i=0;i<200&&intro.sim.respawnTravel;i++)intro.step();
+      assert.equal(intro.sim.player.x,36);
     }
     walkTo(intro,x,y);
     for(let i=0;i<100&&intro.phase==='free';i++)intro.step();
@@ -306,9 +368,19 @@ test('portrait reveal and hint flash follow the source command phases',()=>{
     assert.equal(intro.portraitVisible,false);
   }
   intro.step();assert.equal(intro.portraitRevealTicks,0);assert.equal(intro.portraitVisible,true);
+  intro.step();assert.equal(intro.flash,false);
   intro.step();assert.equal(intro.flash,true);
   intro.step();assert.equal(intro.flash,true);
   intro.step();assert.equal(intro.flash,false);
+});
+
+test('portrait growth uses source screen coordinates and stays capped on its sixth tick',()=>{
+  const intro=new IntroSequence(level,scripts,undefined,29);
+  intro.sim.player.x=6;intro.sim.player.y=4;intro.cameraX=12;intro.cameraY=0;
+  intro.portraitRevealTicks=1;
+  assert.deepEqual(intro.portraitRevealRect,{x:109,y:86,width:20,height:7});
+  for(const tick of [5,6]){intro.portraitRevealTicks=tick;assert.deepEqual(intro.portraitRevealRect,{x:17,y:50,width:102,height:38});}
+  intro.portraitRevealTicks=0;assert.equal(intro.portraitRevealRect,null);
 });
 
 test('the two original recovery demos run after resetting from the blocked-path lessons',()=>{

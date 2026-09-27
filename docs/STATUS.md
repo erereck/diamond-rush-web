@@ -1,6 +1,6 @@
 # Progresso e próximos marcos
 
-Estado em 26/09/2026. Fonte canônica S700 1.2.0. Referências Nokia e ferramentas são comparativas; não misturar regras de execução.
+Estado em 27/09/2026. Fonte canônica S700 1.2.0. Referências Nokia e ferramentas são comparativas; não misturar regras de execução.
 
 | Área | Estado | Limitação restante |
 |---|---|---|
@@ -8,7 +8,7 @@ Estado em 26/09/2026. Fonte canônica S700 1.2.0. Referências Nokia e ferrament
 | Packs, strings e sprites | Todos os recursos decodificados | Comparação visual externa com Java/aparelho |
 | 41 mapas / três planos | Decodificados integralmente | Semântica de todos os parâmetros e objetos |
 | Renderização Canvas | Implementada, com desenhos provisórios de alguns objetos | Ordem exata, animações e efeitos por entidade |
-| Relógio e câmera | Inteiros, 20 Hz, teste independente de refresh; abertura, primeiro roteiro e rota ao aviso do baú comparados com trace Java | Estender trace às demais cenas e fases jogáveis |
+| Relógio e câmera | Inteiros, 20 Hz, teste independente de refresh; abertura, primeiro roteiro, rota ao aviso do baú, lições 13/16, selo 28 e retorno manual comparados com trace Java | Comparar a continuidade entre as cenas isoladas e estender às demais fases jogáveis |
 | Controles | Teclado, toque, pausa, ação e retorno ao círculo também na introdução; gamepad implementado | Testar controle físico e calibrar escolha automática de alvos |
 | Movimento / pedras / coleta / cobras | Subconjunto experimental; chão transitável alinhado aos casos de `method_288`, giro visual da pedra, esquerda do herói, esmagamento sob pedra, patrulha e perseguição curta da cobra vermelha | Água, colisões especiais e demais regras |
 | Itens, chaves e portões | Chaves prateadas/douradas, vida extra, cura, conversão da cura em dez diamantes com vida cheia, fechaduras numeradas e abertura animada da passagem | Tempo fino das animações, interruptores e puzzles restantes |
@@ -16,7 +16,7 @@ Estado em 26/09/2026. Fonte canônica S700 1.2.0. Referências Nokia e ferrament
 | Fogo e baús de Angkor | Alcance, dano, abertura e prêmio visível; 81 estados da bússola conferidos por trace Java; apresentação 47 com brilhos, conversões de cura/vida e consumo permanente da vida extra | Comparar os demais baús, fase dos efeitos e áudio |
 | Perigos de Bavaria e Tibet | Roladores de Bavaria (14), armadilhas duplas (16), espinhos (28) e pedras de teto de Tibet (44); inimigo de gelo (45) anda pelos ciclos da sprite; atirador (46) cai e lança projéteis (21); inimigo 49 usa a patrulha de `method_325`. Martelo de gelo congela e descongela 45/46/49. Estados entram no checkpoint e replay | Interações especiais, IA completa dos inimigos 45/46, água, puzzles, projéteis de outras armas e tempos finos |
 | Tijolos destrutíveis | Frame imóvel até impacto, quebra de 16 ticks e propagação aos vizinhos | Integrar com os projéteis e armas originais |
-| Checkpoint e morte | Snapshot/restore dos planos mutáveis, vidas, dano e retorno após animação | Integrar com RMS, vida máxima e demais equipamentos |
+| Checkpoint e morte | Snapshot/restore dos planos mutáveis, vidas, dano e retorno após animação; 87 estados do retorno manual com aviso 17 conferidos no Java, animação de 42 ticks e câmera de 8 px/tick | Comparar dano fatal por trace, integrar vida máxima e demais equipamentos |
 | Campanha / cenas / menus | Menu S700, mapas dos três mundos, entrada automática, primeiro diálogo e rota ao aviso do baú conferidos por trace Java (com controle livre no primeiro círculo), seis cenas, dois roteiros de recuperação, oito gatilhos de mapa e quatro cenas de baú de `demo.f`, com física ativa durante as cenas; conclusão retorna ao mapa; quatro recompensas por fase registradas individualmente; progresso também sincronizado no record 1 RMS | Paridade fina dos eventos/animações J2ME e seis roteiros sem gatilho ativo nesta versão |
 | Save RMS | Codec e modelo inicial de 994 bytes; importação/exportação de campanha com recursos, conclusão, desbloqueios normais, recompensas, segredos, baús consumidos e bytes desconhecidos preservados; revisitadas somam diamantes vermelhos | Compras, vida máxima acima de quatro pontos, comparação com um save real de execução S700 |
 | Replay de desenvolvimento | Versionado, validado e restaurável, inclusive equipamento inicial e puxão do gancho | Golden traces comparados ao original |
@@ -24,12 +24,12 @@ Estado em 26/09/2026. Fonte canônica S700 1.2.0. Referências Nokia e ferrament
 
 ## Próximo marco de gameplay
 
-1. Expandir o trace da decompilação S700 recompilada, que já compara a entrada, a rota ao aviso do baú e a abertura isolada da bússola, para arrays e mudanças de estado nas demais cenas/fases. Executar também o JAR original para comparar bytecode e comportamento.
+1. Expandir o trace da decompilação S700 recompilada, que já compara a entrada, a rota ao aviso do baú, a bússola, as lições 13/16, o retorno manual e o selo 28, para um percurso contínuo no port e para as demais cenas/fases. Executar também o JAR original para comparar bytecode e comportamento.
 2. Completar `method_288`, `method_304` e `method_351`, inclusive ativação e ordem de atualização. Cobrir limiares, movimento de entidades no mesmo tick, gravidade e colisão com testes de comportamento.
-3. Comparar o checkpoint, morte/vidas e baú já implementados com traces da execução canônica, inclusive a ordem dos eventos em cada tick. A recuperação das lições 13/16 agora conserva flags fora dos gatilhos e limpa os marcadores no snapshot; ação/reinício/morte/repetição têm testes, mas esse retorno ainda requer trace.
+3. Ampliar a comparação do checkpoint, morte/vidas e baús, inclusive a ordem dos eventos em cada tick. A recuperação das lições 13/16 conserva flags fora dos gatilhos e limpa os marcadores no snapshot; o retorno manual com aviso 17 já coincide por trace. Dano fatal e as demais recuperações ainda precisam de comparação diferencial.
 4. Completar objetos e mecanismos necessários à primeira fase, depois exigir um percurso verificável de entrada até saída. Conclusão experimental atual não equivale à progressão original.
 5. Comparar a campanha/RMS sincronizados, as cenas e os gatilhos jogáveis do tutorial índice 13 com uma execução do JAR original.
 
 Depois: três mundos, segredos, chefes, interações restantes das armas, UI, música e testes de paridade de cada sistema. A lista não é uma alegação de cobertura atual.
 
-Última conferência: o roteiro 13 da pedra coincide com 188 estados medidos no Java recompilado, incluindo câmera, empurrão/queda, páginas das falas, avisos no mapa e frames de destruição da grama. A amostra é isolada no gatilho; ainda falta comparar a continuidade desde o baú e o roteiro seguinte do círculo. O objeto 32 de grama destruída é renderizado em primeiro plano nos três mundos e participa do checkpoint/replay.
+Última conferência: além dos 188 estados da pedra, esta rodada compara 613 estados novos no Java recompilado: 125 da lição 16, 401 do selo 28 e 87 do retorno manual com aviso 17. Foram alinhados o último frame de comandos/falas, a câmera de comandos paralelos, a paridade dos flashes e o crescimento do retrato. O objeto 32 de grama destruída não sustenta pedras, mas bloqueia inimigos, conforme `method_309/310`. As amostras começam em condições medidas isoladas; o próximo passo é comparar a continuidade entre baú, checkpoint e selo. Os 260 testes passaram; nenhum percurso completo de campanha está certificado.

@@ -1,0 +1,137 @@
+{
+  "version": 1,
+  "engine": "fidelity-22",
+  "levelFingerprint": "1d50de16",
+  "world": 0,
+  "level": 1,
+  "kind": "stage",
+  "scope": "isolated-stage",
+  "initial": {
+    "diamonds": 0,
+    "redDiamonds": 0,
+    "lives": 5,
+    "health": 4,
+    "weaponTier": 0
+  },
+  "provenance": "Incomplete control-only attempt; not a completion certificate.",
+  "controls": [
+    {
+      "ticks": 1,
+      "direction": 2,
+      "action": false
+    },
+    {
+      "ticks": 3,
+      "direction": 0,
+      "action": false
+    },
+    {
+      "ticks": 1,
+      "direction": 2,
+      "action": false
+    },
+    {
+      "ticks": 3,
+      "direction": 0,
+      "action": false
+    },
+    {
+      "ticks": 1,
+      "direction": 2,
+      "action": false
+    },
+    {
+      "ticks": 3,
+      "direction": 0,
+      "action": false
+    },
+    {
+      "ticks": 1,
+      "direction": 2,
+      "action": false
+    },
+    {
+      "ticks": 3,
+      "direction": 0,
+      "action": false
+    },
+    {
+      "ticks": 1,
+      "direction": 2,
+      "action": false
+    },
+    {
+      "ticks": 3,
+      "direction": 0,
+      "action": false
+    },
+    {
+      "ticks": 1,
+      "direction": 2,
+      "action": false
+    },
+    {
+      "ticks": 3,
+      "direction": 0,
+      "action": false
+    },
+    {
+      "ticks": 1,
+      "direction": 2,
+      "action": false
+    },
+    {
+      "ticks": 3,
+      "direction": 0,
+      "action": false
+    },
+    {
+      "ticks": 1,
+      "direction": 2,
+      "action": false
+    },
+    {
+      "ticks": 3,
+      "direction": 0,
+      "action": false
+    },
+    {
+      "ticks": 7,
+      "direction": 2,
+      "action": false
+    },
+    {
+      "ticks": 3,
+      "direction": 0,
+      "action": false
+    },
+    {
+      "ticks": 1,
+      "direction": 2,
+      "action": false
+    },
+    {
+      "ticks": 3,
+      "direction": 0,
+      "action": false
+    }
+  ],
+  "expected": {
+    "status": "playing",
+    "ticks": 46,
+    "x": 13,
+    "y": 5,
+    "exitObject": 0,
+    "diamonds": 2,
+    "redDiamonds": 0,
+    "lives": 5,
+    "health": 4,
+    "weaponTier": 0,
+    "hits": 0,
+    "retries": 0,
+    "opened": [],
+    "demos": [],
+    "bossHealth": null,
+    "bossCleared": false
+  }
+}

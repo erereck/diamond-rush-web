@@ -13,3 +13,13 @@ O chefe de Tibet foi traçado de `cGame.method_281/282`. Ele começa oculto em X
 Os baús finais de Bavaria e Tibet contêm os cristais 51 e 52, respectivamente, e disparam os roteiros 30 e 31. A entrada de Tibet foi corrigida a partir de `cGame` na inicialização do mapa: tile 34 vira passagem vazia com objeto de fundo 15; tile 35 continua sólido. Os interruptores trocam quais paredes estão abertas. Um teste atravessa desde o spawn (5, 16) até a arena e confirma que o chefe desperta. A mesma regra de carregamento também corrige outras fases de Bavaria e Tibet. Ainda faltam verificar a solução completa da luta e os tempos exatos no emulador.
 
 Os testes exercitam os três mapas extraídos: golpes de pedra e gelo, os interruptores de Tibet, ataques, derrota, retorno ao checkpoint, replays e conclusão pelos cristais. Ainda falta comparar quadro a quadro com o emulador os deslocamentos, efeitos sonoros e alguns tempos das animações.
+
+## Percursos completos por controles
+
+O novo executor em `tools/routes/RouteRunner.ts` começa no spawn original e aceita somente direção, ação e retorno ao checkpoint. Executa as cenas pelos gatilhos normais; a aprovação exige zero de vida do chefe e o evento `boss-clear`, além do término da cena do cristal. Os arquivos abaixo têm controle por tick comprimido, recursos iniciais e resultados verificados em `tests/playability.test.ts` e `npm run verify:routes`.
+
+- Angkor: `tests/fixtures/routes/angkor-boss-crystal.json`, 964 ticks de controles. Três impactos, reposição das pedras, derrota completa, Cristal de Fogo e roteiros 33/32, sem dano ou morte. Começa com martelo predefinido.
+- Bavaria: `tests/fixtures/routes/bavaria-boss-crystal.json`, 1629 ticks. Quatro impactos, saltos que repõem as pedras, derrota completa, cristal e roteiros 34/30; dois danos e nenhuma morte. Começa com gancho predefinido.
+- Tibet: tentativa incompleta em `tests/fixtures/route-attempts/tibet-boss-approach.json`; os cinco golpes e a coleta final ainda não estão certificados por controles.
+
+Esses dois percursos não obtêm as armas nem liberam as câmaras finais pela campanha. Os recursos iniciais são explícitos; a validação desde um save novo e a paridade com Java permanecem pendentes. A lista das fases e saídas está em [`PLAYABILITY.md`](PLAYABILITY.md).

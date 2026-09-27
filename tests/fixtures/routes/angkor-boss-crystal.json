@@ -1,0 +1,582 @@
+{
+  "version": 1,
+  "engine": "fidelity-22",
+  "levelFingerprint": "9d1730e6",
+  "world": 0,
+  "level": 8,
+  "kind": "stage",
+  "scope": "isolated-stage",
+  "initial": {
+    "diamonds": 0,
+    "redDiamonds": 0,
+    "lives": 5,
+    "health": 4,
+    "weaponTier": 1
+  },
+  "provenance": "Recorded from the original spawn using waypoint-directed controls. Dialogues use the normal game interpreter; no state edits or teleportation.",
+  "controls": [
+    {
+      "ticks": 1,
+      "direction": 2,
+      "action": false
+    },
+    {
+      "ticks": 3,
+      "direction": 0,
+      "action": false
+    },
+    {
+      "ticks": 1,
+      "direction": 2,
+      "action": false
+    },
+    {
+      "ticks": 20,
+      "direction": 0,
+      "action": false
+    },
+    {
+      "ticks": 1,
+      "direction": 0,
+      "action": true
+    },
+    {
+      "ticks": 19,
+      "direction": 0,
+      "action": false
+    },
+    {
+      "ticks": 1,
+      "direction": 0,
+      "action": true
+    },
+    {
+      "ticks": 19,
+      "direction": 0,
+      "action": false
+    },
+    {
+      "ticks": 1,
+      "direction": 0,
+      "action": true
+    },
+    {
+      "ticks": 9,
+      "direction": 0,
+      "action": false
+    },
+    {
+      "ticks": 1,
+      "direction": 2,
+      "action": false
+    },
+    {
+      "ticks": 3,
+      "direction": 0,
+      "action": false
+    },
+    {
+      "ticks": 1,
+      "direction": 2,
+      "action": false
+    },
+    {
+      "ticks": 3,
+      "direction": 0,
+      "action": false
+    },
+    {
+      "ticks": 1,
+      "direction": 2,
+      "action": false
+    },
+    {
+      "ticks": 3,
+      "direction": 0,
+      "action": false
+    },
+    {
+      "ticks": 1,
+      "direction": 2,
+      "action": false
+    },
+    {
+      "ticks": 3,
+      "direction": 0,
+      "action": false
+    },
+    {
+      "ticks": 1,
+      "direction": 2,
+      "action": false
+    },
+    {
+      "ticks": 3,
+      "direction": 0,
+      "action": false
+    },
+    {
+      "ticks": 7,
+      "direction": 2,
+      "action": false
+    },
+    {
+      "ticks": 3,
+      "direction": 0,
+      "action": false
+    },
+    {
+      "ticks": 4,
+      "direction": 2,
+      "action": false
+    },
+    {
+      "ticks": 3,
+      "direction": 0,
+      "action": false
+    },
+    {
+      "ticks": 1,
+      "direction": 2,
+      "action": false
+    },
+    {
+      "ticks": 135,
+      "direction": 0,
+      "action": false
+    },
+    {
+      "ticks": 1,
+      "direction": 1,
+      "action": false
+    },
+    {
+      "ticks": 3,
+      "direction": 0,
+      "action": false
+    },
+    {
+      "ticks": 1,
+      "direction": 4,
+      "action": false
+    },
+    {
+      "ticks": 3,
+      "direction": 0,
+      "action": false
+    },
+    {
+      "ticks": 1,
+      "direction": 4,
+      "action": false
+    },
+    {
+      "ticks": 3,
+      "direction": 0,
+      "action": false
+    },
+    {
+      "ticks": 1,
+      "direction": 4,
+      "action": false
+    },
+    {
+      "ticks": 3,
+      "direction": 0,
+      "action": false
+    },
+    {
+      "ticks": 1,
+      "direction": 3,
+      "action": false
+    },
+    {
+      "ticks": 35,
+      "direction": 0,
+      "action": false
+    },
+    {
+      "ticks": 7,
+      "direction": 2,
+      "action": false
+    },
+    {
+      "ticks": 3,
+      "direction": 0,
+      "action": false
+    },
+    {
+      "ticks": 4,
+      "direction": 2,
+      "action": false
+    },
+    {
+      "ticks": 3,
+      "direction": 0,
+      "action": false
+    },
+    {
+      "ticks": 1,
+      "direction": 2,
+      "action": false
+    },
+    {
+      "ticks": 114,
+      "direction": 0,
+      "action": false
+    },
+    {
+      "ticks": 1,
+      "direction": 1,
+      "action": false
+    },
+    {
+      "ticks": 3,
+      "direction": 0,
+      "action": false
+    },
+    {
+      "ticks": 1,
+      "direction": 4,
+      "action": false
+    },
+    {
+      "ticks": 3,
+      "direction": 0,
+      "action": false
+    },
+    {
+      "ticks": 5,
+      "direction": 4,
+      "action": false
+    },
+    {
+      "ticks": 3,
+      "direction": 0,
+      "action": false
+    },
+    {
+      "ticks": 1,
+      "direction": 4,
+      "action": false
+    },
+    {
+      "ticks": 3,
+      "direction": 0,
+      "action": false
+    },
+    {
+      "ticks": 1,
+      "direction": 3,
+      "action": false
+    },
+    {
+      "ticks": 31,
+      "direction": 0,
+      "action": false
+    },
+    {
+      "ticks": 7,
+      "direction": 2,
+      "action": false
+    },
+    {
+      "ticks": 3,
+      "direction": 0,
+      "action": false
+    },
+    {
+      "ticks": 4,
+      "direction": 2,
+      "action": false
+    },
+    {
+      "ticks": 3,
+      "direction": 0,
+      "action": false
+    },
+    {
+      "ticks": 1,
+      "direction": 2,
+      "action": false
+    },
+    {
+      "ticks": 109,
+      "direction": 0,
+      "action": false
+    },
+    {
+      "ticks": 1,
+      "direction": 1,
+      "action": false
+    },
+    {
+      "ticks": 3,
+      "direction": 0,
+      "action": false
+    },
+    {
+      "ticks": 1,
+      "direction": 4,
+      "action": false
+    },
+    {
+      "ticks": 3,
+      "direction": 0,
+      "action": false
+    },
+    {
+      "ticks": 5,
+      "direction": 4,
+      "action": false
+    },
+    {
+      "ticks": 3,
+      "direction": 0,
+      "action": false
+    },
+    {
+      "ticks": 1,
+      "direction": 4,
+      "action": false
+    },
+    {
+      "ticks": 3,
+      "direction": 0,
+      "action": false
+    },
+    {
+      "ticks": 1,
+      "direction": 3,
+      "action": false
+    },
+    {
+      "ticks": 31,
+      "direction": 0,
+      "action": false
+    },
+    {
+      "ticks": 7,
+      "direction": 2,
+      "action": false
+    },
+    {
+      "ticks": 3,
+      "direction": 0,
+      "action": false
+    },
+    {
+      "ticks": 4,
+      "direction": 2,
+      "action": false
+    },
+    {
+      "ticks": 3,
+      "direction": 0,
+      "action": false
+    },
+    {
+      "ticks": 1,
+      "direction": 2,
+      "action": false
+    },
+    {
+      "ticks": 119,
+      "direction": 0,
+      "action": false
+    },
+    {
+      "ticks": 7,
+      "direction": 2,
+      "action": false
+    },
+    {
+      "ticks": 3,
+      "direction": 0,
+      "action": false
+    },
+    {
+      "ticks": 4,
+      "direction": 2,
+      "action": false
+    },
+    {
+      "ticks": 3,
+      "direction": 0,
+      "action": false
+    },
+    {
+      "ticks": 1,
+      "direction": 2,
+      "action": false
+    },
+    {
+      "ticks": 3,
+      "direction": 0,
+      "action": false
+    },
+    {
+      "ticks": 1,
+      "direction": 2,
+      "action": false
+    },
+    {
+      "ticks": 3,
+      "direction": 0,
+      "action": false
+    },
+    {
+      "ticks": 1,
+      "direction": 2,
+      "action": false
+    },
+    {
+      "ticks": 3,
+      "direction": 0,
+      "action": false
+    },
+    {
+      "ticks": 1,
+      "direction": 2,
+      "action": false
+    },
+    {
+      "ticks": 3,
+      "direction": 0,
+      "action": false
+    },
+    {
+      "ticks": 1,
+      "direction": 2,
+      "action": false
+    },
+    {
+      "ticks": 3,
+      "direction": 0,
+      "action": false
+    },
+    {
+      "ticks": 1,
+      "direction": 2,
+      "action": false
+    },
+    {
+      "ticks": 3,
+      "direction": 0,
+      "action": false
+    },
+    {
+      "ticks": 1,
+      "direction": 2,
+      "action": false
+    },
+    {
+      "ticks": 3,
+      "direction": 0,
+      "action": false
+    },
+    {
+      "ticks": 1,
+      "direction": 2,
+      "action": false
+    },
+    {
+      "ticks": 3,
+      "direction": 0,
+      "action": false
+    },
+    {
+      "ticks": 1,
+      "direction": 2,
+      "action": false
+    },
+    {
+      "ticks": 3,
+      "direction": 0,
+      "action": false
+    },
+    {
+      "ticks": 1,
+      "direction": 2,
+      "action": false
+    },
+    {
+      "ticks": 3,
+      "direction": 0,
+      "action": false
+    },
+    {
+      "ticks": 1,
+      "direction": 2,
+      "action": false
+    },
+    {
+      "ticks": 3,
+      "direction": 0,
+      "action": false
+    },
+    {
+      "ticks": 1,
+      "direction": 3,
+      "action": false
+    },
+    {
+      "ticks": 60,
+      "direction": 0,
+      "action": false
+    },
+    {
+      "ticks": 1,
+      "direction": 0,
+      "action": true
+    },
+    {
+      "ticks": 19,
+      "direction": 0,
+      "action": false
+    },
+    {
+      "ticks": 1,
+      "direction": 0,
+      "action": true
+    },
+    {
+      "ticks": 19,
+      "direction": 0,
+      "action": false
+    },
+    {
+      "ticks": 1,
+      "direction": 0,
+      "action": true
+    },
+    {
+      "ticks": 1,
+      "direction": 0,
+      "action": false
+    }
+  ],
+  "expected": {
+    "status": "complete",
+    "ticks": 964,
+    "x": 27,
+    "y": 6,
+    "exitObject": 0,
+    "diamonds": 0,
+    "redDiamonds": 0,
+    "lives": 5,
+    "health": 4,
+    "weaponTier": 1,
+    "hits": 0,
+    "retries": 0,
+    "opened": [
+      237
+    ],
+    "demos": [
+      33,
+      32
+    ],
+    "bossHealth": 0,
+    "bossCleared": true
+  }
+}

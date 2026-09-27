@@ -5,6 +5,7 @@
     "build": "tsc --noEmit && vite build",
     "preview": "vite preview --host 127.0.0.1",
     "test": "node --test tests/*.test.ts",
+    "verify:routes": "node tools/verify-routes.ts",
     "audit": "node tools/audit.ts",
     "extract-assets": "node tools/extract.ts"
   },

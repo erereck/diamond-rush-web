@@ -100,6 +100,18 @@ Nas fases posteriores, os obstáculos rolantes de Bavaria já caem e percorrem o
 
 Um JAR original fornecido para a pesquisa teve seus 40 recursos comparados byte a byte com a referência S700: todos coincidem. O binário fica apenas na área local de pesquisa, fora deste repositório. A identidade do bytecode com a decompilação e o modelo de aparelho não são comprovados apenas por essa comparação. Veja [`docs/ORIGINAL_JAR.md`](docs/ORIGINAL_JAR.md), [`docs/FIDELITY_REVIEW.md`](docs/FIDELITY_REVIEW.md), `docs/STATUS.md` e `docs/VERIFICATION.md`.
 
+## Verificar quais fases podem ser concluídas
+
+A lista por fase está em [`docs/PLAYABILITY.md`](docs/PLAYABILITY.md), com o inventário completo de 41 mapas: 40 fases jogáveis, incluindo dez secretas, e a introdução. Existem 47 conclusões a conferir quando contamos as saídas alternativas. Os estados distinguem percursos aprovados, tentativas pendentes e fases ainda não verificadas.
+
+Nesta rodada, quatro percursos foram concluídos desde a entrada usando somente direção, ação e retorno ao checkpoint: introdução completa, saída comum de Angkor 1, chefe de Angkor com três golpes/cristal e chefe de Bavaria com quatro golpes/cristal. Os arquivos em `tests/fixtures/routes` registram os controles e recursos iniciais; os chefes começam com equipamento de campanha predefinido (martelo/gancho). A aquisição desses equipamentos, a campanha contínua desde um save novo, Tibet e as demais saídas ainda não estão aprovados. Angkor 1 comprova a saída, sem exigir todos os coletáveis.
+
+```powershell
+npm run verify:routes
+```
+
+O verificador reexecuta os percursos, incluindo os diálogos originais pelos gatilhos normais, e falha se a conclusão, a derrota do chefe ou o resultado gravado mudarem. O arquivo aceita apenas controles; não aceita teleporte, edições de mapa, chaves injetadas ou baús inicialmente consumidos. `npm test` também verifica esses percursos e a reconstrução dos replays. Para regenerar a tabela e seu JSON: `npm run verify:routes -- --write-report`. As tentativas incompletas ficam separadas em `tests/fixtures/route-attempts` e não certificam bloqueios definitivos.
+
 ## Créditos e fontes
 
 - **Diamond Rush e recursos originais:** Gameloft. Os mapas, sprites, textos e músicas vêm da versão Sony Ericsson S700 1.2.0 *non-padlock* preservada no projeto [Diamond-Rush-Decomp, de palaceswitcher](https://github.com/palaceswitcher/Diamond-Rush-Decomp). A extração e os testes deste port usam o [commit fixado `5e05c42`](https://github.com/palaceswitcher/Diamond-Rush-Decomp/commit/5e05c42aa1aae3377790600eb6d27497101b79e7), especialmente [`cGame.java`](https://github.com/palaceswitcher/Diamond-Rush-Decomp/blob/5e05c42aa1aae3377790600eb6d27497101b79e7/src/cGame.java), [`DemoInterpreter.java`](https://github.com/palaceswitcher/Diamond-Rush-Decomp/blob/5e05c42aa1aae3377790600eb6d27497101b79e7/src/DemoInterpreter.java) e os [dados em `res/`](https://github.com/palaceswitcher/Diamond-Rush-Decomp/tree/5e05c42aa1aae3377790600eb6d27497101b79e7/res).

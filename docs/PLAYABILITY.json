@@ -1,0 +1,1344 @@
+{
+  "engine": "fidelity-22",
+  "reference": "5e05c42aa1aae3377790600eb6d27497101b79e7",
+  "scope": "Control-only routes from the original spawn in isolated stages. This is not a new-save campaign or Java parity certificate.",
+  "counts": {
+    "maps": 41,
+    "playableStages": 40,
+    "secretStages": 10,
+    "goals": 47,
+    "verifiedMaps": 4,
+    "verifiedBosses": 2,
+    "completedRoutes": 4,
+    "attemptedMaps": 2
+  },
+  "levels": [
+    {
+      "world": 0,
+      "level": 0,
+      "kind": "normal",
+      "width": 26,
+      "height": 21,
+      "goals": [
+        {
+          "kind": "normal",
+          "x": 22,
+          "y": 9
+        }
+      ],
+      "status": "verified",
+      "evidence": [
+        {
+          "file": "tests/fixtures/routes/angkor-01-normal.json",
+          "world": 0,
+          "level": 0,
+          "goal": "normal",
+          "initial": {
+            "diamonds": 0,
+            "redDiamonds": 0,
+            "lives": 5,
+            "health": 4,
+            "weaponTier": 0
+          },
+          "outcome": {
+            "status": "complete",
+            "ticks": 398,
+            "x": 32,
+            "y": 9,
+            "exitObject": 5,
+            "diamonds": 0,
+            "redDiamonds": 0,
+            "lives": 5,
+            "health": 3,
+            "weaponTier": 0,
+            "hits": 1,
+            "retries": 0,
+            "opened": [],
+            "demos": [],
+            "bossHealth": null,
+            "bossCleared": false
+          }
+        }
+      ],
+      "pendingAttempts": [],
+      "reviews": []
+    },
+    {
+      "world": 0,
+      "level": 1,
+      "kind": "normal",
+      "width": 27,
+      "height": 24,
+      "goals": [
+        {
+          "kind": "normal",
+          "x": 23,
+          "y": 2
+        }
+      ],
+      "status": "attempted",
+      "evidence": [],
+      "pendingAttempts": [
+        {
+          "file": "tests/fixtures/route-attempts/angkor-02-approach.json",
+          "world": 0,
+          "level": 1,
+          "goal": "normal",
+          "initial": {
+            "diamonds": 0,
+            "redDiamonds": 0,
+            "lives": 5,
+            "health": 4,
+            "weaponTier": 0
+          },
+          "outcome": {
+            "status": "playing",
+            "ticks": 46,
+            "x": 13,
+            "y": 5,
+            "exitObject": 0,
+            "diamonds": 2,
+            "redDiamonds": 0,
+            "lives": 5,
+            "health": 4,
+            "weaponTier": 0,
+            "hits": 0,
+            "retries": 0,
+            "opened": [],
+            "demos": [],
+            "bossHealth": null,
+            "bossCleared": false
+          }
+        }
+      ],
+      "reviews": []
+    },
+    {
+      "world": 0,
+      "level": 2,
+      "kind": "normal",
+      "width": 27,
+      "height": 26,
+      "goals": [
+        {
+          "kind": "normal",
+          "x": 23,
+          "y": 21
+        }
+      ],
+      "status": "unverified",
+      "evidence": [],
+      "pendingAttempts": [],
+      "reviews": []
+    },
+    {
+      "world": 0,
+      "level": 3,
+      "kind": "normal",
+      "width": 40,
+      "height": 23,
+      "goals": [
+        {
+          "kind": "normal",
+          "x": 37,
+          "y": 5
+        }
+      ],
+      "status": "unverified",
+      "evidence": [],
+      "pendingAttempts": [],
+      "reviews": []
+    },
+    {
+      "world": 0,
+      "level": 4,
+      "kind": "normal",
+      "width": 51,
+      "height": 24,
+      "goals": [
+        {
+          "kind": "normal",
+          "x": 2,
+          "y": 10
+        }
+      ],
+      "status": "unverified",
+      "evidence": [],
+      "pendingAttempts": [],
+      "reviews": [
+        {
+          "tile": 11,
+          "description": "Objeto móvel 11: method_331",
+          "count": 1
+        }
+      ]
+    },
+    {
+      "world": 0,
+      "level": 5,
+      "kind": "normal",
+      "width": 30,
+      "height": 75,
+      "goals": [
+        {
+          "kind": "normal",
+          "x": 26,
+          "y": 5
+        }
+      ],
+      "status": "unverified",
+      "evidence": [],
+      "pendingAttempts": [],
+      "reviews": []
+    },
+    {
+      "world": 0,
+      "level": 6,
+      "kind": "normal",
+      "width": 26,
+      "height": 45,
+      "goals": [
+        {
+          "kind": "normal",
+          "x": 19,
+          "y": 4
+        },
+        {
+          "kind": "secret",
+          "x": 21,
+          "y": 40
+        }
+      ],
+      "status": "unverified",
+      "evidence": [],
+      "pendingAttempts": [],
+      "reviews": [
+        {
+          "tile": 11,
+          "description": "Objeto móvel 11: method_331",
+          "count": 2
+        }
+      ]
+    },
+    {
+      "world": 0,
+      "level": 7,
+      "kind": "normal",
+      "width": 44,
+      "height": 29,
+      "goals": [
+        {
+          "kind": "secret",
+          "x": 4,
+          "y": 3
+        },
+        {
+          "kind": "normal",
+          "x": 5,
+          "y": 19
+        }
+      ],
+      "status": "unverified",
+      "evidence": [],
+      "pendingAttempts": [],
+      "reviews": []
+    },
+    {
+      "world": 0,
+      "level": 8,
+      "kind": "boss",
+      "width": 35,
+      "height": 14,
+      "goals": [
+        {
+          "kind": "crystal",
+          "x": 27,
+          "y": 6
+        }
+      ],
+      "status": "verified",
+      "evidence": [
+        {
+          "file": "tests/fixtures/routes/angkor-boss-crystal.json",
+          "world": 0,
+          "level": 8,
+          "goal": "crystal",
+          "initial": {
+            "diamonds": 0,
+            "redDiamonds": 0,
+            "lives": 5,
+            "health": 4,
+            "weaponTier": 1
+          },
+          "outcome": {
+            "status": "complete",
+            "ticks": 964,
+            "x": 27,
+            "y": 6,
+            "exitObject": 0,
+            "diamonds": 0,
+            "redDiamonds": 0,
+            "lives": 5,
+            "health": 4,
+            "weaponTier": 1,
+            "hits": 0,
+            "retries": 0,
+            "opened": [
+              237
+            ],
+            "demos": [
+              33,
+              32
+            ],
+            "bossHealth": 0,
+            "bossCleared": true
+          }
+        }
+      ],
+      "pendingAttempts": [],
+      "reviews": []
+    },
+    {
+      "world": 0,
+      "level": 9,
+      "kind": "secret",
+      "width": 50,
+      "height": 30,
+      "goals": [
+        {
+          "kind": "secret",
+          "x": 42,
+          "y": 11
+        }
+      ],
+      "status": "unverified",
+      "evidence": [],
+      "pendingAttempts": [],
+      "reviews": []
+    },
+    {
+      "world": 0,
+      "level": 10,
+      "kind": "secret",
+      "width": 50,
+      "height": 31,
+      "goals": [
+        {
+          "kind": "secret",
+          "x": 43,
+          "y": 27
+        }
+      ],
+      "status": "unverified",
+      "evidence": [],
+      "pendingAttempts": [],
+      "reviews": []
+    },
+    {
+      "world": 0,
+      "level": 11,
+      "kind": "secret",
+      "width": 46,
+      "height": 31,
+      "goals": [
+        {
+          "kind": "secret",
+          "x": 35,
+          "y": 25
+        }
+      ],
+      "status": "unverified",
+      "evidence": [],
+      "pendingAttempts": [],
+      "reviews": []
+    },
+    {
+      "world": 0,
+      "level": 12,
+      "kind": "secret",
+      "width": 46,
+      "height": 31,
+      "goals": [
+        {
+          "kind": "secret",
+          "x": 39,
+          "y": 27
+        }
+      ],
+      "status": "unverified",
+      "evidence": [],
+      "pendingAttempts": [],
+      "reviews": []
+    },
+    {
+      "world": 0,
+      "level": 13,
+      "kind": "tutorial",
+      "width": 68,
+      "height": 11,
+      "goals": [
+        {
+          "kind": "tutorial",
+          "x": 61,
+          "y": 3
+        }
+      ],
+      "status": "verified",
+      "evidence": [
+        {
+          "file": "tests/fixtures/routes/angkor-introduction.json",
+          "world": 0,
+          "level": 13,
+          "goal": "tutorial",
+          "initial": {
+            "diamonds": 0,
+            "redDiamonds": 0,
+            "lives": 5,
+            "health": 4
+          },
+          "outcome": {
+            "status": "intro-complete",
+            "ticks": 1428,
+            "x": 61,
+            "y": 3,
+            "exitObject": 0,
+            "diamonds": 4,
+            "redDiamonds": 0,
+            "lives": 4,
+            "health": 4,
+            "weaponTier": 0,
+            "hits": 0,
+            "retries": 2,
+            "opened": [
+              436,
+              596
+            ],
+            "demos": [
+              29,
+              10,
+              11,
+              13,
+              15,
+              16,
+              17,
+              28
+            ],
+            "bossHealth": null,
+            "bossCleared": false
+          }
+        }
+      ],
+      "pendingAttempts": [],
+      "reviews": []
+    },
+    {
+      "world": 1,
+      "level": 0,
+      "kind": "normal",
+      "width": 45,
+      "height": 24,
+      "goals": [
+        {
+          "kind": "normal",
+          "x": 35,
+          "y": 20
+        }
+      ],
+      "status": "unverified",
+      "evidence": [],
+      "pendingAttempts": [],
+      "reviews": []
+    },
+    {
+      "world": 1,
+      "level": 1,
+      "kind": "normal",
+      "width": 40,
+      "height": 24,
+      "goals": [
+        {
+          "kind": "normal",
+          "x": 34,
+          "y": 6
+        }
+      ],
+      "status": "unverified",
+      "evidence": [],
+      "pendingAttempts": [],
+      "reviews": [
+        {
+          "tile": 11,
+          "description": "Objeto móvel 11: method_331",
+          "count": 1
+        }
+      ]
+    },
+    {
+      "world": 1,
+      "level": 2,
+      "kind": "normal",
+      "width": 33,
+      "height": 30,
+      "goals": [
+        {
+          "kind": "normal",
+          "x": 25,
+          "y": 17
+        }
+      ],
+      "status": "unverified",
+      "evidence": [],
+      "pendingAttempts": [],
+      "reviews": [
+        {
+          "tile": 11,
+          "description": "Objeto móvel 11: method_331",
+          "count": 1
+        }
+      ]
+    },
+    {
+      "world": 1,
+      "level": 3,
+      "kind": "normal",
+      "width": 43,
+      "height": 30,
+      "goals": [
+        {
+          "kind": "normal",
+          "x": 36,
+          "y": 6
+        },
+        {
+          "kind": "secret",
+          "x": 2,
+          "y": 10
+        }
+      ],
+      "status": "unverified",
+      "evidence": [],
+      "pendingAttempts": [],
+      "reviews": []
+    },
+    {
+      "world": 1,
+      "level": 4,
+      "kind": "normal",
+      "width": 45,
+      "height": 33,
+      "goals": [
+        {
+          "kind": "normal",
+          "x": 40,
+          "y": 29
+        }
+      ],
+      "status": "unverified",
+      "evidence": [],
+      "pendingAttempts": [],
+      "reviews": [
+        {
+          "tile": 11,
+          "description": "Objeto móvel 11: method_331",
+          "count": 2
+        },
+        {
+          "tile": 18,
+          "description": "Interruptores/ponte fora da arena de Tibet: method_240",
+          "count": 3
+        },
+        {
+          "tile": 36,
+          "description": "Objeto 36: method_318",
+          "count": 2
+        }
+      ]
+    },
+    {
+      "world": 1,
+      "level": 5,
+      "kind": "normal",
+      "width": 43,
+      "height": 33,
+      "goals": [
+        {
+          "kind": "normal",
+          "x": 36,
+          "y": 6
+        }
+      ],
+      "status": "unverified",
+      "evidence": [],
+      "pendingAttempts": [],
+      "reviews": [
+        {
+          "tile": 8,
+          "description": "Objeto 8: queda e interações de method_351/331",
+          "count": 9
+        },
+        {
+          "tile": 18,
+          "description": "Interruptores/ponte fora da arena de Tibet: method_240",
+          "count": 3
+        },
+        {
+          "tile": 37,
+          "description": "Objeto 37: method_330",
+          "count": 13
+        }
+      ]
+    },
+    {
+      "world": 1,
+      "level": 6,
+      "kind": "normal",
+      "width": 36,
+      "height": 43,
+      "goals": [
+        {
+          "kind": "normal",
+          "x": 30,
+          "y": 21
+        },
+        {
+          "kind": "secret",
+          "x": 34,
+          "y": 38
+        }
+      ],
+      "status": "unverified",
+      "evidence": [],
+      "pendingAttempts": [],
+      "reviews": [
+        {
+          "tile": 8,
+          "description": "Objeto 8: queda e interações de method_351/331",
+          "count": 26
+        },
+        {
+          "tile": 11,
+          "description": "Objeto móvel 11: method_331",
+          "count": 3
+        },
+        {
+          "tile": 18,
+          "description": "Interruptores/ponte fora da arena de Tibet: method_240",
+          "count": 6
+        },
+        {
+          "tile": 36,
+          "description": "Objeto 36: method_318",
+          "count": 1
+        },
+        {
+          "tile": 37,
+          "description": "Objeto 37: method_330",
+          "count": 6
+        }
+      ]
+    },
+    {
+      "world": 1,
+      "level": 7,
+      "kind": "normal",
+      "width": 53,
+      "height": 27,
+      "goals": [
+        {
+          "kind": "normal",
+          "x": 49,
+          "y": 22
+        }
+      ],
+      "status": "unverified",
+      "evidence": [],
+      "pendingAttempts": [],
+      "reviews": [
+        {
+          "tile": 8,
+          "description": "Objeto 8: queda e interações de method_351/331",
+          "count": 7
+        },
+        {
+          "tile": 11,
+          "description": "Objeto móvel 11: method_331",
+          "count": 3
+        },
+        {
+          "tile": 18,
+          "description": "Interruptores/ponte fora da arena de Tibet: method_240",
+          "count": 1
+        },
+        {
+          "tile": 37,
+          "description": "Objeto 37: method_330",
+          "count": 4
+        },
+        {
+          "tile": 38,
+          "description": "Mecanismo 38 e gatilhos associados",
+          "count": 3
+        }
+      ]
+    },
+    {
+      "world": 1,
+      "level": 8,
+      "kind": "normal",
+      "width": 34,
+      "height": 32,
+      "goals": [
+        {
+          "kind": "normal",
+          "x": 7,
+          "y": 19
+        }
+      ],
+      "status": "unverified",
+      "evidence": [],
+      "pendingAttempts": [],
+      "reviews": [
+        {
+          "tile": 8,
+          "description": "Objeto 8: queda e interações de method_351/331",
+          "count": 6
+        },
+        {
+          "tile": 11,
+          "description": "Objeto móvel 11: method_331",
+          "count": 5
+        },
+        {
+          "tile": 18,
+          "description": "Interruptores/ponte fora da arena de Tibet: method_240",
+          "count": 5
+        },
+        {
+          "tile": 37,
+          "description": "Objeto 37: method_330",
+          "count": 5
+        },
+        {
+          "tile": 38,
+          "description": "Mecanismo 38 e gatilhos associados",
+          "count": 3
+        }
+      ]
+    },
+    {
+      "world": 1,
+      "level": 9,
+      "kind": "boss",
+      "width": 35,
+      "height": 25,
+      "goals": [
+        {
+          "kind": "crystal",
+          "x": 29,
+          "y": 13
+        }
+      ],
+      "status": "verified",
+      "evidence": [
+        {
+          "file": "tests/fixtures/routes/bavaria-boss-crystal.json",
+          "world": 1,
+          "level": 9,
+          "goal": "crystal",
+          "initial": {
+            "diamonds": 0,
+            "redDiamonds": 0,
+            "lives": 5,
+            "health": 4,
+            "weaponTier": 2
+          },
+          "outcome": {
+            "status": "complete",
+            "ticks": 1629,
+            "x": 29,
+            "y": 13,
+            "exitObject": 0,
+            "diamonds": 0,
+            "redDiamonds": 0,
+            "lives": 5,
+            "health": 2,
+            "weaponTier": 2,
+            "hits": 2,
+            "retries": 0,
+            "opened": [
+              484
+            ],
+            "demos": [
+              34,
+              30
+            ],
+            "bossHealth": 0,
+            "bossCleared": true
+          }
+        }
+      ],
+      "pendingAttempts": [],
+      "reviews": []
+    },
+    {
+      "world": 1,
+      "level": 10,
+      "kind": "secret",
+      "width": 37,
+      "height": 24,
+      "goals": [
+        {
+          "kind": "secret",
+          "x": 32,
+          "y": 20
+        }
+      ],
+      "status": "unverified",
+      "evidence": [],
+      "pendingAttempts": [],
+      "reviews": [
+        {
+          "tile": 8,
+          "description": "Objeto 8: queda e interações de method_351/331",
+          "count": 3
+        },
+        {
+          "tile": 18,
+          "description": "Interruptores/ponte fora da arena de Tibet: method_240",
+          "count": 1
+        },
+        {
+          "tile": 37,
+          "description": "Objeto 37: method_330",
+          "count": 3
+        },
+        {
+          "tile": 38,
+          "description": "Mecanismo 38 e gatilhos associados",
+          "count": 2
+        }
+      ]
+    },
+    {
+      "world": 1,
+      "level": 11,
+      "kind": "secret",
+      "width": 60,
+      "height": 20,
+      "goals": [
+        {
+          "kind": "secret",
+          "x": 56,
+          "y": 5
+        }
+      ],
+      "status": "unverified",
+      "evidence": [],
+      "pendingAttempts": [],
+      "reviews": [
+        {
+          "tile": 8,
+          "description": "Objeto 8: queda e interações de method_351/331",
+          "count": 5
+        },
+        {
+          "tile": 18,
+          "description": "Interruptores/ponte fora da arena de Tibet: method_240",
+          "count": 2
+        },
+        {
+          "tile": 37,
+          "description": "Objeto 37: method_330",
+          "count": 4
+        },
+        {
+          "tile": 38,
+          "description": "Mecanismo 38 e gatilhos associados",
+          "count": 1
+        }
+      ]
+    },
+    {
+      "world": 1,
+      "level": 12,
+      "kind": "secret",
+      "width": 23,
+      "height": 60,
+      "goals": [
+        {
+          "kind": "secret",
+          "x": 10,
+          "y": 3
+        }
+      ],
+      "status": "unverified",
+      "evidence": [],
+      "pendingAttempts": [],
+      "reviews": [
+        {
+          "tile": 8,
+          "description": "Objeto 8: queda e interações de method_351/331",
+          "count": 1
+        },
+        {
+          "tile": 11,
+          "description": "Objeto móvel 11: method_331",
+          "count": 1
+        },
+        {
+          "tile": 18,
+          "description": "Interruptores/ponte fora da arena de Tibet: method_240",
+          "count": 3
+        },
+        {
+          "tile": 36,
+          "description": "Objeto 36: method_318",
+          "count": 1
+        },
+        {
+          "tile": 37,
+          "description": "Objeto 37: method_330",
+          "count": 2
+        },
+        {
+          "tile": 38,
+          "description": "Mecanismo 38 e gatilhos associados",
+          "count": 2
+        }
+      ]
+    },
+    {
+      "world": 2,
+      "level": 0,
+      "kind": "normal",
+      "width": 60,
+      "height": 26,
+      "goals": [
+        {
+          "kind": "normal",
+          "x": 51,
+          "y": 9
+        }
+      ],
+      "status": "unverified",
+      "evidence": [],
+      "pendingAttempts": [],
+      "reviews": [
+        {
+          "tile": 38,
+          "description": "Mecanismo 38 e gatilhos associados",
+          "count": 1
+        }
+      ]
+    },
+    {
+      "world": 2,
+      "level": 1,
+      "kind": "normal",
+      "width": 39,
+      "height": 35,
+      "goals": [
+        {
+          "kind": "normal",
+          "x": 4,
+          "y": 6
+        },
+        {
+          "kind": "secret",
+          "x": 4,
+          "y": 33
+        }
+      ],
+      "status": "unverified",
+      "evidence": [],
+      "pendingAttempts": [],
+      "reviews": [
+        {
+          "tile": 18,
+          "description": "Interruptores/ponte fora da arena de Tibet: method_240",
+          "count": 1
+        }
+      ]
+    },
+    {
+      "world": 2,
+      "level": 2,
+      "kind": "normal",
+      "width": 35,
+      "height": 42,
+      "goals": [
+        {
+          "kind": "normal",
+          "x": 3,
+          "y": 25
+        }
+      ],
+      "status": "unverified",
+      "evidence": [],
+      "pendingAttempts": [],
+      "reviews": []
+    },
+    {
+      "world": 2,
+      "level": 3,
+      "kind": "normal",
+      "width": 38,
+      "height": 38,
+      "goals": [
+        {
+          "kind": "normal",
+          "x": 33,
+          "y": 3
+        }
+      ],
+      "status": "unverified",
+      "evidence": [],
+      "pendingAttempts": [],
+      "reviews": [
+        {
+          "tile": 18,
+          "description": "Interruptores/ponte fora da arena de Tibet: method_240",
+          "count": 1
+        },
+        {
+          "tile": 47,
+          "description": "Objeto 47: method_351/311",
+          "count": 7
+        }
+      ]
+    },
+    {
+      "world": 2,
+      "level": 4,
+      "kind": "normal",
+      "width": 46,
+      "height": 27,
+      "goals": [
+        {
+          "kind": "normal",
+          "x": 41,
+          "y": 3
+        },
+        {
+          "kind": "secret",
+          "x": 6,
+          "y": 23
+        }
+      ],
+      "status": "unverified",
+      "evidence": [],
+      "pendingAttempts": [],
+      "reviews": [
+        {
+          "tile": 18,
+          "description": "Interruptores/ponte fora da arena de Tibet: method_240",
+          "count": 3
+        },
+        {
+          "tile": 47,
+          "description": "Objeto 47: method_351/311",
+          "count": 5
+        }
+      ]
+    },
+    {
+      "world": 2,
+      "level": 5,
+      "kind": "normal",
+      "width": 49,
+      "height": 28,
+      "goals": [
+        {
+          "kind": "normal",
+          "x": 46,
+          "y": 7
+        }
+      ],
+      "status": "unverified",
+      "evidence": [],
+      "pendingAttempts": [],
+      "reviews": [
+        {
+          "tile": 18,
+          "description": "Interruptores/ponte fora da arena de Tibet: method_240",
+          "count": 1
+        },
+        {
+          "tile": 48,
+          "description": "Objeto 48: method_306/305 e puxão de method_263",
+          "count": 6
+        }
+      ]
+    },
+    {
+      "world": 2,
+      "level": 6,
+      "kind": "normal",
+      "width": 55,
+      "height": 30,
+      "goals": [
+        {
+          "kind": "normal",
+          "x": 9,
+          "y": 22
+        }
+      ],
+      "status": "unverified",
+      "evidence": [],
+      "pendingAttempts": [],
+      "reviews": [
+        {
+          "tile": 18,
+          "description": "Interruptores/ponte fora da arena de Tibet: method_240",
+          "count": 2
+        },
+        {
+          "tile": 47,
+          "description": "Objeto 47: method_351/311",
+          "count": 1
+        },
+        {
+          "tile": 48,
+          "description": "Objeto 48: method_306/305 e puxão de method_263",
+          "count": 7
+        }
+      ]
+    },
+    {
+      "world": 2,
+      "level": 7,
+      "kind": "normal",
+      "width": 51,
+      "height": 20,
+      "goals": [
+        {
+          "kind": "normal",
+          "x": 5,
+          "y": 14
+        }
+      ],
+      "status": "unverified",
+      "evidence": [],
+      "pendingAttempts": [],
+      "reviews": [
+        {
+          "tile": 18,
+          "description": "Interruptores/ponte fora da arena de Tibet: method_240",
+          "count": 1
+        },
+        {
+          "tile": 47,
+          "description": "Objeto 47: method_351/311",
+          "count": 1
+        },
+        {
+          "tile": 48,
+          "description": "Objeto 48: method_306/305 e puxão de method_263",
+          "count": 1
+        }
+      ]
+    },
+    {
+      "world": 2,
+      "level": 8,
+      "kind": "normal",
+      "width": 51,
+      "height": 37,
+      "goals": [
+        {
+          "kind": "normal",
+          "x": 45,
+          "y": 24
+        }
+      ],
+      "status": "unverified",
+      "evidence": [],
+      "pendingAttempts": [],
+      "reviews": [
+        {
+          "tile": 18,
+          "description": "Interruptores/ponte fora da arena de Tibet: method_240",
+          "count": 1
+        },
+        {
+          "tile": 47,
+          "description": "Objeto 47: method_351/311",
+          "count": 8
+        },
+        {
+          "tile": 48,
+          "description": "Objeto 48: method_306/305 e puxão de method_263",
+          "count": 6
+        }
+      ]
+    },
+    {
+      "world": 2,
+      "level": 9,
+      "kind": "normal",
+      "width": 104,
+      "height": 17,
+      "goals": [
+        {
+          "kind": "normal",
+          "x": 99,
+          "y": 15
+        }
+      ],
+      "status": "unverified",
+      "evidence": [],
+      "pendingAttempts": [],
+      "reviews": [
+        {
+          "tile": 47,
+          "description": "Objeto 47: method_351/311",
+          "count": 6
+        },
+        {
+          "tile": 48,
+          "description": "Objeto 48: method_306/305 e puxão de method_263",
+          "count": 7
+        }
+      ]
+    },
+    {
+      "world": 2,
+      "level": 10,
+      "kind": "boss",
+      "width": 35,
+      "height": 25,
+      "goals": [
+        {
+          "kind": "crystal",
+          "x": 27,
+          "y": 5
+        }
+      ],
+      "status": "attempted",
+      "evidence": [],
+      "pendingAttempts": [
+        {
+          "file": "tests/fixtures/route-attempts/tibet-boss-approach.json",
+          "world": 2,
+          "level": 10,
+          "goal": "crystal",
+          "initial": {
+            "diamonds": 0,
+            "redDiamonds": 0,
+            "lives": 5,
+            "health": 4,
+            "weaponTier": 8
+          },
+          "outcome": {
+            "status": "playing",
+            "ticks": 2249,
+            "x": 14,
+            "y": 18,
+            "exitObject": 0,
+            "diamonds": 0,
+            "redDiamonds": 0,
+            "lives": 4,
+            "health": 2,
+            "weaponTier": 8,
+            "hits": 6,
+            "retries": 1,
+            "opened": [],
+            "demos": [
+              35
+            ],
+            "bossHealth": 5,
+            "bossCleared": false
+          }
+        }
+      ],
+      "reviews": []
+    },
+    {
+      "world": 2,
+      "level": 11,
+      "kind": "secret",
+      "width": 45,
+      "height": 28,
+      "goals": [
+        {
+          "kind": "normal",
+          "x": 39,
+          "y": 23
+        }
+      ],
+      "status": "unverified",
+      "evidence": [],
+      "pendingAttempts": [],
+      "reviews": [
+        {
+          "tile": 18,
+          "description": "Interruptores/ponte fora da arena de Tibet: method_240",
+          "count": 2
+        }
+      ]
+    },
+    {
+      "world": 2,
+      "level": 12,
+      "kind": "secret",
+      "width": 35,
+      "height": 32,
+      "goals": [
+        {
+          "kind": "normal",
+          "x": 32,
+          "y": 8
+        }
+      ],
+      "status": "unverified",
+      "evidence": [],
+      "pendingAttempts": [],
+      "reviews": [
+        {
+          "tile": 18,
+          "description": "Interruptores/ponte fora da arena de Tibet: method_240",
+          "count": 2
+        },
+        {
+          "tile": 38,
+          "description": "Mecanismo 38 e gatilhos associados",
+          "count": 1
+        },
+        {
+          "tile": 47,
+          "description": "Objeto 47: method_351/311",
+          "count": 1
+        }
+      ]
+    },
+    {
+      "world": 2,
+      "level": 13,
+      "kind": "secret",
+      "width": 35,
+      "height": 26,
+      "goals": [
+        {
+          "kind": "normal",
+          "x": 5,
+          "y": 21
+        }
+      ],
+      "status": "unverified",
+      "evidence": [],
+      "pendingAttempts": [],
+      "reviews": [
+        {
+          "tile": 38,
+          "description": "Mecanismo 38 e gatilhos associados",
+          "count": 1
+        },
+        {
+          "tile": 47,
+          "description": "Objeto 47: method_351/311",
+          "count": 6
+        }
+      ]
+    }
+  ]
+}

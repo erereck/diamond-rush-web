@@ -11,6 +11,7 @@ import { LevelRenderer } from '../src/render/LevelRenderer.ts';
 import { SpriteRenderer } from '../src/render/SpriteRenderer.ts';
 import type { AssetManager } from '../src/assets/AssetManager.ts';
 import { animationFrameAt, CHEST_OPEN_DURATIONS } from '../src/core/PhaseOneRules.ts';
+import { decodeSprite } from '../src/assets/SpriteDecoder.ts';
 
 const resource=(name:string)=>readFileSync(new URL(`../../../work/reference-s700/res/${name}`,import.meta.url));
 const scripts=parseDemoScripts(parsePack(resource('demo.f'),'demo.f')[0].data);
@@ -146,6 +147,35 @@ test('compass opening and presentation match 81 measured Java animation states',
   assert.equal(sim.level.objects[sim.index(31,7)],255);
 });
 
+test('the rock lesson matches measured Java movement, command timing and stone fall',()=>{
+  const font=decodeSprite(parsePack(resource('ui.f'),'ui.f')[1].data,'ui-1');
+  const intro=new IntroSequence(level,scripts,undefined,13,font,resource('mc')),sim=intro.sim;
+  // Isolate demo 13 at its measured trigger, after the player reached the circle.
+  sim.tick=475;sim.player={x:37,y:7,dx:1,dy:0,offset:0,direction:2};
+  sim.camera.x=intro.cameraX=756;sim.camera.y=intro.cameraY=24;
+  const rows=readFileSync(new URL('fixtures/intro-rock-lesson-s700.csv',import.meta.url),'utf8').trim().split(/\r?\n/).slice(1).map(line=>line.split(',').map(Number));
+  for(const [tick,x,y,offset,index,opcode,cameraX,cameraY,grassTile,grassObject,grassFrame,...tail] of rows){
+    const stones=tail.slice(0,6),[page,circleObject,circleParameter,blockObject,blockParameter]=tail.slice(6);
+    if(tick%20===0&&intro.dialogue)intro.press();
+    intro.step();
+    assert.deepEqual([sim.player.x,sim.player.y,sim.player.offset],[x,y,offset],`Java hero tick ${tick}`);
+    // The Java leaves a completed command installed until the next tick.
+    const active=intro.active?.command??scripts.get(13)!.commands[intro.commandIndex-1];
+    assert.equal(active.opcode,opcode,`Java opcode tick ${tick}`);
+    assert.equal(intro.active?intro.commandIndex+1:intro.commandIndex,index,`Java command tick ${tick}`);
+    assert.deepEqual([intro.cameraX,intro.cameraY],[cameraX,cameraY],`Java camera tick ${tick}`);
+    assert.equal(sim.tile(38,5),grassTile,`Java grass tick ${tick}`);
+    const stoneState=[5,6,7].flatMap(y=>{const i=sim.index(40,y);return [sim.tiles[i],sim.motion[i]];});
+    assert.deepEqual(stoneState,stones,`Java stone tick ${tick}`);
+    const grassCell=sim.index(38,5);
+    assert.deepEqual([sim.level.objects[grassCell],sim.level.parameters[grassCell]],[grassObject,grassFrame<0?255:grassFrame],`Java grass effect tick ${tick}`);
+    if(intro.active?.command.opcode===27)assert.equal(intro.active.page,page,`Java hint page tick ${tick}`);
+    const circle=sim.index(36,6),block=sim.index(42,8);
+    assert.deepEqual([sim.level.objects[circle],sim.level.parameters[circle],sim.level.objects[block],sim.level.parameters[block]],
+      [circleObject,circleParameter<0?255:circleParameter,blockObject,blockParameter<0?255:blockParameter],`Java hint markers tick ${tick}`);
+  }
+});
+
 function walkTo(intro:IntroSequence,goalX:number,goalY:number){
   for(let tick=0;tick<30&&intro.phase==='opening';tick++)intro.step();
   assert.notEqual(intro.phase,'opening','source opening walk did not finish');
@@ -196,6 +226,9 @@ test('the introduction is freely controlled between all six original scenes',()=
       intro.sim.manualReset();
       for(let i=0;i<200&&(intro.sim.deathTicks>0||intro.sim.respawnTravel||intro.sim.player.x!==36);i++)intro.step();
       assert.equal(intro.sim.player.x,36);
+      for(let i=0;i<2&&intro.phase==='free';i++)intro.step();
+      assert.equal(intro.scriptId,id===16?15:17);
+      finishScript(intro,dialogue);
     }
     walkTo(intro,x,y);
     for(let i=0;i<100&&intro.phase==='free';i++)intro.step();
@@ -274,18 +307,77 @@ test('portrait reveal and hint flash follow the source command phases',()=>{
 });
 
 test('the two original recovery demos run after resetting from the blocked-path lessons',()=>{
-  for(const [marker,section,recovery] of [[13,4,15],[16,5,17]]){
+  for(const [marker,section,recovery] of [[13,3,15],[16,4,17]]){
     const intro=new IntroSequence(level,scripts);
     intro.section=section;intro.phase='free';
-    const i=level.parameters.findIndex((p,j)=>p===marker&&level.objects[j]===0);
+    const stop=intro.stops[section],i=intro.sim.index(stop.x,stop.y);
     assert(i>=0);
     intro.sim.player.x=i%level.width;intro.sim.player.y=Math.floor(i/level.width);
+    intro.step();assert.equal(intro.scriptId,marker);
+    finishScript(intro,new Set());
+    assert.notEqual(intro.sim.index(intro.sim.player.x,intro.sim.player.y),i,'the lesson must leave its trigger before reset');
+    const lives=intro.sim.lives;
     intro.step({direction:0,action:false,reset:true});
     for(let tick=0;tick<300&&intro.scriptId!==recovery;tick++)intro.step();
     assert.equal(intro.scriptId,recovery);
     if(recovery===17)assert.match(intro.scripts.get(17)!.commands[0].text!,/cost you a life/);
     finishScript(intro,new Set());
-    assert.equal(intro.section,section);
+    assert.equal(intro.section,section+1);
     assert.equal(intro.phase,'free');
+    assert.equal(intro.sim.lives,lives-1);
+    const cleared=recovery===15?[[37,7],[39,5]]:[[46,7],[50,7]];
+    for(const [x,y] of cleared)assert.equal(intro.sim.object(x,y),255);
+    // The edits belong to the checkpoint snapshot, so a second return cannot
+    // resurrect the trigger or queue this lesson again.
+    intro.sim.restoreCheckpoint(false,true);intro.step();
+    for(let tick=0;tick<300&&intro.sim.respawnTravel;tick++)intro.step();
+    assert.equal(intro.phase,'free');
+    for(const [x,y] of cleared)assert.equal(intro.sim.object(x,y),255);
   }
+});
+
+test('circle action recovers the rock lesson without charging a life',()=>{
+  const intro=new IntroSequence(level,scripts);
+  for(let tick=0;tick<20;tick++)intro.step();
+  intro.section=3;walkTo(intro,36,7);walkTo(intro,37,7);
+  assert.equal(intro.scriptId,13);finishScript(intro,new Set());
+  walkTo(intro,36,7);
+  const lives=intro.sim.lives;
+  intro.step({direction:0,action:true});
+  for(let tick=0;tick<100&&intro.phase!=='script';tick++)intro.step();
+  assert.equal(intro.scriptId,15);assert.equal(intro.sim.lives,lives);
+  finishScript(intro,new Set());assert.equal(intro.section,4);
+});
+
+test('fatal damage after a lesson remembers its recovery away from the marker',()=>{
+  const intro=new IntroSequence(level,scripts);
+  intro.section=3;intro.phase='free';intro.sim.player.x=37;intro.sim.player.y=7;
+  intro.step();finishScript(intro,new Set());
+  intro.sim.hurt(4);
+  for(let tick=0;tick<300&&intro.scriptId!==15;tick++)intro.step();
+  assert.equal(intro.scriptId,15);assert.equal(intro.sim.health,4);assert.equal(intro.sim.lives,4);
+});
+
+test('death during the rock demonstration consumes its trigger and continues at the next lesson',()=>{
+  const intro=new IntroSequence(level,scripts);
+  intro.section=3;intro.phase='free';intro.sim.player.x=37;intro.sim.player.y=7;
+  intro.step();intro.step();intro.sim.hurt(4);
+  for(let tick=0;tick<300&&intro.scriptId!==15;tick++)intro.step();
+  assert.equal(intro.scriptId,15);finishScript(intro,new Set());
+  assert.equal(intro.section,4);assert.equal(intro.sim.object(37,7),255);
+});
+
+test('a single checkpoint return consumes only one pending lesson flag',()=>{
+  const intro=new IntroSequence(level,scripts);
+  intro.section=3;intro.phase='free';intro.sim.player.x=37;intro.sim.player.y=7;
+  intro.step();finishScript(intro,new Set());
+  intro.sim.player.x=46;intro.sim.player.y=7;
+  intro.step();assert.equal(intro.scriptId,16);finishScript(intro,new Set());
+  intro.step({direction:0,action:false,reset:true});
+  for(let tick=0;tick<300&&Number(intro.scriptId)!==15;tick++)intro.step();
+  assert.equal(intro.scriptId,15);finishScript(intro,new Set());intro.step();
+  assert.equal(intro.phase,'free');assert.equal(intro.sim.object(46,7),0);
+  intro.sim.restoreCheckpoint(false,true);intro.step();
+  for(let tick=0;tick<300&&Number(intro.scriptId)!==17;tick++)intro.step();
+  assert.equal(intro.scriptId,17);assert.equal(intro.sim.object(46,7),255);
 });

@@ -26,8 +26,10 @@ Estado em 26/09/2026. Fonte canônica S700 1.2.0. Referências Nokia e ferrament
 
 1. Expandir o trace da decompilação S700 recompilada, que já compara a entrada, a rota ao aviso do baú e a abertura isolada da bússola, para arrays e mudanças de estado nas demais cenas/fases. Executar também o JAR original para comparar bytecode e comportamento.
 2. Completar `method_288`, `method_304` e `method_351`, inclusive ativação e ordem de atualização. Cobrir limiares, movimento de entidades no mesmo tick, gravidade e colisão com testes de comportamento.
-3. Comparar o checkpoint, morte/vidas e baú já implementados com traces da execução canônica, inclusive a ordem dos eventos em cada tick.
+3. Comparar o checkpoint, morte/vidas e baú já implementados com traces da execução canônica, inclusive a ordem dos eventos em cada tick. A recuperação das lições 13/16 agora conserva flags fora dos gatilhos e limpa os marcadores no snapshot; ação/reinício/morte/repetição têm testes, mas esse retorno ainda requer trace.
 4. Completar objetos e mecanismos necessários à primeira fase, depois exigir um percurso verificável de entrada até saída. Conclusão experimental atual não equivale à progressão original.
 5. Comparar a campanha/RMS sincronizados, as cenas e os gatilhos jogáveis do tutorial índice 13 com uma execução do JAR original.
 
 Depois: três mundos, segredos, chefes, interações restantes das armas, UI, música e testes de paridade de cada sistema. A lista não é uma alegação de cobertura atual.
+
+Última conferência: o roteiro 13 da pedra coincide com 188 estados medidos no Java recompilado, incluindo câmera, empurrão/queda, páginas das falas, avisos no mapa e frames de destruição da grama. A amostra é isolada no gatilho; ainda falta comparar a continuidade desde o baú e o roteiro seguinte do círculo. O objeto 32 de grama destruída é renderizado em primeiro plano nos três mundos e participa do checkpoint/replay.

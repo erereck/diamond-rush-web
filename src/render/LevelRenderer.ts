@@ -210,6 +210,9 @@ export class LevelRenderer {
       const i=x+y*level.width,o=level.objects[i];
       if(o>=80&&o!==255)frame(`${w}-2`,o-80,x*24,y*24);
       if(o>=20&&o<26&&w!==2){const s=a.sprite(w===1?'gen2-1':'gen0-4'),an=s.animations[o-20];if(an){const af=s.animationFrames[an.start+((tick>>2)%an.count)];r.frame(ctx,s,af.frame,x*24,y*24,af.flags);}}
+      // Object 32 uses the world's grass AF index directly (method_151).
+      if(o===32){const s=a.sprite(`${w}-1`),an=s.animations[0],af=s.animationFrames[an.start+level.parameters[i]];
+        if(af)r.frame(ctx,s,af.frame,x*24,y*24,af.flags);}
     }
     if(debug){
       ctx.strokeStyle='#ffffff20';ctx.lineWidth=1;

@@ -1,15 +1,15 @@
 import type { LevelDefinition } from '../level/LevelParser.ts';
 import { Camera } from './Camera.ts';
 import { ENGINE_REVISION, levelFingerprint } from './Compatibility.ts';
-import { animationFrameAt, BOULDER_BRACE_TICKS, BOULDER_PRESSURE_TICKS, CHEST_OPEN_DURATIONS, ITEM_PRESENTATION_TICKS, fireReach, HAMMER_ATTACK_TICKS, HAMMER_BOUNCE_TICKS, HAMMER_IMPACT_TICK } from './PhaseOneRules.ts';
+import { animationFrameAt, BOULDER_BRACE_TICKS, BOULDER_PRESSURE_TICKS, CHEST_OPEN_DURATIONS, GRASS_DESTRUCTION_FRAMES, ITEM_PRESENTATION_TICKS, fireReach, HAMMER_ATTACK_TICKS, HAMMER_BOUNCE_TICKS, HAMMER_IMPACT_TICK } from './PhaseOneRules.ts';
 import { spikeExtension, spikeReach } from './LaterStageRules.ts';
 import { AngkorBoss } from './AngkorBoss.ts';
 import { BavariaBoss } from './BavariaBoss.ts';
 import { TibetBoss } from './TibetBoss.ts';
 export type Direction=0|1|2|3|4;
 export const DX=[0,0,1,0,-1], DY=[0,-1,0,1,0];
-export interface DemoEdit {cell:number;object?:number;parameter?:number;state?:number}
-export interface InputFrame {direction:Direction;action:boolean;reset?:boolean;demoEdits?:DemoEdit[]}
+export interface DemoEdit {cell:number;object?:number;parameter?:number;state?:number;checkpoint?:boolean}
+export interface InputFrame {direction:Direction;action:boolean;reset?:boolean;scripted?:boolean;scriptedView?:{x:number;y:number;follow:boolean};demoEdits?:DemoEdit[]}
 export interface StageStart {diamonds:number;redDiamonds:number;lives:number;health:number;weaponTier?:0|1|2|8;openedChests?:number[]}
 export interface Replay {version:3;target:'1.2.0-s700';engine:typeof ENGINE_REVISION;levelFingerprint:string;world:number;level:number;initial:StageStart;inputs:InputFrame[]}
 /** Tile cases which set var15=true in cGame.method_288. */
@@ -115,12 +115,17 @@ export class Simulation {
     if(edit.object!==undefined)this.level.objects[edit.cell]=edit.object;
     if(edit.parameter!==undefined)this.level.parameters[edit.cell]=edit.parameter;
     if(edit.state!==undefined)this.state[edit.cell]=edit.state;
+    if(edit.checkpoint){
+      if(edit.object!==undefined)this.savedCheckpoint.objects[edit.cell]=edit.object;
+      if(edit.parameter!==undefined)this.savedCheckpoint.parameters[edit.cell]=edit.parameter;
+      if(edit.state!==undefined)this.savedCheckpoint.state[edit.cell]=edit.state;
+    }
     if(record&&this.inputs.length)(this.inputs[this.inputs.length-1].demoEdits??=[]).push({...edit});
   }
   tile(x:number,y:number){const i=this.index(x,y);return i<0?80:this.tiles[i];}
   object(x:number,y:number){const i=this.index(x,y);return i<0?255:i===this.entranceGate?7:this.level.objects[i];}
   isPlayer(x:number,y:number){return this.player.x===x&&this.player.y===y;}
-  free(x:number,y:number){return this.tile(x,y)===-1&&![14,33,5,28].includes(this.object(x,y))&&!(this.object(x,y)===7&&this.gatePhases[this.index(x,y)]<2);}
+  free(x:number,y:number){return this.tile(x,y)===-1&&![14,33,5,28,32].includes(this.object(x,y))&&!(this.object(x,y)===7&&this.gatePhases[this.index(x,y)]<2);}
   enemyFree(x:number,y:number){return this.tile(x,y)===-1&&![14,33,4,32,7].includes(this.object(x,y));}
   wake(x:number,y:number){for(let dy=-1;dy<=1;dy++)for(let dx=-1;dx<=1;dx++){const i=this.index(x+dx,y+dy);if(i>=0)this.active[i]=48;}}
   hurt(amount:number,knockback:Direction=0){
@@ -446,7 +451,7 @@ export class Simulation {
       if(below<0){this.state[i]=32;this.motion[i]=0;return;}
       const target=this.tiles[below];
       if(this.isPlayer(x,y+1)){this.hurt(1,3);this.state[i]=32;this.motion[i]=0;this.events.push('trap-impact');return;}
-      if(target===10){this.tiles[below]=-1;this.events.push('grass');}
+      if(target===10){this.destroyGrass(x,y+1);this.events.push('grass');}
       else if(target===30){this.triggerBrick(x,y+1);this.state[i]=32;this.motion[i]=0;this.events.push('trap-impact');return;}
       else if([19,43,45,46,49].includes(target)){
         this.tiles[below]=-1;this.enemySmoke.push({cell:below,age:0});this.events.push('enemy-death');
@@ -529,6 +534,10 @@ export class Simulation {
   step(input:InputFrame){
     if(this.status!=='playing')return;
     this.inputs.push({...input});this.events=[];this.tick++;this.animationTick++;
+    if(input.scriptedView){
+      this.camera.x=input.scriptedView.x;this.camera.y=input.scriptedView.y;
+      if(input.scriptedView.follow){const p=this.player;this.camera.update(p.x*24-p.dx*p.offset,p.y*24-p.dy*p.offset,this.level.width,this.level.height);}
+    }
     this.enemySmoke=this.enemySmoke.filter(s=>++s.age<14);
     // cGame uses animation-frame indices for cm.f/7 effects, ignoring duration.
     this.itemSparkles=this.itemSparkles.filter(s=>++s.age<[10,10,10,10,9][s.kind]);
@@ -555,6 +564,14 @@ export class Simulation {
     for(let y=Math.min(this.level.height-2,this.player.y+8);y>=Math.max(1,this.player.y-8);y--){
       for(let x=Math.max(1,this.player.x-8);x<=Math.min(this.level.width-2,this.player.x+8);x++){
         const i=this.index(x,y);if(this.active[i]<=0)continue;this.active[i]-=6;
+        if(this.level.objects[i]===32){
+          // method_315 advances foreground grass debris on the global parity.
+          if((this.tick&1)===0)this.level.parameters[i]++;
+          if(this.level.parameters[i]>=GRASS_DESTRUCTION_FRAMES[this.level.world]){
+            this.level.objects[i]=255;this.level.parameters[i]=255;
+          }
+          this.active[i]=24;
+        }
         if(this.hook?.x===x&&this.hook.y===y){this.active[i]=24;continue;}
         if(this.tiles[i]===0||this.tiles[i]===1||this.tiles[i]===9)this.updateFalling(x,y);
         else if(this.tiles[i]===19||this.tiles[i]===43||this.tiles[i]===49)this.updateSnake(x,y);
@@ -570,7 +587,7 @@ export class Simulation {
           this.active[i]=24;const side=this.tiles[i]===23?-1:1;
           if(this.player.y===y)for(let n=0;n<=fireReach(this.tick);n++)if(this.player.x===x+n*side)this.hurt(1);
         }
-        if(this.tiles[i]===10&&this.state[i]>0){this.tiles[i]=-1;this.wake(x,y);}
+        if(this.tiles[i]===10&&this.state[i]>0)this.destroyGrass(x,y);
         const lastChestFrame=this.level.objects[i]===14?2:3;
         if(this.chestFrames[i]>0&&this.chestFrames[i]<lastChestFrame&&((this.tick>>1)&1)===0)this.chestFrames[i]++;
       }
@@ -679,12 +696,12 @@ export class Simulation {
         if(this.pushDelay<0&&this.free(x+p.dx,y)&&this.motion[i]===0&&![19,43,45,49].includes(this.tile(x,y+1))){
           this.moveObject(i,this.index(x+p.dx,y),t,(this.state[i]&~(7|3072|512))|p.direction| (p.dx>0?1024:2048),18);this.wake(x+p.dx,y);pass=true;
         }
-      }else this.pushDelay=6;
+      }else this.pushDelay=input.scripted?0:6;
       if(pass){
         this.wake(p.x,p.y);p.x=x;p.y=y;p.offset=18;this.wake(x,y);this.setAnimation(3+p.direction);
         if(t===10){this.state[i]=1;this.events.push('grass');}
       }else if(t!==0&&t!==9&&this.stonePressure===0)this.setAnimation(p.direction-1);
-    }else {this.pushDelay=6;if(this.stonePressure===0)this.setAnimation(p.direction-1);}
+    }else {this.pushDelay=input.scripted?0:6;if(this.stonePressure===0)this.setAnimation(p.direction-1);}
     const i=this.index(p.x,p.y),t=this.tiles[i],o=this.level.objects[i];
     if(p.offset===0){
       const insideChest=[14,33].includes(o);
@@ -704,7 +721,17 @@ export class Simulation {
       this.hurt(4);
     this.updateCamera();
   }
-  private updateCamera(){const p=this.player;this.camera.update(p.x*24-p.dx*p.offset,p.y*24-p.dy*p.offset,this.level.width,this.level.height);}
+  private updateCamera(){
+    // DemoInterpreter updates the camera before scripted movement; normal
+    // gameplay follows it after movement. Pans/dialogues keep their own view.
+    if(this.inputs.at(-1)?.scripted)return;
+    const p=this.player;this.camera.update(p.x*24-p.dx*p.offset,p.y*24-p.dy*p.offset,this.level.width,this.level.height);
+  }
+  private destroyGrass(x:number,y:number){
+    const i=this.index(x,y);
+    this.tiles[i]=-1;this.level.objects[i]=32;this.level.parameters[i]=0;
+    this.wake(x,y);this.active[i]=24;
+  }
   /** cGame.method_322 converts a field health pickup into ten diamonds at full health. */
   private collectHealthOrDiamonds(){
     if(this.health===4){this.diamonds+=10;this.bonusDiamondTotal+=10;this.events.push('diamond');}

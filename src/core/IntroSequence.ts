@@ -7,6 +7,7 @@ import type { DecodedSprite } from '../assets/SpriteDecoder.ts';
 interface RunningCommand {
   command:DemoCommand;ticks:number;startX:number;startY:number;page:number;children?:RunningCommand[];done?:boolean;
   blinkRemaining?:number;blinkOn?:boolean;closingTicks?:number;closingStart?:number;
+  walkComplete?:boolean;
 }
 export function wrapDemoText(value:string,maxCharacters:number):string[]{
   const lines:string[]=[];let line='';
@@ -59,6 +60,8 @@ export class IntroSequence {
   portraitVisible=false;portraitFrame=2;portraitSprite=2;portraitX=17;portraitY=50;portraitRevealTicks=0;blinkFrame=-1;flashColor='#fff';flash=false;
   private pressed=false;
   private auxiliaryScriptId:number|null=null;private recoveryAfterReset:number|null=null;
+  private rockLessonPending=false;private blockedLessonPending=false;
+  private recoveryRestoreTick=-1;
   constructor(level:LevelDefinition,scripts:Map<number,DemoScript>,sim?:Simulation,scriptId?:number,font?:DecodedSprite,fontMap?:Uint8Array){
     this.standalone=scriptId!==undefined;
     this.stops=this.standalone?[{id:scriptId!,x:0,y:0}]:STOPS;
@@ -103,21 +106,19 @@ export class IntroSequence {
   }
   step(input:InputFrame=NO_INPUT){
     if(this.phase==='done')return;
+    this.rememberLesson();this.recoverLesson();
     if(this.phase==='opening'){
       this.sim.step({direction:2,action:false});this.tick=this.sim.tick;this.followHero();
       if(this.sim.player.x===5&&this.sim.player.offset===0)this.phase='free';
       return;
     }
     if(this.phase==='free'){
-      if(input.reset)this.recoveryAfterReset=this.recoveryAtPlayer()??this.recoveryAfterReset;
       this.sim.step(input);this.tick=this.sim.tick;this.followHero();
-      if(this.sim.deathTicks>0)this.recoveryAfterReset=this.recoveryAtPlayer()??this.recoveryAfterReset;
+      this.rememberLesson();
       if(this.sim.status==='dead'){
         this.sim.lives=5;this.sim.status='playing';this.sim.restoreCheckpoint(true,true);
       }
-      if(this.recoveryAfterReset!==null&&this.sim.events.includes('respawn')){
-        this.auxiliaryScriptId=this.recoveryAfterReset;this.recoveryAfterReset=null;this.startScript();return;
-      }
+      if(this.recoverLesson())return;
       if(this.section>=this.stops.length){
         if(this.atSealExit())this.phase='done';
       }else if(this.atTrigger())this.startScript();
@@ -131,10 +132,10 @@ export class IntroSequence {
     }
     // The same physics and collision path runs while the hero is scripted.
     const direction=this.scriptedDirection(this.active);
-    this.sim.step({direction,action:false});this.tick=this.sim.tick;
-    if(direction)this.followHero();
+    const walking=this.hasWalk(this.active);
+    this.sim.step({direction,action:false,scripted:true,scriptedView:{x:this.cameraX,y:this.cameraY,follow:walking}});this.tick=this.sim.tick;
+    if(walking)this.followHero();
     if(this.sim.deathTicks>0||this.sim.status==='dead'){
-      this.recoveryAfterReset=this.recoveryAtPlayer()??this.recoveryAfterReset;
       this.phase=this.standalone?'done':'free';this.active=null;this.portraitVisible=false;this.portraitRevealTicks=0;this.pressed=false;
       return;
     }
@@ -145,17 +146,41 @@ export class IntroSequence {
     return this.font&&this.fontMap?wrapDemoTextPixels(value,popup?196:222,this.font,this.fontMap):wrapDemoText(value,popup?23:18);
   }
   private atTrigger(){
-    if(this.sim.status!=='playing'||this.sim.player.offset!==0)return false;
+    if(this.sim.status!=='playing'||this.sim.player.offset!==0||this.sim.hurtTicks||this.sim.deathTicks||this.sim.respawnTravel)return false;
     const stop=this.stops[this.section],i=this.sim.index(stop.x,stop.y);
     if(this.section===2)return this.sim.opened.has(i);
     if(this.sim.chestCell>=0)return false;
-    return this.sim.player.x===stop.x&&this.sim.player.y===stop.y;
+    return this.sim.player.x===stop.x&&this.sim.player.y===stop.y&&this.sim.level.objects[i]===0&&this.sim.level.parameters[i]===stop.id;
   }
   private atSealExit(){return [60,61].includes(this.sim.player.x)&&this.sim.player.y===3&&this.sim.player.offset===0;}
-  private recoveryAtPlayer(){
+  private rememberLesson(){
+    if(this.standalone)return;
     const i=this.sim.index(this.sim.player.x,this.sim.player.y);
-    if(i<0||this.sim.level.objects[i]!==0)return null;
-    return this.sim.level.parameters[i]===13?15:this.sim.level.parameters[i]===16?17:null;
+    if(i<0||this.sim.level.objects[i]!==0)return;
+    if(this.sim.level.parameters[i]===13)this.rockLessonPending=true;
+    if(this.sim.level.parameters[i]===16)this.blockedLessonPending=true;
+  }
+  private recoverLesson(){
+    if(this.standalone)return false;
+    if(this.recoveryRestoreTick!==this.sim.tick&&this.sim.events.some(event=>event==='respawn-start'||event==='respawn')){
+      this.recoveryRestoreTick=this.sim.tick;
+      // method_347 consumes the sticky lesson flags, including when the hero
+      // left the trigger, and clears these objects in the saved map (field_349).
+      const recovery=this.recoveryAfterReset!==null?null:this.rockLessonPending?15:this.blockedLessonPending?17:null;
+      if(recovery!==null){
+        if(recovery===15)this.rockLessonPending=false;else this.blockedLessonPending=false;
+        this.recoveryAfterReset=recovery;
+        this.phase='free';this.active=null;this.portraitVisible=false;this.portraitRevealTicks=0;this.pressed=false;
+        if(this.section===(recovery===15?3:4))this.section++;
+        for(const [x,y] of recovery===15?[[37,7],[39,5]]:[[46,7],[50,7]]){
+          this.sim.applyDemoEdit({cell:this.sim.index(x,y),object:255,parameter:255,checkpoint:true},true);
+        }
+      }
+    }
+    if(this.recoveryAfterReset!==null&&this.sim.events.includes('respawn')){
+      this.auxiliaryScriptId=this.recoveryAfterReset;this.recoveryAfterReset=null;this.startScript();return true;
+    }
+    return false;
   }
   private startScript(){
     this.phase='script';this.commandIndex=0;this.active=null;this.pressed=false;
@@ -172,11 +197,15 @@ export class IntroSequence {
   private scriptedDirection(r:RunningCommand):Direction{
     if(r.done)return 0;
     // The source releases direction for the final settled tick of a walk command.
-    if(r.command.opcode===10)return r.ticks>=4&&this.sim.player.offset===0?0:r.command.args[0] as Direction;
+    if(r.command.opcode===10){
+      r.walkComplete=r.ticks>0&&this.sim.player.offset===0;
+      return r.walkComplete?0:r.command.args[0] as Direction;
+    }
     if(r.command.opcode===0)r.children??=r.command.children!.map(c=>this.running(c));
     for(const child of r.children??[]){const direction=this.scriptedDirection(child);if(direction)return direction;}
     return 0;
   }
+  private hasWalk(r:RunningCommand):boolean{return !r.done&&(r.command.opcode===10||(r.children??[]).some(child=>this.hasWalk(child)));}
   private followHero(){this.cameraX=this.sim.camera.x;this.cameraY=this.sim.camera.y;}
   private running(command:DemoCommand):RunningCommand{return {command,ticks:0,startX:command.opcode===13?this.portraitX:this.cameraX,startY:command.opcode===13?this.portraitY:this.cameraY,page:0};}
   private stepCommand(r:RunningCommand):boolean{
@@ -217,7 +246,7 @@ export class IntroSequence {
       return false;
     }
     if(opcode===6)return r.ticks>=args[0]+2;
-    if(opcode===10)return r.ticks>4&&this.sim.player.offset<=0;
+    if(opcode===10)return r.walkComplete===true;
     if(opcode===11){this.portraitFrame=args[0];this.portraitSprite=args[1];return true;}
     if(opcode===12){
       this.portraitX=args[0];this.portraitY=args[1];

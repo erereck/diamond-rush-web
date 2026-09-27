@@ -1,7 +1,7 @@
 /**
  * Rebuild a locally checked-out S700 decompilation with an isolated trace hook.
  * The original Java sources and the emulator stay outside this repository.
- * Usage: node tools/trace-s700.ts <reference-s700> <jdk-bin> <freej2me.jar> <output-dir> [--auto-dialogue] [--walk-chest] [--open-chest] [--ticks=N]
+ * Usage: node tools/trace-s700.ts <reference-s700> <jdk-bin> <freej2me.jar> <output-dir> [--auto-dialogue] [--walk-chest] [--open-chest] [--rock-lesson] [--ticks=N]
  */
 import { copyFileSync, mkdirSync, readFileSync, readdirSync, writeFileSync } from 'node:fs';
 import { spawnSync } from 'node:child_process';
@@ -10,13 +10,13 @@ import { pathToFileURL } from 'node:url';
 
 const [referenceArg,jdkArg,emulatorArg,outputArg]=process.argv.slice(2);
 if(!referenceArg||!jdkArg||!emulatorArg||!outputArg){
-  console.error('Usage: node tools/trace-s700.ts <reference-s700> <jdk-bin> <freej2me.jar> <output-dir> [--auto-dialogue] [--walk-chest] [--open-chest] [--ticks=N]');
+  console.error('Usage: node tools/trace-s700.ts <reference-s700> <jdk-bin> <freej2me.jar> <output-dir> [--auto-dialogue] [--walk-chest] [--open-chest] [--rock-lesson] [--ticks=N]');
   process.exit(2);
 }
-const options=process.argv.slice(6),openChest=options.includes('--open-chest'),walkChest=options.includes('--walk-chest')||openChest,autoDialogue=options.includes('--auto-dialogue')||walkChest;
+const options=process.argv.slice(6),rockLesson=options.includes('--rock-lesson'),openChest=options.includes('--open-chest')||rockLesson,walkChest=options.includes('--walk-chest')||openChest,autoDialogue=options.includes('--auto-dialogue')||walkChest;
 const ticksArg=options.find(arg=>arg.startsWith('--ticks='));
 const tickLimit=ticksArg?Number(ticksArg.slice(8)):300;
-if(!Number.isInteger(tickLimit)||tickLimit<21||tickLimit>2000||options.some(arg=>!['--auto-dialogue','--walk-chest','--open-chest'].includes(arg)&&!arg.startsWith('--ticks=')))throw new Error('Invalid trace options');
+if(!Number.isInteger(tickLimit)||tickLimit<21||tickLimit>2000||options.some(arg=>!['--auto-dialogue','--walk-chest','--open-chest','--rock-lesson'].includes(arg)&&!arg.startsWith('--ticks=')))throw new Error('Invalid trace options');
 const reference=resolve(referenceArg),jdk=resolve(jdkArg),emulator=resolve(emulatorArg),output=resolve(outputArg);
 const source=join(reference,'src'),resources=join(reference,'res'),traceSource=join(output,'src'),classes=join(output,'classes');
 mkdirSync(traceSource,{recursive:true});mkdirSync(classes,{recursive:true});
@@ -31,12 +31,17 @@ function replaceOnce(before:string,after:string){
 replaceOnce('private void method_304() {',`private int traceTicks;
   private boolean traceStarted;
   private int traceRouteIndex;
-  private final int[][] traceRoute = new int[][] {{9,4},{9,6},{16,6},{16,5},{20,5},{20,6},{27,6},{27,5},{30,5},{30,7},{31,7}${openChest?',{30,6},{28,6}':''}};
+  private final int[][] traceRoute = new int[][] {{9,4},{9,6},{16,6},{16,5},{20,5},{20,6},{27,6},{27,5},{30,5},{30,7},{31,7}${openChest?',{30,6},{28,6}':''}${rockLesson?',{30,6},{30,7},{31,7},{31,8},{33,8},{33,7},{37,7}':''}};
+  private final int[][] traceCells = new int[][] {{36,6},{36,7},{37,7},{38,5},{39,5},{39,6},{39,7},{40,5},{40,6},{40,7},{42,8}};
   private void method_304() {
     if (Boolean.getBoolean("diamond.trace")) {
       System.out.println("DRTRACE," + traceTicks + "," + currentWorld + "," + currentLevel + "," + playerXPos + "," + playerYPos + "," + field_232 + "," + field_197 + "," + collectedDiamonds + "," + collectedRedDiamonds + "," + playerLifeCount + "," + gameState);
       ASpriteInstance hero = field_323[0];
       System.out.println("DRCHEST," + traceTicks + "," + hero._nCrtAnim + "," + hero._nCrtAFrame + "," + hero._nCrtTime + "," + field_210 + "," + field_211 + "," + field_213 + "," + field_334[28][6] + "," + (field_332[28][6] >> 8));
+      if (${rockLesson} && traceTicks >= 423) for (int n = 0; n < traceCells.length; n++) {
+        int x = traceCells[n][0], y = traceCells[n][1];
+        System.out.println("DRMAP," + traceTicks + "," + x + "," + y + "," + field_334[x][y] + "," + field_333[x][y] + "," + field_335[x][y] + "," + (field_332[x][y] & 255) + "," + (field_332[x][y] >> 8) + "," + field_336[x][y]);
+      }
       if (field_354 != null && field_354.field_45 != null) {
         int opcode = field_354.field_45[0] & 255;
         int page = opcode == 2 ? (field_354.field_45[9] & 255) : (opcode == 27 ? (field_354.field_45[6] & 255) : -1);
@@ -59,6 +64,7 @@ replaceOnce('this.method_67();',`if (Boolean.getBoolean("diamond.trace") && game
           }
           if (${walkChest} && gameState == 1 && traceTicks > 129 && field_354 == null && currentWorld == 0 && currentLevel == 13) {
             if (${openChest} && traceRouteIndex == 10 && traceTicks >= 297 && playerXPos == 30 && playerYPos == 7 && field_232 == 0) traceRouteIndex++;
+            if (${rockLesson} && traceTicks >= 664 && traceRouteIndex == traceRoute.length - 1) traceRouteIndex++;
             while (traceRouteIndex < traceRoute.length && playerXPos == traceRoute[traceRouteIndex][0] &&
                    playerYPos == traceRoute[traceRouteIndex][1] && field_232 == 0) traceRouteIndex++;
             if (traceRouteIndex < traceRoute.length) {
@@ -99,4 +105,6 @@ const demoRows=result.stdout.split(/\r?\n/).filter(line=>line.startsWith('DRDEMO
 writeFileSync(join(output,'demo-s700.csv'),'tick,commandIndex,opcode,commandTick,page,portrait,cameraX,cameraY\n'+demoRows.join('\n')+'\n');
 const chestRows=result.stdout.split(/\r?\n/).filter(line=>line.startsWith('DRCHEST,')).map(line=>line.slice(8));
 writeFileSync(join(output,'chest-s700.csv'),'tick,animation,frame,time,itemSprite,itemFrame,reward,chestTile,chestFrame\n'+chestRows.join('\n')+'\n');
+const mapRows=result.stdout.split(/\r?\n/).filter(line=>line.startsWith('DRMAP,')).map(line=>line.slice(6));
+writeFileSync(join(output,'map-s700.csv'),'tick,x,y,tile,state,motion,object,parameter,active\n'+mapRows.join('\n')+'\n');
 console.log(`Captured ${rows.length} Java S700 ticks: ${join(output,'trace-s700.csv')}`);

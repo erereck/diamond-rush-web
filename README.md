@@ -62,6 +62,10 @@ Com `--walk-chest --ticks=298`, o mesmo capturador avança pelas células transi
 
 Com `--open-chest --ticks=460`, a rota continua até o baú da bússola e seu aviso. O arquivo adicional `chest-s700.csv` registra animação, índice/tempo do frame, item e estado do baú. A amostra `tests/fixtures/intro-compass-chest-s700.csv` compara 81 estados consecutivos da abertura e apresentação do item, a partir de uma condição inicial isolada no baú. Ela não certifica o percurso inteiro nem a câmera das cenas seguintes. As pressões durante a apresentação são ignoradas, como no Java; o aviso curto usa páginas fixas, sem a animação lateral da caixa de diálogo longa.
 
+Com `--rock-lesson --ticks=665`, a rota segue até a demonstração de empurrar a pedra. `map-s700.csv` registra onze células relevantes, incluindo grama, pedra e marcadores dos avisos. A amostra `tests/fixtures/intro-rock-lesson-s700.csv` compara os 188 ticks de execução do roteiro 13 (476–663): posição, deslocamento, comandos, câmera, páginas das falas com a fonte S700, queda da pedra e efeito de destruição da grama. O teste começa na condição medida do gatilho; a continuidade entre o baú e esse ponto ainda não é certificada.
+
+O retorno ao círculo lembra as lições 13/16 mesmo depois que o personagem sai do gatilho, como `method_284/347`. Ao restaurar, os marcadores são removidos também do checkpoint salvo, e os roteiros 15/17 entram após o deslocamento da câmera. Testes cobrem ação no círculo, reinício fora dele, morte durante/depois da demonstração e retornos repetidos. A grama destruída usa os 8/6/7 frames originais dos três mundos como objeto de primeiro plano, com avanço pela paridade do relógio.
+
 Os baús de equipamento, bússola, poção e cristais passam à animação original 47 e usam os brilhos de `cm.f/7`. A cura de baú com vida cheia vira dez diamantes, e uma vida extra no limite de 99 segue a conversão original. Uma vida extra já obtida em baú permanece consumida após retornar ao checkpoint. O intérprete respeita as pausas finais dos comandos e a posição vertical das falas, inclusive as falas junto ao selo.
 
 ## Estado real

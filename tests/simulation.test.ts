@@ -9,7 +9,7 @@ import { parseWorld, parseWorldMap } from '../src/level/LevelParser.ts';
 import { nextMainLevel } from '../src/level/Progression.ts';
 import type { LevelDefinition } from '../src/level/LevelParser.ts';
 import { validateReplay, restoreReplay } from '../src/platform/Session.ts';
-import { animationFrameAt, CHEST_OPEN_DURATIONS, fallingDrawOffset, fireReach } from '../src/core/PhaseOneRules.ts';
+import { animationFrameAt, CHEST_OPEN_DURATIONS, GRASS_DESTRUCTION_FRAMES, fallingDrawOffset, fireReach } from '../src/core/PhaseOneRules.ts';
 import { spikeExtension, spikeReach } from '../src/core/LaterStageRules.ts';
 import { decodeSprite } from '../src/assets/SpriteDecoder.ts';
 import { parsePack } from '../src/assets/Pack.ts';
@@ -37,6 +37,37 @@ test('wall collision and cleared grass preserve data definitions',()=>{
 test('falling rocks update bottom to top and cannot move two rows per tick',()=>{
   const s=new Simulation(fixture(['#######','# OO  #','#     #','#   @ #','#######']));step(s);
   assert.equal(s.tile(2,2),0);assert.equal(s.tile(2,3),-1);assert.equal(s.motion[s.index(2,2)],18);
+});
+
+test('grass debris plays every original foreground frame in all three worlds and then clears',()=>{
+  const cache=new Map<string,ReturnType<typeof decodeSprite>>(),draws:{id:string;frame:number}[]=[];
+  const assets={sprite(id:string){
+    if(!cache.has(id)){const split=id.lastIndexOf('-'),name=id.slice(0,split),index=Number(id.slice(split+1));
+      cache.set(id,decodeSprite(parsePack(readFileSync(new URL(`../../../work/reference-s700/res/${name}.f`,import.meta.url)),name)[index].data,id));}
+    return cache.get(id)!;
+  }} as unknown as AssetManager;
+  class CheckedRenderer extends SpriteRenderer{
+    override module(_ctx:CanvasRenderingContext2D,s:ReturnType<typeof decodeSprite>,index:number){assert(s.modules[index],`${s.name}: missing module ${index}`);}
+    override frame(ctx:CanvasRenderingContext2D,s:ReturnType<typeof decodeSprite>,frame:number,x:number,y:number,flags=0,palette=0){
+      draws.push({id:s.name,frame});super.frame(ctx,s,frame,x,y,flags,palette);
+    }
+  }
+  const renderer=new LevelRenderer(assets,new CheckedRenderer());
+  for(const world of [0,1,2]){
+    const level=fixture(['#####','#@g #','#####']);level.world=world;
+    const sim=new Simulation(level),cell=sim.index(2,1),grass=assets.sprite(`${world}-1`),animation=grass.animations[0];
+    assert.equal(animation.count,GRASS_DESTRUCTION_FRAMES[world]);
+    step(sim,2);step(sim);
+    assert.equal(sim.tiles[cell],-1);assert.equal(sim.level.objects[cell],32);assert.equal(sim.level.parameters[cell],0);
+    assert.equal(sim.free(2,1),false,'debris temporarily blocks a falling/pushed object');
+    draws.length=0;
+    for(let tick=0;tick<20&&sim.level.objects[cell]===32;tick++){
+      renderer.draw({} as CanvasRenderingContext2D,sim.level,sim.tick,sim);step(sim);
+    }
+    const frames=[...new Set(draws.filter(d=>d.id===`${world}-1`).map(d=>d.frame))];
+    assert.deepEqual(frames,grass.animationFrames.slice(animation.start,animation.start+animation.count).map(f=>f.frame));
+    assert.equal(sim.level.objects[cell],255);assert.equal(sim.level.parameters[cell],255);assert.equal(sim.free(2,1),true);
+  }
 });
 test('boulders resting directly above player do not start falling into player',()=>{
   const s=new Simulation(fixture(['#####','# O #','# @ #','#####']));step(s,0,10);assert.equal(s.health,4);assert.equal(s.tile(2,1),0);
@@ -198,6 +229,37 @@ test('an extra life stays collected after checkpoint restore',()=>{
   step(sim,4,4);sim.step({direction:0,action:true});
   assert.equal(sim.lives,6);assert.equal(sim.tile(2,1),-1);
   step(sim,2,4);assert.equal(sim.lives,6);
+});
+
+test('replay keeps recovery edits in the saved checkpoint through repeated returns',()=>{
+  const level=fixture(['#####','#@  #','#####']);level.objects[6]=4;level.parameters[6]=0;level.objects[7]=0;level.parameters[7]=13;
+  const sim=new Simulation(level);
+  step(sim);
+  sim.applyDemoEdit({cell:7,object:255,parameter:255,checkpoint:true},true);
+  for(let reset=0;reset<2;reset++){
+    step(sim,2,4);sim.step({direction:0,action:false,reset:true});
+    for(let tick=0;tick<120&&(sim.deathTicks||sim.respawnTravel);tick++)step(sim);
+    assert.equal(sim.level.objects[7],255);assert.equal(sim.level.parameters[7],255);
+  }
+  const worlds=[{version:0,world:0,levels:[level]}];
+  const replay=validateReplay(JSON.parse(JSON.stringify(sim.replay())),worlds);
+  assert.deepEqual(restoreReplay(replay,worlds).snapshot(),sim.snapshot());
+});
+
+test('scripted pushing and camera timing survive validated replay restoration',()=>{
+  const level=fixture(['###############','#@O           #','###############']),sim=new Simulation(level);
+  sim.step({direction:0,action:false,scripted:true,scriptedView:{x:24,y:0,follow:false}});
+  assert.equal(sim.pushDelay,0);
+  for(let tick=0;tick<5;tick++)sim.step({direction:tick<4?2:0,action:false,scripted:true,scriptedView:{x:sim.camera.x,y:0,follow:true}});
+  assert.equal(sim.player.x,2);assert.equal(sim.tile(3,1),0);
+  const worlds=[{version:0,world:0,levels:[level]}],replay=validateReplay(sim.replay(),worlds);
+  assert.deepEqual(restoreReplay(replay,worlds).snapshot(),sim.snapshot());
+  for(const input of [
+    {direction:0,action:false,scripted:'yes'},
+    {direction:0,action:false,scriptedView:{x:0,y:0,follow:true}},
+    {direction:0,action:false,scripted:true,scriptedView:{x:121,y:0,follow:true}},
+    {direction:0,action:false,demoEdits:[{cell:7,object:255,checkpoint:1}]}
+  ])assert.throws(()=>validateReplay({...replay,inputs:[input]},worlds),/inválid/);
 });
 test('closed map gate blocks entry until its opening phase reaches two',()=>{
   const level=fixture(['#####','#@  #','#####']);level.objects[7]=7;level.parameters[7]=0;

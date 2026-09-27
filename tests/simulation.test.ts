@@ -75,6 +75,17 @@ test('boulders resting directly above player do not start falling into player',(
 test('pushing requires seven attempted ticks and an empty destination',()=>{
   const s=new Simulation(fixture(['#######','#@O   #','#######']));step(s,2,6);assert.equal(s.player.x,1);step(s,2);assert.equal(s.player.x,2);assert.equal(s.tile(3,1),0);
 });
+
+test('walking without support and successful pushing keep the source hero poses',()=>{
+  const suspended=new Simulation(fixture(['#######','# @   #','#     #','#######']));
+  step(suspended,2);assert.equal(suspended.playerAnimation,24);assert.equal(suspended.animationTick,1);
+  step(suspended,0,4);assert.equal(suspended.playerAnimation,35);
+  step(suspended,4);assert.equal(suspended.playerAnimation,25);assert.equal(suspended.animationTick,1);
+  const pushing=new Simulation(fixture(['#######','#@O   #','#######']));
+  step(pushing,2,7);assert.equal(pushing.player.x,2);assert.equal(pushing.playerAnimation,8);
+  step(pushing,0,3);assert.equal(pushing.player.offset,0);assert.equal(pushing.playerAnimation,8);
+  step(pushing);assert.equal(pushing.playerAnimation,1);
+});
 test('original collision threshold is strict 24 pixels',()=>{
   const s=new Simulation(fixture(['######','#@   #','######']));assert.equal(s.overlap(2,1,0,0),false);assert.equal(s.overlap(2,1,2,6),true);
 });

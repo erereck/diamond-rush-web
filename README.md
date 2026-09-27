@@ -66,6 +66,8 @@ Com `--rock-lesson --ticks=665`, a rota segue até a demonstração de empurrar 
 
 O retorno ao círculo lembra as lições 13/16 mesmo depois que o personagem sai do gatilho, como `method_284/347`. Ao restaurar, os marcadores são removidos também do checkpoint salvo, e os roteiros 15/17 entram após o deslocamento da câmera. Testes cobrem ação no círculo, reinício fora dele, morte durante/depois da demonstração e retornos repetidos. A grama destruída usa os 8/6/7 frames originais dos três mundos como objeto de primeiro plano, com avanço pela paridade do relógio.
 
+A mesma amostra da pedra também compara animação, índice e tempo do frame do herói nos 188 ticks. A escolha das poses considera apoio sob o personagem, conforme `method_211/260`: caminhada horizontal 24/25 e repouso 34/35 quando suspenso, esforço 8/9 durante o empurrão completo e 26/27 sem apoio. A nova animação avança já no tick em que começa. Isso não certifica as demais transições de equipamento, água ou dano.
+
 Os baús de equipamento, bússola, poção e cristais passam à animação original 47 e usam os brilhos de `cm.f/7`. A cura de baú com vida cheia vira dez diamantes, e uma vida extra no limite de 99 segue a conversão original. Uma vida extra já obtida em baú permanece consumida após retornar ao checkpoint. O intérprete respeita as pausas finais dos comandos e a posição vertical das falas, inclusive as falas junto ao selo.
 
 ## Estado real

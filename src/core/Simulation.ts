@@ -191,6 +191,15 @@ export class Simulation {
     else {this.health=0;this.hurtTicks=0;this.deathTicks=80;this.invulnerable=0;this.pendingDirection=0;this.setAnimation(19);this.events.push('death');}
   }
   setAnimation(n:number){if(n!==this.playerAnimation){this.playerAnimation=n;this.animationTick=0;}}
+  private setLocomotionAnimation(n:number){
+    // method_211/260 select different idle/walk/push poses without a tile
+    // supporting the hero. The newly selected animation advances this tick.
+    const below=this.tile(this.player.x,this.player.y+1);
+    if((below<0||below===14)&&(n===1||n===3))n=n===1?35:34;
+    if(below<0&&[5,7,8,9].includes(n))n=n===5?24:n===7?25:n===8?26:27;
+    const changed=n!==this.playerAnimation;this.setAnimation(n);
+    if(changed)this.animationTick=1;
+  }
   /** Subset of method_351: normal gravity, diamonds, ice blocks, boulder support and delayed rolling. */
   updateFalling(x:number,y:number){
     const i=this.index(x,y),t=this.tiles[i];let s=this.state[i],m=this.motion[i],dir=s&7;
@@ -675,7 +684,7 @@ export class Simulation {
     else if(direction){
       this.pendingDirection=0;p.direction=direction;p.dx=DX[p.direction];p.dy=DY[p.direction];
       const x=p.x+p.dx,y=p.y+p.dy,i=this.index(x,y),t=this.tile(x,y),o=this.object(x,y);
-      let pass=WALKABLE_TILES.has(t)||t===10;
+      let pass=WALKABLE_TILES.has(t)||t===10,blockedBySweep=false;
       // Gate object 7 is solid while its opening phase is below 2.
       if(o===7&&this.gatePhases[i]<2)pass=false;
       // The entrance corridor is closed after spawning. Exterior cells are only
@@ -684,24 +693,25 @@ export class Simulation {
       if(this.exitDirection)pass=true;
       // method_288: do not enter the trailing portion of a descending boulder.
       const belowTarget=this.index(x,y+1);
-      if(p.dx&&this.tile(x,y+1)===0&&belowTarget>=0&&(this.state[belowTarget]&7)===3&&this.motion[belowTarget]>0)pass=false;
+      if(p.dx&&this.tile(x,y+1)===0&&belowTarget>=0&&(this.state[belowTarget]&7)===3&&this.motion[belowTarget]>0){pass=false;blockedBySweep=true;}
       // method_288 also prevents walking into the swept path of an extended spike.
       if(t===-1)for(const sy of [y-1,y+1]){
         const spike=this.index(x,sy);
         if(spike<0||this.tiles[spike]!==28)continue;
-        if(spikeExtension(this.tick,(this.state[spike]&8)!==0)>=24){pass=false;break;}
+        if(spikeExtension(this.tick,(this.state[spike]&8)!==0)>=24){pass=false;blockedBySweep=true;break;}
       }
       if((t===0||t===9)&&p.dx){
-        this.pushDelay--;this.setAnimation(p.dx>0?8:9);
+        this.pushDelay--;this.setLocomotionAnimation(p.dx>0?8:9);
         if(this.pushDelay<0&&this.free(x+p.dx,y)&&this.motion[i]===0&&![19,43,45,49].includes(this.tile(x,y+1))){
           this.moveObject(i,this.index(x+p.dx,y),t,(this.state[i]&~(7|3072|512))|p.direction| (p.dx>0?1024:2048),18);this.wake(x+p.dx,y);pass=true;
         }
       }else this.pushDelay=input.scripted?0:6;
       if(pass){
-        this.wake(p.x,p.y);p.x=x;p.y=y;p.offset=18;this.wake(x,y);this.setAnimation(3+p.direction);
+        this.wake(p.x,p.y);p.x=x;p.y=y;p.offset=18;this.wake(x,y);
+        this.setLocomotionAnimation((t===0||t===9)&&p.dx?(p.dx>0?8:9):3+p.direction);
         if(t===10){this.state[i]=1;this.events.push('grass');}
-      }else if(t!==0&&t!==9&&this.stonePressure===0)this.setAnimation(p.direction-1);
-    }else {this.pushDelay=input.scripted?0:6;if(this.stonePressure===0)this.setAnimation(p.direction-1);}
+      }else if(t!==0&&t!==9&&this.stonePressure===0)this.setLocomotionAnimation(blockedBySweep&&p.dx?(p.dx>0?8:9):p.direction-1);
+    }else {this.pushDelay=input.scripted?0:6;if(this.stonePressure===0)this.setLocomotionAnimation(p.direction-1);}
     const i=this.index(p.x,p.y),t=this.tiles[i],o=this.level.objects[i];
     if(p.offset===0){
       const insideChest=[14,33].includes(o);

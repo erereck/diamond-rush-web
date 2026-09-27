@@ -2,7 +2,7 @@
 
 Em 26/09/2026, no Windows, Node 26.7 e navegador Chromium integrado:
 
-- `npm test`: 255 testes passaram, sem testes ignorados. Incluem codecs, todos os 95 sprites, 41 mapas, 21 MIDIs, hashes, relógio, câmera, movimento, pedras, limites de colisão, equipamento, replay e RMS.
+- `npm test`: 256 testes passaram, sem testes ignorados. Incluem codecs, todos os 95 sprites, 41 mapas, 21 MIDIs, hashes, relógio, câmera, movimento, pedras, limites de colisão, equipamento, replay e RMS.
 - `npm run build`: TypeScript e build de produção passaram.
 - Validação no navegador: 2664 combinações de módulo/paleta, 1888 combinações de frame/paleta e 41 mapas renderizados sem exceção. As três referências de animação inválidas `mmv` são documentadas, não corrigidas artificialmente.
 - Início de Angkor, pausa, movimento por teclado e avanço individual de tick verificados no navegador. Um toque curto capturado entre ticks foi aplicado na próxima leitura.
@@ -30,6 +30,8 @@ Em 26/09/2026, no Windows, Node 26.7 e navegador Chromium integrado:
 - Uma página local temporária desenhou os prêmios de bússola, martelo, poção, chave, cura convertida e cristal com os recursos reais. Ela revelou a chamada inválida de frame da bússola, corrigida para módulo (assim como a poção). Após a correção, os seis casos renderizaram; o teste permanente percorre todos os 14 tipos de prêmio com os sprites decodificados reais e valida cada frame/módulo/paleta.
 
 - O novo trace `--rock-lesson` mediu a demonstração de empurrão. A amostra confere 188 estados consecutivos (476–663), começando no gatilho isolado: herói, comando, câmera, páginas das falas com fonte original, grama e seus frames, queda da pedra e marcadores de aviso. Todos coincidiram. O retorno das lições tem testes de cenário por ação, reinício e morte; os marcadores continuam removidos após uma segunda restauração. Os dados de câmera e as edições permanentes do checkpoint sobrevivem ao replay validado.
+- A amostra da pedra compara ainda a animação, índice e tempo do frame do personagem nos mesmos 188 ticks. As poses sem apoio e o esforço durante o empurrão foram alinhados a `method_211/260`, incluindo o primeiro avanço da animação no tick de início. O teste de cenário verifica poses suspensas dos dois lados e manutenção do esforço durante um empurrão manual bem-sucedido.
+- As poses 24 e 8 dos ticks 514/518 foram renderizadas e conferidas no navegador com os sprites S700, sem erro de console; a página local de revisão foi removida.
 - O menu abriu na origem local 5176 sem overlay ou erros no console. Uma página temporária de revisão renderizou os ticks 514, 525, 528 e 663 com os recursos reais, conferidos visualmente: grama em destruição, pedra caindo, efeito encerrado e cenário ao terminar a demonstração. A página foi removida antes da build. Os testes permanentes conferem todos os frames/módulos de destruição da grama nos três mundos, e a remoção do objeto 32 ao final.
 
 Os testes de simulação verificam invariantes do subconjunto implementado. A comparação diferencial Java cobre a entrada, o primeiro roteiro, a rota até o aviso do baú, a abertura isolada da bússola e a demonstração isolada da pedra; ainda não cobre a continuidade entre as últimas cenas ou um percurso inteiro. O validador de recursos detecta falhas de acesso/renderização, mas não prova que cada objeto tem o desenho, comportamento ou ordem exatos. Nenhum percurso completo de campanha foi aprovado.

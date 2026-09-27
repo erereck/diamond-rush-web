@@ -149,13 +149,15 @@ test('compass opening and presentation match 81 measured Java animation states',
 
 test('the rock lesson matches measured Java movement, command timing and stone fall',()=>{
   const font=decodeSprite(parsePack(resource('ui.f'),'ui.f')[1].data,'ui-1');
+  const hero=decodeSprite(parsePack(resource('o.f'),'o.f')[0].data,'o-0');
   const intro=new IntroSequence(level,scripts,undefined,13,font,resource('mc')),sim=intro.sim;
   // Isolate demo 13 at its measured trigger, after the player reached the circle.
   sim.tick=475;sim.player={x:37,y:7,dx:1,dy:0,offset:0,direction:2};
+  sim.animationTick=1;
   sim.camera.x=intro.cameraX=756;sim.camera.y=intro.cameraY=24;
   const rows=readFileSync(new URL('fixtures/intro-rock-lesson-s700.csv',import.meta.url),'utf8').trim().split(/\r?\n/).slice(1).map(line=>line.split(',').map(Number));
   for(const [tick,x,y,offset,index,opcode,cameraX,cameraY,grassTile,grassObject,grassFrame,...tail] of rows){
-    const stones=tail.slice(0,6),[page,circleObject,circleParameter,blockObject,blockParameter]=tail.slice(6);
+    const stones=tail.slice(0,6),[page,circleObject,circleParameter,blockObject,blockParameter,heroAnimation,heroFrame,heroTime]=tail.slice(6);
     if(tick%20===0&&intro.dialogue)intro.press();
     intro.step();
     assert.deepEqual([sim.player.x,sim.player.y,sim.player.offset],[x,y,offset],`Java hero tick ${tick}`);
@@ -173,6 +175,9 @@ test('the rock lesson matches measured Java movement, command timing and stone f
     const circle=sim.index(36,6),block=sim.index(42,8);
     assert.deepEqual([sim.level.objects[circle],sim.level.parameters[circle],sim.level.objects[block],sim.level.parameters[block]],
       [circleObject,circleParameter<0?255:circleParameter,blockObject,blockParameter<0?255:blockParameter],`Java hint markers tick ${tick}`);
+    const animation=hero.animations[sim.playerAnimation],durations=hero.animationFrames.slice(animation.start,animation.start+animation.count).map(af=>af.duration);
+    const frame=animationFrameAt(durations,sim.animationTick),time=sim.animationTick%durations.reduce((a,b)=>a+b,0)-durations.slice(0,frame).reduce((a,b)=>a+b,0);
+    assert.deepEqual([sim.playerAnimation,frame,time],[heroAnimation,heroFrame,heroTime],`Java hero animation tick ${tick}`);
   }
 });
 

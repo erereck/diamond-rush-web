@@ -1,7 +1,7 @@
 import type { LevelDefinition } from '../level/LevelParser.ts';
 import { Camera } from './Camera.ts';
 import { ENGINE_REVISION, levelFingerprint } from './Compatibility.ts';
-import { animationFrameAt, BOULDER_BRACE_TICKS, BOULDER_PRESSURE_TICKS, CHEST_OPEN_DURATIONS, fireReach, HAMMER_ATTACK_TICKS, HAMMER_BOUNCE_TICKS, HAMMER_IMPACT_TICK } from './PhaseOneRules.ts';
+import { animationFrameAt, BOULDER_BRACE_TICKS, BOULDER_PRESSURE_TICKS, CHEST_OPEN_DURATIONS, ITEM_PRESENTATION_TICKS, fireReach, HAMMER_ATTACK_TICKS, HAMMER_BOUNCE_TICKS, HAMMER_IMPACT_TICK } from './PhaseOneRules.ts';
 import { spikeExtension, spikeReach } from './LaterStageRules.ts';
 import { AngkorBoss } from './AngkorBoss.ts';
 import { BavariaBoss } from './BavariaBoss.ts';
@@ -30,6 +30,8 @@ export class Simulation {
   chestFrames:Int16Array;checkpointOrder=-1;private savedCheckpoint!:CheckpointState;
   lives=5;hurtTicks=0;deathTicks=0;chestCell=-1;chestTicks=0;exitDirection:Direction=0;exitObject:0|5|28=0;stonePressure=0;
   pendingCrystalCompletion=false;
+  chestReward=-1;chestRewardAmount=0;
+  itemSparkles:{x:number;y:number;kind:number;age:number}[]=[];
   respawnTravel=false;respawnFlash=0;respawnTarget={x:0,y:0};
   enemySmoke:{cell:number;age:number}[]=[];hits=0;retries=0;
   bonusDiamondTotal=0;
@@ -84,11 +86,11 @@ export class Simulation {
     for(let i=0;i<this.tiles.length;i++){
       const reward=this.tiles[i],required=reward===24?1:reward===27?2:reward===26?8:0;
       if(required&&this.weaponTier>=required&&[14,33].includes(level.objects[i])){
-        this.tiles[i]=-1;this.chestFrames[i]=3;this.opened.add(i);this.permanentEquipmentChests.add(i);
+        this.tiles[i]=-1;this.chestFrames[i]=level.objects[i]===14?2:3;this.opened.add(i);this.permanentEquipmentChests.add(i);
       }
     }
     for(const i of initial.openedChests??[])if(i>=0&&i<this.tiles.length&&[14,33].includes(level.objects[i])){
-      this.tiles[i]=-1;this.chestFrames[i]=3;this.opened.add(i);
+      this.tiles[i]=-1;this.chestFrames[i]=level.objects[i]===14?2:3;this.opened.add(i);
     }
     // cGame.method_294/296: each numbered door waits for its matching locks.
     for(let i=0;i<this.tiles.length;i++)if(this.level.objects[i]===7){
@@ -149,15 +151,16 @@ export class Simulation {
     this.tiles.set(save.tiles);this.state.set(save.state);this.motion.set(save.motion);this.active.set(save.active);this.chestFrames.set(save.chestFrames);this.frozenKinds.set(save.frozenKinds);
     this.level.objects.splice(0,this.level.objects.length,...save.objects);
     this.level.parameters.splice(0,this.level.parameters.length,...save.parameters);
-    for(const i of this.permanentPickups)this.tiles[i]=-1;
-    for(const i of this.permanentEquipmentChests){this.tiles[i]=-1;this.chestFrames[i]=3;}
+    for(const i of this.permanentPickups){this.tiles[i]=-1;if([14,33].includes(this.level.objects[i]))this.chestFrames[i]=this.level.objects[i]===14?2:3;}
+    for(const i of this.permanentEquipmentChests){this.tiles[i]=-1;this.chestFrames[i]=this.level.objects[i]===14?2:3;}
     this.gatePhases.set(save.gatePhases);this.gateCounts.set(save.gateCounts);this.unlockedGates=new Set(save.unlockedGates);
     this.goldKeys=save.goldKeys;this.silverKeys=save.silverKeys;
     this.boss?.reset();
     this.player={x:save.x,y:save.y,dx:0,dy:1,offset:0,direction:3};
-    this.diamonds=save.diamonds;this.redDiamonds=save.redDiamonds;this.opened=new Set([...save.opened,...this.permanentEquipmentChests]);
+    this.diamonds=save.diamonds;this.redDiamonds=save.redDiamonds;this.opened=new Set([...save.opened,...this.permanentEquipmentChests,...[...this.permanentPickups].filter(i=>[14,33].includes(this.level.objects[i]))]);
     this.hurtTicks=0;this.deathTicks=0;this.chestCell=-1;this.chestTicks=0;this.exitDirection=0;this.exitObject=0;this.pendingDirection=0;this.pushDelay=6;this.stonePressure=0;this.attackTicks=0;this.pendingHammer=null;this.hook=null;
     this.pendingCrystalCompletion=false;
+    this.chestReward=-1;this.chestRewardAmount=0;this.itemSparkles=[];
     if(heal){this.health=4;this.invulnerable=40;}
     this.playerAnimation=2;this.animationTick=0;
     // method_347 reactivates the saved objects; it does not reset the global clock.
@@ -527,6 +530,8 @@ export class Simulation {
     if(this.status!=='playing')return;
     this.inputs.push({...input});this.events=[];this.tick++;this.animationTick++;
     this.enemySmoke=this.enemySmoke.filter(s=>++s.age<14);
+    // cGame uses animation-frame indices for cm.f/7 effects, ignoring duration.
+    this.itemSparkles=this.itemSparkles.filter(s=>++s.age<[10,10,10,10,9][s.kind]);
     if(input.reset){this.manualReset();return;}
     if(this.respawnTravel){this.travelToCheckpoint();return;}
     if(this.respawnFlash>0)this.respawnFlash--;
@@ -566,7 +571,8 @@ export class Simulation {
           if(this.player.y===y)for(let n=0;n<=fireReach(this.tick);n++)if(this.player.x===x+n*side)this.hurt(1);
         }
         if(this.tiles[i]===10&&this.state[i]>0){this.tiles[i]=-1;this.wake(x,y);}
-        if(this.chestFrames[i]>0&&this.chestFrames[i]<3&&((this.tick>>1)&1)===0)this.chestFrames[i]++;
+        const lastChestFrame=this.level.objects[i]===14?2:3;
+        if(this.chestFrames[i]>0&&this.chestFrames[i]<lastChestFrame&&((this.tick>>1)&1)===0)this.chestFrames[i]++;
       }
     }
     if(!this.deathTicks&&!this.hurtTicks)this.boss?.step(this);
@@ -597,25 +603,41 @@ export class Simulation {
     }
     if(this.chestCell>=0){
       this.chestTicks++;this.pendingDirection=0;
-      if(animationFrameAt(CHEST_OPEN_DURATIONS,this.chestTicks,false)>=13&&!this.opened.has(this.chestCell)){
+      // The map scan consumes the item as opening begins. method_260 awards it
+      // when frame 13 is processed, after that frame first becomes visible.
+      if(this.chestReward<0&&!this.opened.has(this.chestCell)){
+        this.chestReward=this.tiles[this.chestCell];this.tiles[this.chestCell]=-1;
+        this.chestRewardAmount=this.level.parameters[this.chestCell];
+        if(this.chestReward===6&&this.lives>=99)this.chestReward=7;
+        if(this.chestReward===7&&this.health===4){this.chestReward=41;this.chestRewardAmount=10;this.bonusDiamondTotal+=10;}
+      }
+      if(animationFrameAt(CHEST_OPEN_DURATIONS,this.chestTicks-1,false)>=13&&!this.opened.has(this.chestCell)){
         this.opened.add(this.chestCell);
-        const reward=this.tiles[this.chestCell];this.tiles[this.chestCell]=-1;
+        const reward=this.chestReward;
         if(reward===2)this.redDiamonds++;
         else if(reward===4)this.goldKeys++;
         else if(reward===5)this.silverKeys++;
-        else if(reward===6)this.lives=Math.min(99,this.lives+1);
+        else if(reward===6){this.lives=Math.min(99,this.lives+1);this.permanentPickups.add(this.chestCell);}
         else if(reward===7)this.health=4;
-        else if(reward===41){const amount=this.level.parameters[this.chestCell];this.diamonds+=amount===255?1:Math.max(1,amount);}
+        else if(reward===41){const amount=this.chestRewardAmount;this.diamonds+=amount===255?1:Math.max(1,amount);}
         else if(reward===24||reward===27||reward===26){
           this.weaponTier=reward===24?Math.max(this.weaponTier,1) as 1|2|8:reward===27?Math.max(this.weaponTier,2) as 2|8:8;
           this.permanentEquipmentChests.add(this.chestCell);this.events.push('weapon',`demo:${reward===24?22:reward===27?23:25}`);
         }
         else if(reward===40)this.events.push('demo:24');
+        else if(reward===42)this.events.push('demo:11');
         else if(reward===51||reward===52||reward===53){this.pendingCrystalCompletion=true;this.events.push(`demo:${reward===53?32:reward===51?30:31}`);}
+        if([24,26,27,40,42,51,52,53].includes(reward)){this.setAnimation(47);this.animationTick=1;}
         this.events.push('chest-reward');
       }
-      if(this.chestTicks>=CHEST_OPEN_DURATIONS.reduce((a,b)=>a+b,0)){
-        this.chestCell=-1;this.setAnimation(p.direction-1);
+      if(this.playerAnimation===47&&this.animationTick>1&&(this.tick&1)===0){
+        let x=p.x-2+this.tick%5;const y=p.y-2+this.tick%3;
+        if(x===p.x&&(y===p.y||y===p.y-1))x+=((this.tick>>1)&1)===0?1:-1;
+        this.itemSparkles.push({x,y,kind:this.tick*3%5,age:0});
+        if(this.itemSparkles.length>7)this.itemSparkles.shift();
+      }
+      if(this.playerAnimation===47?this.animationTick>=ITEM_PRESENTATION_TICKS:this.chestTicks>=CHEST_OPEN_DURATIONS.reduce((a,b)=>a+b,0)){
+        this.chestCell=-1;this.chestReward=-1;this.chestRewardAmount=0;this.setAnimation(p.direction-1);this.animationTick=1;
         if(this.pendingCrystalCompletion){this.pendingCrystalCompletion=false;this.status='complete';this.events.push('complete');}
       }
       this.updateCamera();return;
@@ -671,7 +693,7 @@ export class Simulation {
       if(!insideChest&&t===7){this.tiles[i]=-1;this.collectHealthOrDiamonds();}
       if(o===4&&this.level.parameters[i]>this.checkpointOrder){this.checkpoint=i;this.checkpointOrder=this.level.parameters[i];this.captureCheckpoint();this.events.push('checkpoint');}
       if([14,33].includes(o)&&!this.opened.has(i)&&this.chestFrames[i]===0){
-        this.chestCell=i;this.chestTicks=0;this.chestFrames[i]=1;this.setAnimation(40);this.events.push('chest');
+        this.chestCell=i;this.chestTicks=0;this.chestReward=-1;this.chestRewardAmount=0;this.chestFrames[i]=1;this.setAnimation(40);this.events.push('chest');
       }else if(!insideChest&&t===2&&!this.opened.has(i)){this.tiles[i]=-1;this.redDiamonds++;this.events.push('red-diamond');}
       if(o===5||o===28){this.exitDirection=p.direction;this.exitObject=o;}
       if(this.exitDirection&&(p.x>this.level.width+5||p.x< -5||p.y>this.level.height+5||p.y< -5)){this.status='complete';this.events.push('complete');}
@@ -689,5 +711,5 @@ export class Simulation {
     else {this.health=4;this.events.push('health');}
   }
   replay():Replay{return {version:3,target:'1.2.0-s700',engine:ENGINE_REVISION,levelFingerprint:this.initialLevelFingerprint,world:this.level.world,level:this.level.index,initial:{...this.initial},inputs:this.inputs.map(i=>({...i,demoEdits:i.demoEdits?.map(edit=>({...edit}))}))};}
-  snapshot(){return {tick:this.tick,player:{...this.player},camera:{x:this.camera.x,y:this.camera.y},tiles:[...this.tiles],state:[...this.state],motion:[...this.motion],active:[...this.active],objects:[...this.level.objects],parameters:[...this.level.parameters],frozenKinds:[...this.frozenKinds],diamonds:this.diamonds,bonusDiamondTotal:this.bonusDiamondTotal,redDiamonds:this.redDiamonds,goldKeys:this.goldKeys,silverKeys:this.silverKeys,gatePhases:[...this.gatePhases],gateCounts:[...this.gateCounts],unlockedGates:[...this.unlockedGates],permanentPickups:[...this.permanentPickups],permanentEquipmentChests:[...this.permanentEquipmentChests],weaponTier:this.weaponTier,attackTicks:this.attackTicks,pendingHammer:this.pendingHammer?{...this.pendingHammer}:null,hook:this.hook?{...this.hook}:null,health:this.health,invulnerable:this.invulnerable,status:this.status,playerAnimation:this.playerAnimation,animationTick:this.animationTick,pushDelay:this.pushDelay,checkpoint:this.checkpoint,checkpointOrder:this.checkpointOrder,opened:[...this.opened],chestFrames:[...this.chestFrames],chestCell:this.chestCell,chestTicks:this.chestTicks,pendingCrystalCompletion:this.pendingCrystalCompletion,lives:this.lives,hurtTicks:this.hurtTicks,deathTicks:this.deathTicks,respawnTravel:this.respawnTravel,respawnFlash:this.respawnFlash,respawnTarget:{...this.respawnTarget},exitDirection:this.exitDirection,exitObject:this.exitObject,stonePressure:this.stonePressure,pendingDirection:this.pendingDirection,lastInputDirection:this.lastInputDirection,actionHeld:this.actionHeld,entranceGate:this.entranceGate,boss:this.boss?.snapshot()??null,enemySmoke:this.enemySmoke.map(s=>({...s})),hits:this.hits,retries:this.retries,savedCheckpoint:structuredClone(this.savedCheckpoint)};}
+  snapshot(){return {chestReward:this.chestReward,chestRewardAmount:this.chestRewardAmount,itemSparkles:this.itemSparkles.map(s=>({...s})),tick:this.tick,player:{...this.player},camera:{x:this.camera.x,y:this.camera.y},tiles:[...this.tiles],state:[...this.state],motion:[...this.motion],active:[...this.active],objects:[...this.level.objects],parameters:[...this.level.parameters],frozenKinds:[...this.frozenKinds],diamonds:this.diamonds,bonusDiamondTotal:this.bonusDiamondTotal,redDiamonds:this.redDiamonds,goldKeys:this.goldKeys,silverKeys:this.silverKeys,gatePhases:[...this.gatePhases],gateCounts:[...this.gateCounts],unlockedGates:[...this.unlockedGates],permanentPickups:[...this.permanentPickups],permanentEquipmentChests:[...this.permanentEquipmentChests],weaponTier:this.weaponTier,attackTicks:this.attackTicks,pendingHammer:this.pendingHammer?{...this.pendingHammer}:null,hook:this.hook?{...this.hook}:null,health:this.health,invulnerable:this.invulnerable,status:this.status,playerAnimation:this.playerAnimation,animationTick:this.animationTick,pushDelay:this.pushDelay,checkpoint:this.checkpoint,checkpointOrder:this.checkpointOrder,opened:[...this.opened],chestFrames:[...this.chestFrames],chestCell:this.chestCell,chestTicks:this.chestTicks,pendingCrystalCompletion:this.pendingCrystalCompletion,lives:this.lives,hurtTicks:this.hurtTicks,deathTicks:this.deathTicks,respawnTravel:this.respawnTravel,respawnFlash:this.respawnFlash,respawnTarget:{...this.respawnTarget},exitDirection:this.exitDirection,exitObject:this.exitObject,stonePressure:this.stonePressure,pendingDirection:this.pendingDirection,lastInputDirection:this.lastInputDirection,actionHeld:this.actionHeld,entranceGate:this.entranceGate,boss:this.boss?.snapshot()??null,enemySmoke:this.enemySmoke.map(s=>({...s})),hits:this.hits,retries:this.retries,savedCheckpoint:structuredClone(this.savedCheckpoint)};}
 }

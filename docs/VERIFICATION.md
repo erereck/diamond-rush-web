@@ -1,8 +1,8 @@
 # Verificações da build experimental
 
-Em 24/09/2026, no Windows, Node 26.7 e navegador Chromium integrado:
+Em 26/09/2026, no Windows, Node 26.7 e navegador Chromium integrado:
 
-- `npm test`: 241 testes passaram, sem testes ignorados. Incluem codecs, todos os 95 sprites, 41 mapas, 21 MIDIs, hashes, relógio, câmera, movimento, pedras, limites de colisão, equipamento, replay e RMS.
+- `npm test`: 247 testes passaram, sem testes ignorados. Incluem codecs, todos os 95 sprites, 41 mapas, 21 MIDIs, hashes, relógio, câmera, movimento, pedras, limites de colisão, equipamento, replay e RMS.
 - `npm run build`: TypeScript e build de produção passaram.
 - Validação no navegador: 2664 combinações de módulo/paleta, 1888 combinações de frame/paleta e 41 mapas renderizados sem exceção. As três referências de animação inválidas `mmv` são documentadas, não corrigidas artificialmente.
 - Início de Angkor, pausa, movimento por teclado e avanço individual de tick verificados no navegador. Um toque curto capturado entre ticks foi aplicado na próxima leitura.
@@ -24,4 +24,9 @@ Em 24/09/2026, no Windows, Node 26.7 e navegador Chromium integrado:
 - Com `--walk-chest`, o Java percorreu a rota até o primeiro aviso de baú. O teste web reproduz os estados medidos nos ticks 130–297: passagem por 32 células, dois diamantes, gatilho da fala no tick 258, passo roteirizado no 291 e edição do mapa no 296. O avanço da caixa de texto antes de completar sua entrada revelou um tempo variável de saída, corrigido no intérprete.
 - Depois do ajuste, uma origem local isolada abriu **New Game**, parou no círculo e mostrou o primeiro diálogo após a pressão à direita; não houve erro no console. As origens locais com saves anteriores não foram alteradas nessa conferência.
 
-Os testes de simulação verificam invariantes do subconjunto implementado. A comparação diferencial Java cobre a entrada, o primeiro roteiro e a rota até o aviso do baú; ainda não cobre o baú aberto, as cenas seguintes ou um percurso inteiro. O validador de recursos detecta falhas de acesso/renderização, mas não prova que cada objeto tem o desenho, comportamento ou ordem exatos. Nenhum percurso completo de campanha foi aprovado.
+- O trace `--open-chest --ticks=460` registrou a abertura do baú da bússola e seu aviso. O teste isola o estado inicial no baú e compara os 81 estados seguintes, incluindo animação, índice/tempo do frame, consumo do tile, abertura e apresentação. Ele verifica também que as pressões durante a apresentação não avançam o aviso. Não é uma comparação contínua da rota completa.
+- Os testes de comportamento conferem conversões de cura/vida no limite, persistência da vida extra do baú após checkpoint, vida útil dos brilhos, pausas dos comandos e origem do deslocamento do retrato. A fala do selo usa agora sua coordenada vertical original.
+- A build local abriu em uma origem de teste isolada, iniciou New Game e mostrou a primeira fala de Angkor com o enquadramento esperado, sem erros no console.
+- Uma página local temporária desenhou os prêmios de bússola, martelo, poção, chave, cura convertida e cristal com os recursos reais. Ela revelou a chamada inválida de frame da bússola, corrigida para módulo (assim como a poção). Após a correção, os seis casos renderizaram; o teste permanente percorre todos os 14 tipos de prêmio com os sprites decodificados reais e valida cada frame/módulo/paleta.
+
+Os testes de simulação verificam invariantes do subconjunto implementado. A comparação diferencial Java cobre a entrada, o primeiro roteiro, a rota até o aviso do baú e a abertura isolada da bússola; ainda não cobre as cenas seguintes ou um percurso inteiro. O validador de recursos detecta falhas de acesso/renderização, mas não prova que cada objeto tem o desenho, comportamento ou ordem exatos. Nenhum percurso completo de campanha foi aprovado.

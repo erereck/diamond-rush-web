@@ -171,6 +171,10 @@ export class LevelRenderer {
       if(boss.phase===12)anim('gen0-3',0,boss.x+tick*boss.age%48,528,0,0,tick);
     }
     if(sim)for(const smoke of sim.enemySmoke)r.animation(ctx,a.sprite('cm-3'),0,Math.min(6,smoke.age>>1),(smoke.cell%level.width)*24,Math.floor(smoke.cell/level.width)*24);
+    if(sim)for(const sparkle of sim.itemSparkles){
+      const s=a.sprite('cm-7'),an=s.animations[sparkle.kind],af=s.animationFrames[an.start+sparkle.age];
+      if(af)r.frame(ctx,s,af.frame,sparkle.x*24,sparkle.y*24,af.flags);
+    }
     if(sim?.hook){
       const p=sim.player,h=sim.hook;
       ctx.strokeStyle='#e5d1a7';ctx.lineWidth=2;ctx.setLineDash([4,2]);ctx.beginPath();ctx.moveTo(p.x*24+12,p.y*24+12);ctx.lineTo(h.x*24+12,h.y*24+12);ctx.stroke();ctx.setLineDash([]);
@@ -182,14 +186,15 @@ export class LevelRenderer {
         // cGame.method_159 adds each animation frame's X/Y before drawing the
         // hero. Left-facing frames are mirrored around x+24 or x+26.
         r.frame(ctx,hero,af.frame,p.x*24-p.dx*p.offset+af.x,p.y*24-p.dy*p.offset+af.y,af.flags);
-        if(sim.chestCell>=0&&sim.opened.has(sim.chestCell)&&animationFrameAt(CHEST_OPEN_DURATIONS,sim.chestTicks,false)>13){
-          const prize=level.tiles[sim.chestCell],rx=p.x*24-p.dx*p.offset+af.x,ry=p.y*24-p.dy*p.offset+af.y-24;
+        if(sim.chestCell>=0&&sim.opened.has(sim.chestCell)&&(sim.playerAnimation===47||animationFrameAt(CHEST_OPEN_DURATIONS,sim.chestTicks,false)>13)){
+          const prize=sim.chestReward,rx=p.x*24-p.dx*p.offset+af.x,ry=p.y*24-p.dy*p.offset+af.y-24;
           if(prize===2||prize===41)r.frame(ctx,a.sprite('cm-2'),0,rx,ry,0,prize===2?1:0);
-          else if(prize===42)r.frame(ctx,a.sprite('gen3-1'),0,rx,ry);
+          else if(prize===42)r.module(ctx,a.sprite('gen3-1'),0,rx,ry);
+          else if(prize===40)r.module(ctx,a.sprite('gen2-7'),0,rx,ry);
           else if(prize===24||prize===27||prize===26)r.module(ctx,a.sprite('gen1-9'),prize===24?0:prize===27?1:2,rx,ry);
           else if(prize===4||prize===5)r.module(ctx,a.sprite('gen0-2'),0,rx+6,ry,0,prize===5?1:0);
           else if(prize===6||prize===7)r.module(ctx,a.sprite('cm-4'),prize===6?0:1,rx,ry);
-          else if(prize===51||prize===52||prize===53)r.module(ctx,a.sprite(`mmv-${prize===53?3:prize===51?2:1}`),0,rx,ry);
+          else if(prize===51||prize===52||prize===53)r.module(ctx,a.sprite(`mmv-${prize===53?3:prize===51?2:1}`),0,rx-2,ry);
         }
       }
       if(sim.respawnFlash>0){

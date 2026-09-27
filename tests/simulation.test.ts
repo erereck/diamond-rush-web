@@ -300,6 +300,45 @@ test('a key chest delays the key and never awards a red diamond',()=>{
   assert.equal(sim.goldKeys,1);assert.equal(sim.redDiamonds,0);assert.equal(sim.tile(2,1),-1);
   step(sim,0,80);assert.equal(sim.goldKeys,1);assert.equal(sim.redDiamonds,0);
 });
+test('chest life and health rewards use the original cap conversions and presentation item',()=>{
+  for(const [reward,lives,health,expectedLives,expectedHealth,diamonds,shown] of [
+    [6,5,4,6,4,0,6],[6,99,2,99,4,0,7],[6,99,4,99,4,10,41],
+    [7,5,2,5,4,0,7],[7,5,4,5,4,10,41]
+  ]){
+    const level=fixture(['#####','#@  #','#####']);level.tiles[7]=reward;level.objects[7]=14;
+    const sim=new Simulation(level,{diamonds:0,redDiamonds:0,lives,health});
+    step(sim,2,4);step(sim);
+    assert.equal(sim.tiles[7],-1,'the opening consumes the map item immediately');
+    assert.equal(sim.chestReward,shown);
+    while(!sim.opened.has(7))step(sim);
+    assert.deepEqual([sim.lives,sim.health,sim.diamonds],[expectedLives,expectedHealth,diamonds]);
+    assert.equal(sim.bonusDiamondTotal,diamonds);
+    assert.equal(sim.redDiamonds,0);
+    step(sim,0,80);assert.equal(sim.chestReward,-1);
+  }
+});
+
+test('a chest extra life stays consumed after returning to the checkpoint',()=>{
+  const level=fixture(['#####','#@  #','#####']);level.tiles[7]=6;level.objects[7]=14;
+  const sim=new Simulation(level);step(sim,2,4);
+  while(!sim.opened.has(7))step(sim);
+  sim.restoreCheckpoint(true);
+  assert.equal(sim.lives,6);assert.equal(sim.tiles[7],-1);assert.equal(sim.opened.has(7),true);
+  step(sim,2,4);step(sim,0,90);assert.equal(sim.lives,6);assert.equal(sim.chestCell,-1);
+});
+
+test('equipment presentation emits the original sparkle sprites and clears them on reset',()=>{
+  const level=fixture(['#####','#@  #','#####']);level.tiles[7]=24;level.objects[7]=14;
+  const sim=new Simulation(level);step(sim,2,4);
+  while(sim.playerAnimation!==47)step(sim);
+  step(sim,0,12);
+  assert(sim.itemSparkles.length>0&&sim.itemSparkles.length<=7);
+  assert(sim.itemSparkles.every(s=>s.kind>=0&&s.kind<5&&s.age<[10,10,10,10,9][s.kind]));
+  assert(sim.itemSparkles.every(s=>s.x!==sim.player.x||![sim.player.y,sim.player.y-1].includes(s.y)));
+  sim.restoreCheckpoint();
+  assert.deepEqual(sim.itemSparkles,[]);assert.equal(sim.chestReward,-1);
+});
+
 test('a falling stone kills a snake and leaves the original smoke effect briefly',()=>{
   const sim=new Simulation(fixture(['#######','#  O  #','#  S  #','#  @  #','#######']));
   const stone=sim.index(3,1),snake=sim.index(3,2);sim.state[stone]=3;sim.motion[stone]=6;
@@ -423,7 +462,7 @@ test('the red prize rises above the hero after the chest reward frame',()=>{
   const fromPack=(name:string,index:number)=>decodeSprite(parsePack(readFileSync(new URL(`../../../work/reference-s700/res/${name}.f`,import.meta.url)),`${name}.f`)[index].data,`${name}-${index}`);
   const hero=fromPack('o',0),chest=fromPack('gen3',3),smallChest=fromPack('gen2',2),draws:{id:string;frame:number;x:number;y:number;palette:number}[]=[];
   const base=new SpriteRenderer();
-  const spy={module(){},animation(){},animationFrame:base.animationFrame.bind(base),
+  const spy={module(_ctx:unknown,s:{name:string},frame:number,x:number,y:number,_flags=0,palette=0){draws.push({id:s.name,frame,x,y,palette});},animation(){},animationFrame:base.animationFrame.bind(base),
     frame(_ctx:unknown,s:{name:string},frame:number,x:number,y:number,_flags=0,palette=0){draws.push({id:s.name,frame,x,y,palette});}} as unknown as SpriteRenderer;
   const assets={sprite:(id:string)=>id==='o-0'?hero:id==='gen3-3'?chest:id==='gen2-2'?smallChest:
     {name:id,frames:Array.from({length:8},()=>({})),animations:[]}} as unknown as AssetManager;
@@ -445,6 +484,30 @@ test('the red prize rises above the hero after the chest reward frame',()=>{
   while(animationFrameAt(CHEST_OPEN_DURATIONS,compass.chestTicks,false)<=13)step(compass);
   draws.length=0;renderer.draw({} as CanvasRenderingContext2D,compassLevel,compass.tick,compass);
   assert.ok(draws.some(d=>d.id==='gen3-1'&&d.y===compass.player.y*24-24));
+});
+
+test('every chest reward renders with real decoded sprite modules and frames',()=>{
+  const cache=new Map<string,ReturnType<typeof decodeSprite>>();
+  const assets={sprite(id:string){
+    if(!cache.has(id)){const split=id.lastIndexOf('-'),name=id.slice(0,split),index=Number(id.slice(split+1));
+      cache.set(id,decodeSprite(parsePack(readFileSync(new URL(`../../../work/reference-s700/res/${name}.f`,import.meta.url)),name)[index].data,id));}
+    return cache.get(id)!;
+  }} as unknown as AssetManager;
+  class CheckedRenderer extends SpriteRenderer{
+    override module(_ctx:CanvasRenderingContext2D,s:ReturnType<typeof decodeSprite>,index:number,_x:number,_y:number,_flags=0,palette=0){
+      assert(s.modules[index],`${s.name}: missing real module ${index}`);
+      assert(s.palettes[palette],`${s.name}: missing real palette ${palette}`);
+    }
+  }
+  const renderer=new LevelRenderer(assets,new CheckedRenderer());
+  for(const reward of [2,4,5,6,7,24,26,27,40,41,42,51,52,53]){
+    const level=fixture(['#####','#@  #','#####']);level.tiles[7]=reward;level.objects[7]=reward===2?33:14;level.parameters[7]=5;
+    const sim=new Simulation(level,{diamonds:0,redDiamonds:0,lives:5,health:2});step(sim,2,4);
+    for(let tick=0;tick<90;tick++){
+      renderer.draw({} as CanvasRenderingContext2D,sim.level,sim.tick,sim);
+      step(sim);
+    }
+  }
 });
 
 test('canonical equipment chests award hammer, hook and ice hammer in order',()=>{

@@ -1,6 +1,6 @@
 # Progresso e próximos marcos
 
-Estado em 24/09/2026. Fonte canônica S700 1.2.0. Referências Nokia e ferramentas são comparativas; não misturar regras de execução.
+Estado em 26/09/2026. Fonte canônica S700 1.2.0. Referências Nokia e ferramentas são comparativas; não misturar regras de execução.
 
 | Área | Estado | Limitação restante |
 |---|---|---|
@@ -8,12 +8,12 @@ Estado em 24/09/2026. Fonte canônica S700 1.2.0. Referências Nokia e ferrament
 | Packs, strings e sprites | Todos os recursos decodificados | Comparação visual externa com Java/aparelho |
 | 41 mapas / três planos | Decodificados integralmente | Semântica de todos os parâmetros e objetos |
 | Renderização Canvas | Implementada, com desenhos provisórios de alguns objetos | Ordem exata, animações e efeitos por entidade |
-| Relógio e câmera | Inteiros, 20 Hz, teste independente de refresh; abertura, primeiro roteiro e rota ao aviso do baú comparados com trace Java | Estender trace ao baú aberto, demais cenas e fases jogáveis |
+| Relógio e câmera | Inteiros, 20 Hz, teste independente de refresh; abertura, primeiro roteiro e rota ao aviso do baú comparados com trace Java | Estender trace às demais cenas e fases jogáveis |
 | Controles | Teclado, toque, pausa, ação e retorno ao círculo também na introdução; gamepad implementado | Testar controle físico e calibrar escolha automática de alvos |
 | Movimento / pedras / coleta / cobras | Subconjunto experimental; chão transitável alinhado aos casos de `method_288`, giro visual da pedra, esquerda do herói, esmagamento sob pedra, patrulha e perseguição curta da cobra vermelha | Água, colisões especiais e demais regras |
 | Itens, chaves e portões | Chaves prateadas/douradas, vida extra, cura, conversão da cura em dez diamantes com vida cheia, fechaduras numeradas e abertura animada da passagem | Tempo fino das animações, interruptores e puzzles restantes |
 | Martelo, gancho e martelo de gelo | Baús canônicos concedem níveis 1/2/8; ação escolhe alvo próximo; golpe no frame 2 das animações 13–16 e ricochete 41–44 em pedra/parede; martelo quebra tijolos/grama e atordoa cobras; gancho puxa objetos em linha horizontal com frame inicial 20/22; gelo congela diamantes/cobras; progresso persiste entre fases e checkpoints | Demais alvos e casos especiais de `method_230/231/240/263/333`, tempos do gancho e comparação por trace J2ME |
-| Fogo e baús de Angkor | Alcance, dano, abertura e prêmio visível; baús comuns concedem a quantidade codificada no mapa | Validar tempos por trace Java e efeitos de partículas/áudio |
+| Fogo e baús de Angkor | Alcance, dano, abertura e prêmio visível; 81 estados da bússola conferidos por trace Java; apresentação 47 com brilhos, conversões de cura/vida e consumo permanente da vida extra | Comparar os demais baús, fase dos efeitos e áudio |
 | Perigos de Bavaria e Tibet | Roladores de Bavaria (14), armadilhas duplas (16), espinhos (28) e pedras de teto de Tibet (44); inimigo de gelo (45) anda pelos ciclos da sprite; atirador (46) cai e lança projéteis (21); inimigo 49 usa a patrulha de `method_325`. Martelo de gelo congela e descongela 45/46/49. Estados entram no checkpoint e replay | Interações especiais, IA completa dos inimigos 45/46, água, puzzles, projéteis de outras armas e tempos finos |
 | Tijolos destrutíveis | Frame imóvel até impacto, quebra de 16 ticks e propagação aos vizinhos | Integrar com os projéteis e armas originais |
 | Checkpoint e morte | Snapshot/restore dos planos mutáveis, vidas, dano e retorno após animação | Integrar com RMS, vida máxima e demais equipamentos |
@@ -24,7 +24,7 @@ Estado em 24/09/2026. Fonte canônica S700 1.2.0. Referências Nokia e ferrament
 
 ## Próximo marco de gameplay
 
-1. Expandir o trace da decompilação S700 recompilada, que já compara a entrada e a rota ao aviso do baú, para a abertura do baú, arrays e mudanças de estado nas demais cenas/fases. Executar também o JAR original para comparar bytecode e comportamento.
+1. Expandir o trace da decompilação S700 recompilada, que já compara a entrada, a rota ao aviso do baú e a abertura isolada da bússola, para arrays e mudanças de estado nas demais cenas/fases. Executar também o JAR original para comparar bytecode e comportamento.
 2. Completar `method_288`, `method_304` e `method_351`, inclusive ativação e ordem de atualização. Cobrir limiares, movimento de entidades no mesmo tick, gravidade e colisão com testes de comportamento.
 3. Comparar o checkpoint, morte/vidas e baú já implementados com traces da execução canônica, inclusive a ordem dos eventos em cada tick.
 4. Completar objetos e mecanismos necessários à primeira fase, depois exigir um percurso verificável de entrada até saída. Conclusão experimental atual não equivale à progressão original.

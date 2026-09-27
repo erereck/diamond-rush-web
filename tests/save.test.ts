@@ -80,7 +80,7 @@ test('campaign progress round-trips through the original record without losing u
   const initial=campaignStageStart(restored,worlds,maps,0,6);
   assert.deepEqual(initial.openedChests,[chest]);
   const revisited=new Simulation(worlds[0].levels[6],initial);
-  assert.equal(revisited.tiles[chest],-1);assert.equal(revisited.chestFrames[chest],3);
+  assert.equal(revisited.tiles[chest],-1);assert.equal(revisited.chestFrames[chest],stage.level.objects[chest]===14?2:3);
   assert.equal(revisited.opened.has(chest),true);
   assert.equal(restoreReplay(revisited.replay(),worlds).tiles[chest],-1);
   // method_108 accumulates red diamonds across visits instead of replacing

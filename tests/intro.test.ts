@@ -10,6 +10,7 @@ import { parseWorld } from '../src/level/LevelParser.ts';
 import { LevelRenderer } from '../src/render/LevelRenderer.ts';
 import { SpriteRenderer } from '../src/render/SpriteRenderer.ts';
 import type { AssetManager } from '../src/assets/AssetManager.ts';
+import { animationFrameAt, CHEST_OPEN_DURATIONS } from '../src/core/PhaseOneRules.ts';
 
 const resource=(name:string)=>readFileSync(new URL(`../../../work/reference-s700/res/${name}`,import.meta.url));
 const scripts=parseDemoScripts(parsePack(resource('demo.f'),'demo.f')[0].data);
@@ -113,6 +114,38 @@ test('the route to the chest hint matches measured Java movement and pickups',()
   assert.equal(intro.section,2);
 });
 
+test('compass opening and presentation match 81 measured Java animation states',()=>{
+  const intro=new IntroSequence(level,scripts),sim=intro.sim,cell=sim.index(28,6);
+  // Isolate the chest from preceding travel. Java tick 313 has just settled
+  // on this cell; the measured opening begins in the next map update.
+  intro.section=2;intro.phase='free';sim.tick=313;
+  sim.player={x:28,y:6,dx:-1,dy:0,offset:0,direction:4};
+  sim.chestCell=cell;sim.chestFrames[cell]=1;sim.setAnimation(40);sim.wake(28,6);
+  const rows=readFileSync(new URL('fixtures/intro-compass-chest-s700.csv',import.meta.url),'utf8').trim().split(/\r?\n/).slice(1).map(line=>line.split(',').map(Number));
+  for(const [elapsed,animation,frame,time,tile,chestFrame,awarded] of rows){
+    if((313+elapsed)%20===0&&intro.dialogue)intro.press();
+    intro.step();
+    const shownFrame=animation===40?animationFrameAt(CHEST_OPEN_DURATIONS,sim.animationTick,false):0;
+    assert.deepEqual([sim.playerAnimation,sim.tiles[cell],sim.chestFrames[cell],Number(sim.opened.has(cell))],
+      [animation,tile,chestFrame,awarded],`Java chest elapsed ${elapsed}`);
+    if(animation===40||animation===47){
+      assert.equal(shownFrame,frame,`Java hero frame elapsed ${elapsed}`);
+      const start=animation===40?CHEST_OPEN_DURATIONS.slice(0,frame).reduce((a,b)=>a+b,0):0;
+      assert.equal(sim.animationTick-start,time,`Java frame time elapsed ${elapsed}`);
+    }
+    if(elapsed>=41){assert.equal(intro.scriptId,11);assert.equal(intro.active?.command.opcode,27);}
+    assert.equal(sim.redDiamonds,0);
+  }
+  assert.equal(sim.chestCell,-1);
+  assert.equal(intro.active?.page,0,'presses during presentation must be ignored');
+  while(sim.tick<400)intro.step();
+  intro.press();intro.step();
+  assert.equal(intro.active?.page,2);
+  intro.press();intro.step();intro.step();intro.step();intro.step();
+  assert.equal(intro.phase,'free');
+  assert.equal(sim.level.objects[sim.index(31,7)],255);
+});
+
 function walkTo(intro:IntroSequence,goalX:number,goalY:number){
   for(let tick=0;tick<30&&intro.phase==='opening';tick++)intro.step();
   assert.notEqual(intro.phase,'opening','source opening walk did not finish');
@@ -139,6 +172,20 @@ function finishScript(intro:IntroSequence,dialogue:Set<string>){
   }
   assert.notEqual(intro.phase,'script','script failed to end');
 }
+
+test('source waits include their final ticks and portrait motion starts at the portrait',()=>{
+  const altered=new Map(scripts);
+  altered.set(29,{id:29,resources:[],commands:[
+    {opcode:6,args:[5]},{opcode:13,args:[80,90,5]},{opcode:2,args:[2,230],text:'At the seal.'}
+  ]});
+  const intro=new IntroSequence(level,altered,undefined,29);
+  for(let tick=0;tick<6;tick++){intro.step();assert.equal(intro.commandIndex,0);}
+  intro.step();assert.equal(intro.commandIndex,1);
+  intro.step();assert.deepEqual([intro.portraitX,intro.portraitY],[30,58]);
+  for(let tick=0;tick<5;tick++){intro.step();assert.equal(intro.commandIndex,1);}
+  intro.step();assert.equal(intro.commandIndex,2);
+  intro.step();assert.equal(intro.dialogue?.y,230);
+});
 
 test('the introduction is freely controlled between all six original scenes',()=>{
   const intro=new IntroSequence(level,scripts),seen:number[]=[],dialogue=new Set<string>();

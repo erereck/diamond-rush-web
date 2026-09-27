@@ -1,5 +1,6 @@
 // Animation durations from canonical S700 o.f/0 and gen1.f/0.
 export const CHEST_OPEN_DURATIONS=[1,1,4,11,1,2,3,3,2,3,3,3,2,2,1,25];
+export const ITEM_PRESENTATION_TICKS=42; // o.f/0 animation 47
 export const FIRE_DURATIONS=[20,...Array<number>(35).fill(2)];
 export const BOULDER_BRACE_TICKS=31; // o.f/0 animation 11
 export const BOULDER_PRESSURE_TICKS=40; // cGame.field_93

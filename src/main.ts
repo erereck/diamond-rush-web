@@ -104,7 +104,7 @@ function drawIntro(){
     if(sequence.blinkFrame>=0)sprites.frame(ctx,assets.sprite('demo-sprite-1'),sequence.blinkFrame,x+90,y-6);
   }
   if(dialogue){
-    const x=dialogue.popup?6:7+dialogue.slide,y=dialogue.popup?229:90,height=dialogue.popup?35:dialogue.lines.length*16+7;
+    const x=dialogue.popup?6:7+dialogue.slide,y=dialogue.y,height=dialogue.popup?35:dialogue.lines.length*16+7;
     ctx.fillStyle='#2e2818';ctx.fillRect(x,y,226,height);ctx.strokeStyle='#c4a05b';ctx.strokeRect(x+.5,y+.5,225,height-1);
     dialogue.lines.forEach((line,i)=>text(line,x+(dialogue.popup?16:3),y+4+i*15));
     if(dialogue.popup)text(assets.strings[70],19,211);

@@ -78,12 +78,12 @@ export class IntroSequence {
   get scriptId(){return this.phase==='script'?(this.auxiliaryScriptId??this.stops[this.section].id):null;}
   get finished(){return this.phase==='done';}
   get commandTick(){return this.active?.ticks??0;}
-  get dialogue():{lines:string[];popup:boolean;slide:number}|null{
+  get dialogue():{lines:string[];popup:boolean;slide:number;y:number}|null{
     const running=this.findDialogue(this.active);
     if(!running)return null;
     const popup=running.command.opcode===27,lines=this.wrap(running.command.text??'',popup);
-    return {lines:lines.slice(running.page,running.page+(popup?2:running.command.args[0])),popup,
-      slide:running.closingTicks===undefined?Math.min(0,-240+running.ticks*30):Math.min(263,running.closingStart!+running.closingTicks*30)};
+    return {lines:lines.slice(running.page,running.page+(popup?2:running.command.args[0])),popup,y:popup?229:running.command.args[1],
+      slide:popup?0:running.closingTicks===undefined?Math.min(0,-240+running.ticks*30):Math.min(263,running.closingStart!+running.closingTicks*30)};
   }
   private findDialogue(r:RunningCommand|null):RunningCommand|null{
     if(!r||r.done)return null;
@@ -92,7 +92,12 @@ export class IntroSequence {
     return null;
   }
   press(){
-    if(this.dialogue){this.pressed=true;return;}
+    if(this.dialogue){
+      // DemoInterpreter.method_20 ignores hint presses while animation 47
+      // presents the newly acquired equipment/compass (cGame.field_367).
+      if(this.dialogue.popup&&this.sim.playerAnimation===47)return;
+      this.pressed=true;return;
+    }
     // The original softkey can skip the current automatic animation.
     if(this.phase==='script'&&this.active&&[1,6,12,16,17,18].includes(this.active.command.opcode))this.active.ticks=10000;
   }
@@ -140,9 +145,10 @@ export class IntroSequence {
     return this.font&&this.fontMap?wrapDemoTextPixels(value,popup?196:222,this.font,this.fontMap):wrapDemoText(value,popup?23:18);
   }
   private atTrigger(){
-    if(this.sim.status!=='playing'||this.sim.player.offset!==0||this.sim.chestCell>=0)return false;
+    if(this.sim.status!=='playing'||this.sim.player.offset!==0)return false;
     const stop=this.stops[this.section],i=this.sim.index(stop.x,stop.y);
     if(this.section===2)return this.sim.opened.has(i);
+    if(this.sim.chestCell>=0)return false;
     return this.sim.player.x===stop.x&&this.sim.player.y===stop.y;
   }
   private atSealExit(){return [60,61].includes(this.sim.player.x)&&this.sim.player.y===3&&this.sim.player.offset===0;}
@@ -172,7 +178,7 @@ export class IntroSequence {
     return 0;
   }
   private followHero(){this.cameraX=this.sim.camera.x;this.cameraY=this.sim.camera.y;}
-  private running(command:DemoCommand):RunningCommand{return {command,ticks:0,startX:this.cameraX,startY:this.cameraY,page:0};}
+  private running(command:DemoCommand):RunningCommand{return {command,ticks:0,startX:command.opcode===13?this.portraitX:this.cameraX,startY:command.opcode===13?this.portraitY:this.cameraY,page:0};}
   private stepCommand(r:RunningCommand):boolean{
     const {opcode,args}=r.command;r.ticks++;
     if(opcode===0){
@@ -189,10 +195,19 @@ export class IntroSequence {
       return r.ticks>=duration+2;
     }
     if(opcode===2||opcode===27){
+      if(opcode===27){
+        if(r.closingTicks!==undefined){this.pressed=false;return true;}
+        if(this.pressed){
+          this.pressed=false;
+          if(r.page+2<this.wrap(r.command.text??'',true).length)r.page+=2;
+          else r.closingTicks=0;
+        }
+        return false;
+      }
       if(r.closingTicks!==undefined){this.pressed=false;return r.closingStart!+(++r.closingTicks)*30>=263;}
       if(this.pressed){
         this.pressed=false;
-        const lines=this.wrap(r.command.text??'',opcode===27),perPage=opcode===27?2:args[0];
+        const lines=this.wrap(r.command.text??'',false),perPage=args[0];
         if(r.page+perPage<lines.length){r.page+=perPage;return false;}
         // Dialogue can be dismissed before it has fully slid in. The Java
         // continues from its current X instead of jumping to the open position.
@@ -201,7 +216,7 @@ export class IntroSequence {
       }
       return false;
     }
-    if(opcode===6)return r.ticks>=args[0];
+    if(opcode===6)return r.ticks>=args[0]+2;
     if(opcode===10)return r.ticks>4&&this.sim.player.offset<=0;
     if(opcode===11){this.portraitFrame=args[0];this.portraitSprite=args[1];return true;}
     if(opcode===12){
@@ -212,7 +227,7 @@ export class IntroSequence {
     if(opcode===13){
       const t=Math.min(1,r.ticks/Math.max(1,args[2]));
       this.portraitX=Math.round(r.startX+(args[0]-r.startX)*t);this.portraitY=Math.round(r.startY+(args[1]-r.startY)*t);
-      return r.ticks>=args[2];
+      return r.ticks>=args[2]+2;
     }
     if(opcode===14){this.portraitVisible=true;return true;}
     if(opcode===15){this.portraitVisible=false;this.portraitRevealTicks=0;this.blinkFrame=-1;return true;}

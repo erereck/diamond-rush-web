@@ -60,6 +60,10 @@ Para medir o primeiro diálogo, acrescente `--auto-dialogue --ticks=250` e use o
 
 Com `--walk-chest --ticks=298`, o mesmo capturador avança pelas células transitáveis até o primeiro aviso do baú. A amostra em `tests/fixtures/intro-chest-route-s700.csv` compara posições, deslocamento, dois diamantes coletados, início do roteiro e o passo comandado pelo Java. Esse modo usa uma rota fixa de pesquisa; não representa uma solução automática do tutorial completo.
 
+Com `--open-chest --ticks=460`, a rota continua até o baú da bússola e seu aviso. O arquivo adicional `chest-s700.csv` registra animação, índice/tempo do frame, item e estado do baú. A amostra `tests/fixtures/intro-compass-chest-s700.csv` compara 81 estados consecutivos da abertura e apresentação do item, a partir de uma condição inicial isolada no baú. Ela não certifica o percurso inteiro nem a câmera das cenas seguintes. As pressões durante a apresentação são ignoradas, como no Java; o aviso curto usa páginas fixas, sem a animação lateral da caixa de diálogo longa.
+
+Os baús de equipamento, bússola, poção e cristais passam à animação original 47 e usam os brilhos de `cm.f/7`. A cura de baú com vida cheia vira dez diamantes, e uma vida extra no limite de 99 segue a conversão original. Uma vida extra já obtida em baú permanece consumida após retornar ao checkpoint. O intérprete respeita as pausas finais dos comandos e a posição vertical das falas, inclusive as falas junto ao selo.
+
 ## Estado real
 
 Concluídos nesta etapa: auditoria e hashes das fontes, decodificação dos packs/sprites/mapas/strings/MIDI, renderização de recursos, menu e mapa interativos com os sprites originais, progresso local de campanha, relógio fixo, câmera, controles, simulação inicial, replays versionados e codec estrutural do save original.

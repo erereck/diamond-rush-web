@@ -5,7 +5,7 @@ import { Simulation } from '../src/core/Simulation.ts';
 import { BavariaBoss } from '../src/core/BavariaBoss.ts';
 import { TibetBoss } from '../src/core/TibetBoss.ts';
 import type { WorldDefinition } from '../src/level/LevelParser.ts';
-import { CHEST_OPEN_DURATIONS } from '../src/core/PhaseOneRules.ts';
+import { CHEST_OPEN_DURATIONS, ITEM_PRESENTATION_TICKS } from '../src/core/PhaseOneRules.ts';
 import { restoreReplay } from '../src/platform/Session.ts';
 
 const world=JSON.parse(readFileSync(new URL('../public/assets/world-0.json',import.meta.url),'utf8')) as WorldDefinition;
@@ -59,7 +59,7 @@ test('three hits finish the guardian and checkpoint return restarts the fight',(
 test('the Fire Crystal chest plays its reward scene and finishes Angkor',()=>{
   const s=make();s.player.x=27;s.player.y=6;
   let scene=false;
-  for(let tick=0;tick<CHEST_OPEN_DURATIONS.reduce((a,b)=>a+b,0)+2;tick++){
+  for(let tick=0;tick<CHEST_OPEN_DURATIONS.reduce((a,b)=>a+b,0)+ITEM_PRESENTATION_TICKS;tick++){
     idle(s);if(s.events.includes('demo:32'))scene=true;
   }
   assert.ok(scene);assert.equal(s.status,'complete');assert.equal(s.tile(27,6),-1);
@@ -77,7 +77,7 @@ test('the other two final-chamber crystal chests use their own scripts',()=>{
     const data=JSON.parse(readFileSync(new URL(`../public/assets/world-${worldIndex}.json`,import.meta.url),'utf8')) as WorldDefinition;
     const s=new Simulation(data.levels[levelIndex]);s.player.x=x;s.player.y=y;
     let scene=false;
-    for(let i=0;i<CHEST_OPEN_DURATIONS.reduce((a,b)=>a+b,0)+2;i++){
+    for(let i=0;i<CHEST_OPEN_DURATIONS.reduce((a,b)=>a+b,0)+ITEM_PRESENTATION_TICKS;i++){
       idle(s);if(s.events.includes(`demo:${script}`))scene=true;
     }
     assert.ok(scene);assert.equal(s.status,'complete');

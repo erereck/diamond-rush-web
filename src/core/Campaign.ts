@@ -1,6 +1,8 @@
 import type { Direction, StageStart } from './Simulation.ts';
 import type { MapNode } from '../level/LevelParser.ts';
 import { CanonicalSave } from '../platform/CanonicalSave.ts';
+import type { Simulation } from './Simulation.ts';
+import { stageCollectibleTotals } from './OriginalText.ts';
 
 export const CAMPAIGN_KEY='diamond-rush:campaign:v1';
 export const REWARD_FLAGS=[4,8,16,32] as const;
@@ -24,6 +26,13 @@ export function pendingRewards(c:Campaign,world:number,level:number,eligible:num
   let mask=0;
   for(const flag of REWARD_FLAGS)if(lives<99&&(eligible&flag)&&!((c.awards[world]?.[level]??0)&flag)){mask|=flag;lives++;}
   return {mask,lives};
+}
+/** The four result-screen prizes use the actual visit's collections and damage. */
+export function eligibleStageRewards(s:Simulation){
+  const totals=stageCollectibleTotals(s.level);
+  return (s.diamonds-s.initial.diamonds===totals.diamonds+s.bonusDiamondTotal?4:0)|
+    (s.redDiamonds-s.initial.redDiamonds===totals.redDiamonds?8:0)|
+    (s.hits===0?16:0)|(s.retries===0?32:0);
 }
 export function unlockedWorld(c:Campaign,world:number,maps:MapNode[][]):boolean {
   if(world===0)return true;
@@ -67,8 +76,10 @@ export function finishLevel(c:Campaign,world:number,level:number,resources:Stage
 export function validateCampaign(value:unknown,maps:MapNode[][]):Campaign {
   if(!value||typeof value!=='object')throw new Error('Campanha inválida');
   const c=value as Campaign;
+  // The tutorial has a real S700 save slot, though it is absent from the map.
+  const storedLevel=(world:number,level:number)=>maps[world].some(node=>node.level===level)||(world===0&&level===13);
   if(c.version!==1||!Array.isArray(c.completed)||c.completed.length!==3)throw new Error('Versão da campanha inválida');
-  for(let w=0;w<3;w++)if(!Array.isArray(c.completed[w])||c.completed[w].some(n=>!Number.isInteger(n)||!maps[w].some(node=>node.level===n)))throw new Error('Fases salvas inválidas');
+  for(let w=0;w<3;w++)if(!Array.isArray(c.completed[w])||c.completed[w].some(n=>!Number.isInteger(n)||!storedLevel(w,n)))throw new Error('Fases salvas inválidas');
   // Older local saves had no exit-kind record. Keep secret stages already
   // completed or selected, without exposing every branch beside a normal exit.
   const secretUnlocked=c.secretUnlocked??maps.map((nodes,w)=>nodes.filter(node=>node.type===1&&(
@@ -78,17 +89,19 @@ export function validateCampaign(value:unknown,maps:MapNode[][]):Campaign {
   )).map(node=>node.level));
   if(!Array.isArray(secretUnlocked)||secretUnlocked.length!==3||secretUnlocked.some((row,w)=>!Array.isArray(row)||row.some(level=>!Number.isInteger(level)||!maps[w].some(node=>node.type===1&&node.level===level))))throw new Error('Fases secretas salvas inválidas');
   const explicitUnlocked=c.explicitUnlocked??[[],[],[]];
-  if(!Array.isArray(explicitUnlocked)||explicitUnlocked.length!==3||explicitUnlocked.some((row,w)=>!Array.isArray(row)||row.some(level=>!Number.isInteger(level)||!maps[w].some(node=>node.level===level))))throw new Error('Fases liberadas salvas inválidas');
+  if(!Array.isArray(explicitUnlocked)||explicitUnlocked.length!==3||explicitUnlocked.some((row,w)=>!Array.isArray(row)||row.some(level=>!Number.isInteger(level)||!storedLevel(w,level))))throw new Error('Fases liberadas salvas inválidas');
   // Older v1 saves tracked only completion. Treat their awards as claimed to
   // preserve the life balance earned before per-category flags were stored.
   const awards=c.awards??c.completed.map((levels,w)=>Array.from({length:Math.max(...maps[w].map(node=>node.level))+1},(_,level)=>levels.includes(level)?60:0));
-  if(!Array.isArray(awards)||awards.length!==3||awards.some((row,w)=>!Array.isArray(row)||row.some((flags,i)=>!maps[w].some(node=>node.level===i)||!Number.isInteger(flags)||flags<0||(flags&~60)!==0)))throw new Error('Recompensas salvas inválidas');
+  if(!Array.isArray(awards)||awards.length!==3||awards.some((row,w)=>!Array.isArray(row)||row.some((flags,i)=>!storedLevel(w,i)||!Number.isInteger(flags)||flags<0||(flags&~60)!==0)))throw new Error('Recompensas salvas inválidas');
   const worldAccess=c.worldAccess??[true,false,false];
   if(!Array.isArray(worldAccess)||worldAccess.length!==3||worldAccess.some(v=>typeof v!=='boolean')||!worldAccess[0])throw new Error('Mundos salvos inválidos');
   if(c.canonicalRecord!==undefined&&(!Array.isArray(c.canonicalRecord)||c.canonicalRecord.length<20||c.canonicalRecord.length>1000||c.canonicalRecord.some(b=>!Number.isInteger(b)||b<0||b>255)))throw new Error('Record RMS salvo inválido');
   if(c.canonicalRecord){
     const record=new CanonicalSave(Uint8Array.from(c.canonicalRecord));
-    if(record.worlds.some((w,i)=>w.levels.length!==Math.max(...maps[i].map(node=>node.level))+1))throw new Error('Record RMS de outra versão');
+    // S700 stores the Angkor tutorial at index 13 in RMS. The overworld
+    // has only indices 0–12, so counting map nodes rejected our own saves.
+    if(record.worlds.some((w,i)=>w.levels.length!==Math.max(...maps[i].map(node=>node.level),i===0?13:0)+1))throw new Error('Record RMS de outra versão');
   }
   const normalized={...c,secretUnlocked,explicitUnlocked,worldAccess};
   if(!Number.isInteger(c.world)||c.world<0||c.world>2||!unlockedWorld(normalized,c.world,maps)||!maps[c.world].some(n=>n.level===c.selected&&unlockedNode(normalized,c.world,n,maps)))throw new Error('Mapa salvo inválido');

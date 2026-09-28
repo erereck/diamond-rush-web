@@ -3,7 +3,7 @@ import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
 import { CanonicalSave } from '../src/platform/CanonicalSave.ts';
 import { campaignFromRecord, campaignRecord, campaignStageStart } from '../src/platform/CanonicalCampaign.ts';
-import { finishLevel, newCampaign, unlockedNode, unlockedWorld } from '../src/core/Campaign.ts';
+import { finishLevel, newCampaign, unlockedNode, unlockedWorld, validateCampaign } from '../src/core/Campaign.ts';
 import { Simulation } from '../src/core/Simulation.ts';
 import { restoreReplay } from '../src/platform/Session.ts';
 import { parseWorld,parseWorldMap } from '../src/level/LevelParser.ts';
@@ -55,6 +55,27 @@ test('canonical 41-level save retains every chest in row-major order',()=>{
   }
   save.unlockThrough(0,3);save.unlockThrough(0,1);assert.equal(new CanonicalSave(save.export()).worlds[0].unlocked,3);
   assert.deepEqual(new CanonicalSave(save.export()).export(),save.export());
+});
+
+test('campaign reload accepts the S700 tutorial RMS slot and still rejects another level count',()=>{
+  const res=new URL('../../../work/reference-s700/res/',import.meta.url),read=(name:string)=>readFileSync(new URL(name,res));
+  const worlds=[0,1,2].map(i=>parseWorld(read(`w${i}.bin`),i));
+  const maps=['map_angkor.out','map_scotland.out','map_tibet.out'].map(n=>parseWorldMap(read(n),n));
+  const campaign=finishLevel(newCampaign(),0,0,{diamonds:3,redDiamonds:0,lives:6,health:3,weaponTier:0});
+  campaign.canonicalRecord=[...campaignRecord(campaign,worlds,maps).export()];
+  const restored=validateCampaign(JSON.parse(JSON.stringify(campaign)),maps);
+  assert.deepEqual(restored,campaign);
+  const imported=campaignFromRecord(new CanonicalSave(Uint8Array.from(campaign.canonicalRecord)),worlds,maps);
+  assert.doesNotThrow(()=>validateCampaign(imported,maps));
+  const withTutorialFlags=new CanonicalSave(Uint8Array.from(campaign.canonicalRecord));
+  withTutorialFlags.addLevelFlags(0,13,2|16|64);
+  const withIntro=validateCampaign(campaignFromRecord(withTutorialFlags,worlds,maps),maps);
+  assert.ok(withIntro.completed[0].includes(13));
+  assert.equal(withIntro.awards[0][13],16);
+  assert.deepEqual(campaignRecord(withIntro,worlds,maps).export(),withTutorialFlags.export());
+  const withoutIntro=worlds.map((world,i)=>({...world,levels:i===0?world.levels.slice(0,13):world.levels}));
+  const incompatible={...campaign,canonicalRecord:[...CanonicalSave.create(withoutIntro,maps).export()]};
+  assert.throws(()=>validateCampaign(incompatible,maps),/outra versão/);
 });
 
 test('campaign progress round-trips through the original record without losing unknown bytes',()=>{

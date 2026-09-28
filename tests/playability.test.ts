@@ -6,6 +6,8 @@ import type { RouteFixture } from '../tools/routes/RouteRunner.ts';
 import { buildPlayabilityReport, renderPlayabilityReport } from '../tools/routes/PlayabilityReport.ts';
 import { loadRouteResources } from '../tools/routes/loadResources.ts';
 import { restoreReplay, validateReplay } from '../src/platform/Session.ts';
+import { playCampaignRoute, verifyCampaignRoute } from '../tools/routes/CampaignRoute.ts';
+import type { CampaignRouteFixture } from '../tools/routes/CampaignRoute.ts';
 
 const resources=loadRouteResources();
 const root=new URL('fixtures/routes/',import.meta.url);
@@ -56,6 +58,44 @@ test('boss certification rejects a crystal route without a completed boss defeat
   assert.equal(completedRoute(runner),true);
 });
 
+test('all three boss routes contain their real hits and Tibet uses both bridge states, freezing and hook pulls',()=>{
+  for(const {fixture} of fixtures.filter(f=>f.fixture.expected.bossHealth!==null)){
+    const runner=playRoute(fixture,resources);
+    assert.equal(runner.eventCounts['boss-hurt'],[3,4,5][fixture.world]);
+    assert.equal(runner.eventCounts['boss-defeated'],1);
+    assert.equal(runner.eventCounts['boss-clear'],1);
+    if(fixture.world===2){
+      assert.equal(runner.eventCounts['tibet-bridge'],5);
+      assert.ok(runner.eventCounts.freeze>=5);
+      assert.ok(runner.eventCounts['hook-pull']>=5);
+      assert.deepEqual(runner.demos,[35]);
+      // method_322 requests 31, but that ID is absent from the canonical
+      // demo.f pack. Do not invent dialogue or mistake the entrance for it.
+      assert.equal(runner.eventCounts['demo:31'],1);
+      assert.equal(resources.scripts.has(31),false);
+    }
+  }
+});
+
+test('New Game completes intro and Angkor 1–2 with carried resources, rewards and save reloads',()=>{
+  const fixture=JSON.parse(readFileSync(new URL('fixtures/campaign-routes/angkor-start.json',import.meta.url),'utf8')) as CampaignRouteFixture;
+  const result=verifyCampaignRoute(fixture);
+  assert.deepEqual(result.completed,[[0,1],[],[]]);
+  assert.deepEqual(result.unlocked,[[0,1,2],[],[]]);
+  assert.deepEqual(result.resources,{diamonds:10,redDiamonds:0,lives:7,health:4,weaponTier:0});
+  assert.deepEqual(result.stages[2].initial,{diamonds:0,redDiamonds:0,lives:6,health:3,weaponTier:0});
+  assert.deepEqual(result.opened,[{world:0,level:0,cells:[]},{world:0,level:1,cells:[426]}]);
+  assert.deepEqual(result.awards,[[32,32],[],[]]);
+});
+
+test('campaign routes cannot skip locks, introduction, or inject saved resources',()=>{
+  assert.throws(()=>playCampaignRoute(['angkor-introduction.json','angkor-boss-crystal.json']),/locked/);
+  assert.throws(()=>playCampaignRoute(['angkor-01-normal.json','angkor-02-normal.json']),/introduction/);
+  const fixture=JSON.parse(readFileSync(new URL('fixtures/campaign-routes/angkor-start.json',import.meta.url),'utf8')) as CampaignRouteFixture;
+  Object.assign(fixture,{resources:{weaponTier:8,lives:99}});
+  assert.throws(()=>verifyCampaignRoute(fixture),/inject progress/);
+});
+
 test('the playability inventory covers all maps and every alternative exit without promoting attempts',()=>{
   const report=buildPlayabilityReport();
   const pairs=report.levels.map(level=>`${level.world}/${level.level}`);
@@ -67,9 +107,11 @@ test('the playability inventory covers all maps and every alternative exit witho
     assert.equal(level.goals.length,2);
     assert.notEqual(level.status,'verified','no ordinary-exit replay may certify its secret exit');
   }
-  assert.equal(report.levels.find(level=>level.world===2&&level.level===10)!.status,'attempted');
-  assert.equal(report.counts.verifiedBosses,2);
-  assert.equal(report.counts.completedRoutes,4);
+  assert.equal(report.levels.find(level=>level.world===2&&level.level===10)!.status,'verified');
+  assert.equal(report.counts.verifiedBosses,3);
+  assert.equal(report.counts.completedRoutes,6);
+  assert.equal(report.counts.campaignPrefixes,1);
+  assert.equal(report.counts.campaignPrefixStages,2);
   assert.deepEqual(JSON.parse(readFileSync(new URL('../docs/PLAYABILITY.json',import.meta.url),'utf8')),report);
   assert.equal(readFileSync(new URL('../docs/PLAYABILITY.md',import.meta.url),'utf8'),renderPlayabilityReport(report));
 });

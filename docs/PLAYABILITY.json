@@ -1,17 +1,179 @@
 {
   "engine": "fidelity-22",
   "reference": "5e05c42aa1aae3377790600eb6d27497101b79e7",
-  "scope": "Control-only routes from the original spawn in isolated stages. This is not a new-save campaign or Java parity certificate.",
+  "scope": "Control-only routes from the original spawn and explicitly bounded New Game prefixes. Not a full campaign or Java parity certificate.",
   "counts": {
     "maps": 41,
     "playableStages": 40,
     "secretStages": 10,
     "goals": 47,
-    "verifiedMaps": 4,
-    "verifiedBosses": 2,
-    "completedRoutes": 4,
-    "attemptedMaps": 2
+    "verifiedMaps": 6,
+    "verifiedBosses": 3,
+    "completedRoutes": 6,
+    "attemptedMaps": 0,
+    "campaignPrefixes": 1,
+    "campaignPrefixStages": 2
   },
+  "campaignPrefixes": [
+    {
+      "file": "tests/fixtures/campaign-routes/angkor-start.json",
+      "stages": [
+        {
+          "file": "angkor-introduction.json",
+          "world": 0,
+          "level": 13,
+          "initial": {
+            "diamonds": 0,
+            "redDiamonds": 0,
+            "lives": 5,
+            "health": 4
+          },
+          "outcome": {
+            "status": "intro-complete",
+            "ticks": 1428,
+            "x": 61,
+            "y": 3,
+            "exitObject": 0,
+            "diamonds": 4,
+            "redDiamonds": 0,
+            "lives": 4,
+            "health": 4,
+            "weaponTier": 0,
+            "hits": 0,
+            "retries": 2,
+            "opened": [
+              436,
+              596
+            ],
+            "demos": [
+              29,
+              10,
+              11,
+              13,
+              15,
+              16,
+              17,
+              28
+            ],
+            "bossHealth": null,
+            "bossCleared": false
+          },
+          "awards": 0
+        },
+        {
+          "file": "angkor-01-normal.json",
+          "world": 0,
+          "level": 0,
+          "initial": {
+            "diamonds": 0,
+            "redDiamonds": 0,
+            "lives": 5,
+            "health": 4,
+            "weaponTier": 0
+          },
+          "outcome": {
+            "status": "complete",
+            "ticks": 398,
+            "x": 32,
+            "y": 9,
+            "exitObject": 5,
+            "diamonds": 0,
+            "redDiamonds": 0,
+            "lives": 5,
+            "health": 3,
+            "weaponTier": 0,
+            "hits": 1,
+            "retries": 0,
+            "opened": [],
+            "demos": [],
+            "bossHealth": null,
+            "bossCleared": false
+          },
+          "awards": 32
+        },
+        {
+          "file": "angkor-02-normal.json",
+          "world": 0,
+          "level": 1,
+          "initial": {
+            "diamonds": 0,
+            "redDiamonds": 0,
+            "lives": 6,
+            "health": 3,
+            "weaponTier": 0
+          },
+          "outcome": {
+            "status": "complete",
+            "ticks": 722,
+            "x": 33,
+            "y": 2,
+            "exitObject": 5,
+            "diamonds": 10,
+            "redDiamonds": 0,
+            "lives": 6,
+            "health": 4,
+            "weaponTier": 0,
+            "hits": 1,
+            "retries": 0,
+            "opened": [
+              426
+            ],
+            "demos": [],
+            "bossHealth": null,
+            "bossCleared": false
+          },
+          "awards": 32
+        }
+      ],
+      "completed": [
+        [
+          0,
+          1
+        ],
+        [],
+        []
+      ],
+      "awards": [
+        [
+          32,
+          32
+        ],
+        [],
+        []
+      ],
+      "resources": {
+        "diamonds": 10,
+        "redDiamonds": 0,
+        "lives": 7,
+        "health": 4,
+        "weaponTier": 0
+      },
+      "unlocked": [
+        [
+          0,
+          1,
+          2
+        ],
+        [],
+        []
+      ],
+      "opened": [
+        {
+          "world": 0,
+          "level": 0,
+          "cells": []
+        },
+        {
+          "world": 0,
+          "level": 1,
+          "cells": [
+            426
+          ]
+        }
+      ],
+      "recordHash": "a34f5c85026227f8fb77b221fd8a74b24a7a5296f5c603638a9f89d6457fdbfe"
+    }
+  ],
   "levels": [
     {
       "world": 0,
@@ -57,6 +219,13 @@
             "demos": [],
             "bossHealth": null,
             "bossCleared": false
+          },
+          "events": {
+            "hurt": 1,
+            "grass": 29,
+            "boulder": 6,
+            "checkpoint": 2,
+            "complete": 1
           }
         }
       ],
@@ -76,8 +245,53 @@
           "y": 2
         }
       ],
-      "status": "attempted",
-      "evidence": [],
+      "status": "verified",
+      "evidence": [
+        {
+          "file": "tests/fixtures/routes/angkor-02-normal.json",
+          "world": 0,
+          "level": 1,
+          "goal": "normal",
+          "initial": {
+            "diamonds": 0,
+            "redDiamonds": 0,
+            "lives": 5,
+            "health": 4,
+            "weaponTier": 0
+          },
+          "outcome": {
+            "status": "complete",
+            "ticks": 722,
+            "x": 33,
+            "y": 2,
+            "exitObject": 5,
+            "diamonds": 10,
+            "redDiamonds": 0,
+            "lives": 5,
+            "health": 4,
+            "weaponTier": 0,
+            "hits": 1,
+            "retries": 0,
+            "opened": [
+              426
+            ],
+            "demos": [],
+            "bossHealth": null,
+            "bossCleared": false
+          },
+          "events": {
+            "grass": 22,
+            "diamond": 10,
+            "boulder": 27,
+            "checkpoint": 3,
+            "hurt": 1,
+            "enemy-death": 2,
+            "chest": 1,
+            "chest-reward": 1,
+            "complete": 1
+          }
+        }
+      ],
       "pendingAttempts": [
         {
           "file": "tests/fixtures/route-attempts/angkor-02-approach.json",
@@ -108,6 +322,11 @@
             "demos": [],
             "bossHealth": null,
             "bossCleared": false
+          },
+          "events": {
+            "grass": 3,
+            "diamond": 2,
+            "boulder": 1
           }
         }
       ],
@@ -147,7 +366,14 @@
       "status": "unverified",
       "evidence": [],
       "pendingAttempts": [],
-      "reviews": []
+      "reviews": [
+        {
+          "plane": "object",
+          "tile": 6,
+          "description": "Placas de pressão: method_316/256/259",
+          "count": 2
+        }
+      ]
     },
     {
       "world": 0,
@@ -167,8 +393,15 @@
       "pendingAttempts": [],
       "reviews": [
         {
+          "plane": "tile",
           "tile": 11,
           "description": "Objeto móvel 11: method_331",
+          "count": 1
+        },
+        {
+          "plane": "object",
+          "tile": 6,
+          "description": "Placas de pressão: method_316/256/259",
           "count": 1
         }
       ]
@@ -189,7 +422,14 @@
       "status": "unverified",
       "evidence": [],
       "pendingAttempts": [],
-      "reviews": []
+      "reviews": [
+        {
+          "plane": "object",
+          "tile": 6,
+          "description": "Placas de pressão: method_316/256/259",
+          "count": 1
+        }
+      ]
     },
     {
       "world": 0,
@@ -214,8 +454,15 @@
       "pendingAttempts": [],
       "reviews": [
         {
+          "plane": "tile",
           "tile": 11,
           "description": "Objeto móvel 11: method_331",
+          "count": 2
+        },
+        {
+          "plane": "object",
+          "tile": 6,
+          "description": "Placas de pressão: method_316/256/259",
           "count": 2
         }
       ]
@@ -241,7 +488,14 @@
       "status": "unverified",
       "evidence": [],
       "pendingAttempts": [],
-      "reviews": []
+      "reviews": [
+        {
+          "plane": "object",
+          "tile": 6,
+          "description": "Placas de pressão: method_316/256/259",
+          "count": 2
+        }
+      ]
     },
     {
       "world": 0,
@@ -292,6 +546,17 @@
             ],
             "bossHealth": 0,
             "bossCleared": true
+          },
+          "events": {
+            "checkpoint": 1,
+            "boulder": 7,
+            "boss-hurt": 3,
+            "boss-defeated": 1,
+            "boss-clear": 1,
+            "chest": 1,
+            "demo:32": 1,
+            "chest-reward": 1,
+            "complete": 1
           }
         }
       ],
@@ -314,7 +579,14 @@
       "status": "unverified",
       "evidence": [],
       "pendingAttempts": [],
-      "reviews": []
+      "reviews": [
+        {
+          "plane": "object",
+          "tile": 6,
+          "description": "Placas de pressão: method_316/256/259",
+          "count": 5
+        }
+      ]
     },
     {
       "world": 0,
@@ -332,7 +604,14 @@
       "status": "unverified",
       "evidence": [],
       "pendingAttempts": [],
-      "reviews": []
+      "reviews": [
+        {
+          "plane": "object",
+          "tile": 6,
+          "description": "Placas de pressão: method_316/256/259",
+          "count": 2
+        }
+      ]
     },
     {
       "world": 0,
@@ -425,6 +704,18 @@
             ],
             "bossHealth": null,
             "bossCleared": false
+          },
+          "events": {
+            "grass": 21,
+            "diamond": 4,
+            "boulder": 12,
+            "chest": 2,
+            "demo:11": 1,
+            "chest-reward": 2,
+            "checkpoint": 1,
+            "death": 2,
+            "respawn-start": 2,
+            "respawn": 2
           }
         }
       ],
@@ -467,6 +758,7 @@
       "pendingAttempts": [],
       "reviews": [
         {
+          "plane": "tile",
           "tile": 11,
           "description": "Objeto móvel 11: method_331",
           "count": 1
@@ -491,9 +783,16 @@
       "pendingAttempts": [],
       "reviews": [
         {
+          "plane": "tile",
           "tile": 11,
           "description": "Objeto móvel 11: method_331",
           "count": 1
+        },
+        {
+          "plane": "object",
+          "tile": 6,
+          "description": "Placas de pressão: method_316/256/259",
+          "count": 2
         }
       ]
     },
@@ -518,7 +817,14 @@
       "status": "unverified",
       "evidence": [],
       "pendingAttempts": [],
-      "reviews": []
+      "reviews": [
+        {
+          "plane": "object",
+          "tile": 6,
+          "description": "Placas de pressão: method_316/256/259",
+          "count": 1
+        }
+      ]
     },
     {
       "world": 1,
@@ -538,18 +844,27 @@
       "pendingAttempts": [],
       "reviews": [
         {
+          "plane": "tile",
           "tile": 11,
           "description": "Objeto móvel 11: method_331",
           "count": 2
         },
         {
+          "plane": "tile",
           "tile": 18,
           "description": "Interruptores/ponte fora da arena de Tibet: method_240",
           "count": 3
         },
         {
+          "plane": "tile",
           "tile": 36,
           "description": "Objeto 36: method_318",
+          "count": 2
+        },
+        {
+          "plane": "object",
+          "tile": 6,
+          "description": "Placas de pressão: method_316/256/259",
           "count": 2
         }
       ]
@@ -572,16 +887,19 @@
       "pendingAttempts": [],
       "reviews": [
         {
+          "plane": "tile",
           "tile": 8,
           "description": "Objeto 8: queda e interações de method_351/331",
           "count": 9
         },
         {
+          "plane": "tile",
           "tile": 18,
           "description": "Interruptores/ponte fora da arena de Tibet: method_240",
           "count": 3
         },
         {
+          "plane": "tile",
           "tile": 37,
           "description": "Objeto 37: method_330",
           "count": 13
@@ -611,26 +929,31 @@
       "pendingAttempts": [],
       "reviews": [
         {
+          "plane": "tile",
           "tile": 8,
           "description": "Objeto 8: queda e interações de method_351/331",
           "count": 26
         },
         {
+          "plane": "tile",
           "tile": 11,
           "description": "Objeto móvel 11: method_331",
           "count": 3
         },
         {
+          "plane": "tile",
           "tile": 18,
           "description": "Interruptores/ponte fora da arena de Tibet: method_240",
           "count": 6
         },
         {
+          "plane": "tile",
           "tile": 36,
           "description": "Objeto 36: method_318",
           "count": 1
         },
         {
+          "plane": "tile",
           "tile": 37,
           "description": "Objeto 37: method_330",
           "count": 6
@@ -655,26 +978,31 @@
       "pendingAttempts": [],
       "reviews": [
         {
+          "plane": "tile",
           "tile": 8,
           "description": "Objeto 8: queda e interações de method_351/331",
           "count": 7
         },
         {
+          "plane": "tile",
           "tile": 11,
           "description": "Objeto móvel 11: method_331",
           "count": 3
         },
         {
+          "plane": "tile",
           "tile": 18,
           "description": "Interruptores/ponte fora da arena de Tibet: method_240",
           "count": 1
         },
         {
+          "plane": "tile",
           "tile": 37,
           "description": "Objeto 37: method_330",
           "count": 4
         },
         {
+          "plane": "tile",
           "tile": 38,
           "description": "Mecanismo 38 e gatilhos associados",
           "count": 3
@@ -699,26 +1027,31 @@
       "pendingAttempts": [],
       "reviews": [
         {
+          "plane": "tile",
           "tile": 8,
           "description": "Objeto 8: queda e interações de method_351/331",
           "count": 6
         },
         {
+          "plane": "tile",
           "tile": 11,
           "description": "Objeto móvel 11: method_331",
           "count": 5
         },
         {
+          "plane": "tile",
           "tile": 18,
           "description": "Interruptores/ponte fora da arena de Tibet: method_240",
           "count": 5
         },
         {
+          "plane": "tile",
           "tile": 37,
           "description": "Objeto 37: method_330",
           "count": 5
         },
         {
+          "plane": "tile",
           "tile": 38,
           "description": "Mecanismo 38 e gatilhos associados",
           "count": 3
@@ -774,6 +1107,19 @@
             ],
             "bossHealth": 0,
             "bossCleared": true
+          },
+          "events": {
+            "checkpoint": 1,
+            "boulder": 6,
+            "boss-stone": 5,
+            "boss-hurt": 4,
+            "hurt": 2,
+            "boss-defeated": 1,
+            "boss-clear": 1,
+            "chest": 1,
+            "demo:30": 1,
+            "chest-reward": 1,
+            "complete": 1
           }
         }
       ],
@@ -798,24 +1144,34 @@
       "pendingAttempts": [],
       "reviews": [
         {
+          "plane": "tile",
           "tile": 8,
           "description": "Objeto 8: queda e interações de method_351/331",
           "count": 3
         },
         {
+          "plane": "tile",
           "tile": 18,
           "description": "Interruptores/ponte fora da arena de Tibet: method_240",
           "count": 1
         },
         {
+          "plane": "tile",
           "tile": 37,
           "description": "Objeto 37: method_330",
           "count": 3
         },
         {
+          "plane": "tile",
           "tile": 38,
           "description": "Mecanismo 38 e gatilhos associados",
           "count": 2
+        },
+        {
+          "plane": "object",
+          "tile": 6,
+          "description": "Placas de pressão: method_316/256/259",
+          "count": 1
         }
       ]
     },
@@ -837,24 +1193,34 @@
       "pendingAttempts": [],
       "reviews": [
         {
+          "plane": "tile",
           "tile": 8,
           "description": "Objeto 8: queda e interações de method_351/331",
           "count": 5
         },
         {
+          "plane": "tile",
           "tile": 18,
           "description": "Interruptores/ponte fora da arena de Tibet: method_240",
           "count": 2
         },
         {
+          "plane": "tile",
           "tile": 37,
           "description": "Objeto 37: method_330",
           "count": 4
         },
         {
+          "plane": "tile",
           "tile": 38,
           "description": "Mecanismo 38 e gatilhos associados",
           "count": 1
+        },
+        {
+          "plane": "object",
+          "tile": 6,
+          "description": "Placas de pressão: method_316/256/259",
+          "count": 2
         }
       ]
     },
@@ -876,31 +1242,37 @@
       "pendingAttempts": [],
       "reviews": [
         {
+          "plane": "tile",
           "tile": 8,
           "description": "Objeto 8: queda e interações de method_351/331",
           "count": 1
         },
         {
+          "plane": "tile",
           "tile": 11,
           "description": "Objeto móvel 11: method_331",
           "count": 1
         },
         {
+          "plane": "tile",
           "tile": 18,
           "description": "Interruptores/ponte fora da arena de Tibet: method_240",
           "count": 3
         },
         {
+          "plane": "tile",
           "tile": 36,
           "description": "Objeto 36: method_318",
           "count": 1
         },
         {
+          "plane": "tile",
           "tile": 37,
           "description": "Objeto 37: method_330",
           "count": 2
         },
         {
+          "plane": "tile",
           "tile": 38,
           "description": "Mecanismo 38 e gatilhos associados",
           "count": 2
@@ -925,6 +1297,7 @@
       "pendingAttempts": [],
       "reviews": [
         {
+          "plane": "tile",
           "tile": 38,
           "description": "Mecanismo 38 e gatilhos associados",
           "count": 1
@@ -954,6 +1327,7 @@
       "pendingAttempts": [],
       "reviews": [
         {
+          "plane": "tile",
           "tile": 18,
           "description": "Interruptores/ponte fora da arena de Tibet: method_240",
           "count": 1
@@ -976,7 +1350,14 @@
       "status": "unverified",
       "evidence": [],
       "pendingAttempts": [],
-      "reviews": []
+      "reviews": [
+        {
+          "plane": "object",
+          "tile": 6,
+          "description": "Placas de pressão: method_316/256/259",
+          "count": 2
+        }
+      ]
     },
     {
       "world": 2,
@@ -996,14 +1377,22 @@
       "pendingAttempts": [],
       "reviews": [
         {
+          "plane": "tile",
           "tile": 18,
           "description": "Interruptores/ponte fora da arena de Tibet: method_240",
           "count": 1
         },
         {
+          "plane": "tile",
           "tile": 47,
           "description": "Objeto 47: method_351/311",
           "count": 7
+        },
+        {
+          "plane": "object",
+          "tile": 6,
+          "description": "Placas de pressão: method_316/256/259",
+          "count": 4
         }
       ]
     },
@@ -1030,14 +1419,22 @@
       "pendingAttempts": [],
       "reviews": [
         {
+          "plane": "tile",
           "tile": 18,
           "description": "Interruptores/ponte fora da arena de Tibet: method_240",
           "count": 3
         },
         {
+          "plane": "tile",
           "tile": 47,
           "description": "Objeto 47: method_351/311",
           "count": 5
+        },
+        {
+          "plane": "object",
+          "tile": 6,
+          "description": "Placas de pressão: method_316/256/259",
+          "count": 1
         }
       ]
     },
@@ -1059,14 +1456,22 @@
       "pendingAttempts": [],
       "reviews": [
         {
+          "plane": "tile",
           "tile": 18,
           "description": "Interruptores/ponte fora da arena de Tibet: method_240",
           "count": 1
         },
         {
+          "plane": "tile",
           "tile": 48,
           "description": "Objeto 48: method_306/305 e puxão de method_263",
           "count": 6
+        },
+        {
+          "plane": "object",
+          "tile": 6,
+          "description": "Placas de pressão: method_316/256/259",
+          "count": 1
         }
       ]
     },
@@ -1088,19 +1493,28 @@
       "pendingAttempts": [],
       "reviews": [
         {
+          "plane": "tile",
           "tile": 18,
           "description": "Interruptores/ponte fora da arena de Tibet: method_240",
           "count": 2
         },
         {
+          "plane": "tile",
           "tile": 47,
           "description": "Objeto 47: method_351/311",
           "count": 1
         },
         {
+          "plane": "tile",
           "tile": 48,
           "description": "Objeto 48: method_306/305 e puxão de method_263",
           "count": 7
+        },
+        {
+          "plane": "object",
+          "tile": 6,
+          "description": "Placas de pressão: method_316/256/259",
+          "count": 4
         }
       ]
     },
@@ -1122,19 +1536,28 @@
       "pendingAttempts": [],
       "reviews": [
         {
+          "plane": "tile",
           "tile": 18,
           "description": "Interruptores/ponte fora da arena de Tibet: method_240",
           "count": 1
         },
         {
+          "plane": "tile",
           "tile": 47,
           "description": "Objeto 47: method_351/311",
           "count": 1
         },
         {
+          "plane": "tile",
           "tile": 48,
           "description": "Objeto 48: method_306/305 e puxão de method_263",
           "count": 1
+        },
+        {
+          "plane": "object",
+          "tile": 6,
+          "description": "Placas de pressão: method_316/256/259",
+          "count": 2
         }
       ]
     },
@@ -1156,19 +1579,28 @@
       "pendingAttempts": [],
       "reviews": [
         {
+          "plane": "tile",
           "tile": 18,
           "description": "Interruptores/ponte fora da arena de Tibet: method_240",
           "count": 1
         },
         {
+          "plane": "tile",
           "tile": 47,
           "description": "Objeto 47: method_351/311",
           "count": 8
         },
         {
+          "plane": "tile",
           "tile": 48,
           "description": "Objeto 48: method_306/305 e puxão de method_263",
           "count": 6
+        },
+        {
+          "plane": "object",
+          "tile": 6,
+          "description": "Placas de pressão: method_316/256/259",
+          "count": 3
         }
       ]
     },
@@ -1190,14 +1622,22 @@
       "pendingAttempts": [],
       "reviews": [
         {
+          "plane": "tile",
           "tile": 47,
           "description": "Objeto 47: method_351/311",
           "count": 6
         },
         {
+          "plane": "tile",
           "tile": 48,
           "description": "Objeto 48: method_306/305 e puxão de method_263",
           "count": 7
+        },
+        {
+          "plane": "object",
+          "tile": 6,
+          "description": "Placas de pressão: method_316/256/259",
+          "count": 3
         }
       ]
     },
@@ -1214,8 +1654,66 @@
           "y": 5
         }
       ],
-      "status": "attempted",
-      "evidence": [],
+      "status": "verified",
+      "evidence": [
+        {
+          "file": "tests/fixtures/routes/tibet-boss-crystal.json",
+          "world": 2,
+          "level": 10,
+          "goal": "crystal",
+          "initial": {
+            "diamonds": 0,
+            "redDiamonds": 0,
+            "lives": 5,
+            "health": 4,
+            "weaponTier": 8
+          },
+          "outcome": {
+            "status": "complete",
+            "ticks": 2968,
+            "x": 27,
+            "y": 5,
+            "exitObject": 0,
+            "diamonds": 0,
+            "redDiamonds": 0,
+            "lives": 5,
+            "health": 2,
+            "weaponTier": 8,
+            "hits": 2,
+            "retries": 0,
+            "opened": [
+              202
+            ],
+            "demos": [
+              35
+            ],
+            "bossHealth": 0,
+            "bossCleared": true
+          },
+          "events": {
+            "checkpoint": 1,
+            "trap-trigger": 1,
+            "trap-fall": 8,
+            "trap-impact": 8,
+            "boss-ceiling": 7,
+            "hammer": 13,
+            "tibet-switch": 5,
+            "tibet-bridge": 5,
+            "freeze": 7,
+            "hook": 5,
+            "hook-pull": 5,
+            "boss-hurt": 5,
+            "boss-stone": 7,
+            "hurt": 2,
+            "boss-defeated": 1,
+            "boss-clear": 1,
+            "chest": 1,
+            "demo:31": 1,
+            "chest-reward": 1,
+            "complete": 1
+          }
+        }
+      ],
       "pendingAttempts": [
         {
           "file": "tests/fixtures/route-attempts/tibet-boss-approach.json",
@@ -1248,6 +1746,20 @@
             ],
             "bossHealth": 5,
             "bossCleared": false
+          },
+          "events": {
+            "checkpoint": 1,
+            "trap-trigger": 3,
+            "trap-fall": 10,
+            "trap-impact": 10,
+            "boss-ceiling": 7,
+            "hammer": 2,
+            "tibet-switch": 2,
+            "tibet-bridge": 2,
+            "hurt": 6,
+            "death": 1,
+            "respawn-start": 1,
+            "respawn": 1
           }
         }
       ],
@@ -1271,9 +1783,16 @@
       "pendingAttempts": [],
       "reviews": [
         {
+          "plane": "tile",
           "tile": 18,
           "description": "Interruptores/ponte fora da arena de Tibet: method_240",
           "count": 2
+        },
+        {
+          "plane": "object",
+          "tile": 6,
+          "description": "Placas de pressão: method_316/256/259",
+          "count": 3
         }
       ]
     },
@@ -1295,18 +1814,27 @@
       "pendingAttempts": [],
       "reviews": [
         {
+          "plane": "tile",
           "tile": 18,
           "description": "Interruptores/ponte fora da arena de Tibet: method_240",
           "count": 2
         },
         {
+          "plane": "tile",
           "tile": 38,
           "description": "Mecanismo 38 e gatilhos associados",
           "count": 1
         },
         {
+          "plane": "tile",
           "tile": 47,
           "description": "Objeto 47: method_351/311",
+          "count": 1
+        },
+        {
+          "plane": "object",
+          "tile": 6,
+          "description": "Placas de pressão: method_316/256/259",
           "count": 1
         }
       ]
@@ -1329,14 +1857,22 @@
       "pendingAttempts": [],
       "reviews": [
         {
+          "plane": "tile",
           "tile": 38,
           "description": "Mecanismo 38 e gatilhos associados",
           "count": 1
         },
         {
+          "plane": "tile",
           "tile": 47,
           "description": "Objeto 47: method_351/311",
           "count": 6
+        },
+        {
+          "plane": "object",
+          "tile": 6,
+          "description": "Placas de pressão: method_316/256/259",
+          "count": 3
         }
       ]
     }

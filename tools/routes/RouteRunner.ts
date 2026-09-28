@@ -27,6 +27,7 @@ export class RouteRunner {
   scene:IntroSequence|null=null;
   readonly controls:RouteControl[]=[];
   readonly demos:number[]=[];
+  readonly eventCounts:Record<string,number>={};
   bossCleared=false;
   private actionHeld=false;
   private tutorial:boolean;
@@ -49,6 +50,7 @@ export class RouteRunner {
     if(this.finished||this.sim.status==='dead')throw new Error('Route contains controls after its terminal state');
     validateControl(control);
     this.controls.push({...control});
+    const beforeTick=this.sim.tick;
     if(this.scene){
       if(control.action&&!this.actionHeld)this.scene.press();
       const id=this.scene.scriptId;
@@ -65,6 +67,10 @@ export class RouteRunner {
       }
     }
     if(this.sim.events.includes('boss-clear'))this.bossCleared=true;
+    // A finished dialogue may retain the last simulation events without an
+    // update. Count each real update once, including updates inside cutscenes.
+    if(this.sim.tick!==beforeTick)for(const event of this.sim.events)
+      this.eventCounts[event]=(this.eventCounts[event]??0)+1;
   }
   outcome():RouteOutcome {
     const s=this.sim;

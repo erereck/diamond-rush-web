@@ -1,6 +1,6 @@
 import type { WorldDefinition, MapNode } from '../level/LevelParser.ts';
 import type { Campaign } from '../core/Campaign.ts';
-import { newCampaign, unlockedNode, unlockedWorld } from '../core/Campaign.ts';
+import { eligibleStageRewards, finishLevel, newCampaign, pendingRewards, unlockedNode, unlockedWorld } from '../core/Campaign.ts';
 import type { Simulation } from '../core/Simulation.ts';
 import type { StageStart } from '../core/Simulation.ts';
 import { CanonicalSave } from './CanonicalSave.ts';
@@ -45,6 +45,17 @@ export function campaignStageStart(c:Campaign,worlds:WorldDefinition[],maps:MapN
     else if(chest.x!==cells[i]%definition.width||chest.y!==Math.floor(cells[i]/definition.width))throw new Error('RMS: posição de baú incompatível.');
   });
   return {...c.resources,openedChests};
+}
+
+/** Shared by the game and control-route verification, including the real RMS write. */
+export function completeCampaignLevel(c:Campaign,stage:Simulation,worlds:WorldDefinition[],maps:MapNode[][]):Campaign {
+  if(stage.status!=='complete')throw new Error('A fase ainda não foi concluída.');
+  const {world,index}=stage.level;
+  const awarded=pendingRewards(c,world,index,eligibleStageRewards(stage),stage.lives);
+  const next=finishLevel(c,world,index,{diamonds:stage.diamonds,redDiamonds:stage.redDiamonds,
+    lives:awarded.lives,health:stage.health,weaponTier:stage.weaponTier},awarded.mask,stage.exitObject===28,maps);
+  next.canonicalRecord=[...campaignRecord(next,worlds,maps,stage).export()];
+  return next;
 }
 
 /** Imports record 1, whose level flags carry completion, prizes and secrets. */

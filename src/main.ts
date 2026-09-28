@@ -11,8 +11,8 @@ import { MobileControls } from './platform/MobileControls.ts';
 import { MidiPreview, parseMidi } from './platform/Midi.ts';
 import { SESSION_KEY, validateReplay, restoreReplay } from './platform/Session.ts';
 import { CanonicalSave } from './platform/CanonicalSave.ts';
-import { campaignFromRecord, campaignRecord, campaignStageStart } from './platform/CanonicalCampaign.ts';
-import { CAMPAIGN_KEY, REWARD_FLAGS, adjacentNode, finishLevel, newCampaign, pendingRewards, unlockedNode, unlockedWorld, validateCampaign } from './core/Campaign.ts';
+import { campaignFromRecord, campaignRecord, campaignStageStart, completeCampaignLevel } from './platform/CanonicalCampaign.ts';
+import { CAMPAIGN_KEY, REWARD_FLAGS, adjacentNode, eligibleStageRewards, newCampaign, pendingRewards, unlockedNode, unlockedWorld, validateCampaign } from './core/Campaign.ts';
 import type { Campaign } from './core/Campaign.ts';
 import { FrontEndRenderer, MENU_ITEMS } from './render/FrontEndRenderer.ts';
 import type { FrontScene } from './render/FrontEndRenderer.ts';
@@ -55,14 +55,8 @@ function stageDemoTrigger(){
 function openMap(world=campaign?.world??0){if(!campaign)return;campaign.world=world;campaign.selected=assets.maps[world].find(n=>n.level===campaign!.selected&&unlockedNode(campaign!,world,n,assets.maps))?.level??0;scene='map';simulation=null;campaignStage=false;paused=false;input.clear();clock.reset();frontCooldown=0;saveCampaign();game.focus();}
 function start(l=assets.worlds[0].levels[0],initial?:StageStart,fromCampaign=false){simulation=new Simulation(l,initial);scene='playing';campaignStage=fromCampaign;paused=false;stageIntroTicks=60;results.reset();clock.reset();input.clear();lastError='';$('pause').textContent='Ⅱ';$('play').innerHTML='Abrir menu do jogo <span>→</span>';$('next-level').hidden=true;game.focus();saveSession();}
 function startSelected(){if(!campaign)return;const node=assets.maps[campaign.world].find(n=>n.level===campaign!.selected);if(!node||!unlockedNode(campaign,campaign.world,node,assets.maps))return;start(assets.worlds[campaign.world].levels[node.level],campaignStageStart(campaign,assets.worlds,assets.maps,campaign.world,node.level),true);}
-function eligibleRewards(s:Simulation){
-  const totals=stageCollectibleTotals(s.level);
-  return (s.diamonds-s.initial.diamonds===totals.diamonds+s.bonusDiamondTotal?4:0)|
-    (s.redDiamonds-s.initial.redDiamonds===totals.redDiamonds?8:0)|
-    (s.hits===0?16:0)|(s.retries===0?32:0);
-}
-function completionBonus(s:Simulation){return pendingRewards(newCampaign(),s.level.world,s.level.index,eligibleRewards(s),s.lives).lives-s.lives;}
-function completeCampaignStage(){const s=simulation;if(!s||!campaign||s.status!=='complete')return;const awarded=pendingRewards(campaign,s.level.world,s.level.index,eligibleRewards(s),s.lives);campaign=finishLevel(campaign,s.level.world,s.level.index,{diamonds:s.diamonds,redDiamonds:s.redDiamonds,lives:awarded.lives,health:s.health,weaponTier:s.weaponTier},awarded.mask,s.exitObject===28,assets.maps);campaign.canonicalRecord=[...campaignRecord(campaign,assets.worlds,assets.maps,s).export()];saveCampaign();openMap(s.level.world);}
+function completionBonus(s:Simulation){return pendingRewards(newCampaign(),s.level.world,s.level.index,eligibleStageRewards(s),s.lives).lives-s.lives;}
+function completeCampaignStage(){const s=simulation;if(!s||!campaign||s.status!=='complete')return;campaign=completeCampaignLevel(campaign,s,assets.worlds,assets.maps);saveCampaign();openMap(s.level.world);}
 function advanceLevel(){
   const current=simulation;
   if(!current||current.status!=='complete')return;
@@ -124,7 +118,7 @@ function drawResult(s:Simulation){
   ctx.fillStyle='#261707';ctx.fillRect(0,0,240,320);
   const titleSlide=phase===0?Math.min(0,-100+ticks*10):0;
   text(stageTitle(assets.strings,s.level),120+titleSlide,10,'center');text(assets.strings[41],120+(phase===0?Math.min(0,-340+ticks*10):0),25,'center');
-  const awardMask=pendingRewards(campaignStage&&campaign?campaign:newCampaign(),s.level.world,s.level.index,eligibleRewards(s),s.lives).mask;
+  const awardMask=pendingRewards(campaignStage&&campaign?campaign:newCampaign(),s.level.world,s.level.index,eligibleStageRewards(s),s.lives).mask;
   const rows:[string,string,(x:number)=>void,boolean][]=[
     [assets.strings[109],`${phase===1?Math.min(collectedDiamonds,ticks>>1):collectedDiamonds}/${totals.diamonds}`,x=>sprites.frame(ctx,assets.sprite('cm-2'),0,x,69),collectedDiamonds>=totals.diamonds],
     [assets.strings[114],`${collectedRed}/${totals.redDiamonds}`,x=>sprites.frame(ctx,assets.sprite('cm-2'),0,x,127,0,1),collectedRed>=totals.redDiamonds],

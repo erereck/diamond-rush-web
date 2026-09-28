@@ -4,7 +4,7 @@ import { SpriteRenderer } from './SpriteRenderer.ts';
 import type { Simulation } from '../core/Simulation.ts';
 import { animationFrameAt, CHEST_OPEN_DURATIONS, fallingDrawOffset } from '../core/PhaseOneRules.ts';
 import { spikeExtension, spikeReach } from '../core/LaterStageRules.ts';
-import { crusherFrameIndex, rollingStoneVisual, scotlandExplosiveVisual, snakeVisual, sourceFrameForElapsed, tibetSliderVisual } from './OriginalAnimationRules.ts';
+import { crusherFrameIndex, pressurePlateDepression, rollingStoneVisual, scotlandExplosiveVisual, snakeVisual, sourceFrameForElapsed, tibetSliderVisual } from './OriginalAnimationRules.ts';
 import { AngkorBoss } from '../core/AngkorBoss.ts';
 import { BavariaBoss } from '../core/BavariaBoss.ts';
 import { TibetBoss } from '../core/TibetBoss.ts';
@@ -24,6 +24,12 @@ export class LevelRenderer {
       if(t>=80)frame(`${w}-2`,t-80,px,py);
       if(t===10)frame(`${w}-1`,0,px,py);
       const obj=level.objects[i];
+      if(obj===6){
+        const p=sim?.player,plate=a.sprite('gen2-9'),depression=pressurePlateDepression(t,sim?.motion[i]??0,
+          p?.x??-1,p?.y??-1,p?.offset??0,p?.direction??0,x,y);
+        ctx.save();ctx.beginPath();ctx.rect(px,py,24,24);ctx.clip();
+        r.module(ctx,plate,0,px,py+24-plate.modules[0].height+depression);ctx.restore();
+      }
       if(obj===4&&(sim?.checkpointOrder??-1)<=level.parameters[i])frame('cm-6',sim?.checkpoint===i?7:((tick>>1)%7),px,py);
       if(obj===5||obj===28)r.module(ctx,a.sprite('cm-0'),0,px,py);
       if(obj===8||obj===9)frame('gen2-8',sim?.unlockedGates.has(i)?1:0,px,py,obj===8?1:0);

@@ -19,7 +19,7 @@ const renderer=new LevelRenderer(assets,{
   animation(_ctx:unknown,s:DecodedSprite,n:number,time:number){assert(s.animations[n],`${s.name}: animation ${n}`);realRenderer.animationFrame(s,n,time);},
   animationFrame:(s:DecodedSprite,n:number,time:number)=>realRenderer.animationFrame(s,n,time)
 } as unknown as SpriteRenderer);
-const ctx={fillRect(){},strokeRect(){},beginPath(){},moveTo(){},lineTo(){},stroke(){},setLineDash(){},save(){},restore(){}} as unknown as CanvasRenderingContext2D;
+const ctx={fillRect(){},strokeRect(){},beginPath(){},rect(){},clip(){},moveTo(){},lineTo(){},stroke(){},setLineDash(){},save(){},restore(){}} as unknown as CanvasRenderingContext2D;
 
 test('all ten canonical secret stages have a spawn and usable exit and render without missing sprite frames',()=>{
   let count=0;

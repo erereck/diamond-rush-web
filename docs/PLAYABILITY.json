@@ -1,5 +1,5 @@
 {
-  "engine": "fidelity-22",
+  "engine": "fidelity-23",
   "reference": "5e05c42aa1aae3377790600eb6d27497101b79e7",
   "scope": "Control-only routes from the original spawn and explicitly bounded New Game prefixes. Not a full campaign or Java parity certificate.",
   "counts": {
@@ -7,12 +7,12 @@
     "playableStages": 40,
     "secretStages": 10,
     "goals": 47,
-    "verifiedMaps": 6,
+    "verifiedMaps": 8,
     "verifiedBosses": 3,
-    "completedRoutes": 6,
+    "completedRoutes": 8,
     "attemptedMaps": 0,
     "campaignPrefixes": 1,
-    "campaignPrefixStages": 2
+    "campaignPrefixStages": 4
   },
   "campaignPrefixes": [
     {
@@ -123,12 +123,87 @@
             "bossCleared": false
           },
           "awards": 32
+        },
+        {
+          "file": "angkor-03-normal.json",
+          "world": 0,
+          "level": 2,
+          "initial": {
+            "diamonds": 10,
+            "redDiamonds": 0,
+            "lives": 7,
+            "health": 4,
+            "weaponTier": 0
+          },
+          "outcome": {
+            "status": "complete",
+            "ticks": 1045,
+            "x": 33,
+            "y": 21,
+            "exitObject": 5,
+            "diamonds": 21,
+            "redDiamonds": 0,
+            "lives": 7,
+            "health": 2,
+            "weaponTier": 0,
+            "hits": 4,
+            "retries": 0,
+            "opened": [
+              409,
+              470,
+              596
+            ],
+            "demos": [
+              30
+            ],
+            "bossHealth": null,
+            "bossCleared": false
+          },
+          "awards": 32
+        },
+        {
+          "file": "angkor-04-hammer-normal.json",
+          "world": 0,
+          "level": 3,
+          "initial": {
+            "diamonds": 21,
+            "redDiamonds": 0,
+            "lives": 8,
+            "health": 2,
+            "weaponTier": 0
+          },
+          "outcome": {
+            "status": "complete",
+            "ticks": 1397,
+            "x": 46,
+            "y": 5,
+            "exitObject": 5,
+            "diamonds": 47,
+            "redDiamonds": 0,
+            "lives": 7,
+            "health": 1,
+            "weaponTier": 1,
+            "hits": 5,
+            "retries": 1,
+            "opened": [
+              379,
+              746
+            ],
+            "demos": [
+              22
+            ],
+            "bossHealth": null,
+            "bossCleared": false
+          },
+          "awards": 0
         }
       ],
       "completed": [
         [
           0,
-          1
+          1,
+          2,
+          3
         ],
         [],
         []
@@ -136,23 +211,27 @@
       "awards": [
         [
           32,
-          32
+          32,
+          32,
+          0
         ],
         [],
         []
       ],
       "resources": {
-        "diamonds": 10,
+        "diamonds": 47,
         "redDiamonds": 0,
         "lives": 7,
-        "health": 4,
-        "weaponTier": 0
+        "health": 1,
+        "weaponTier": 1
       },
       "unlocked": [
         [
           0,
           1,
-          2
+          2,
+          3,
+          4
         ],
         [],
         []
@@ -169,9 +248,26 @@
           "cells": [
             426
           ]
+        },
+        {
+          "world": 0,
+          "level": 2,
+          "cells": [
+            409,
+            470,
+            596
+          ]
+        },
+        {
+          "world": 0,
+          "level": 3,
+          "cells": [
+            379,
+            746
+          ]
         }
       ],
-      "recordHash": "a34f5c85026227f8fb77b221fd8a74b24a7a5296f5c603638a9f89d6457fdbfe"
+      "recordHash": "708d8578b9053aa7a74ec06d82f19b683fdf0add5dcae649accdf280770c0be0"
     }
   ],
   "levels": [
@@ -345,8 +441,61 @@
           "y": 21
         }
       ],
-      "status": "unverified",
-      "evidence": [],
+      "status": "verified",
+      "evidence": [
+        {
+          "file": "tests/fixtures/routes/angkor-03-normal.json",
+          "world": 0,
+          "level": 2,
+          "goal": "normal",
+          "initial": {
+            "diamonds": 0,
+            "redDiamonds": 0,
+            "lives": 5,
+            "health": 4,
+            "weaponTier": 0
+          },
+          "outcome": {
+            "status": "complete",
+            "ticks": 1045,
+            "x": 33,
+            "y": 21,
+            "exitObject": 5,
+            "diamonds": 11,
+            "redDiamonds": 0,
+            "lives": 5,
+            "health": 2,
+            "weaponTier": 0,
+            "hits": 4,
+            "retries": 0,
+            "opened": [
+              409,
+              470,
+              596
+            ],
+            "demos": [
+              30
+            ],
+            "bossHealth": null,
+            "bossCleared": false
+          },
+          "events": {
+            "grass": 27,
+            "boulder": 12,
+            "chest": 3,
+            "chest-reward": 3,
+            "silver-gate": 1,
+            "gate-open": 2,
+            "gate-opening": 4,
+            "hurt": 4,
+            "diamond": 11,
+            "checkpoint": 4,
+            "enemy-death": 1,
+            "gold-gate": 1,
+            "complete": 1
+          }
+        }
+      ],
       "pendingAttempts": [],
       "reviews": []
     },
@@ -363,17 +512,66 @@
           "y": 5
         }
       ],
-      "status": "unverified",
-      "evidence": [],
-      "pendingAttempts": [],
-      "reviews": [
+      "status": "verified",
+      "evidence": [
         {
-          "plane": "object",
-          "tile": 6,
-          "description": "Placas de pressão: method_316/256/259",
-          "count": 2
+          "file": "tests/fixtures/routes/angkor-04-hammer-normal.json",
+          "world": 0,
+          "level": 3,
+          "goal": "normal",
+          "initial": {
+            "diamonds": 21,
+            "health": 2,
+            "lives": 8,
+            "weaponTier": 0,
+            "redDiamonds": 0
+          },
+          "outcome": {
+            "status": "complete",
+            "ticks": 1397,
+            "x": 46,
+            "y": 5,
+            "exitObject": 5,
+            "diamonds": 47,
+            "redDiamonds": 0,
+            "lives": 7,
+            "health": 1,
+            "weaponTier": 1,
+            "hits": 5,
+            "retries": 1,
+            "opened": [
+              379,
+              746
+            ],
+            "demos": [
+              22
+            ],
+            "bossHealth": null,
+            "bossCleared": false
+          },
+          "events": {
+            "diamond": 19,
+            "gate-open": 2,
+            "gate-opening": 4,
+            "boulder": 7,
+            "hurt": 5,
+            "grass": 9,
+            "checkpoint": 6,
+            "death": 1,
+            "respawn-start": 1,
+            "respawn": 1,
+            "chest": 2,
+            "chest-reward": 2,
+            "weapon": 1,
+            "demo:22": 1,
+            "hammer": 14,
+            "break": 7,
+            "complete": 1
+          }
         }
-      ]
+      ],
+      "pendingAttempts": [],
+      "reviews": []
     },
     {
       "world": 0,
@@ -397,12 +595,6 @@
           "tile": 11,
           "description": "Objeto móvel 11: method_331",
           "count": 1
-        },
-        {
-          "plane": "object",
-          "tile": 6,
-          "description": "Placas de pressão: method_316/256/259",
-          "count": 1
         }
       ]
     },
@@ -422,14 +614,7 @@
       "status": "unverified",
       "evidence": [],
       "pendingAttempts": [],
-      "reviews": [
-        {
-          "plane": "object",
-          "tile": 6,
-          "description": "Placas de pressão: method_316/256/259",
-          "count": 1
-        }
-      ]
+      "reviews": []
     },
     {
       "world": 0,
@@ -458,12 +643,6 @@
           "tile": 11,
           "description": "Objeto móvel 11: method_331",
           "count": 2
-        },
-        {
-          "plane": "object",
-          "tile": 6,
-          "description": "Placas de pressão: method_316/256/259",
-          "count": 2
         }
       ]
     },
@@ -488,14 +667,7 @@
       "status": "unverified",
       "evidence": [],
       "pendingAttempts": [],
-      "reviews": [
-        {
-          "plane": "object",
-          "tile": 6,
-          "description": "Placas de pressão: method_316/256/259",
-          "count": 2
-        }
-      ]
+      "reviews": []
     },
     {
       "world": 0,
@@ -579,14 +751,7 @@
       "status": "unverified",
       "evidence": [],
       "pendingAttempts": [],
-      "reviews": [
-        {
-          "plane": "object",
-          "tile": 6,
-          "description": "Placas de pressão: method_316/256/259",
-          "count": 5
-        }
-      ]
+      "reviews": []
     },
     {
       "world": 0,
@@ -604,14 +769,7 @@
       "status": "unverified",
       "evidence": [],
       "pendingAttempts": [],
-      "reviews": [
-        {
-          "plane": "object",
-          "tile": 6,
-          "description": "Placas de pressão: method_316/256/259",
-          "count": 2
-        }
-      ]
+      "reviews": []
     },
     {
       "world": 0,
@@ -787,12 +945,6 @@
           "tile": 11,
           "description": "Objeto móvel 11: method_331",
           "count": 1
-        },
-        {
-          "plane": "object",
-          "tile": 6,
-          "description": "Placas de pressão: method_316/256/259",
-          "count": 2
         }
       ]
     },
@@ -817,14 +969,7 @@
       "status": "unverified",
       "evidence": [],
       "pendingAttempts": [],
-      "reviews": [
-        {
-          "plane": "object",
-          "tile": 6,
-          "description": "Placas de pressão: method_316/256/259",
-          "count": 1
-        }
-      ]
+      "reviews": []
     },
     {
       "world": 1,
@@ -859,12 +1004,6 @@
           "plane": "tile",
           "tile": 36,
           "description": "Objeto 36: method_318",
-          "count": 2
-        },
-        {
-          "plane": "object",
-          "tile": 6,
-          "description": "Placas de pressão: method_316/256/259",
           "count": 2
         }
       ]
@@ -1166,12 +1305,6 @@
           "tile": 38,
           "description": "Mecanismo 38 e gatilhos associados",
           "count": 2
-        },
-        {
-          "plane": "object",
-          "tile": 6,
-          "description": "Placas de pressão: method_316/256/259",
-          "count": 1
         }
       ]
     },
@@ -1215,12 +1348,6 @@
           "tile": 38,
           "description": "Mecanismo 38 e gatilhos associados",
           "count": 1
-        },
-        {
-          "plane": "object",
-          "tile": 6,
-          "description": "Placas de pressão: method_316/256/259",
-          "count": 2
         }
       ]
     },
@@ -1350,14 +1477,7 @@
       "status": "unverified",
       "evidence": [],
       "pendingAttempts": [],
-      "reviews": [
-        {
-          "plane": "object",
-          "tile": 6,
-          "description": "Placas de pressão: method_316/256/259",
-          "count": 2
-        }
-      ]
+      "reviews": []
     },
     {
       "world": 2,
@@ -1387,12 +1507,6 @@
           "tile": 47,
           "description": "Objeto 47: method_351/311",
           "count": 7
-        },
-        {
-          "plane": "object",
-          "tile": 6,
-          "description": "Placas de pressão: method_316/256/259",
-          "count": 4
         }
       ]
     },
@@ -1429,12 +1543,6 @@
           "tile": 47,
           "description": "Objeto 47: method_351/311",
           "count": 5
-        },
-        {
-          "plane": "object",
-          "tile": 6,
-          "description": "Placas de pressão: method_316/256/259",
-          "count": 1
         }
       ]
     },
@@ -1466,12 +1574,6 @@
           "tile": 48,
           "description": "Objeto 48: method_306/305 e puxão de method_263",
           "count": 6
-        },
-        {
-          "plane": "object",
-          "tile": 6,
-          "description": "Placas de pressão: method_316/256/259",
-          "count": 1
         }
       ]
     },
@@ -1509,12 +1611,6 @@
           "tile": 48,
           "description": "Objeto 48: method_306/305 e puxão de method_263",
           "count": 7
-        },
-        {
-          "plane": "object",
-          "tile": 6,
-          "description": "Placas de pressão: method_316/256/259",
-          "count": 4
         }
       ]
     },
@@ -1552,12 +1648,6 @@
           "tile": 48,
           "description": "Objeto 48: method_306/305 e puxão de method_263",
           "count": 1
-        },
-        {
-          "plane": "object",
-          "tile": 6,
-          "description": "Placas de pressão: method_316/256/259",
-          "count": 2
         }
       ]
     },
@@ -1595,12 +1685,6 @@
           "tile": 48,
           "description": "Objeto 48: method_306/305 e puxão de method_263",
           "count": 6
-        },
-        {
-          "plane": "object",
-          "tile": 6,
-          "description": "Placas de pressão: method_316/256/259",
-          "count": 3
         }
       ]
     },
@@ -1632,12 +1716,6 @@
           "tile": 48,
           "description": "Objeto 48: method_306/305 e puxão de method_263",
           "count": 7
-        },
-        {
-          "plane": "object",
-          "tile": 6,
-          "description": "Placas de pressão: method_316/256/259",
-          "count": 3
         }
       ]
     },
@@ -1787,12 +1865,6 @@
           "tile": 18,
           "description": "Interruptores/ponte fora da arena de Tibet: method_240",
           "count": 2
-        },
-        {
-          "plane": "object",
-          "tile": 6,
-          "description": "Placas de pressão: method_316/256/259",
-          "count": 3
         }
       ]
     },
@@ -1830,12 +1902,6 @@
           "tile": 47,
           "description": "Objeto 47: method_351/311",
           "count": 1
-        },
-        {
-          "plane": "object",
-          "tile": 6,
-          "description": "Placas de pressão: method_316/256/259",
-          "count": 1
         }
       ]
     },
@@ -1867,12 +1933,6 @@
           "tile": 47,
           "description": "Objeto 47: method_351/311",
           "count": 6
-        },
-        {
-          "plane": "object",
-          "tile": 6,
-          "description": "Placas de pressão: method_316/256/259",
-          "count": 3
         }
       ]
     }

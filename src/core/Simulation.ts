@@ -92,7 +92,8 @@ export class Simulation {
     for(const i of initial.openedChests??[])if(i>=0&&i<this.tiles.length&&[14,33].includes(level.objects[i])){
       this.tiles[i]=-1;this.chestFrames[i]=level.objects[i]===14?2:3;this.opened.add(i);
     }
-    // cGame.method_294/296: each numbered door waits for its matching locks.
+    // cGame.method_294/296: activate plates and count each door's linked locks.
+    for(let i=0;i<this.tiles.length;i++)if(this.level.objects[i]===6)this.active[i]=48;
     for(let i=0;i<this.tiles.length;i++)if(this.level.objects[i]===7){
       const id=this.level.parameters[i],x=i%level.width,y=Math.floor(i/level.width);
       this.gateCounts[i]=level.objects.reduce((count,o,j)=>count+([6,8,9].includes(o)&&level.parameters[j]===id?1:0),0);
@@ -221,10 +222,15 @@ export class Simulation {
         this.state[i]=s;
       }else this.state[i]=s&~3072&~4063232&~7;
     }else if(!(s&512)){
-      m-=6;
+      // method_351 sinks a descending weight into a pressure plate one pixel
+      // on odd ticks, after reaching its last 12 pixels of travel.
+      const plateLanding=dir===3&&this.object(x,y)===6&&m<=12;
+      m-=plateLanding?(this.tick&1):6;
+      if(plateLanding)this.active[i]=24;
       if(m===0||m===12){if(s&1024)s=s&~56|(s+8)&56;else if(s&2048)s=s&~56|(s-8)&56;}
       this.motion[i]=m;
       if(m===0&&dir===3){
+        if(plateLanding)s&=~448;
         this.active[i]=30;
         if(t===0&&!this.free(x,y+1))this.events.push('boulder');
         if(this.tile(x,y+1)===30)this.triggerBrick(x,y+1);
@@ -542,6 +548,42 @@ export class Simulation {
     this.moveObject(from,to,this.tiles[from],this.state[from],0);hook.x=nextX;
     this.wake(nextX,hook.y);this.events.push('hook-pull');
   }
+  /** method_256 preserves the final count nibble when opening a door. */
+  private openLinkedGate(id:number){
+    if(id<0||id===255)return;
+    for(let i=0;i<this.tiles.length;i++)if(this.level.objects[i]===7&&this.level.parameters[i]===id&&this.gatePhases[i]===0){
+      const remaining=this.gateCounts[i]-1;
+      if(remaining===0){this.gatePhases[i]=1;this.active[i]=24;this.events.push('gate-open');}
+      else this.gateCounts[i]=remaining;
+    }
+  }
+  /** method_316 runs before the moving tile in the same cell. */
+  updatePressurePlate(x:number,y:number){
+    const i=this.index(x,y),t=this.tiles[i];
+    let occupied=[0,1,8,9,47,48].includes(t),motion=this.motion[i];
+    if(!occupied&&this.isPlayer(x,y)){occupied=true;motion=this.player.offset;}
+    const id=this.level.parameters[i];
+    if(occupied&&motion<12){this.openLinkedGate(id);return;}
+    if(id<0||id===255)return;
+    for(let j=0;j<this.tiles.length;j++)if(this.level.objects[j]===7&&this.level.parameters[j]===id&&this.gatePhases[j]!==0){
+      // method_258 leaves a door open if the cell contains tile 32.
+      if(this.tiles[j]===32)continue;
+      this.gatePhases[j]=0;this.active[j]=24;this.events.push('gate-close');
+      const gx=j%this.level.width,gy=Math.floor(j/this.level.width);
+      if(this.isPlayer(gx,gy)){this.invulnerable=0;this.hurt(4);}
+      else if([0,1,19,43,45].includes(this.tiles[j])){
+        if([19,43,45].includes(this.tiles[j])){this.enemySmoke.push({cell:j,age:0});this.events.push('enemy-death');}
+        this.tiles[j]=-1;this.state[j]=0;this.motion[j]=0;this.frozenKinds[j]=-1;this.events.push('gate-crush');this.wake(gx,gy);
+      }
+    }
+  }
+  /** method_340 updates only when the door is in the active map scan. */
+  updateGate(x:number,y:number){
+    const i=this.index(x,y);
+    if(this.tick%3===0&&(this.gatePhases[i]===1||this.gatePhases[i]===2)){
+      this.gatePhases[i]++;this.active[i]=24;this.events.push('gate-opening');
+    }
+  }
   step(input:InputFrame){
     if(this.status!=='playing')return;
     this.inputs.push({...input});this.events=[];this.tick++;this.animationTick++;
@@ -556,9 +598,6 @@ export class Simulation {
     if(this.respawnTravel){this.travelToCheckpoint();return;}
     if(this.respawnFlash>0)this.respawnFlash--;
     if(this.invulnerable)this.invulnerable--;
-    if(this.tick%3===0)for(let i=0;i<this.gatePhases.length;i++){
-      if(this.gatePhases[i]===1||this.gatePhases[i]===2){this.gatePhases[i]++;this.active[i]=24;this.events.push('gate-opening');}
-    }
     const actionPressed=input.action&&!this.actionHeld;this.actionHeld=input.action;
     if(input.direction&&input.direction!==this.lastInputDirection)this.pendingDirection=input.direction;
     this.lastInputDirection=input.direction;
@@ -575,6 +614,8 @@ export class Simulation {
     for(let y=Math.min(this.level.height-2,this.player.y+8);y>=Math.max(1,this.player.y-8);y--){
       for(let x=Math.max(1,this.player.x-8);x<=Math.min(this.level.width-2,this.player.x+8);x++){
         const i=this.index(x,y);if(this.active[i]<=0)continue;this.active[i]-=6;
+        if(this.level.objects[i]===6)this.updatePressurePlate(x,y);
+        if(this.level.objects[i]===7)this.updateGate(x,y);
         if(this.level.objects[i]===32){
           // method_315 advances foreground grass debris on the global parity.
           if((this.tick&1)===0)this.level.parameters[i]++;
@@ -615,10 +656,7 @@ export class Simulation {
       if(kind===8)this.silverKeys--;else this.goldKeys--;
       this.unlockedGates.add(i);this.events.push(kind===8?'silver-gate':'gold-gate');
       const id=this.level.parameters[i];
-      for(let j=0;j<this.level.objects.length;j++)if(this.level.objects[j]===7&&this.level.parameters[j]===id){
-        this.gateCounts[j]=Math.max(0,this.gateCounts[j]-1);
-        if(this.gateCounts[j]===0&&this.gatePhases[j]===0)this.gatePhases[j]=1;
-      }
+      this.openLinkedGate(id);
     }
     const overhead=this.index(p.x,p.y-1);
     this.stonePressure=overhead>=0&&[0,8,9,48].includes(this.tiles[overhead])&&p.offset===0

@@ -55,3 +55,12 @@ export function tibetSliderVisual(state:number,motion:number) {
   const frame=(opening&&direction===2)||(!opening&&direction===4)?2:opening?1:0;
   return {frame,x:motion*([0,0,-1,0,1][direction]??0),y:motion*([0,1,0,-1,0][direction]??0)};
 }
+
+/** method_195: 13px plate image, anchored at the cell bottom and depressed up
+ * to 12px. The departing hero raises it while still overlapping the cell. */
+export function pressurePlateDepression(tile:number,motion:number,heroX:number,heroY:number,heroOffset:number,heroDirection:number,x:number,y:number){
+  if([0,1,8,9].includes(tile)&&motion<=12)return 12-motion;
+  if(heroX===x&&heroY===y)return heroOffset<=12?12-heroOffset:0;
+  if(heroY===y&&heroOffset>12&&((heroX===x-1&&heroDirection===4)||(heroX===x+1&&heroDirection===2)))return heroOffset-12;
+  return 0;
+}

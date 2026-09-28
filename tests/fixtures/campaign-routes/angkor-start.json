@@ -1,11 +1,13 @@
 {
   "version": 1,
-  "engine": "fidelity-22",
+  "engine": "fidelity-23",
   "scope": "new-save-prefix",
   "routes": [
     "angkor-introduction.json",
     "angkor-01-normal.json",
-    "angkor-02-normal.json"
+    "angkor-02-normal.json",
+    "angkor-03-normal.json",
+    "angkor-04-hammer-normal.json"
   ],
   "expected": {
     "stages": [
@@ -114,12 +116,87 @@
           "bossCleared": false
         },
         "awards": 32
+      },
+      {
+        "file": "angkor-03-normal.json",
+        "world": 0,
+        "level": 2,
+        "initial": {
+          "diamonds": 10,
+          "redDiamonds": 0,
+          "lives": 7,
+          "health": 4,
+          "weaponTier": 0
+        },
+        "outcome": {
+          "status": "complete",
+          "ticks": 1045,
+          "x": 33,
+          "y": 21,
+          "exitObject": 5,
+          "diamonds": 21,
+          "redDiamonds": 0,
+          "lives": 7,
+          "health": 2,
+          "weaponTier": 0,
+          "hits": 4,
+          "retries": 0,
+          "opened": [
+            409,
+            470,
+            596
+          ],
+          "demos": [
+            30
+          ],
+          "bossHealth": null,
+          "bossCleared": false
+        },
+        "awards": 32
+      },
+      {
+        "file": "angkor-04-hammer-normal.json",
+        "world": 0,
+        "level": 3,
+        "initial": {
+          "diamonds": 21,
+          "redDiamonds": 0,
+          "lives": 8,
+          "health": 2,
+          "weaponTier": 0
+        },
+        "outcome": {
+          "status": "complete",
+          "ticks": 1397,
+          "x": 46,
+          "y": 5,
+          "exitObject": 5,
+          "diamonds": 47,
+          "redDiamonds": 0,
+          "lives": 7,
+          "health": 1,
+          "weaponTier": 1,
+          "hits": 5,
+          "retries": 1,
+          "opened": [
+            379,
+            746
+          ],
+          "demos": [
+            22
+          ],
+          "bossHealth": null,
+          "bossCleared": false
+        },
+        "awards": 0
       }
     ],
     "completed": [
       [
         0,
-        1
+        1,
+        2,
+        3
       ],
       [],
       []
@@ -127,23 +204,27 @@
     "awards": [
       [
         32,
-        32
+        32,
+        32,
+        0
       ],
       [],
       []
     ],
     "resources": {
-      "diamonds": 10,
+      "diamonds": 47,
       "redDiamonds": 0,
       "lives": 7,
-      "health": 4,
-      "weaponTier": 0
+      "health": 1,
+      "weaponTier": 1
     },
     "unlocked": [
       [
         0,
         1,
-        2
+        2,
+        3,
+        4
       ],
       [],
       []
@@ -160,8 +241,25 @@
         "cells": [
           426
         ]
+      },
+      {
+        "world": 0,
+        "level": 2,
+        "cells": [
+          409,
+          470,
+          596
+        ]
+      },
+      {
+        "world": 0,
+        "level": 3,
+        "cells": [
+          379,
+          746
+        ]
       }
     ],
-    "recordHash": "a34f5c85026227f8fb77b221fd8a74b24a7a5296f5c603638a9f89d6457fdbfe"
+    "recordHash": "708d8578b9053aa7a74ec06d82f19b683fdf0add5dcae649accdf280770c0be0"
   }
 }

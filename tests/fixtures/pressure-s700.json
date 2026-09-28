@@ -1,0 +1,2704 @@
+{
+  "reference": "5e05c42aa1aae3377790600eb6d27497101b79e7",
+  "scope": "isolated-source-methods",
+  "methods": [
+    "method_195",
+    "method_256",
+    "method_258",
+    "method_259",
+    "method_297",
+    "method_298",
+    "method_316",
+    "method_340",
+    "method_344"
+  ],
+  "sourceHashEncoding": "utf8-lf",
+  "sourceHash": "346df2f57ac9abd2741caa25a32a965778297b361bee6d8e9b70366db741054c",
+  "methodHash": "c1d3f74dfb81b081e066c747f69b0a5c8a34e047f0192dd0691244336023270d",
+  "stubs": [
+    "sound",
+    "render invalidation",
+    "object destruction effect",
+    "damage callback (requested amount recorded)"
+  ],
+  "cases": [
+    {
+      "input": {
+        "op": "plate",
+        "tile": -1,
+        "motion": 0,
+        "heroX": 1,
+        "heroY": 1,
+        "offset": 0,
+        "direction": 2,
+        "phase": 0,
+        "count": 1,
+        "gateTile": -1,
+        "frame": 1
+      },
+      "expected": {
+        "phase": 0,
+        "count": 1,
+        "gateTile": -1,
+        "damage": 0,
+        "depression": 0
+      }
+    },
+    {
+      "input": {
+        "op": "plate",
+        "tile": -1,
+        "motion": 11,
+        "heroX": 1,
+        "heroY": 1,
+        "offset": 0,
+        "direction": 2,
+        "phase": 0,
+        "count": 1,
+        "gateTile": -1,
+        "frame": 1
+      },
+      "expected": {
+        "phase": 0,
+        "count": 1,
+        "gateTile": -1,
+        "damage": 0,
+        "depression": 0
+      }
+    },
+    {
+      "input": {
+        "op": "plate",
+        "tile": -1,
+        "motion": 12,
+        "heroX": 1,
+        "heroY": 1,
+        "offset": 0,
+        "direction": 2,
+        "phase": 0,
+        "count": 1,
+        "gateTile": -1,
+        "frame": 1
+      },
+      "expected": {
+        "phase": 0,
+        "count": 1,
+        "gateTile": -1,
+        "damage": 0,
+        "depression": 0
+      }
+    },
+    {
+      "input": {
+        "op": "plate",
+        "tile": -1,
+        "motion": 18,
+        "heroX": 1,
+        "heroY": 1,
+        "offset": 0,
+        "direction": 2,
+        "phase": 0,
+        "count": 1,
+        "gateTile": -1,
+        "frame": 1
+      },
+      "expected": {
+        "phase": 0,
+        "count": 1,
+        "gateTile": -1,
+        "damage": 0,
+        "depression": 0
+      }
+    },
+    {
+      "input": {
+        "op": "plate",
+        "tile": 0,
+        "motion": 0,
+        "heroX": 1,
+        "heroY": 1,
+        "offset": 0,
+        "direction": 2,
+        "phase": 0,
+        "count": 1,
+        "gateTile": -1,
+        "frame": 1
+      },
+      "expected": {
+        "phase": 1,
+        "count": 1,
+        "gateTile": -1,
+        "damage": 0,
+        "depression": 12
+      }
+    },
+    {
+      "input": {
+        "op": "plate",
+        "tile": 0,
+        "motion": 11,
+        "heroX": 1,
+        "heroY": 1,
+        "offset": 0,
+        "direction": 2,
+        "phase": 0,
+        "count": 1,
+        "gateTile": -1,
+        "frame": 1
+      },
+      "expected": {
+        "phase": 1,
+        "count": 1,
+        "gateTile": -1,
+        "damage": 0,
+        "depression": 1
+      }
+    },
+    {
+      "input": {
+        "op": "plate",
+        "tile": 0,
+        "motion": 12,
+        "heroX": 1,
+        "heroY": 1,
+        "offset": 0,
+        "direction": 2,
+        "phase": 0,
+        "count": 1,
+        "gateTile": -1,
+        "frame": 1
+      },
+      "expected": {
+        "phase": 0,
+        "count": 1,
+        "gateTile": -1,
+        "damage": 0,
+        "depression": 0
+      }
+    },
+    {
+      "input": {
+        "op": "plate",
+        "tile": 0,
+        "motion": 18,
+        "heroX": 1,
+        "heroY": 1,
+        "offset": 0,
+        "direction": 2,
+        "phase": 0,
+        "count": 1,
+        "gateTile": -1,
+        "frame": 1
+      },
+      "expected": {
+        "phase": 0,
+        "count": 1,
+        "gateTile": -1,
+        "damage": 0,
+        "depression": 0
+      }
+    },
+    {
+      "input": {
+        "op": "plate",
+        "tile": 1,
+        "motion": 0,
+        "heroX": 1,
+        "heroY": 1,
+        "offset": 0,
+        "direction": 2,
+        "phase": 0,
+        "count": 1,
+        "gateTile": -1,
+        "frame": 1
+      },
+      "expected": {
+        "phase": 1,
+        "count": 1,
+        "gateTile": -1,
+        "damage": 0,
+        "depression": 12
+      }
+    },
+    {
+      "input": {
+        "op": "plate",
+        "tile": 1,
+        "motion": 11,
+        "heroX": 1,
+        "heroY": 1,
+        "offset": 0,
+        "direction": 2,
+        "phase": 0,
+        "count": 1,
+        "gateTile": -1,
+        "frame": 1
+      },
+      "expected": {
+        "phase": 1,
+        "count": 1,
+        "gateTile": -1,
+        "damage": 0,
+        "depression": 1
+      }
+    },
+    {
+      "input": {
+        "op": "plate",
+        "tile": 1,
+        "motion": 12,
+        "heroX": 1,
+        "heroY": 1,
+        "offset": 0,
+        "direction": 2,
+        "phase": 0,
+        "count": 1,
+        "gateTile": -1,
+        "frame": 1
+      },
+      "expected": {
+        "phase": 0,
+        "count": 1,
+        "gateTile": -1,
+        "damage": 0,
+        "depression": 0
+      }
+    },
+    {
+      "input": {
+        "op": "plate",
+        "tile": 1,
+        "motion": 18,
+        "heroX": 1,
+        "heroY": 1,
+        "offset": 0,
+        "direction": 2,
+        "phase": 0,
+        "count": 1,
+        "gateTile": -1,
+        "frame": 1
+      },
+      "expected": {
+        "phase": 0,
+        "count": 1,
+        "gateTile": -1,
+        "damage": 0,
+        "depression": 0
+      }
+    },
+    {
+      "input": {
+        "op": "plate",
+        "tile": 8,
+        "motion": 0,
+        "heroX": 1,
+        "heroY": 1,
+        "offset": 0,
+        "direction": 2,
+        "phase": 0,
+        "count": 1,
+        "gateTile": -1,
+        "frame": 1
+      },
+      "expected": {
+        "phase": 1,
+        "count": 1,
+        "gateTile": -1,
+        "damage": 0,
+        "depression": 12
+      }
+    },
+    {
+      "input": {
+        "op": "plate",
+        "tile": 8,
+        "motion": 11,
+        "heroX": 1,
+        "heroY": 1,
+        "offset": 0,
+        "direction": 2,
+        "phase": 0,
+        "count": 1,
+        "gateTile": -1,
+        "frame": 1
+      },
+      "expected": {
+        "phase": 1,
+        "count": 1,
+        "gateTile": -1,
+        "damage": 0,
+        "depression": 1
+      }
+    },
+    {
+      "input": {
+        "op": "plate",
+        "tile": 8,
+        "motion": 12,
+        "heroX": 1,
+        "heroY": 1,
+        "offset": 0,
+        "direction": 2,
+        "phase": 0,
+        "count": 1,
+        "gateTile": -1,
+        "frame": 1
+      },
+      "expected": {
+        "phase": 0,
+        "count": 1,
+        "gateTile": -1,
+        "damage": 0,
+        "depression": 0
+      }
+    },
+    {
+      "input": {
+        "op": "plate",
+        "tile": 8,
+        "motion": 18,
+        "heroX": 1,
+        "heroY": 1,
+        "offset": 0,
+        "direction": 2,
+        "phase": 0,
+        "count": 1,
+        "gateTile": -1,
+        "frame": 1
+      },
+      "expected": {
+        "phase": 0,
+        "count": 1,
+        "gateTile": -1,
+        "damage": 0,
+        "depression": 0
+      }
+    },
+    {
+      "input": {
+        "op": "plate",
+        "tile": 9,
+        "motion": 0,
+        "heroX": 1,
+        "heroY": 1,
+        "offset": 0,
+        "direction": 2,
+        "phase": 0,
+        "count": 1,
+        "gateTile": -1,
+        "frame": 1
+      },
+      "expected": {
+        "phase": 1,
+        "count": 1,
+        "gateTile": -1,
+        "damage": 0,
+        "depression": 12
+      }
+    },
+    {
+      "input": {
+        "op": "plate",
+        "tile": 9,
+        "motion": 11,
+        "heroX": 1,
+        "heroY": 1,
+        "offset": 0,
+        "direction": 2,
+        "phase": 0,
+        "count": 1,
+        "gateTile": -1,
+        "frame": 1
+      },
+      "expected": {
+        "phase": 1,
+        "count": 1,
+        "gateTile": -1,
+        "damage": 0,
+        "depression": 1
+      }
+    },
+    {
+      "input": {
+        "op": "plate",
+        "tile": 9,
+        "motion": 12,
+        "heroX": 1,
+        "heroY": 1,
+        "offset": 0,
+        "direction": 2,
+        "phase": 0,
+        "count": 1,
+        "gateTile": -1,
+        "frame": 1
+      },
+      "expected": {
+        "phase": 0,
+        "count": 1,
+        "gateTile": -1,
+        "damage": 0,
+        "depression": 0
+      }
+    },
+    {
+      "input": {
+        "op": "plate",
+        "tile": 9,
+        "motion": 18,
+        "heroX": 1,
+        "heroY": 1,
+        "offset": 0,
+        "direction": 2,
+        "phase": 0,
+        "count": 1,
+        "gateTile": -1,
+        "frame": 1
+      },
+      "expected": {
+        "phase": 0,
+        "count": 1,
+        "gateTile": -1,
+        "damage": 0,
+        "depression": 0
+      }
+    },
+    {
+      "input": {
+        "op": "plate",
+        "tile": 47,
+        "motion": 0,
+        "heroX": 1,
+        "heroY": 1,
+        "offset": 0,
+        "direction": 2,
+        "phase": 0,
+        "count": 1,
+        "gateTile": -1,
+        "frame": 1
+      },
+      "expected": {
+        "phase": 1,
+        "count": 1,
+        "gateTile": -1,
+        "damage": 0,
+        "depression": 0
+      }
+    },
+    {
+      "input": {
+        "op": "plate",
+        "tile": 47,
+        "motion": 11,
+        "heroX": 1,
+        "heroY": 1,
+        "offset": 0,
+        "direction": 2,
+        "phase": 0,
+        "count": 1,
+        "gateTile": -1,
+        "frame": 1
+      },
+      "expected": {
+        "phase": 1,
+        "count": 1,
+        "gateTile": -1,
+        "damage": 0,
+        "depression": 0
+      }
+    },
+    {
+      "input": {
+        "op": "plate",
+        "tile": 47,
+        "motion": 12,
+        "heroX": 1,
+        "heroY": 1,
+        "offset": 0,
+        "direction": 2,
+        "phase": 0,
+        "count": 1,
+        "gateTile": -1,
+        "frame": 1
+      },
+      "expected": {
+        "phase": 0,
+        "count": 1,
+        "gateTile": -1,
+        "damage": 0,
+        "depression": 0
+      }
+    },
+    {
+      "input": {
+        "op": "plate",
+        "tile": 47,
+        "motion": 18,
+        "heroX": 1,
+        "heroY": 1,
+        "offset": 0,
+        "direction": 2,
+        "phase": 0,
+        "count": 1,
+        "gateTile": -1,
+        "frame": 1
+      },
+      "expected": {
+        "phase": 0,
+        "count": 1,
+        "gateTile": -1,
+        "damage": 0,
+        "depression": 0
+      }
+    },
+    {
+      "input": {
+        "op": "plate",
+        "tile": 48,
+        "motion": 0,
+        "heroX": 1,
+        "heroY": 1,
+        "offset": 0,
+        "direction": 2,
+        "phase": 0,
+        "count": 1,
+        "gateTile": -1,
+        "frame": 1
+      },
+      "expected": {
+        "phase": 1,
+        "count": 1,
+        "gateTile": -1,
+        "damage": 0,
+        "depression": 0
+      }
+    },
+    {
+      "input": {
+        "op": "plate",
+        "tile": 48,
+        "motion": 11,
+        "heroX": 1,
+        "heroY": 1,
+        "offset": 0,
+        "direction": 2,
+        "phase": 0,
+        "count": 1,
+        "gateTile": -1,
+        "frame": 1
+      },
+      "expected": {
+        "phase": 1,
+        "count": 1,
+        "gateTile": -1,
+        "damage": 0,
+        "depression": 0
+      }
+    },
+    {
+      "input": {
+        "op": "plate",
+        "tile": 48,
+        "motion": 12,
+        "heroX": 1,
+        "heroY": 1,
+        "offset": 0,
+        "direction": 2,
+        "phase": 0,
+        "count": 1,
+        "gateTile": -1,
+        "frame": 1
+      },
+      "expected": {
+        "phase": 0,
+        "count": 1,
+        "gateTile": -1,
+        "damage": 0,
+        "depression": 0
+      }
+    },
+    {
+      "input": {
+        "op": "plate",
+        "tile": 48,
+        "motion": 18,
+        "heroX": 1,
+        "heroY": 1,
+        "offset": 0,
+        "direction": 2,
+        "phase": 0,
+        "count": 1,
+        "gateTile": -1,
+        "frame": 1
+      },
+      "expected": {
+        "phase": 0,
+        "count": 1,
+        "gateTile": -1,
+        "damage": 0,
+        "depression": 0
+      }
+    },
+    {
+      "input": {
+        "op": "plate",
+        "tile": 10,
+        "motion": 0,
+        "heroX": 1,
+        "heroY": 1,
+        "offset": 0,
+        "direction": 2,
+        "phase": 0,
+        "count": 1,
+        "gateTile": -1,
+        "frame": 1
+      },
+      "expected": {
+        "phase": 0,
+        "count": 1,
+        "gateTile": -1,
+        "damage": 0,
+        "depression": 0
+      }
+    },
+    {
+      "input": {
+        "op": "plate",
+        "tile": 10,
+        "motion": 11,
+        "heroX": 1,
+        "heroY": 1,
+        "offset": 0,
+        "direction": 2,
+        "phase": 0,
+        "count": 1,
+        "gateTile": -1,
+        "frame": 1
+      },
+      "expected": {
+        "phase": 0,
+        "count": 1,
+        "gateTile": -1,
+        "damage": 0,
+        "depression": 0
+      }
+    },
+    {
+      "input": {
+        "op": "plate",
+        "tile": 10,
+        "motion": 12,
+        "heroX": 1,
+        "heroY": 1,
+        "offset": 0,
+        "direction": 2,
+        "phase": 0,
+        "count": 1,
+        "gateTile": -1,
+        "frame": 1
+      },
+      "expected": {
+        "phase": 0,
+        "count": 1,
+        "gateTile": -1,
+        "damage": 0,
+        "depression": 0
+      }
+    },
+    {
+      "input": {
+        "op": "plate",
+        "tile": 10,
+        "motion": 18,
+        "heroX": 1,
+        "heroY": 1,
+        "offset": 0,
+        "direction": 2,
+        "phase": 0,
+        "count": 1,
+        "gateTile": -1,
+        "frame": 1
+      },
+      "expected": {
+        "phase": 0,
+        "count": 1,
+        "gateTile": -1,
+        "damage": 0,
+        "depression": 0
+      }
+    },
+    {
+      "input": {
+        "op": "plate",
+        "tile": 19,
+        "motion": 0,
+        "heroX": 1,
+        "heroY": 1,
+        "offset": 0,
+        "direction": 2,
+        "phase": 0,
+        "count": 1,
+        "gateTile": -1,
+        "frame": 1
+      },
+      "expected": {
+        "phase": 0,
+        "count": 1,
+        "gateTile": -1,
+        "damage": 0,
+        "depression": 0
+      }
+    },
+    {
+      "input": {
+        "op": "plate",
+        "tile": 19,
+        "motion": 11,
+        "heroX": 1,
+        "heroY": 1,
+        "offset": 0,
+        "direction": 2,
+        "phase": 0,
+        "count": 1,
+        "gateTile": -1,
+        "frame": 1
+      },
+      "expected": {
+        "phase": 0,
+        "count": 1,
+        "gateTile": -1,
+        "damage": 0,
+        "depression": 0
+      }
+    },
+    {
+      "input": {
+        "op": "plate",
+        "tile": 19,
+        "motion": 12,
+        "heroX": 1,
+        "heroY": 1,
+        "offset": 0,
+        "direction": 2,
+        "phase": 0,
+        "count": 1,
+        "gateTile": -1,
+        "frame": 1
+      },
+      "expected": {
+        "phase": 0,
+        "count": 1,
+        "gateTile": -1,
+        "damage": 0,
+        "depression": 0
+      }
+    },
+    {
+      "input": {
+        "op": "plate",
+        "tile": 19,
+        "motion": 18,
+        "heroX": 1,
+        "heroY": 1,
+        "offset": 0,
+        "direction": 2,
+        "phase": 0,
+        "count": 1,
+        "gateTile": -1,
+        "frame": 1
+      },
+      "expected": {
+        "phase": 0,
+        "count": 1,
+        "gateTile": -1,
+        "damage": 0,
+        "depression": 0
+      }
+    },
+    {
+      "input": {
+        "op": "plate",
+        "tile": 43,
+        "motion": 0,
+        "heroX": 1,
+        "heroY": 1,
+        "offset": 0,
+        "direction": 2,
+        "phase": 0,
+        "count": 1,
+        "gateTile": -1,
+        "frame": 1
+      },
+      "expected": {
+        "phase": 0,
+        "count": 1,
+        "gateTile": -1,
+        "damage": 0,
+        "depression": 0
+      }
+    },
+    {
+      "input": {
+        "op": "plate",
+        "tile": 43,
+        "motion": 11,
+        "heroX": 1,
+        "heroY": 1,
+        "offset": 0,
+        "direction": 2,
+        "phase": 0,
+        "count": 1,
+        "gateTile": -1,
+        "frame": 1
+      },
+      "expected": {
+        "phase": 0,
+        "count": 1,
+        "gateTile": -1,
+        "damage": 0,
+        "depression": 0
+      }
+    },
+    {
+      "input": {
+        "op": "plate",
+        "tile": 43,
+        "motion": 12,
+        "heroX": 1,
+        "heroY": 1,
+        "offset": 0,
+        "direction": 2,
+        "phase": 0,
+        "count": 1,
+        "gateTile": -1,
+        "frame": 1
+      },
+      "expected": {
+        "phase": 0,
+        "count": 1,
+        "gateTile": -1,
+        "damage": 0,
+        "depression": 0
+      }
+    },
+    {
+      "input": {
+        "op": "plate",
+        "tile": 43,
+        "motion": 18,
+        "heroX": 1,
+        "heroY": 1,
+        "offset": 0,
+        "direction": 2,
+        "phase": 0,
+        "count": 1,
+        "gateTile": -1,
+        "frame": 1
+      },
+      "expected": {
+        "phase": 0,
+        "count": 1,
+        "gateTile": -1,
+        "damage": 0,
+        "depression": 0
+      }
+    },
+    {
+      "input": {
+        "op": "plate",
+        "tile": 45,
+        "motion": 0,
+        "heroX": 1,
+        "heroY": 1,
+        "offset": 0,
+        "direction": 2,
+        "phase": 0,
+        "count": 1,
+        "gateTile": -1,
+        "frame": 1
+      },
+      "expected": {
+        "phase": 0,
+        "count": 1,
+        "gateTile": -1,
+        "damage": 0,
+        "depression": 0
+      }
+    },
+    {
+      "input": {
+        "op": "plate",
+        "tile": 45,
+        "motion": 11,
+        "heroX": 1,
+        "heroY": 1,
+        "offset": 0,
+        "direction": 2,
+        "phase": 0,
+        "count": 1,
+        "gateTile": -1,
+        "frame": 1
+      },
+      "expected": {
+        "phase": 0,
+        "count": 1,
+        "gateTile": -1,
+        "damage": 0,
+        "depression": 0
+      }
+    },
+    {
+      "input": {
+        "op": "plate",
+        "tile": 45,
+        "motion": 12,
+        "heroX": 1,
+        "heroY": 1,
+        "offset": 0,
+        "direction": 2,
+        "phase": 0,
+        "count": 1,
+        "gateTile": -1,
+        "frame": 1
+      },
+      "expected": {
+        "phase": 0,
+        "count": 1,
+        "gateTile": -1,
+        "damage": 0,
+        "depression": 0
+      }
+    },
+    {
+      "input": {
+        "op": "plate",
+        "tile": 45,
+        "motion": 18,
+        "heroX": 1,
+        "heroY": 1,
+        "offset": 0,
+        "direction": 2,
+        "phase": 0,
+        "count": 1,
+        "gateTile": -1,
+        "frame": 1
+      },
+      "expected": {
+        "phase": 0,
+        "count": 1,
+        "gateTile": -1,
+        "damage": 0,
+        "depression": 0
+      }
+    },
+    {
+      "input": {
+        "op": "plate",
+        "tile": 46,
+        "motion": 0,
+        "heroX": 1,
+        "heroY": 1,
+        "offset": 0,
+        "direction": 2,
+        "phase": 0,
+        "count": 1,
+        "gateTile": -1,
+        "frame": 1
+      },
+      "expected": {
+        "phase": 0,
+        "count": 1,
+        "gateTile": -1,
+        "damage": 0,
+        "depression": 0
+      }
+    },
+    {
+      "input": {
+        "op": "plate",
+        "tile": 46,
+        "motion": 11,
+        "heroX": 1,
+        "heroY": 1,
+        "offset": 0,
+        "direction": 2,
+        "phase": 0,
+        "count": 1,
+        "gateTile": -1,
+        "frame": 1
+      },
+      "expected": {
+        "phase": 0,
+        "count": 1,
+        "gateTile": -1,
+        "damage": 0,
+        "depression": 0
+      }
+    },
+    {
+      "input": {
+        "op": "plate",
+        "tile": 46,
+        "motion": 12,
+        "heroX": 1,
+        "heroY": 1,
+        "offset": 0,
+        "direction": 2,
+        "phase": 0,
+        "count": 1,
+        "gateTile": -1,
+        "frame": 1
+      },
+      "expected": {
+        "phase": 0,
+        "count": 1,
+        "gateTile": -1,
+        "damage": 0,
+        "depression": 0
+      }
+    },
+    {
+      "input": {
+        "op": "plate",
+        "tile": 46,
+        "motion": 18,
+        "heroX": 1,
+        "heroY": 1,
+        "offset": 0,
+        "direction": 2,
+        "phase": 0,
+        "count": 1,
+        "gateTile": -1,
+        "frame": 1
+      },
+      "expected": {
+        "phase": 0,
+        "count": 1,
+        "gateTile": -1,
+        "damage": 0,
+        "depression": 0
+      }
+    },
+    {
+      "input": {
+        "op": "plate",
+        "tile": -1,
+        "motion": 0,
+        "heroX": 3,
+        "heroY": 3,
+        "offset": 0,
+        "direction": 2,
+        "phase": 0,
+        "count": 1,
+        "gateTile": -1,
+        "frame": 1
+      },
+      "expected": {
+        "phase": 1,
+        "count": 1,
+        "gateTile": -1,
+        "damage": 0,
+        "depression": 12
+      }
+    },
+    {
+      "input": {
+        "op": "plate",
+        "tile": -1,
+        "motion": 0,
+        "heroX": 3,
+        "heroY": 3,
+        "offset": 6,
+        "direction": 2,
+        "phase": 0,
+        "count": 1,
+        "gateTile": -1,
+        "frame": 1
+      },
+      "expected": {
+        "phase": 1,
+        "count": 1,
+        "gateTile": -1,
+        "damage": 0,
+        "depression": 6
+      }
+    },
+    {
+      "input": {
+        "op": "plate",
+        "tile": -1,
+        "motion": 0,
+        "heroX": 3,
+        "heroY": 3,
+        "offset": 11,
+        "direction": 2,
+        "phase": 0,
+        "count": 1,
+        "gateTile": -1,
+        "frame": 1
+      },
+      "expected": {
+        "phase": 1,
+        "count": 1,
+        "gateTile": -1,
+        "damage": 0,
+        "depression": 1
+      }
+    },
+    {
+      "input": {
+        "op": "plate",
+        "tile": -1,
+        "motion": 0,
+        "heroX": 3,
+        "heroY": 3,
+        "offset": 12,
+        "direction": 2,
+        "phase": 0,
+        "count": 1,
+        "gateTile": -1,
+        "frame": 1
+      },
+      "expected": {
+        "phase": 0,
+        "count": 1,
+        "gateTile": -1,
+        "damage": 0,
+        "depression": 0
+      }
+    },
+    {
+      "input": {
+        "op": "plate",
+        "tile": -1,
+        "motion": 0,
+        "heroX": 3,
+        "heroY": 3,
+        "offset": 18,
+        "direction": 2,
+        "phase": 0,
+        "count": 1,
+        "gateTile": -1,
+        "frame": 1
+      },
+      "expected": {
+        "phase": 0,
+        "count": 1,
+        "gateTile": -1,
+        "damage": 0,
+        "depression": 0
+      }
+    },
+    {
+      "input": {
+        "op": "plate",
+        "tile": -1,
+        "motion": 0,
+        "heroX": 2,
+        "heroY": 3,
+        "offset": 6,
+        "direction": 1,
+        "phase": 0,
+        "count": 1,
+        "gateTile": -1,
+        "frame": 1
+      },
+      "expected": {
+        "phase": 0,
+        "count": 1,
+        "gateTile": -1,
+        "damage": 0,
+        "depression": 0
+      }
+    },
+    {
+      "input": {
+        "op": "plate",
+        "tile": -1,
+        "motion": 0,
+        "heroX": 2,
+        "heroY": 3,
+        "offset": 12,
+        "direction": 1,
+        "phase": 0,
+        "count": 1,
+        "gateTile": -1,
+        "frame": 1
+      },
+      "expected": {
+        "phase": 0,
+        "count": 1,
+        "gateTile": -1,
+        "damage": 0,
+        "depression": 0
+      }
+    },
+    {
+      "input": {
+        "op": "plate",
+        "tile": -1,
+        "motion": 0,
+        "heroX": 2,
+        "heroY": 3,
+        "offset": 18,
+        "direction": 1,
+        "phase": 0,
+        "count": 1,
+        "gateTile": -1,
+        "frame": 1
+      },
+      "expected": {
+        "phase": 0,
+        "count": 1,
+        "gateTile": -1,
+        "damage": 0,
+        "depression": 0
+      }
+    },
+    {
+      "input": {
+        "op": "plate",
+        "tile": -1,
+        "motion": 0,
+        "heroX": 2,
+        "heroY": 3,
+        "offset": 6,
+        "direction": 2,
+        "phase": 0,
+        "count": 1,
+        "gateTile": -1,
+        "frame": 1
+      },
+      "expected": {
+        "phase": 0,
+        "count": 1,
+        "gateTile": -1,
+        "damage": 0,
+        "depression": 0
+      }
+    },
+    {
+      "input": {
+        "op": "plate",
+        "tile": -1,
+        "motion": 0,
+        "heroX": 2,
+        "heroY": 3,
+        "offset": 12,
+        "direction": 2,
+        "phase": 0,
+        "count": 1,
+        "gateTile": -1,
+        "frame": 1
+      },
+      "expected": {
+        "phase": 0,
+        "count": 1,
+        "gateTile": -1,
+        "damage": 0,
+        "depression": 0
+      }
+    },
+    {
+      "input": {
+        "op": "plate",
+        "tile": -1,
+        "motion": 0,
+        "heroX": 2,
+        "heroY": 3,
+        "offset": 18,
+        "direction": 2,
+        "phase": 0,
+        "count": 1,
+        "gateTile": -1,
+        "frame": 1
+      },
+      "expected": {
+        "phase": 0,
+        "count": 1,
+        "gateTile": -1,
+        "damage": 0,
+        "depression": 0
+      }
+    },
+    {
+      "input": {
+        "op": "plate",
+        "tile": -1,
+        "motion": 0,
+        "heroX": 2,
+        "heroY": 3,
+        "offset": 6,
+        "direction": 3,
+        "phase": 0,
+        "count": 1,
+        "gateTile": -1,
+        "frame": 1
+      },
+      "expected": {
+        "phase": 0,
+        "count": 1,
+        "gateTile": -1,
+        "damage": 0,
+        "depression": 0
+      }
+    },
+    {
+      "input": {
+        "op": "plate",
+        "tile": -1,
+        "motion": 0,
+        "heroX": 2,
+        "heroY": 3,
+        "offset": 12,
+        "direction": 3,
+        "phase": 0,
+        "count": 1,
+        "gateTile": -1,
+        "frame": 1
+      },
+      "expected": {
+        "phase": 0,
+        "count": 1,
+        "gateTile": -1,
+        "damage": 0,
+        "depression": 0
+      }
+    },
+    {
+      "input": {
+        "op": "plate",
+        "tile": -1,
+        "motion": 0,
+        "heroX": 2,
+        "heroY": 3,
+        "offset": 18,
+        "direction": 3,
+        "phase": 0,
+        "count": 1,
+        "gateTile": -1,
+        "frame": 1
+      },
+      "expected": {
+        "phase": 0,
+        "count": 1,
+        "gateTile": -1,
+        "damage": 0,
+        "depression": 0
+      }
+    },
+    {
+      "input": {
+        "op": "plate",
+        "tile": -1,
+        "motion": 0,
+        "heroX": 2,
+        "heroY": 3,
+        "offset": 6,
+        "direction": 4,
+        "phase": 0,
+        "count": 1,
+        "gateTile": -1,
+        "frame": 1
+      },
+      "expected": {
+        "phase": 0,
+        "count": 1,
+        "gateTile": -1,
+        "damage": 0,
+        "depression": 0
+      }
+    },
+    {
+      "input": {
+        "op": "plate",
+        "tile": -1,
+        "motion": 0,
+        "heroX": 2,
+        "heroY": 3,
+        "offset": 12,
+        "direction": 4,
+        "phase": 0,
+        "count": 1,
+        "gateTile": -1,
+        "frame": 1
+      },
+      "expected": {
+        "phase": 0,
+        "count": 1,
+        "gateTile": -1,
+        "damage": 0,
+        "depression": 0
+      }
+    },
+    {
+      "input": {
+        "op": "plate",
+        "tile": -1,
+        "motion": 0,
+        "heroX": 2,
+        "heroY": 3,
+        "offset": 18,
+        "direction": 4,
+        "phase": 0,
+        "count": 1,
+        "gateTile": -1,
+        "frame": 1
+      },
+      "expected": {
+        "phase": 0,
+        "count": 1,
+        "gateTile": -1,
+        "damage": 0,
+        "depression": 6
+      }
+    },
+    {
+      "input": {
+        "op": "plate",
+        "tile": -1,
+        "motion": 0,
+        "heroX": 4,
+        "heroY": 3,
+        "offset": 6,
+        "direction": 1,
+        "phase": 0,
+        "count": 1,
+        "gateTile": -1,
+        "frame": 1
+      },
+      "expected": {
+        "phase": 0,
+        "count": 1,
+        "gateTile": -1,
+        "damage": 0,
+        "depression": 0
+      }
+    },
+    {
+      "input": {
+        "op": "plate",
+        "tile": -1,
+        "motion": 0,
+        "heroX": 4,
+        "heroY": 3,
+        "offset": 12,
+        "direction": 1,
+        "phase": 0,
+        "count": 1,
+        "gateTile": -1,
+        "frame": 1
+      },
+      "expected": {
+        "phase": 0,
+        "count": 1,
+        "gateTile": -1,
+        "damage": 0,
+        "depression": 0
+      }
+    },
+    {
+      "input": {
+        "op": "plate",
+        "tile": -1,
+        "motion": 0,
+        "heroX": 4,
+        "heroY": 3,
+        "offset": 18,
+        "direction": 1,
+        "phase": 0,
+        "count": 1,
+        "gateTile": -1,
+        "frame": 1
+      },
+      "expected": {
+        "phase": 0,
+        "count": 1,
+        "gateTile": -1,
+        "damage": 0,
+        "depression": 0
+      }
+    },
+    {
+      "input": {
+        "op": "plate",
+        "tile": -1,
+        "motion": 0,
+        "heroX": 4,
+        "heroY": 3,
+        "offset": 6,
+        "direction": 2,
+        "phase": 0,
+        "count": 1,
+        "gateTile": -1,
+        "frame": 1
+      },
+      "expected": {
+        "phase": 0,
+        "count": 1,
+        "gateTile": -1,
+        "damage": 0,
+        "depression": 0
+      }
+    },
+    {
+      "input": {
+        "op": "plate",
+        "tile": -1,
+        "motion": 0,
+        "heroX": 4,
+        "heroY": 3,
+        "offset": 12,
+        "direction": 2,
+        "phase": 0,
+        "count": 1,
+        "gateTile": -1,
+        "frame": 1
+      },
+      "expected": {
+        "phase": 0,
+        "count": 1,
+        "gateTile": -1,
+        "damage": 0,
+        "depression": 0
+      }
+    },
+    {
+      "input": {
+        "op": "plate",
+        "tile": -1,
+        "motion": 0,
+        "heroX": 4,
+        "heroY": 3,
+        "offset": 18,
+        "direction": 2,
+        "phase": 0,
+        "count": 1,
+        "gateTile": -1,
+        "frame": 1
+      },
+      "expected": {
+        "phase": 0,
+        "count": 1,
+        "gateTile": -1,
+        "damage": 0,
+        "depression": 6
+      }
+    },
+    {
+      "input": {
+        "op": "plate",
+        "tile": -1,
+        "motion": 0,
+        "heroX": 4,
+        "heroY": 3,
+        "offset": 6,
+        "direction": 3,
+        "phase": 0,
+        "count": 1,
+        "gateTile": -1,
+        "frame": 1
+      },
+      "expected": {
+        "phase": 0,
+        "count": 1,
+        "gateTile": -1,
+        "damage": 0,
+        "depression": 0
+      }
+    },
+    {
+      "input": {
+        "op": "plate",
+        "tile": -1,
+        "motion": 0,
+        "heroX": 4,
+        "heroY": 3,
+        "offset": 12,
+        "direction": 3,
+        "phase": 0,
+        "count": 1,
+        "gateTile": -1,
+        "frame": 1
+      },
+      "expected": {
+        "phase": 0,
+        "count": 1,
+        "gateTile": -1,
+        "damage": 0,
+        "depression": 0
+      }
+    },
+    {
+      "input": {
+        "op": "plate",
+        "tile": -1,
+        "motion": 0,
+        "heroX": 4,
+        "heroY": 3,
+        "offset": 18,
+        "direction": 3,
+        "phase": 0,
+        "count": 1,
+        "gateTile": -1,
+        "frame": 1
+      },
+      "expected": {
+        "phase": 0,
+        "count": 1,
+        "gateTile": -1,
+        "damage": 0,
+        "depression": 0
+      }
+    },
+    {
+      "input": {
+        "op": "plate",
+        "tile": -1,
+        "motion": 0,
+        "heroX": 4,
+        "heroY": 3,
+        "offset": 6,
+        "direction": 4,
+        "phase": 0,
+        "count": 1,
+        "gateTile": -1,
+        "frame": 1
+      },
+      "expected": {
+        "phase": 0,
+        "count": 1,
+        "gateTile": -1,
+        "damage": 0,
+        "depression": 0
+      }
+    },
+    {
+      "input": {
+        "op": "plate",
+        "tile": -1,
+        "motion": 0,
+        "heroX": 4,
+        "heroY": 3,
+        "offset": 12,
+        "direction": 4,
+        "phase": 0,
+        "count": 1,
+        "gateTile": -1,
+        "frame": 1
+      },
+      "expected": {
+        "phase": 0,
+        "count": 1,
+        "gateTile": -1,
+        "damage": 0,
+        "depression": 0
+      }
+    },
+    {
+      "input": {
+        "op": "plate",
+        "tile": -1,
+        "motion": 0,
+        "heroX": 4,
+        "heroY": 3,
+        "offset": 18,
+        "direction": 4,
+        "phase": 0,
+        "count": 1,
+        "gateTile": -1,
+        "frame": 1
+      },
+      "expected": {
+        "phase": 0,
+        "count": 1,
+        "gateTile": -1,
+        "damage": 0,
+        "depression": 0
+      }
+    },
+    {
+      "input": {
+        "op": "plate",
+        "tile": -1,
+        "motion": 0,
+        "heroX": 1,
+        "heroY": 1,
+        "offset": 0,
+        "direction": 2,
+        "phase": 0,
+        "count": 1,
+        "gateTile": -1,
+        "frame": 1
+      },
+      "expected": {
+        "phase": 0,
+        "count": 1,
+        "gateTile": -1,
+        "damage": 0,
+        "depression": 0
+      }
+    },
+    {
+      "input": {
+        "op": "plate",
+        "tile": 0,
+        "motion": 0,
+        "heroX": 1,
+        "heroY": 1,
+        "offset": 0,
+        "direction": 2,
+        "phase": 0,
+        "count": 1,
+        "gateTile": -1,
+        "frame": 1
+      },
+      "expected": {
+        "phase": 1,
+        "count": 1,
+        "gateTile": -1,
+        "damage": 0,
+        "depression": 12
+      }
+    },
+    {
+      "input": {
+        "op": "plate",
+        "tile": -1,
+        "motion": 0,
+        "heroX": 1,
+        "heroY": 1,
+        "offset": 0,
+        "direction": 2,
+        "phase": 0,
+        "count": 2,
+        "gateTile": -1,
+        "frame": 1
+      },
+      "expected": {
+        "phase": 0,
+        "count": 2,
+        "gateTile": -1,
+        "damage": 0,
+        "depression": 0
+      }
+    },
+    {
+      "input": {
+        "op": "plate",
+        "tile": 0,
+        "motion": 0,
+        "heroX": 1,
+        "heroY": 1,
+        "offset": 0,
+        "direction": 2,
+        "phase": 0,
+        "count": 2,
+        "gateTile": -1,
+        "frame": 1
+      },
+      "expected": {
+        "phase": 0,
+        "count": 1,
+        "gateTile": -1,
+        "damage": 0,
+        "depression": 12
+      }
+    },
+    {
+      "input": {
+        "op": "plate",
+        "tile": -1,
+        "motion": 0,
+        "heroX": 1,
+        "heroY": 1,
+        "offset": 0,
+        "direction": 2,
+        "phase": 1,
+        "count": 1,
+        "gateTile": -1,
+        "frame": 1
+      },
+      "expected": {
+        "phase": 0,
+        "count": 1,
+        "gateTile": -1,
+        "damage": 0,
+        "depression": 0
+      }
+    },
+    {
+      "input": {
+        "op": "plate",
+        "tile": 0,
+        "motion": 0,
+        "heroX": 1,
+        "heroY": 1,
+        "offset": 0,
+        "direction": 2,
+        "phase": 1,
+        "count": 1,
+        "gateTile": -1,
+        "frame": 1
+      },
+      "expected": {
+        "phase": 1,
+        "count": 1,
+        "gateTile": -1,
+        "damage": 0,
+        "depression": 12
+      }
+    },
+    {
+      "input": {
+        "op": "plate",
+        "tile": -1,
+        "motion": 0,
+        "heroX": 1,
+        "heroY": 1,
+        "offset": 0,
+        "direction": 2,
+        "phase": 1,
+        "count": 2,
+        "gateTile": -1,
+        "frame": 1
+      },
+      "expected": {
+        "phase": 0,
+        "count": 2,
+        "gateTile": -1,
+        "damage": 0,
+        "depression": 0
+      }
+    },
+    {
+      "input": {
+        "op": "plate",
+        "tile": 0,
+        "motion": 0,
+        "heroX": 1,
+        "heroY": 1,
+        "offset": 0,
+        "direction": 2,
+        "phase": 1,
+        "count": 2,
+        "gateTile": -1,
+        "frame": 1
+      },
+      "expected": {
+        "phase": 1,
+        "count": 2,
+        "gateTile": -1,
+        "damage": 0,
+        "depression": 12
+      }
+    },
+    {
+      "input": {
+        "op": "plate",
+        "tile": -1,
+        "motion": 0,
+        "heroX": 1,
+        "heroY": 1,
+        "offset": 0,
+        "direction": 2,
+        "phase": 2,
+        "count": 1,
+        "gateTile": -1,
+        "frame": 1
+      },
+      "expected": {
+        "phase": 0,
+        "count": 1,
+        "gateTile": -1,
+        "damage": 0,
+        "depression": 0
+      }
+    },
+    {
+      "input": {
+        "op": "plate",
+        "tile": 0,
+        "motion": 0,
+        "heroX": 1,
+        "heroY": 1,
+        "offset": 0,
+        "direction": 2,
+        "phase": 2,
+        "count": 1,
+        "gateTile": -1,
+        "frame": 1
+      },
+      "expected": {
+        "phase": 2,
+        "count": 1,
+        "gateTile": -1,
+        "damage": 0,
+        "depression": 12
+      }
+    },
+    {
+      "input": {
+        "op": "plate",
+        "tile": -1,
+        "motion": 0,
+        "heroX": 1,
+        "heroY": 1,
+        "offset": 0,
+        "direction": 2,
+        "phase": 2,
+        "count": 2,
+        "gateTile": -1,
+        "frame": 1
+      },
+      "expected": {
+        "phase": 0,
+        "count": 2,
+        "gateTile": -1,
+        "damage": 0,
+        "depression": 0
+      }
+    },
+    {
+      "input": {
+        "op": "plate",
+        "tile": 0,
+        "motion": 0,
+        "heroX": 1,
+        "heroY": 1,
+        "offset": 0,
+        "direction": 2,
+        "phase": 2,
+        "count": 2,
+        "gateTile": -1,
+        "frame": 1
+      },
+      "expected": {
+        "phase": 2,
+        "count": 2,
+        "gateTile": -1,
+        "damage": 0,
+        "depression": 12
+      }
+    },
+    {
+      "input": {
+        "op": "plate",
+        "tile": -1,
+        "motion": 0,
+        "heroX": 1,
+        "heroY": 1,
+        "offset": 0,
+        "direction": 2,
+        "phase": 3,
+        "count": 1,
+        "gateTile": -1,
+        "frame": 1
+      },
+      "expected": {
+        "phase": 0,
+        "count": 1,
+        "gateTile": -1,
+        "damage": 0,
+        "depression": 0
+      }
+    },
+    {
+      "input": {
+        "op": "plate",
+        "tile": 0,
+        "motion": 0,
+        "heroX": 1,
+        "heroY": 1,
+        "offset": 0,
+        "direction": 2,
+        "phase": 3,
+        "count": 1,
+        "gateTile": -1,
+        "frame": 1
+      },
+      "expected": {
+        "phase": 3,
+        "count": 1,
+        "gateTile": -1,
+        "damage": 0,
+        "depression": 12
+      }
+    },
+    {
+      "input": {
+        "op": "plate",
+        "tile": -1,
+        "motion": 0,
+        "heroX": 1,
+        "heroY": 1,
+        "offset": 0,
+        "direction": 2,
+        "phase": 3,
+        "count": 2,
+        "gateTile": -1,
+        "frame": 1
+      },
+      "expected": {
+        "phase": 0,
+        "count": 2,
+        "gateTile": -1,
+        "damage": 0,
+        "depression": 0
+      }
+    },
+    {
+      "input": {
+        "op": "plate",
+        "tile": 0,
+        "motion": 0,
+        "heroX": 1,
+        "heroY": 1,
+        "offset": 0,
+        "direction": 2,
+        "phase": 3,
+        "count": 2,
+        "gateTile": -1,
+        "frame": 1
+      },
+      "expected": {
+        "phase": 3,
+        "count": 2,
+        "gateTile": -1,
+        "damage": 0,
+        "depression": 12
+      }
+    },
+    {
+      "input": {
+        "op": "plate",
+        "tile": -1,
+        "motion": 0,
+        "heroX": 1,
+        "heroY": 1,
+        "offset": 0,
+        "direction": 2,
+        "phase": 3,
+        "count": 1,
+        "gateTile": -1,
+        "frame": 1
+      },
+      "expected": {
+        "phase": 0,
+        "count": 1,
+        "gateTile": -1,
+        "damage": 0,
+        "depression": 0
+      }
+    },
+    {
+      "input": {
+        "op": "plate",
+        "tile": -1,
+        "motion": 0,
+        "heroX": 1,
+        "heroY": 1,
+        "offset": 0,
+        "direction": 2,
+        "phase": 3,
+        "count": 1,
+        "gateTile": 0,
+        "frame": 1
+      },
+      "expected": {
+        "phase": 0,
+        "count": 1,
+        "gateTile": -1,
+        "damage": 0,
+        "depression": 0
+      }
+    },
+    {
+      "input": {
+        "op": "plate",
+        "tile": -1,
+        "motion": 0,
+        "heroX": 1,
+        "heroY": 1,
+        "offset": 0,
+        "direction": 2,
+        "phase": 3,
+        "count": 1,
+        "gateTile": 1,
+        "frame": 1
+      },
+      "expected": {
+        "phase": 0,
+        "count": 1,
+        "gateTile": -1,
+        "damage": 0,
+        "depression": 0
+      }
+    },
+    {
+      "input": {
+        "op": "plate",
+        "tile": -1,
+        "motion": 0,
+        "heroX": 1,
+        "heroY": 1,
+        "offset": 0,
+        "direction": 2,
+        "phase": 3,
+        "count": 1,
+        "gateTile": 8,
+        "frame": 1
+      },
+      "expected": {
+        "phase": 0,
+        "count": 1,
+        "gateTile": 8,
+        "damage": 0,
+        "depression": 0
+      }
+    },
+    {
+      "input": {
+        "op": "plate",
+        "tile": -1,
+        "motion": 0,
+        "heroX": 1,
+        "heroY": 1,
+        "offset": 0,
+        "direction": 2,
+        "phase": 3,
+        "count": 1,
+        "gateTile": 9,
+        "frame": 1
+      },
+      "expected": {
+        "phase": 0,
+        "count": 1,
+        "gateTile": 9,
+        "damage": 0,
+        "depression": 0
+      }
+    },
+    {
+      "input": {
+        "op": "plate",
+        "tile": -1,
+        "motion": 0,
+        "heroX": 1,
+        "heroY": 1,
+        "offset": 0,
+        "direction": 2,
+        "phase": 3,
+        "count": 1,
+        "gateTile": 19,
+        "frame": 1
+      },
+      "expected": {
+        "phase": 0,
+        "count": 1,
+        "gateTile": -1,
+        "damage": 0,
+        "depression": 0
+      }
+    },
+    {
+      "input": {
+        "op": "plate",
+        "tile": -1,
+        "motion": 0,
+        "heroX": 1,
+        "heroY": 1,
+        "offset": 0,
+        "direction": 2,
+        "phase": 3,
+        "count": 1,
+        "gateTile": 32,
+        "frame": 1
+      },
+      "expected": {
+        "phase": 3,
+        "count": 1,
+        "gateTile": 32,
+        "damage": 0,
+        "depression": 0
+      }
+    },
+    {
+      "input": {
+        "op": "plate",
+        "tile": -1,
+        "motion": 0,
+        "heroX": 1,
+        "heroY": 1,
+        "offset": 0,
+        "direction": 2,
+        "phase": 3,
+        "count": 1,
+        "gateTile": 43,
+        "frame": 1
+      },
+      "expected": {
+        "phase": 0,
+        "count": 1,
+        "gateTile": -1,
+        "damage": 0,
+        "depression": 0
+      }
+    },
+    {
+      "input": {
+        "op": "plate",
+        "tile": -1,
+        "motion": 0,
+        "heroX": 1,
+        "heroY": 1,
+        "offset": 0,
+        "direction": 2,
+        "phase": 3,
+        "count": 1,
+        "gateTile": 45,
+        "frame": 1
+      },
+      "expected": {
+        "phase": 0,
+        "count": 1,
+        "gateTile": -1,
+        "damage": 0,
+        "depression": 0
+      }
+    },
+    {
+      "input": {
+        "op": "plate",
+        "tile": -1,
+        "motion": 0,
+        "heroX": 1,
+        "heroY": 1,
+        "offset": 0,
+        "direction": 2,
+        "phase": 3,
+        "count": 1,
+        "gateTile": 46,
+        "frame": 1
+      },
+      "expected": {
+        "phase": 0,
+        "count": 1,
+        "gateTile": 46,
+        "damage": 0,
+        "depression": 0
+      }
+    },
+    {
+      "input": {
+        "op": "plate",
+        "tile": -1,
+        "motion": 0,
+        "heroX": 1,
+        "heroY": 1,
+        "offset": 0,
+        "direction": 2,
+        "phase": 3,
+        "count": 1,
+        "gateTile": 49,
+        "frame": 1
+      },
+      "expected": {
+        "phase": 0,
+        "count": 1,
+        "gateTile": 49,
+        "damage": 0,
+        "depression": 0
+      }
+    },
+    {
+      "input": {
+        "op": "plate",
+        "tile": -1,
+        "motion": 0,
+        "heroX": 6,
+        "heroY": 3,
+        "offset": 0,
+        "direction": 2,
+        "phase": 3,
+        "count": 1,
+        "gateTile": -1,
+        "frame": 1
+      },
+      "expected": {
+        "phase": 0,
+        "count": 1,
+        "gateTile": -1,
+        "damage": 4,
+        "depression": 0
+      }
+    },
+    {
+      "input": {
+        "op": "gate",
+        "phase": 0,
+        "count": 1,
+        "frame": 1
+      },
+      "expected": {
+        "phase": 0,
+        "count": 1
+      }
+    },
+    {
+      "input": {
+        "op": "gate",
+        "phase": 0,
+        "count": 1,
+        "frame": 2
+      },
+      "expected": {
+        "phase": 0,
+        "count": 1
+      }
+    },
+    {
+      "input": {
+        "op": "gate",
+        "phase": 0,
+        "count": 1,
+        "frame": 3
+      },
+      "expected": {
+        "phase": 0,
+        "count": 1
+      }
+    },
+    {
+      "input": {
+        "op": "gate",
+        "phase": 0,
+        "count": 1,
+        "frame": 6
+      },
+      "expected": {
+        "phase": 0,
+        "count": 1
+      }
+    },
+    {
+      "input": {
+        "op": "gate",
+        "phase": 1,
+        "count": 1,
+        "frame": 1
+      },
+      "expected": {
+        "phase": 1,
+        "count": 1
+      }
+    },
+    {
+      "input": {
+        "op": "gate",
+        "phase": 1,
+        "count": 1,
+        "frame": 2
+      },
+      "expected": {
+        "phase": 1,
+        "count": 1
+      }
+    },
+    {
+      "input": {
+        "op": "gate",
+        "phase": 1,
+        "count": 1,
+        "frame": 3
+      },
+      "expected": {
+        "phase": 2,
+        "count": 1
+      }
+    },
+    {
+      "input": {
+        "op": "gate",
+        "phase": 1,
+        "count": 1,
+        "frame": 6
+      },
+      "expected": {
+        "phase": 2,
+        "count": 1
+      }
+    },
+    {
+      "input": {
+        "op": "gate",
+        "phase": 2,
+        "count": 1,
+        "frame": 1
+      },
+      "expected": {
+        "phase": 2,
+        "count": 1
+      }
+    },
+    {
+      "input": {
+        "op": "gate",
+        "phase": 2,
+        "count": 1,
+        "frame": 2
+      },
+      "expected": {
+        "phase": 2,
+        "count": 1
+      }
+    },
+    {
+      "input": {
+        "op": "gate",
+        "phase": 2,
+        "count": 1,
+        "frame": 3
+      },
+      "expected": {
+        "phase": 3,
+        "count": 1
+      }
+    },
+    {
+      "input": {
+        "op": "gate",
+        "phase": 2,
+        "count": 1,
+        "frame": 6
+      },
+      "expected": {
+        "phase": 3,
+        "count": 1
+      }
+    },
+    {
+      "input": {
+        "op": "gate",
+        "phase": 3,
+        "count": 1,
+        "frame": 1
+      },
+      "expected": {
+        "phase": 3,
+        "count": 1
+      }
+    },
+    {
+      "input": {
+        "op": "gate",
+        "phase": 3,
+        "count": 1,
+        "frame": 2
+      },
+      "expected": {
+        "phase": 3,
+        "count": 1
+      }
+    },
+    {
+      "input": {
+        "op": "gate",
+        "phase": 3,
+        "count": 1,
+        "frame": 3
+      },
+      "expected": {
+        "phase": 3,
+        "count": 1
+      }
+    },
+    {
+      "input": {
+        "op": "gate",
+        "phase": 3,
+        "count": 1,
+        "frame": 6
+      },
+      "expected": {
+        "phase": 3,
+        "count": 1
+      }
+    },
+    {
+      "input": {
+        "op": "fall-motion",
+        "motion": 1,
+        "direction": 2,
+        "frame": 0
+      },
+      "expected": {
+        "motion": -5
+      }
+    },
+    {
+      "input": {
+        "op": "fall-motion",
+        "motion": 1,
+        "direction": 2,
+        "frame": 1
+      },
+      "expected": {
+        "motion": -5
+      }
+    },
+    {
+      "input": {
+        "op": "fall-motion",
+        "motion": 1,
+        "direction": 3,
+        "frame": 0
+      },
+      "expected": {
+        "motion": 1
+      }
+    },
+    {
+      "input": {
+        "op": "fall-motion",
+        "motion": 1,
+        "direction": 3,
+        "frame": 1
+      },
+      "expected": {
+        "motion": 0
+      }
+    },
+    {
+      "input": {
+        "op": "fall-motion",
+        "motion": 11,
+        "direction": 2,
+        "frame": 0
+      },
+      "expected": {
+        "motion": 5
+      }
+    },
+    {
+      "input": {
+        "op": "fall-motion",
+        "motion": 11,
+        "direction": 2,
+        "frame": 1
+      },
+      "expected": {
+        "motion": 5
+      }
+    },
+    {
+      "input": {
+        "op": "fall-motion",
+        "motion": 11,
+        "direction": 3,
+        "frame": 0
+      },
+      "expected": {
+        "motion": 11
+      }
+    },
+    {
+      "input": {
+        "op": "fall-motion",
+        "motion": 11,
+        "direction": 3,
+        "frame": 1
+      },
+      "expected": {
+        "motion": 10
+      }
+    },
+    {
+      "input": {
+        "op": "fall-motion",
+        "motion": 12,
+        "direction": 2,
+        "frame": 0
+      },
+      "expected": {
+        "motion": 6
+      }
+    },
+    {
+      "input": {
+        "op": "fall-motion",
+        "motion": 12,
+        "direction": 2,
+        "frame": 1
+      },
+      "expected": {
+        "motion": 6
+      }
+    },
+    {
+      "input": {
+        "op": "fall-motion",
+        "motion": 12,
+        "direction": 3,
+        "frame": 0
+      },
+      "expected": {
+        "motion": 12
+      }
+    },
+    {
+      "input": {
+        "op": "fall-motion",
+        "motion": 12,
+        "direction": 3,
+        "frame": 1
+      },
+      "expected": {
+        "motion": 11
+      }
+    },
+    {
+      "input": {
+        "op": "fall-motion",
+        "motion": 18,
+        "direction": 2,
+        "frame": 0
+      },
+      "expected": {
+        "motion": 12
+      }
+    },
+    {
+      "input": {
+        "op": "fall-motion",
+        "motion": 18,
+        "direction": 2,
+        "frame": 1
+      },
+      "expected": {
+        "motion": 12
+      }
+    },
+    {
+      "input": {
+        "op": "fall-motion",
+        "motion": 18,
+        "direction": 3,
+        "frame": 0
+      },
+      "expected": {
+        "motion": 12
+      }
+    },
+    {
+      "input": {
+        "op": "fall-motion",
+        "motion": 18,
+        "direction": 3,
+        "frame": 1
+      },
+      "expected": {
+        "motion": 12
+      }
+    }
+  ]
+}

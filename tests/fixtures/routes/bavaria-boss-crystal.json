@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "engine": "fidelity-23",
+  "engine": "fidelity-24",
   "levelFingerprint": "38cb55e9",
   "world": 1,
   "level": 9,
@@ -131,7 +131,7 @@
       "action": false
     },
     {
-      "ticks": 3,
+      "ticks": 136,
       "direction": 0,
       "action": false
     },
@@ -172,66 +172,6 @@
     },
     {
       "ticks": 3,
-      "direction": 0,
-      "action": false
-    },
-    {
-      "ticks": 1,
-      "direction": 2,
-      "action": false
-    },
-    {
-      "ticks": 3,
-      "direction": 0,
-      "action": false
-    },
-    {
-      "ticks": 1,
-      "direction": 1,
-      "action": false
-    },
-    {
-      "ticks": 3,
-      "direction": 0,
-      "action": false
-    },
-    {
-      "ticks": 1,
-      "direction": 1,
-      "action": false
-    },
-    {
-      "ticks": 3,
-      "direction": 0,
-      "action": false
-    },
-    {
-      "ticks": 1,
-      "direction": 4,
-      "action": false
-    },
-    {
-      "ticks": 3,
-      "direction": 0,
-      "action": false
-    },
-    {
-      "ticks": 7,
-      "direction": 4,
-      "action": false
-    },
-    {
-      "ticks": 3,
-      "direction": 0,
-      "action": false
-    },
-    {
-      "ticks": 4,
-      "direction": 4,
-      "action": false
-    },
-    {
-      "ticks": 11,
       "direction": 0,
       "action": false
     },
@@ -251,13 +191,13 @@
       "action": false
     },
     {
-      "ticks": 53,
+      "ticks": 3,
       "direction": 0,
       "action": false
     },
     {
       "ticks": 1,
-      "direction": 3,
+      "direction": 4,
       "action": false
     },
     {
@@ -267,17 +207,7 @@
     },
     {
       "ticks": 1,
-      "direction": 3,
-      "action": false
-    },
-    {
-      "ticks": 3,
-      "direction": 0,
-      "action": false
-    },
-    {
-      "ticks": 1,
-      "direction": 3,
+      "direction": 4,
       "action": false
     },
     {
@@ -317,21 +247,11 @@
     },
     {
       "ticks": 1,
-      "direction": 1,
-      "action": false
-    },
-    {
-      "ticks": 3,
-      "direction": 0,
-      "action": false
-    },
-    {
-      "ticks": 1,
       "direction": 2,
       "action": false
     },
     {
-      "ticks": 178,
+      "ticks": 12,
       "direction": 0,
       "action": false
     },
@@ -431,7 +351,7 @@
       "action": false
     },
     {
-      "ticks": 221,
+      "ticks": 125,
       "direction": 0,
       "action": false
     },
@@ -651,7 +571,7 @@
       "action": false
     },
     {
-      "ticks": 117,
+      "ticks": 181,
       "direction": 0,
       "action": false
     },
@@ -918,7 +838,7 @@
   ],
   "expected": {
     "status": "complete",
-    "ticks": 1629,
+    "ticks": 1465,
     "x": 29,
     "y": 13,
     "exitObject": 0,

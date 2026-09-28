@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "engine": "fidelity-23",
+  "engine": "fidelity-24",
   "levelFingerprint": "9d1730e6",
   "world": 0,
   "level": 8,
@@ -91,7 +91,7 @@
       "action": false
     },
     {
-      "ticks": 3,
+      "ticks": 136,
       "direction": 0,
       "action": false
     },
@@ -381,7 +381,7 @@
       "action": false
     },
     {
-      "ticks": 119,
+      "ticks": 143,
       "direction": 0,
       "action": false
     },
@@ -558,7 +558,7 @@
   ],
   "expected": {
     "status": "complete",
-    "ticks": 964,
+    "ticks": 1121,
     "x": 27,
     "y": 6,
     "exitObject": 0,

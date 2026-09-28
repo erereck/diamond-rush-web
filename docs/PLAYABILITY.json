@@ -1,5 +1,5 @@
 {
-  "engine": "fidelity-23",
+  "engine": "fidelity-24",
   "reference": "5e05c42aa1aae3377790600eb6d27497101b79e7",
   "scope": "Control-only routes from the original spawn and explicitly bounded New Game prefixes. Not a full campaign or Java parity certificate.",
   "counts": {
@@ -7,12 +7,12 @@
     "playableStages": 40,
     "secretStages": 10,
     "goals": 47,
-    "verifiedMaps": 8,
+    "verifiedMaps": 9,
     "verifiedBosses": 3,
-    "completedRoutes": 8,
+    "completedRoutes": 9,
     "attemptedMaps": 0,
     "campaignPrefixes": 1,
-    "campaignPrefixStages": 4
+    "campaignPrefixStages": 5
   },
   "campaignPrefixes": [
     {
@@ -137,16 +137,16 @@
           },
           "outcome": {
             "status": "complete",
-            "ticks": 1045,
+            "ticks": 1248,
             "x": 33,
             "y": 21,
             "exitObject": 5,
             "diamonds": 21,
             "redDiamonds": 0,
             "lives": 7,
-            "health": 2,
+            "health": 3,
             "weaponTier": 0,
-            "hits": 4,
+            "hits": 3,
             "retries": 0,
             "opened": [
               409,
@@ -169,21 +169,21 @@
             "diamonds": 21,
             "redDiamonds": 0,
             "lives": 8,
-            "health": 2,
+            "health": 3,
             "weaponTier": 0
           },
           "outcome": {
             "status": "complete",
-            "ticks": 1397,
+            "ticks": 1930,
             "x": 46,
             "y": 5,
             "exitObject": 5,
-            "diamonds": 47,
+            "diamonds": 37,
             "redDiamonds": 0,
             "lives": 7,
             "health": 1,
             "weaponTier": 1,
-            "hits": 5,
+            "hits": 9,
             "retries": 1,
             "opened": [
               379,
@@ -196,6 +196,41 @@
             "bossCleared": false
           },
           "awards": 0
+        },
+        {
+          "file": "angkor-05-normal.json",
+          "world": 0,
+          "level": 4,
+          "initial": {
+            "diamonds": 37,
+            "redDiamonds": 0,
+            "lives": 7,
+            "health": 1,
+            "weaponTier": 1
+          },
+          "outcome": {
+            "status": "complete",
+            "ticks": 1953,
+            "x": -6,
+            "y": 10,
+            "exitObject": 5,
+            "diamonds": 58,
+            "redDiamonds": 0,
+            "lives": 6,
+            "health": 3,
+            "weaponTier": 1,
+            "hits": 5,
+            "retries": 1,
+            "opened": [
+              372,
+              1016,
+              1098
+            ],
+            "demos": [],
+            "bossHealth": null,
+            "bossCleared": false
+          },
+          "awards": 0
         }
       ],
       "completed": [
@@ -203,7 +238,8 @@
           0,
           1,
           2,
-          3
+          3,
+          4
         ],
         [],
         []
@@ -213,16 +249,17 @@
           32,
           32,
           32,
+          0,
           0
         ],
         [],
         []
       ],
       "resources": {
-        "diamonds": 47,
+        "diamonds": 58,
         "redDiamonds": 0,
-        "lives": 7,
-        "health": 1,
+        "lives": 6,
+        "health": 3,
         "weaponTier": 1
       },
       "unlocked": [
@@ -231,7 +268,8 @@
           1,
           2,
           3,
-          4
+          4,
+          5
         ],
         [],
         []
@@ -265,9 +303,18 @@
             379,
             746
           ]
+        },
+        {
+          "world": 0,
+          "level": 4,
+          "cells": [
+            372,
+            1016,
+            1098
+          ]
         }
       ],
-      "recordHash": "708d8578b9053aa7a74ec06d82f19b683fdf0add5dcae649accdf280770c0be0"
+      "recordHash": "e3bdeebca02b0666437d4d5c4d549ce8e8e8f7eb69da78a27ab479d63c5c9159"
     }
   ],
   "levels": [
@@ -457,16 +504,16 @@
           },
           "outcome": {
             "status": "complete",
-            "ticks": 1045,
+            "ticks": 1248,
             "x": 33,
             "y": 21,
             "exitObject": 5,
             "diamonds": 11,
             "redDiamonds": 0,
             "lives": 5,
-            "health": 2,
+            "health": 3,
             "weaponTier": 0,
-            "hits": 4,
+            "hits": 3,
             "retries": 0,
             "opened": [
               409,
@@ -480,18 +527,21 @@
             "bossCleared": false
           },
           "events": {
-            "grass": 27,
-            "boulder": 12,
+            "grass": 30,
+            "boulder": 15,
             "chest": 3,
             "chest-reward": 3,
             "silver-gate": 1,
-            "gate-open": 2,
-            "gate-opening": 4,
-            "hurt": 4,
+            "gate-open": 4,
+            "gate-opening": 8,
+            "hurt": 3,
             "diamond": 11,
             "checkpoint": 4,
-            "enemy-death": 1,
+            "enemy-death": 3,
             "gold-gate": 1,
+            "gate-close": 2,
+            "riddle": 1,
+            "riddle-solved": 1,
             "complete": 1
           }
         }
@@ -521,23 +571,23 @@
           "goal": "normal",
           "initial": {
             "diamonds": 21,
-            "health": 2,
+            "health": 3,
             "lives": 8,
             "weaponTier": 0,
             "redDiamonds": 0
           },
           "outcome": {
             "status": "complete",
-            "ticks": 1397,
+            "ticks": 1930,
             "x": 46,
             "y": 5,
             "exitObject": 5,
-            "diamonds": 47,
+            "diamonds": 37,
             "redDiamonds": 0,
             "lives": 7,
             "health": 1,
             "weaponTier": 1,
-            "hits": 5,
+            "hits": 9,
             "retries": 1,
             "opened": [
               379,
@@ -550,18 +600,22 @@
             "bossCleared": false
           },
           "events": {
-            "diamond": 19,
-            "gate-open": 2,
-            "gate-opening": 4,
-            "boulder": 7,
-            "hurt": 5,
-            "grass": 9,
+            "diamond": 16,
+            "gate-open": 6,
+            "gate-opening": 12,
+            "boulder": 12,
+            "hurt": 9,
+            "grass": 12,
             "checkpoint": 6,
+            "chest": 2,
+            "chest-reward": 2,
+            "gate-close": 3,
+            "riddle": 1,
+            "enemy-death": 4,
+            "riddle-solved": 2,
             "death": 1,
             "respawn-start": 1,
             "respawn": 1,
-            "chest": 2,
-            "chest-reward": 2,
             "weapon": 1,
             "demo:22": 1,
             "hammer": 14,
@@ -586,17 +640,70 @@
           "y": 10
         }
       ],
-      "status": "unverified",
-      "evidence": [],
-      "pendingAttempts": [],
-      "reviews": [
+      "status": "verified",
+      "evidence": [
         {
-          "plane": "tile",
-          "tile": 11,
-          "description": "Objeto móvel 11: method_331",
-          "count": 1
+          "file": "tests/fixtures/routes/angkor-05-normal.json",
+          "world": 0,
+          "level": 4,
+          "goal": "normal",
+          "initial": {
+            "redDiamonds": 0,
+            "health": 1,
+            "weaponTier": 1,
+            "diamonds": 37,
+            "lives": 7
+          },
+          "outcome": {
+            "status": "complete",
+            "ticks": 1953,
+            "x": -6,
+            "y": 10,
+            "exitObject": 5,
+            "diamonds": 58,
+            "redDiamonds": 0,
+            "lives": 6,
+            "health": 3,
+            "weaponTier": 1,
+            "hits": 5,
+            "retries": 1,
+            "opened": [
+              372,
+              1016,
+              1098
+            ],
+            "demos": [],
+            "bossHealth": null,
+            "bossCleared": false
+          },
+          "events": {
+            "boulder": 46,
+            "grass": 28,
+            "diamond": 14,
+            "hammer": 17,
+            "break": 5,
+            "hurt": 5,
+            "death": 1,
+            "respawn-start": 1,
+            "respawn": 1,
+            "checkpoint": 5,
+            "chest": 3,
+            "chest-reward": 3,
+            "gate-open": 5,
+            "gate-close": 3,
+            "gate-opening": 8,
+            "riddle": 1,
+            "enemy-hit": 3,
+            "hammer-block": 1,
+            "enemy-death": 1,
+            "riddle-solved": 1,
+            "gold-gate": 1,
+            "complete": 1
+          }
         }
-      ]
+      ],
+      "pendingAttempts": [],
+      "reviews": []
     },
     {
       "world": 0,
@@ -637,14 +744,7 @@
       "status": "unverified",
       "evidence": [],
       "pendingAttempts": [],
-      "reviews": [
-        {
-          "plane": "tile",
-          "tile": 11,
-          "description": "Objeto móvel 11: method_331",
-          "count": 2
-        }
-      ]
+      "reviews": []
     },
     {
       "world": 0,
@@ -698,7 +798,7 @@
           },
           "outcome": {
             "status": "complete",
-            "ticks": 964,
+            "ticks": 1121,
             "x": 27,
             "y": 6,
             "exitObject": 0,
@@ -721,10 +821,15 @@
           },
           "events": {
             "checkpoint": 1,
+            "gate-close": 2,
+            "riddle": 1,
             "boulder": 7,
             "boss-hurt": 3,
             "boss-defeated": 1,
             "boss-clear": 1,
+            "gate-open": 2,
+            "riddle-solved": 1,
+            "gate-opening": 4,
             "chest": 1,
             "demo:32": 1,
             "chest-reward": 1,
@@ -873,7 +978,8 @@
             "checkpoint": 1,
             "death": 2,
             "respawn-start": 2,
-            "respawn": 2
+            "respawn": 2,
+            "gate-close": 1
           }
         }
       ],
@@ -914,14 +1020,7 @@
       "status": "unverified",
       "evidence": [],
       "pendingAttempts": [],
-      "reviews": [
-        {
-          "plane": "tile",
-          "tile": 11,
-          "description": "Objeto móvel 11: method_331",
-          "count": 1
-        }
-      ]
+      "reviews": []
     },
     {
       "world": 1,
@@ -939,14 +1038,7 @@
       "status": "unverified",
       "evidence": [],
       "pendingAttempts": [],
-      "reviews": [
-        {
-          "plane": "tile",
-          "tile": 11,
-          "description": "Objeto móvel 11: method_331",
-          "count": 1
-        }
-      ]
+      "reviews": []
     },
     {
       "world": 1,
@@ -987,26 +1079,7 @@
       "status": "unverified",
       "evidence": [],
       "pendingAttempts": [],
-      "reviews": [
-        {
-          "plane": "tile",
-          "tile": 11,
-          "description": "Objeto móvel 11: method_331",
-          "count": 2
-        },
-        {
-          "plane": "tile",
-          "tile": 18,
-          "description": "Interruptores/ponte fora da arena de Tibet: method_240",
-          "count": 3
-        },
-        {
-          "plane": "tile",
-          "tile": 36,
-          "description": "Objeto 36: method_318",
-          "count": 2
-        }
-      ]
+      "reviews": []
     },
     {
       "world": 1,
@@ -1028,19 +1101,13 @@
         {
           "plane": "tile",
           "tile": 8,
-          "description": "Objeto 8: queda e interações de method_351/331",
+          "description": "Minas: queda padrão/explosão implementadas; água e demais casos de method_351",
           "count": 9
         },
         {
           "plane": "tile",
-          "tile": 18,
-          "description": "Interruptores/ponte fora da arena de Tibet: method_240",
-          "count": 3
-        },
-        {
-          "plane": "tile",
           "tile": 37,
-          "description": "Objeto 37: method_330",
+          "description": "Escombros explosivos implementados; inundação de method_397 pendente",
           "count": 13
         }
       ]
@@ -1070,31 +1137,13 @@
         {
           "plane": "tile",
           "tile": 8,
-          "description": "Objeto 8: queda e interações de method_351/331",
+          "description": "Minas: queda padrão/explosão implementadas; água e demais casos de method_351",
           "count": 26
         },
         {
           "plane": "tile",
-          "tile": 11,
-          "description": "Objeto móvel 11: method_331",
-          "count": 3
-        },
-        {
-          "plane": "tile",
-          "tile": 18,
-          "description": "Interruptores/ponte fora da arena de Tibet: method_240",
-          "count": 6
-        },
-        {
-          "plane": "tile",
-          "tile": 36,
-          "description": "Objeto 36: method_318",
-          "count": 1
-        },
-        {
-          "plane": "tile",
           "tile": 37,
-          "description": "Objeto 37: method_330",
+          "description": "Escombros explosivos implementados; inundação de method_397 pendente",
           "count": 6
         }
       ]
@@ -1119,25 +1168,13 @@
         {
           "plane": "tile",
           "tile": 8,
-          "description": "Objeto 8: queda e interações de method_351/331",
+          "description": "Minas: queda padrão/explosão implementadas; água e demais casos de method_351",
           "count": 7
         },
         {
           "plane": "tile",
-          "tile": 11,
-          "description": "Objeto móvel 11: method_331",
-          "count": 3
-        },
-        {
-          "plane": "tile",
-          "tile": 18,
-          "description": "Interruptores/ponte fora da arena de Tibet: method_240",
-          "count": 1
-        },
-        {
-          "plane": "tile",
           "tile": 37,
-          "description": "Objeto 37: method_330",
+          "description": "Escombros explosivos implementados; inundação de method_397 pendente",
           "count": 4
         },
         {
@@ -1168,25 +1205,13 @@
         {
           "plane": "tile",
           "tile": 8,
-          "description": "Objeto 8: queda e interações de method_351/331",
+          "description": "Minas: queda padrão/explosão implementadas; água e demais casos de method_351",
           "count": 6
         },
         {
           "plane": "tile",
-          "tile": 11,
-          "description": "Objeto móvel 11: method_331",
-          "count": 5
-        },
-        {
-          "plane": "tile",
-          "tile": 18,
-          "description": "Interruptores/ponte fora da arena de Tibet: method_240",
-          "count": 5
-        },
-        {
-          "plane": "tile",
           "tile": 37,
-          "description": "Objeto 37: method_330",
+          "description": "Escombros explosivos implementados; inundação de method_397 pendente",
           "count": 5
         },
         {
@@ -1226,7 +1251,7 @@
           },
           "outcome": {
             "status": "complete",
-            "ticks": 1629,
+            "ticks": 1465,
             "x": 29,
             "y": 13,
             "exitObject": 0,
@@ -1249,12 +1274,17 @@
           },
           "events": {
             "checkpoint": 1,
-            "boulder": 6,
-            "boss-stone": 5,
+            "gate-close": 2,
+            "riddle": 1,
             "boss-hurt": 4,
+            "boss-stone": 4,
             "hurt": 2,
+            "boulder": 4,
             "boss-defeated": 1,
             "boss-clear": 1,
+            "gate-open": 2,
+            "riddle-solved": 1,
+            "gate-opening": 4,
             "chest": 1,
             "demo:30": 1,
             "chest-reward": 1,
@@ -1285,19 +1315,13 @@
         {
           "plane": "tile",
           "tile": 8,
-          "description": "Objeto 8: queda e interações de method_351/331",
+          "description": "Minas: queda padrão/explosão implementadas; água e demais casos de method_351",
           "count": 3
         },
         {
           "plane": "tile",
-          "tile": 18,
-          "description": "Interruptores/ponte fora da arena de Tibet: method_240",
-          "count": 1
-        },
-        {
-          "plane": "tile",
           "tile": 37,
-          "description": "Objeto 37: method_330",
+          "description": "Escombros explosivos implementados; inundação de method_397 pendente",
           "count": 3
         },
         {
@@ -1328,19 +1352,13 @@
         {
           "plane": "tile",
           "tile": 8,
-          "description": "Objeto 8: queda e interações de method_351/331",
+          "description": "Minas: queda padrão/explosão implementadas; água e demais casos de method_351",
           "count": 5
         },
         {
           "plane": "tile",
-          "tile": 18,
-          "description": "Interruptores/ponte fora da arena de Tibet: method_240",
-          "count": 2
-        },
-        {
-          "plane": "tile",
           "tile": 37,
-          "description": "Objeto 37: method_330",
+          "description": "Escombros explosivos implementados; inundação de method_397 pendente",
           "count": 4
         },
         {
@@ -1371,31 +1389,13 @@
         {
           "plane": "tile",
           "tile": 8,
-          "description": "Objeto 8: queda e interações de method_351/331",
-          "count": 1
-        },
-        {
-          "plane": "tile",
-          "tile": 11,
-          "description": "Objeto móvel 11: method_331",
-          "count": 1
-        },
-        {
-          "plane": "tile",
-          "tile": 18,
-          "description": "Interruptores/ponte fora da arena de Tibet: method_240",
-          "count": 3
-        },
-        {
-          "plane": "tile",
-          "tile": 36,
-          "description": "Objeto 36: method_318",
+          "description": "Minas: queda padrão/explosão implementadas; água e demais casos de method_351",
           "count": 1
         },
         {
           "plane": "tile",
           "tile": 37,
-          "description": "Objeto 37: method_330",
+          "description": "Escombros explosivos implementados; inundação de method_397 pendente",
           "count": 2
         },
         {
@@ -1452,14 +1452,7 @@
       "status": "unverified",
       "evidence": [],
       "pendingAttempts": [],
-      "reviews": [
-        {
-          "plane": "tile",
-          "tile": 18,
-          "description": "Interruptores/ponte fora da arena de Tibet: method_240",
-          "count": 1
-        }
-      ]
+      "reviews": []
     },
     {
       "world": 2,
@@ -1498,12 +1491,6 @@
       "reviews": [
         {
           "plane": "tile",
-          "tile": 18,
-          "description": "Interruptores/ponte fora da arena de Tibet: method_240",
-          "count": 1
-        },
-        {
-          "plane": "tile",
           "tile": 47,
           "description": "Objeto 47: method_351/311",
           "count": 7
@@ -1534,12 +1521,6 @@
       "reviews": [
         {
           "plane": "tile",
-          "tile": 18,
-          "description": "Interruptores/ponte fora da arena de Tibet: method_240",
-          "count": 3
-        },
-        {
-          "plane": "tile",
           "tile": 47,
           "description": "Objeto 47: method_351/311",
           "count": 5
@@ -1565,12 +1546,6 @@
       "reviews": [
         {
           "plane": "tile",
-          "tile": 18,
-          "description": "Interruptores/ponte fora da arena de Tibet: method_240",
-          "count": 1
-        },
-        {
-          "plane": "tile",
           "tile": 48,
           "description": "Objeto 48: method_306/305 e puxão de method_263",
           "count": 6
@@ -1594,12 +1569,6 @@
       "evidence": [],
       "pendingAttempts": [],
       "reviews": [
-        {
-          "plane": "tile",
-          "tile": 18,
-          "description": "Interruptores/ponte fora da arena de Tibet: method_240",
-          "count": 2
-        },
         {
           "plane": "tile",
           "tile": 47,
@@ -1633,12 +1602,6 @@
       "reviews": [
         {
           "plane": "tile",
-          "tile": 18,
-          "description": "Interruptores/ponte fora da arena de Tibet: method_240",
-          "count": 1
-        },
-        {
-          "plane": "tile",
           "tile": 47,
           "description": "Objeto 47: method_351/311",
           "count": 1
@@ -1668,12 +1631,6 @@
       "evidence": [],
       "pendingAttempts": [],
       "reviews": [
-        {
-          "plane": "tile",
-          "tile": 18,
-          "description": "Interruptores/ponte fora da arena de Tibet: method_240",
-          "count": 1
-        },
         {
           "plane": "tile",
           "tile": 47,
@@ -1748,16 +1705,16 @@
           },
           "outcome": {
             "status": "complete",
-            "ticks": 2968,
+            "ticks": 3145,
             "x": 27,
             "y": 5,
             "exitObject": 0,
             "diamonds": 0,
             "redDiamonds": 0,
             "lives": 5,
-            "health": 2,
+            "health": 3,
             "weaponTier": 8,
-            "hits": 2,
+            "hits": 1,
             "retries": 0,
             "opened": [
               202
@@ -1770,11 +1727,13 @@
           },
           "events": {
             "checkpoint": 1,
+            "gate-close": 2,
+            "riddle": 1,
             "trap-trigger": 1,
             "trap-fall": 8,
             "trap-impact": 8,
             "boss-ceiling": 7,
-            "hammer": 13,
+            "hammer": 12,
             "tibet-switch": 5,
             "tibet-bridge": 5,
             "freeze": 7,
@@ -1782,9 +1741,12 @@
             "hook-pull": 5,
             "boss-hurt": 5,
             "boss-stone": 7,
-            "hurt": 2,
             "boss-defeated": 1,
             "boss-clear": 1,
+            "gate-open": 2,
+            "riddle-solved": 1,
+            "gate-opening": 4,
+            "hurt": 1,
             "chest": 1,
             "demo:31": 1,
             "chest-reward": 1,
@@ -1808,16 +1770,16 @@
           "outcome": {
             "status": "playing",
             "ticks": 2249,
-            "x": 14,
-            "y": 18,
+            "x": 16,
+            "y": 16,
             "exitObject": 0,
             "diamonds": 0,
             "redDiamonds": 0,
-            "lives": 4,
-            "health": 2,
+            "lives": 5,
+            "health": 3,
             "weaponTier": 8,
-            "hits": 6,
-            "retries": 1,
+            "hits": 1,
+            "retries": 0,
             "opened": [],
             "demos": [
               35
@@ -1827,17 +1789,14 @@
           },
           "events": {
             "checkpoint": 1,
-            "trap-trigger": 3,
-            "trap-fall": 10,
-            "trap-impact": 10,
-            "boss-ceiling": 7,
-            "hammer": 2,
-            "tibet-switch": 2,
-            "tibet-bridge": 2,
-            "hurt": 6,
-            "death": 1,
-            "respawn-start": 1,
-            "respawn": 1
+            "gate-close": 2,
+            "riddle": 1,
+            "trap-trigger": 4,
+            "trap-fall": 4,
+            "hurt": 1,
+            "trap-impact": 4,
+            "hammer": 1,
+            "hammer-block": 1
           }
         }
       ],
@@ -1859,14 +1818,7 @@
       "status": "unverified",
       "evidence": [],
       "pendingAttempts": [],
-      "reviews": [
-        {
-          "plane": "tile",
-          "tile": 18,
-          "description": "Interruptores/ponte fora da arena de Tibet: method_240",
-          "count": 2
-        }
-      ]
+      "reviews": []
     },
     {
       "world": 2,
@@ -1885,12 +1837,6 @@
       "evidence": [],
       "pendingAttempts": [],
       "reviews": [
-        {
-          "plane": "tile",
-          "tile": 18,
-          "description": "Interruptores/ponte fora da arena de Tibet: method_240",
-          "count": 2
-        },
         {
           "plane": "tile",
           "tile": 38,

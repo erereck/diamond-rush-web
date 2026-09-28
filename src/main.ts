@@ -19,6 +19,7 @@ import type { FrontScene } from './render/FrontEndRenderer.ts';
 import { stageCollectibleTotals, stageTitle, worldTitle } from './core/OriginalText.ts';
 import { LevelResults } from './core/LevelResults.ts';
 import { IntroSequence } from './core/IntroSequence.ts';
+import { drawRiddleHint } from './render/RiddleHint.ts';
 import { nextStageDemo } from './core/StageDemoTrigger.ts';
 const $=<T extends HTMLElement>(id:string)=>document.getElementById(id) as T;
 const game=$<HTMLCanvasElement>('game'), ctx=game.getContext('2d')!, inspection=$<HTMLCanvasElement>('inspection'), ic=inspection.getContext('2d')!;
@@ -175,6 +176,7 @@ function drawGame(){
   sprites.module(ctx,hud,low?18:17,healthX,291);
   hudNumber(hud,s.diamonds,190,308);hudNumber(hud,s.redDiamonds,227,308);
   hudNumber(hud,s.lives,91,18);hudNumber(hud,s.goldKeys,167,18);hudNumber(hud,s.silverKeys,207,18);
+  drawRiddleHint(ctx,s,assets,sprites);
   if(stageIntroTicks>0){
     const progress=60-stageIntroTicks,slide=progress<15?Math.round((15-progress)*16):stageIntroTicks<15?Math.round((15-stageIntroTicks)*16):0;
     ctx.fillStyle='#2e2818e8';ctx.fillRect(8+slide,4,224,58);ctx.strokeStyle='#b09058';ctx.strokeRect(8.5+slide,4.5,223,57);

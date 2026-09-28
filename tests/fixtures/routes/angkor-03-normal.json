@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "engine": "fidelity-23",
+  "engine": "fidelity-24",
   "levelFingerprint": "27dc5e91",
   "world": 0,
   "level": 2,
@@ -1186,7 +1186,7 @@
       "action": false
     },
     {
-      "ticks": 3,
+      "ticks": 120,
       "direction": 0,
       "action": false
     },
@@ -1212,11 +1212,31 @@
     },
     {
       "ticks": 1,
+      "direction": 1,
+      "action": false
+    },
+    {
+      "ticks": 3,
+      "direction": 0,
+      "action": false
+    },
+    {
+      "ticks": 1,
+      "direction": 1,
+      "action": false
+    },
+    {
+      "ticks": 3,
+      "direction": 0,
+      "action": false
+    },
+    {
+      "ticks": 1,
       "direction": 2,
       "action": false
     },
     {
-      "ticks": 9,
+      "ticks": 3,
       "direction": 0,
       "action": false
     },
@@ -1262,6 +1282,16 @@
     },
     {
       "ticks": 1,
+      "direction": 3,
+      "action": false
+    },
+    {
+      "ticks": 83,
+      "direction": 0,
+      "action": false
+    },
+    {
+      "ticks": 1,
       "direction": 2,
       "action": false
     },
@@ -1293,16 +1323,16 @@
   ],
   "expected": {
     "status": "complete",
-    "ticks": 1045,
+    "ticks": 1248,
     "x": 33,
     "y": 21,
     "exitObject": 5,
     "diamonds": 11,
     "redDiamonds": 0,
     "lives": 5,
-    "health": 2,
+    "health": 3,
     "weaponTier": 0,
-    "hits": 4,
+    "hits": 3,
     "retries": 0,
     "opened": [
       409,

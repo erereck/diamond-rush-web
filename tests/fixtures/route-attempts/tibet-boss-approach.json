@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "engine": "fidelity-23",
+  "engine": "fidelity-24",
   "levelFingerprint": "5fda6906",
   "world": 2,
   "level": 10,
@@ -13,7 +13,7 @@
     "health": 4,
     "weaponTier": 8
   },
-  "provenance": "Incomplete control-only attempt; not a completion certificate.",
+  "provenance": "Incomplete control-only attempt; not a completion certificate. Replayed unchanged controls against fidelity-24 with the original room camera/doors; this remains an incomplete attempt.",
   "controls": [
     {
       "ticks": 1,
@@ -459,16 +459,16 @@
   "expected": {
     "status": "playing",
     "ticks": 2249,
-    "x": 14,
-    "y": 18,
+    "x": 16,
+    "y": 16,
     "exitObject": 0,
     "diamonds": 0,
     "redDiamonds": 0,
-    "lives": 4,
-    "health": 2,
+    "lives": 5,
+    "health": 3,
     "weaponTier": 8,
-    "hits": 6,
-    "retries": 1,
+    "hits": 1,
+    "retries": 0,
     "opened": [],
     "demos": [
       35

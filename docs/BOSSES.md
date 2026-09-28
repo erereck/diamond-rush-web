@@ -14,12 +14,14 @@ Os baús finais de Bavaria e Tibet contêm os cristais 51 e 52, respectivamente.
 
 Os testes exercitam os três mapas extraídos: golpes de pedra e gelo, os interruptores de Tibet, ataques, derrota, retorno ao checkpoint, replays e conclusão pelos cristais. Ainda falta comparar quadro a quadro com o emulador os deslocamentos, efeitos sonoros e alguns tempos das animações.
 
+As arenas também usam os marcadores de sala originais: o gatilho fecha a entrada, apresenta o alvo da câmera e a pista, e bloqueia a saída/prêmio enquanto o chefe vive. Ao terminar a animação de derrota, o evento de destruição reduz o contador e libera as portas e o baú. O checkpoint restaura esse estado. A comparação Java isolada dos métodos da sala está em [RIDDLES.md](RIDDLES.md); os percursos abaixo foram regravados com esse sistema ativo.
+
 ## Percursos completos por controles
 
 O executor em `tools/routes/RouteRunner.ts` começa no spawn original e aceita somente direção, ação e retorno ao checkpoint. Executa as cenas disponíveis pelos gatilhos normais; a aprovação exige zero de vida do chefe, o evento `boss-clear`, coleta do cristal e conclusão da fase sem cena pendente. Os arquivos abaixo têm controle por tick comprimido, recursos iniciais e resultados verificados em `tests/playability.test.ts` e `npm run verify:routes`.
 
-- Angkor: `tests/fixtures/routes/angkor-boss-crystal.json`, 964 ticks de controles. Três impactos, reposição das pedras, derrota completa, Cristal de Fogo e roteiros 33/32, sem dano ou morte. Começa com martelo predefinido.
-- Bavaria: `tests/fixtures/routes/bavaria-boss-crystal.json`, 1629 ticks. Quatro impactos, saltos que repõem as pedras, derrota completa, cristal e roteiros 34/30; dois danos e nenhuma morte. Começa com gancho predefinido.
-- Tibet: `tests/fixtures/routes/tibet-boss-crystal.json`, 2968 ticks. Cinco impactos após congelar inimigos reais e puxar os blocos com o gancho, cinco alternâncias da ponte, derrota completa e cristal; dois danos e nenhuma morte. A entrada executa o roteiro 35. O teste confirma a solicitação do roteiro 31 e sua ausência no pacote. Começa com martelo de gelo predefinido.
+- Angkor: `tests/fixtures/routes/angkor-boss-crystal.json`, 1121 ticks de controles. Três impactos, reposição das pedras, derrota completa, Cristal de Fogo e roteiros 33/32, sem dano ou morte. Começa com martelo predefinido.
+- Bavaria: `tests/fixtures/routes/bavaria-boss-crystal.json`, 1465 ticks. Quatro impactos, saltos que repõem as pedras, derrota completa, cristal e roteiros 34/30; dois danos e nenhuma morte. Começa com gancho predefinido.
+- Tibet: `tests/fixtures/routes/tibet-boss-crystal.json`, 3145 ticks. Cinco impactos após congelar inimigos reais e puxar os blocos com o gancho, cinco alternâncias da ponte, derrota completa e cristal; um dano e nenhuma morte. A entrada executa o roteiro 35. O teste confirma a solicitação do roteiro 31 e sua ausência no pacote. Começa com martelo de gelo predefinido.
 
-Esses três percursos não obtêm as armas nem liberam as câmaras finais pela campanha. Os recursos iniciais são explícitos; a validação dos chefes desde um save novo e a paridade com Java permanecem pendentes. O começo de campanha já cobre introdução e Angkor 1–2, com recursos, prêmios e recarga de save reais. A lista das fases e saídas está em [`PLAYABILITY.md`](PLAYABILITY.md).
+Esses três percursos não obtêm as armas nem liberam as câmaras finais pela campanha. Os recursos iniciais são explícitos; a validação dos chefes desde um save novo e a paridade com Java permanecem pendentes. O começo de campanha já cobre introdução e Angkor 1–5, com recursos, prêmios e recarga de save reais. A lista das fases e saídas está em [`PLAYABILITY.md`](PLAYABILITY.md).

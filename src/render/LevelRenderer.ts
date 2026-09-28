@@ -38,6 +38,11 @@ export class LevelRenderer {
         if(![8,9].includes(level.objects[i-level.width]))frame('cm-1',frameNumber,px,py);
         frame('cm-1',frameNumber+3,px,py);
       }
+      const bridgePosition=sim?.boss instanceof TibetBoss?sim.boss.bridgePosition:sim?.bridges.position??0;
+      if(obj===15||obj===16){
+        const image=obj===15?Math.trunc(bridgePosition*5/10):Math.max(0,4-Math.trunc(bridgePosition*5/10));
+        if(obj===15?bridgePosition<=5:bridgePosition>=5)frame('gen2-4',image,px,py,obj===16?1:0);
+      }
       if(sim?.entranceGate===i){frame('cm-1',2,px,py);frame('cm-1',5,px,py);}
     }
     // cGame.method_181: the tutorial seal is a 5×5 composite in mmv.f,
@@ -56,6 +61,7 @@ export class LevelRenderer {
         const n=sim?.opened.has(i)?an.count-1:sim?.chestFrames[i]??0;
         const af=s.animationFrames[an.start+Math.min(n,an.count-1)];r.frame(ctx,s,af.frame,x*24,y*24,af.flags);
       } else if(t===0)frame(`${w}-0`,((sim?.state[i]??0)&56)>>3,px,py);
+      else if(t===8)frame('gen0-5',(tick>>1)&1,px,py);
       else if(t===1)frame('cm-2',sparkle,px,py);
       else if(t===2)frame('cm-2',sparkle,px,py,1);
       else if(t===4||t===5)r.module(ctx,a.sprite('gen0-2'),0,px,py,0,t===5?1:0);
@@ -77,10 +83,30 @@ export class LevelRenderer {
           frame(id,af.frame,px,py,t===43?1:w===2?2:0,af.flags);
         }
       } else if(t===11){
-        const visual=scotlandExplosiveVisual(sim?.state[i]??level.parameters[i],motion,tick);
+        const visual=scotlandExplosiveVisual(sim?.state[i]??(level.parameters[i]===1?16:0),motion,tick);
         if(visual)r.module(ctx,a.sprite('gen1-4'),visual.module,x*24+visual.x,y*24+visual.y);
       } else if(t===6||t===7)r.module(ctx,a.sprite('cm-4'),t===6?0:1,px,py);
       else if(t===30)frame('gen0-7',Math.min(7,Math.floor(Math.max(0,(sim?.state[i]??0)-1)*7/16)),px,py);
+      else if(t===36){
+        const sprite=a.sprite('gen0-8'),animation=sprite.animations[(sim?.state[i]??level.parameters[i])===1?1:0];
+        const af=sprite.animationFrames[animation.start+(tick>>1)%animation.count];frame('gen0-8',af.frame,x*24,y*24,0,af.flags);
+      }
+      else if(t===37)r.module(ctx,a.sprite('gen2-5'),Math.max(0,Math.min(3,Math.trunc(((sim?.state[i]??0)-1)*3/8))),px,py);
+      else if(t===54){
+        const sprite=a.sprite('gen0-3'),animation=sprite.animations[0],elapsed=Math.max(0,(sim?.state[i]??1)-1);
+        const af=sprite.animationFrames[animation.start+sourceFrameForElapsed(sprite.animationFrames.slice(animation.start,animation.start+animation.count).map(f=>f.duration),elapsed)];
+        frame('gen0-3',af.frame,x*24,y*24,0,af.flags);
+      }
+      else if(t===18){
+        const position=sim?.boss instanceof TibetBoss?sim.boss.bridgePosition:sim?.bridges.position??0;
+        const direction=sim?.boss instanceof TibetBoss?sim.boss.bridgeDirection:sim?.bridges.direction??0;
+        const animation=a.sprite('gen3-9').animations[0],index=position===0?0:position===9?2:direction<0?1:3;
+        frame('gen3-9',a.sprite('gen3-9').animationFrames[animation.start+index].frame,px,py);
+      }
+      else if(t===34||t===35){
+        const position=sim?.boss instanceof TibetBoss?sim.boss.bridgePosition:sim?.bridges.position??0;
+        if(t===34?position>=5:position<=5)frame('gen2-4',t===34?Math.trunc(position*5/10):Math.max(0,4-Math.trunc(position*5/10)),px,py,t===35?1:0);
+      }
       else if(t===28){
         const raw=sim?.state[i]??(level.parameters[i]>10?(Math.floor(level.parameters[i]/11)|8):level.parameters[i]),
           down=(raw&7)===3,alternate=(raw&8)!==0,
@@ -155,9 +181,11 @@ export class LevelRenderer {
         if(s.animations.length)anim(id,0,px,py,0,0,t===16?0:tick);else if(s.frames.length)frame(id,0,px,py);else r.module(ctx,s,0,px,py);
         if(t===22||t===23)anim('gen1-0',0,t===22?x*24+24:x*24,y*24,0,t===23?1:0);
       } else if(t===79&&!sim)frame('o-0',0,px,py);
-      if(debug&&t>=0&&t<80&&![0,1,2,4,5,6,7,10,12,19,43,79].includes(t)&&!tileSprite[t]) {
+      if(debug&&t>=0&&t<80&&![0,1,2,4,5,6,7,10,12,19,43,54,79].includes(t)&&!tileSprite[t]) {
         ctx.fillStyle='#ed489d';ctx.fillRect(px,py,24,24);ctx.fillStyle='#100719';ctx.font='10px monospace';ctx.fillText(String(t),px+2,py+15);
       }
+      if(obj===36){const sprite=a.sprite('gen0-7'),animation=sprite.animations[0],index=Math.max(0,Math.min(animation.count-1,Math.trunc((level.parameters[i]-1)*7/16)));
+        const af=sprite.animationFrames[animation.start+index];frame('gen0-7',af.frame,x*24,y*24,0,af.flags);}
     }
     if(sim?.boss instanceof AngkorBoss){
       const boss=sim.boss;

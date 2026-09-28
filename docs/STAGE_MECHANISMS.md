@@ -1,0 +1,33 @@
+# Inimigos de parede, tochas, minas e barreiras — S700
+
+Referência: [Diamond-Rush-Decomp, de palaceswitcher](https://github.com/palaceswitcher/Diamond-Rush-Decomp/tree/5e05c42aa1aae3377790600eb6d27497101b79e7), commit `5e05c42aa1aae3377790600eb6d27497101b79e7`. Sprites, mapas e comportamento vêm da pesquisa do jogo original da Gameloft. A implementação web e os capturadores de comparação estão neste repositório.
+
+## Comportamento implementado
+
+| Sistema | Fonte e comportamento | Limite da cobertura |
+|---|---|---|
+| Inimigo de parede 11 | Ramo sem água de `method_331`, `method_310/298/345`: segue paredes conforme direção e lado codificados, vira nos cantos, atualiza o deslocamento, causa dano e preserva a ordem de leitura da célula de destino | Água desativada no harness; a comparação executa uma chamada de método por caso |
+| Tocha 36 | `method_318`: acende uma vez com o inimigo 11 acima, reduz o contador da sala e causa dano ao herói sobre a chama; usa a animação original acesa/apagada | Áudio e invalidação visual substituídos no harness |
+| Escombros 37 | `method_330`: ficam imóveis no estado zero, avançam a destruição após impacto e desaparecem no estado 8; desenho usa os módulos originais | Inundação de `method_397` ainda pendente |
+| Mina 8 e explosão 54 | Queda padrão, explosão após cair duas linhas ou receber uma pedra, reação em cadeia, impacto em escombros/tijolos, dano e destruição dos inimigos previstos por `method_317`; duração de 12 ticks conferida em `gen0.f/3` | O trace cobre a explosão, não `method_351` inteiro; água e estados especiais de queda permanecem pendentes |
+| Interruptor 18 e barreiras 34/35 | `method_232/235` e bloco de animação de `method_236`: exige martelo de gelo, não alterna durante uma transição nem sobre os objetos 15/16; alternância de 0 a 9 com troca dos planos na posição 5 e sprites/paletas originais | O ramo do objeto móvel 48 e a inundação não estão portados; a arena do chefe de Tibet conserva sua lógica própria |
+
+As alterações das barreiras e entidades entram no checkpoint e no replay. A destruição chama o contador da sala de desafio e usa a fumaça original. O martelo comum quebra tijolos; destruir grama pelo golpe é uma operação do martelo de gelo no Java S700.
+
+## Comparação executada em Java
+
+`tools/trace-crawler-s700.ts` extrai os métodos originais e registra **174 casos** de movimento, obstáculos, fases de portão, deslocamento e contato com o herói. `tests/crawler.test.ts` compara tiles, estado, deslocamento e dano.
+
+`tools/trace-mechanisms-s700.ts` extrai `method_318/330/317/232/235/298` e o bloco original de animação das barreiras em `method_236`. Registra **189 casos**: 12 de tocha, 11 de escombros, 26 de explosão, 108 de acionamento e 32 de avanço das barreiras. `tests/mechanisms.test.ts` compara planos, estados, posição/sentido da ponte e callbacks de dano, destruição e solução da sala.
+
+Exemplo, a partir da raiz deste repositório:
+
+```powershell
+node tools/trace-crawler-s700.ts ../../work/reference-s700 ../../work/reference-runtime/jdk/jdk-21.0.12.1+1/bin ../../work/reference-runtime/crawler-reproduced
+node tools/trace-mechanisms-s700.ts ../../work/reference-s700 ../../work/reference-runtime/jdk/jdk-21.0.12.1+1/bin ../../work/reference-runtime/mechanisms-reproduced
+node --test tests/crawler.test.ts tests/mechanisms.test.ts
+```
+
+Os arquivos gerados podem ser comparados com os JSON de mesmo nome em `tests/fixtures`. Cada captura guarda hashes do Java normalizado para UTF-8/LF e dos trechos extraídos. O harness do inimigo de parede substitui o callback de dano e desativa água. O dos mecanismos substitui áudio, invalidação visual, inundação, callbacks de solução/destruição/dano e a consulta da duração da explosão, conferida separadamente contra o sprite decodificado.
+
+Os casos executam Java recompilado em um harness isolado, sem emulador, scan completo ou renderizador. Testes adicionais exercitam queda e reação em cadeia de minas, tocha contada por uma sala, dano, retorno ao checkpoint, alternância de barreiras fora da arena e reconstrução por replay. A conferência visual local usou os recursos reais, incluindo a paleta das duas barreiras e a pista da sala em tela estreita. Isso não comprova animações idênticas quadro a quadro ao aparelho original.

@@ -77,19 +77,19 @@ test('all three boss routes contain their real hits and Tibet uses both bridge s
   }
 });
 
-test('New Game completes intro and Angkor 1–4, obtains the hammer and preserves resources through save reloads',()=>{
+test('New Game completes intro and Angkor 1–5, obtains the hammer and preserves resources through save reloads',()=>{
   const fixture=JSON.parse(readFileSync(new URL('fixtures/campaign-routes/angkor-start.json',import.meta.url),'utf8')) as CampaignRouteFixture;
   const result=verifyCampaignRoute(fixture);
-  assert.deepEqual(result.completed,[[0,1,2,3],[],[]]);
-  assert.deepEqual(result.unlocked,[[0,1,2,3,4],[],[]]);
-  assert.deepEqual(result.resources,{diamonds:47,redDiamonds:0,lives:7,health:1,weaponTier:1});
+  assert.deepEqual(result.completed,[[0,1,2,3,4],[],[]]);
+  assert.deepEqual(result.unlocked,[[0,1,2,3,4,5],[],[]]);
+  assert.deepEqual(result.resources,{diamonds:58,redDiamonds:0,lives:6,health:3,weaponTier:1});
   assert.deepEqual(result.stages[2].initial,{diamonds:0,redDiamonds:0,lives:6,health:3,weaponTier:0});
-  assert.deepEqual(result.stages[4].initial,{diamonds:21,redDiamonds:0,lives:8,health:2,weaponTier:0});
+  assert.deepEqual(result.stages[4].initial,{diamonds:21,redDiamonds:0,lives:8,health:3,weaponTier:0});
   assert.equal(result.stages[4].outcome.weaponTier,1);
   assert.equal(result.stages[4].outcome.retries,1);
   assert.deepEqual(result.opened,[{world:0,level:0,cells:[]},{world:0,level:1,cells:[426]},
-    {world:0,level:2,cells:[409,470,596]},{world:0,level:3,cells:[379,746]}]);
-  assert.deepEqual(result.awards,[[32,32,32,0],[],[]]);
+    {world:0,level:2,cells:[409,470,596]},{world:0,level:3,cells:[379,746]},{world:0,level:4,cells:[372,1016,1098]}]);
+  assert.deepEqual(result.awards,[[32,32,32,0,0],[],[]]);
 });
 
 test('Angkor 3 opens both key doors and Angkor 4 uses weighted plates before obtaining and using its hammer',()=>{
@@ -123,9 +123,14 @@ test('the playability inventory covers all maps and every alternative exit witho
   }
   assert.equal(report.levels.find(level=>level.world===2&&level.level===10)!.status,'verified');
   assert.equal(report.counts.verifiedBosses,3);
-  assert.equal(report.counts.completedRoutes,8);
+  assert.equal(report.counts.completedRoutes,9);
   assert.equal(report.counts.campaignPrefixes,1);
-  assert.equal(report.counts.campaignPrefixStages,4);
+  assert.equal(report.counts.campaignPrefixStages,5);
   assert.deepEqual(JSON.parse(readFileSync(new URL('../docs/PLAYABILITY.json',import.meta.url),'utf8')),report);
   assert.equal(readFileSync(new URL('../docs/PLAYABILITY.md',import.meta.url),'utf8'),renderPlayabilityReport(report));
+});
+
+test('Angkor 5 uses both weighted doors and defeats its red snake before collecting the exit key',()=>{
+ const runner=playRoute(fixtures.find(f=>f.name==='angkor-05-normal.json')!.fixture,resources);
+ assert.equal(runner.sim.initial.weaponTier,1);assert.equal(runner.eventCounts['riddle-solved'],1);assert.equal(runner.sim.riddles.remaining[0],0);assert.ok(runner.eventCounts.hammer>=3);assert.equal(runner.eventCounts['gold-gate'],1);assert.equal(runner.sim.exitObject,5);assert.equal(runner.sim.retries,1);
 });

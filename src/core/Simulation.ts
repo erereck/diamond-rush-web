@@ -6,6 +6,9 @@ import { spikeExtension, spikeReach } from './LaterStageRules.ts';
 import { AngkorBoss } from './AngkorBoss.ts';
 import { BavariaBoss } from './BavariaBoss.ts';
 import { TibetBoss } from './TibetBoss.ts';
+import { RiddleRooms } from './RiddleRooms.ts';
+import type { RiddleState } from './RiddleRooms.ts';
+import { IceBridges } from './IceBridges.ts';
 export type Direction=0|1|2|3|4;
 export const DX=[0,0,1,0,-1], DY=[0,-1,0,1,0];
 export interface DemoEdit {cell:number;object?:number;parameter?:number;state?:number;checkpoint?:boolean}
@@ -19,6 +22,8 @@ interface CheckpointState {
   objects:number[];parameters:number[];
   gatePhases:Int16Array;gateCounts:Int16Array;unlockedGates:number[];goldKeys:number;silverKeys:number;
   x:number;y:number;diamonds:number;redDiamonds:number;opened:number[];
+  riddles:RiddleState;
+  bridges:{position:number;direction:number};
 }
 /** Experimental, source-traced subset. Unsupported mechanics remain explicit in coverage. */
 export class Simulation {
@@ -45,6 +50,8 @@ export class Simulation {
   readonly initial:StageStart;
   readonly initialLevelFingerprint:string;
   boss:AngkorBoss|BavariaBoss|TibetBoss|null=null;
+  riddles=new RiddleRooms();
+  bridges=new IceBridges();
   constructor(level:LevelDefinition,initial:StageStart={diamonds:0,redDiamonds:0,lives:5,health:4}){
     this.initialLevelFingerprint=levelFingerprint(level);
     this.initial={...initial,...(initial.openedChests?{openedChests:[...initial.openedChests]}:{})};this.diamonds=initial.diamonds;this.redDiamonds=initial.redDiamonds;
@@ -65,14 +72,18 @@ export class Simulation {
       // the alternating ice bridge (background object 15). Tile 35 stays solid.
       if(t===34){this.tiles[i]=-1;this.level.objects[i]=15;}
       if(t===35)this.level.objects[i]=255;
-      if(t===0||t===1)this.active[i]=48;
+      if(t===0||t===1||t===8)this.active[i]=48;
       if(t===19||t===43||t===49){this.state[i]=p;this.active[i]=48;}
+      if(t===43)this.state[i]=(p&~98304)|65536;
+      if(t===11){this.state[i]=p===1?16:0;this.active[i]=48;}
       if(t===45||t===46){this.state[i]=0;this.motion[i]=0;this.active[i]=24;}
       if(t===22||t===23)this.active[i]=48;
       if(t===14){this.state[i]=p===4?8:0;this.active[i]=24;}
       if(t===16){this.state[i]=p<0?2:p;this.active[i]=24;}
       if(t===28){this.state[i]=p<0?0:p>10?(Math.floor(p/11)|8):p;this.active[i]=24;}
       if(t===44){this.state[i]=0;this.active[i]=24;}
+      if(t===36){this.state[i]=p===1?1:0;this.active[i]=24;}
+      if(t===37){this.state[i]=0;this.active[i]=24;}
     });
     // loadLevelData creates the upper half of each paired Bavaria crusher.
     for(let y=1;y<level.height-1;y++)for(let x=1;x<level.width-1;x++){
@@ -92,13 +103,17 @@ export class Simulation {
     for(const i of initial.openedChests??[])if(i>=0&&i<this.tiles.length&&[14,33].includes(level.objects[i])){
       this.tiles[i]=-1;this.chestFrames[i]=level.objects[i]===14?2:3;this.opened.add(i);
     }
-    // cGame.method_294/296: activate plates and count each door's linked locks.
-    for(let i=0;i<this.tiles.length;i++)if(this.level.objects[i]===6)this.active[i]=48;
+    this.riddles.initialize(this);
+    // cGame.method_294/296: activate plates/triggers and count each door's linked locks.
+    for(let i=0;i<this.tiles.length;i++)if([6,26].includes(this.level.objects[i]))this.active[i]=48;
     for(let i=0;i<this.tiles.length;i++)if(this.level.objects[i]===7){
       const id=this.level.parameters[i],x=i%level.width,y=Math.floor(i/level.width);
       this.gateCounts[i]=level.objects.reduce((count,o,j)=>count+([6,8,9].includes(o)&&level.parameters[j]===id?1:0),0);
       const above=this.index(x,y-1),below=this.index(x,y+1);
-      if(level.objects[above]===17||(level.objects[below]===17&&level.objects[this.index(x-1,y)]!==26&&level.objects[this.index(x+1,y)]!==26))this.gatePhases[i]=3;
+      if(this.level.objects[above]===17||(this.level.objects[below]===17&&level.objects[this.index(x-1,y)]!==26&&level.objects[this.index(x+1,y)]!==26)){
+        this.gatePhases[i]=3;this.active[i]=24;
+        if(this.level.objects[above]===17){this.level.objects[above]=255;this.level.parameters[above]=255;}
+      }
       else this.active[i]=48;
     }
     this.camera.y=Math.max(0,this.player.y*24-160);
@@ -129,7 +144,7 @@ export class Simulation {
   /** method_309: grass debris is only foreground; it cannot support a stone. */
   free(x:number,y:number){return this.tile(x,y)===-1&&![14,33,5,28].includes(this.object(x,y));}
   /** method_310: enemies also avoid circles and grass destruction effects. */
-  enemyFree(x:number,y:number){return this.tile(x,y)===-1&&![14,33,4,32].includes(this.object(x,y))&&!(this.object(x,y)===7&&this.gatePhases[this.index(x,y)]<2);}
+  enemyFree(x:number,y:number){return this.tile(x,y)===-1&&![14,33,4,32].includes(this.object(x,y))&&!(this.object(x,y)===7&&this.gatePhases[this.index(x,y)]===0);}
   wake(x:number,y:number){for(let dy=-1;dy<=1;dy++)for(let dx=-1;dx<=1;dx++){const i=this.index(x+dx,y+dy);if(i>=0)this.active[i]=48;}}
   hurt(amount:number,knockback:Direction=0){
     if(this.invulnerable||this.hurtTicks||this.deathTicks||this.chestCell>=0||this.status!=='playing')return;
@@ -151,7 +166,7 @@ export class Simulation {
       objects:[...this.level.objects],parameters:[...this.level.parameters],
       chestFrames:this.chestFrames.slice(),frozenKinds:this.frozenKinds.slice(),gatePhases:this.gatePhases.slice(),gateCounts:this.gateCounts.slice(),
       unlockedGates:[...this.unlockedGates],goldKeys:this.goldKeys,silverKeys:this.silverKeys,
-      x:this.player.x,y:this.player.y,diamonds:this.diamonds,redDiamonds:this.redDiamonds,opened:[...this.opened]};
+      x:this.player.x,y:this.player.y,diamonds:this.diamonds,redDiamonds:this.redDiamonds,opened:[...this.opened],riddles:this.riddles.snapshot(),bridges:this.bridges.snapshot()};
   }
   restoreCheckpoint(heal=false,travel=false){
     const previousCamera={x:this.camera.x,y:this.camera.y};
@@ -163,6 +178,8 @@ export class Simulation {
     for(const i of this.permanentEquipmentChests){this.tiles[i]=-1;this.chestFrames[i]=this.level.objects[i]===14?2:3;}
     this.gatePhases.set(save.gatePhases);this.gateCounts.set(save.gateCounts);this.unlockedGates=new Set(save.unlockedGates);
     this.goldKeys=save.goldKeys;this.silverKeys=save.silverKeys;
+    this.riddles.restore(save.riddles);
+    this.bridges.restore(save.bridges);
     this.boss?.reset();
     this.player={x:save.x,y:save.y,dx:0,dy:1,offset:0,direction:3};
     this.diamonds=save.diamonds;this.redDiamonds=save.redDiamonds;this.opened=new Set([...save.opened,...this.permanentEquipmentChests,...[...this.permanentPickups].filter(i=>[14,33].includes(this.level.objects[i]))]);
@@ -209,13 +226,17 @@ export class Simulation {
     const below=this.index(x,y+1);
     if(t===1&&this.overlap(x,y,dir,m)){this.tiles[i]=-1;this.diamonds++;this.events.push('diamond');this.wake(x,y);return;}
     if(m<=0){
+      if(!this.free(x,y+1)&&((s&4063232)>>17)>=2){
+        if(t===8){this.tiles[i]=54;this.state[i]=0;this.active[i]=24;this.wake(x,y);return;}
+        if(this.tiles[below]===8&&this.motion[below]<=0){this.tiles[below]=54;this.state[below]=0;this.active[below]=24;this.wake(x,y+1);return;}
+      }
       if(dir===3&&this.isPlayer(x,y+1)&&this.free(x,y+1)){if(t===0||t===9)this.hurt(2);this.state[i]=s&~7;}
       else if(this.free(x,y+1)&&!this.isPlayer(x,y)&&!this.isPlayer(x,y+1)&&
         // method_351's extra AABB test prevents falling through a departing hero.
         !(Math.abs(x*24-(this.player.x*24-this.player.dx*this.player.offset))<24&&
           Math.abs(y*24-(this.player.y*24-this.player.dy*this.player.offset-1))<24)){
         this.moveObject(i,below,t,(s+131072)&~7|3,18);this.wake(x,y);return;
-      }else if([0,1].includes(this.tile(x,y+1))&&this.motion[below]<=0){
+      }else if([0,1,8,9].includes(this.tile(x,y+1))&&this.motion[below]<=0){
         s&=~4063232;
         const side=this.free(x-1,y)&&this.free(x-1,y+1)&&!this.isPlayer(x-1,y)?-1:this.free(x+1,y)&&this.free(x+1,y+1)&&!this.isPlayer(x+1,y)?1:0;
         if(side){this.motion[i]=((s&28672)>>12)+1;this.active[i]=24;s=((s&~7)|(side<0?4:2))&~3072|(side<0?2048:1024)|512;}
@@ -265,7 +286,7 @@ export class Simulation {
   updateSnake(x:number,y:number){
     const i=this.index(x,y),kind=this.tiles[i];let s=this.state[i],dir=s&7,m=this.motion[i],tx=x,ty=y;
     const above=this.index(x,y-1);
-    if(above>=0&&[0,1].includes(this.tiles[above])&&this.motion[above]<=6&&(this.state[above]&7)===3){this.tiles[i]=-1;this.enemySmoke.push({cell:i,age:0});this.events.push('enemy-death');this.wake(x,y);return;}
+    if(above>=0&&[0,1].includes(this.tiles[above])&&this.motion[above]<=6&&(this.state[above]&7)===3){this.tiles[i]=-1;this.destroyEffect(i);this.wake(x,y);return;}
     if(s&248){
       if((this.tick&3)===0){s-=8;if(kind===43&&(s&248)===0)s=s&~3840|3072;this.state[i]=s;}
       this.active[i]=24;return;
@@ -293,7 +314,7 @@ export class Simulation {
   updateIceCreature(x:number,y:number){
     const i=this.index(x,y),above=this.index(x,y-1);
     if(above>=0&&[0,1].includes(this.tiles[above])&&this.motion[above]<=6&&(this.state[above]&7)===3){
-      this.tiles[i]=-1;this.enemySmoke.push({cell:i,age:0});this.events.push('enemy-death');this.wake(x,y);return;
+      this.tiles[i]=-1;this.destroyEffect(i);this.wake(x,y);return;
     }
     const durations=[16,16,6,6,12,12,12,12,12,12,100];
     const state=this.state[i],phase=state&15,age=((state&2088960)>>13)+1;
@@ -322,7 +343,7 @@ export class Simulation {
   updateIceShooter(x:number,y:number){
     const i=this.index(x,y),above=this.index(x,y-1),state=this.state[i],phase=state&31;
     if(above>=0&&[0,1].includes(this.tiles[above])&&this.motion[above]<=6&&(this.state[above]&7)===3){
-      this.tiles[i]=-1;this.enemySmoke.push({cell:i,age:0});this.events.push('enemy-death');this.wake(x,y);return;
+      this.tiles[i]=-1;this.destroyEffect(i);this.wake(x,y);return;
     }
     this.active[i]=24;
     if(phase===8||phase===9){
@@ -370,7 +391,7 @@ export class Simulation {
       if(this.tiles[to]===10){this.state[to]=1;this.active[to]=24;this.events.push('grass');}
       if(this.tiles[to]===30)this.triggerBrick(tx,ty);
       if([19,43,45,46,49].includes(this.tiles[to])){
-        this.tiles[to]=-1;this.enemySmoke.push({cell:to,age:0});this.events.push('enemy-death');this.wake(tx,ty);
+        this.tiles[to]=-1;this.destroyEffect(to);this.wake(tx,ty);
       }
     }
     this.state[i]=direction|8;this.motion[i]=0;this.events.push('dart-impact');
@@ -398,7 +419,7 @@ export class Simulation {
     const tip=this.index(x,tipY);
     if(tip>=0&&tip!==i&&![-1,28,32].includes(this.tiles[tip])){
       if([19,43,45,46,49].includes(this.tiles[tip])){
-        this.enemySmoke.push({cell:tip,age:0});this.events.push('enemy-death');
+        this.destroyEffect(tip);
       }
       this.tiles[tip]=-1;this.state[tip]=0;this.motion[tip]=0;
       this.wake(x,tipY);this.events.push('spike-impact');
@@ -471,7 +492,7 @@ export class Simulation {
       if(target===10){this.destroyGrass(x,y+1);this.events.push('grass');}
       else if(target===30){this.triggerBrick(x,y+1);this.state[i]=32;this.motion[i]=0;this.events.push('trap-impact');return;}
       else if([19,43,45,46,49].includes(target)){
-        this.tiles[below]=-1;this.enemySmoke.push({cell:below,age:0});this.events.push('enemy-death');
+        this.tiles[below]=-1;this.destroyEffect(below);
       }else if(target>=0){this.state[i]=32;this.motion[i]=0;this.events.push('trap-impact');return;}
       this.tiles[i]=-1;this.state[i]=0;this.motion[i]=0;
       this.tiles[below]=44;this.state[below]=27;this.motion[below]=19;this.active[below]=24;
@@ -496,18 +517,80 @@ export class Simulation {
     this.motion[i]=0;
     this.active[i]=48;this.events.push('thaw');this.wake(x,y);
   }
+  /** method_335 overlays the destruction effect and notifies the active riddle. */
+  destroyEffect(cell:number){
+    this.enemySmoke.push({cell,age:0});this.events.push('enemy-death');this.riddles.destroyed(this);
+  }
+  /** method_318: the wall crawler lights a torch from the cell above. */
+  updateTorch(x:number,y:number){
+    const i=this.index(x,y);this.active[i]=24;
+    if(this.state[i]===0){
+      if(this.tile(x,y-1)===11){this.state[i]=1;this.riddles.destroyed(this);this.events.push('torch-lit');}
+    }else if(this.isPlayer(x,y-1))this.hurt(1);
+  }
+  /** method_330: explosive rubble is idle until its state becomes positive. */
+  updateRubble(x:number,y:number){
+    const i=this.index(x,y),state=this.state[i];
+    if(state<=0)return;
+    if(state>=8){this.tiles[i]=-1;this.wake(x,y);this.events.push('rubble-break');}
+    this.state[i]=state+1;this.active[i]=24;
+  }
+  /** method_317, gen0.f/3 animation 0: twelve ticks, blast at tick six. */
+  updateMineBlast(x:number,y:number){
+    const i=this.index(x,y),age=this.state[i]+1;
+    if(age>=12){this.tiles[i]=-1;this.wake(x,y);return;}
+    if(age===1){this.events.push('mine-blast');this.wake(x,y);}
+    else if(age===6)for(let dy=-1;dy<=1;dy++)for(let dx=-1;dx<=1;dx++){
+      const j=this.index(x+dx,y+dy);if(j<0)continue;
+      const kind=this.tiles[j];
+      if(kind===8){this.tiles[j]=54;this.state[j]=0;this.wake(x+dx,y+dy);}
+      else if(kind===30||kind===37||(kind===10&&this.weaponTier===8)){this.state[j]=1;this.wake(x+dx,y+dy);}
+      else if([16,19,43,49].includes(kind)){this.tiles[j]=-1;this.destroyEffect(j);this.active[j]=24;}
+      if(this.isPlayer(x+dx,y+dy))this.hurt(1);
+    }
+    this.state[i]=age;this.active[i]=24;
+  }
+  /** method_233: a fresh hit removes one red-snake resistance unit; a stunned hit only renews it. */
+  stunSnake(x:number,y:number){
+    const i=this.index(x,y),kind=this.tiles[i];let state=this.state[i];
+    if(kind===43&&(state&248)===0){
+      if((state&98304)===0){this.tiles[i]=-1;this.destroyEffect(i);this.wake(x,y);return;}
+      const reduced=state-32768,position=(reduced&-16646145|x<<17)&-2130706433|y<<24;
+      state=(position&7)!==1&&(position&7)!==3?position&2147483647:position|-2147483648;
+    }
+    this.state[i]=(state&~248)|120;
+  }
   private hammer(x:number,y:number){
     const i=this.index(x,y),kind=this.tile(x,y);if(i<0)return;
     if(kind===9){this.thaw(x,y);return;}
     if(kind===30){this.triggerBrick(x,y);return;}
-    if(kind===10){this.state[i]=1;this.active[i]=24;this.events.push('grass');return;}
-    if(kind===18&&this.boss instanceof TibetBoss){this.boss.flipBridge(this);return;}
-    if(this.weaponTier===8&&this.freeze(x,y))return;
-    if(kind===19||kind===43||kind===45){this.state[i]=this.state[i]&~248|120;this.motion[i]=0;this.active[i]=24;this.events.push('enemy-hit');return;}
-    if(kind===0||kind===16||kind>=80||(this.object(x,y)===7&&this.gatePhases[i]<2)){
+    if(kind===10&&this.weaponTier===8&&this.state[i]<=0){this.state[i]=1;this.active[i]=24;this.events.push('grass');return;}
+    if(kind===18&&this.weaponTier===8){
+      if(this.boss instanceof TibetBoss){if(![15,16].includes(this.object(this.player.x,this.player.y)))this.boss.flipBridge(this);}
+      else this.bridges.flip(this);
+      return;
+    }
+    const blocked=kind===16||kind>=80||(this.object(x,y)===7&&this.gatePhases[i]===0);
+    if(kind===0||blocked){
       this.setAnimation(40+this.player.direction);
       this.attackTicks=HAMMER_BOUNCE_TICKS[this.player.direction];
       this.events.push('hammer-block');
+    }
+    if(blocked)return;
+    // method_230 tests the impact cell and four neighbours against the moving enemy's 24px box.
+    for(const [tx,ty] of [[x,y],[x+1,y],[x-1,y],[x,y+1],[x,y-1]]){
+      const j=this.index(tx,ty),target=this.tile(tx,ty);if(j<0)continue;
+      if(target===1&&this.weaponTier===8&&tx===this.player.x+DX[this.player.direction]&&ty===this.player.y+DY[this.player.direction]){this.freeze(tx,ty);continue;}
+      if(![19,43,45,46,49].includes(target))continue;
+      const direction=this.state[j]&7,motion=direction?this.motion[j]:0;
+      if(Math.abs(tx*24-DX[direction]*motion-x*24)>=24||Math.abs(ty*24-DY[direction]*motion-y*24)>=24)continue;
+      if(this.weaponTier===8&&(tx!==this.player.x||ty!==this.player.y)){this.freeze(tx,ty);continue;}
+      if(target===19||target===43){this.stunSnake(tx,ty);this.active[j]=24;this.events.push('enemy-hit');}
+      else if(target===45){
+        const hits=(this.state[j]&7168)>>10;
+        if(hits===3){this.tiles[j]=-1;this.destroyEffect(j);this.wake(tx,ty);}
+        else {this.state[j]=((10|((hits+1)<<10))&~248)|120;this.motion[j]=0;this.active[j]=24;this.events.push('enemy-hit');}
+      }
     }
   }
   /** The hook reaches two or three cells horizontally and draws its target toward the hero. */
@@ -566,15 +649,18 @@ export class Simulation {
     if(occupied&&motion<12){this.openLinkedGate(id);return;}
     if(id<0||id===255)return;
     for(let j=0;j<this.tiles.length;j++)if(this.level.objects[j]===7&&this.level.parameters[j]===id&&this.gatePhases[j]!==0){
-      // method_258 leaves a door open if the cell contains tile 32.
-      if(this.tiles[j]===32)continue;
-      this.gatePhases[j]=0;this.active[j]=24;this.events.push('gate-close');
-      const gx=j%this.level.width,gy=Math.floor(j/this.level.width);
-      if(this.isPlayer(gx,gy)){this.invulnerable=0;this.hurt(4);}
-      else if([0,1,19,43,45].includes(this.tiles[j])){
-        if([19,43,45].includes(this.tiles[j])){this.enemySmoke.push({cell:j,age:0});this.events.push('enemy-death');}
-        this.tiles[j]=-1;this.state[j]=0;this.motion[j]=0;this.frozenKinds[j]=-1;this.events.push('gate-crush');this.wake(gx,gy);
-      }
+      this.closeGate(j);
+    }
+  }
+  /** method_258 is shared by room triggers, the camera sequence and plates. */
+  closeGate(j:number){
+    if(j<0||this.level.objects[j]!==7||this.gatePhases[j]===0||this.tiles[j]===32)return;
+    this.gatePhases[j]=0;this.active[j]=24;this.events.push('gate-close');
+    const x=j%this.level.width,y=Math.floor(j/this.level.width);
+    if(this.isPlayer(x,y)){this.invulnerable=0;this.hurt(4);}
+    else if([0,1,19,43,45].includes(this.tiles[j])){
+      this.tiles[j]=-1;this.destroyEffect(j);this.state[j]=0;this.motion[j]=0;this.frozenKinds[j]=-1;
+      this.events.push('gate-crush');this.wake(x,y);
     }
   }
   /** method_340 updates only when the door is in the active map scan. */
@@ -583,6 +669,41 @@ export class Simulation {
     if(this.tick%3===0&&(this.gatePhases[i]===1||this.gatePhases[i]===2)){
       this.gatePhases[i]++;this.active[i]=24;this.events.push('gate-opening');
     }
+  }
+  /** method_331: tile 11 follows a wall on its encoded left/right side. */
+  updateWallCrawler(x:number,y:number){
+    const i=this.index(x,y),state=this.state[i],phase=(state&3840)>>8;
+    if(phase){
+      if(phase>=4)this.tiles[i]=-1;
+      else if(((this.tick>>1)&1)===0)this.state[i]+=256;
+    }else if(this.motion[i]<=4){
+      this.active[i]=24;
+      const reverse=(state&16)!==0,direction=(state&7) as Direction;
+      if(direction){
+        const side=([0,reverse?4:2,reverse?1:3,reverse?2:4,reverse?3:1][direction]) as Direction;
+        const turn=([0,reverse?2:4,reverse?3:1,reverse?4:2,reverse?1:3][direction]) as Direction;
+        const free=(nx:number,ny:number)=>this.tile(nx,ny)===-1&&![14,33,4,32].includes(this.object(nx,ny))
+          &&!(this.object(nx,ny)===7&&this.gatePhases[this.index(nx,ny)]===0);
+        const forward=free(x+DX[direction],y+DY[direction]),wallSide=free(x+DX[side],y+DY[side]);
+        const move=(d:Direction,next:number)=>{
+          const j=this.index(x+DX[d],y+DY[d]);
+          this.state[j]=next;this.tiles[j]=11;this.tiles[i]=-1;this.motion[j]=18;
+        };
+        if(forward&&wallSide&&free(x+DX[side]-DX[direction],y+DY[side]-DY[direction])){
+          if(this.motion[i]<=0)move(direction,state);
+        }else if(wallSide)move(side,(state&~7)|side);
+        else if(forward){if(this.motion[i]<=0)move(direction,state);}
+        else this.state[i]=(state&~7)|turn;
+      }else{
+        if(this.tile(x-1,y)>=0)this.state[i]=(state&~7)|(reverse?1:3);
+        else if(this.tile(x,y+1)>=0)this.state[i]=(state&~7)|(reverse?2:4);
+        if(this.tile(x+1,y)>=0)this.state[i]=(state&~7)|(reverse?3:1);
+        if(this.tile(x,y+1)>=0)this.state[i]=(state&~7)|(reverse?4:2);
+      }
+      this.wake(x,y);
+    }
+    if(this.isPlayer(x,y))this.hurt(1);
+    if(this.motion[i]>0)this.motion[i]-=5;
   }
   step(input:InputFrame){
     if(this.status!=='playing')return;
@@ -610,12 +731,15 @@ export class Simulation {
     }else if(this.deathTicks>0&&--this.deathTicks===0){
       if(--this.lives>=0){this.retries++;this.restoreCheckpoint(true,true);return;}else {this.status='dead';return;}
     }
+    let roomTriggered=false;
+    if(!(this.boss instanceof TibetBoss))this.bridges.step(this);
     // method_304 precedes player movement; scan bottom-to-top, left-to-right, ±8.
     for(let y=Math.min(this.level.height-2,this.player.y+8);y>=Math.max(1,this.player.y-8);y--){
       for(let x=Math.max(1,this.player.x-8);x<=Math.min(this.level.width-2,this.player.x+8);x++){
         const i=this.index(x,y);if(this.active[i]<=0)continue;this.active[i]-=6;
         if(this.level.objects[i]===6)this.updatePressurePlate(x,y);
         if(this.level.objects[i]===7)this.updateGate(x,y);
+        if(this.level.objects[i]===26){this.active[i]=24;roomTriggered=this.riddles.trigger(this,x,y)||roomTriggered;}
         if(this.level.objects[i]===32){
           // method_315 advances foreground grass debris on the global parity.
           if((this.tick&1)===0)this.level.parameters[i]++;
@@ -624,9 +748,17 @@ export class Simulation {
           }
           this.active[i]=24;
         }
+        if(this.level.objects[i]===36){
+          if(++this.level.parameters[i]>=16){this.level.objects[i]=255;this.level.parameters[i]=255;}
+          else this.active[i]=24;
+        }
         if(this.hook?.x===x&&this.hook.y===y){this.active[i]=24;continue;}
-        if(this.tiles[i]===0||this.tiles[i]===1||this.tiles[i]===9)this.updateFalling(x,y);
+        if(this.tiles[i]===0||this.tiles[i]===1||this.tiles[i]===8||this.tiles[i]===9)this.updateFalling(x,y);
         else if(this.tiles[i]===19||this.tiles[i]===43||this.tiles[i]===49)this.updateSnake(x,y);
+        else if(this.tiles[i]===11)this.updateWallCrawler(x,y);
+        else if(this.tiles[i]===36)this.updateTorch(x,y);
+        else if(this.tiles[i]===37)this.updateRubble(x,y);
+        else if(this.tiles[i]===54)this.updateMineBlast(x,y);
         else if(this.tiles[i]===45)this.updateIceCreature(x,y);
         else if(this.tiles[i]===46)this.updateIceShooter(x,y);
         else if(this.tiles[i]===21)this.updateIceDart(x,y);
@@ -645,6 +777,8 @@ export class Simulation {
       }
     }
     if(!this.deathTicks&&!this.hurtTicks)this.boss?.step(this);
+    if(this.events.includes('boss-clear'))this.riddles.destroyed(this);
+    this.riddles.step(this);
     if(this.status!=='playing')return;
     const p=this.player;
     if(!this.hurtTicks&&!this.deathTicks&&p.offset<=6)for(let i=0;i<this.level.objects.length;i++){
@@ -716,10 +850,12 @@ export class Simulation {
       this.pendingDirection=0;this.updateCamera();return;
     }
     if(actionPressed&&this.index(p.x,p.y)===this.checkpoint&&p.offset===0){this.restoreCheckpoint(false,true);return;}
-    if(actionPressed&&this.weaponTier>0&&p.offset===0&&!this.exitDirection){
+    if(actionPressed&&!roomTriggered&&this.weaponTier>0&&p.offset===0&&!this.exitDirection){
       this.useWeapon();this.pendingDirection=0;this.updateCamera();return;
     }
-    const direction=this.exitDirection||input.direction||this.pendingDirection;
+    if(this.riddles.phase&&!input.action)this.pendingDirection=0;
+    const direction=roomTriggered||(this.riddles.phase&&!input.action)?0:this.exitDirection||input.direction||this.pendingDirection;
+    if(direction)this.riddles.held=false;
     if(p.offset>0)p.offset=Math.max(0,p.offset-6);
     else if(direction){
       this.pendingDirection=0;p.direction=direction;p.dx=DX[p.direction];p.dy=DY[p.direction];
@@ -740,13 +876,13 @@ export class Simulation {
         if(spike<0||this.tiles[spike]!==28)continue;
         if(spikeExtension(this.tick,(this.state[spike]&8)!==0)>=24){pass=false;blockedBySweep=true;break;}
       }
-      if((t===0||t===9)&&p.dx){
+      if((t===0||t===8||t===9)&&p.dx){
         this.pushDelay--;this.setLocomotionAnimation(p.dx>0?8:9);
         const destination=this.index(x+p.dx,y);
-        if(this.pushDelay<0&&this.free(x+p.dx,y)&&!(this.object(x+p.dx,y)===7&&this.gatePhases[destination]<2)&&this.motion[i]===0&&![19,43,45,49].includes(this.tile(x,y+1))){
+        if(this.pushDelay<0&&this.free(x+p.dx,y)&&!(this.object(x+p.dx,y)===7&&this.gatePhases[destination]===0)&&(![19,43,45,49].includes(this.tile(x,y+1))||this.object(x,y+1)===35)){
           this.moveObject(i,this.index(x+p.dx,y),t,(this.state[i]&~(7|3072|512))|p.direction| (p.dx>0?1024:2048),18);this.wake(x+p.dx,y);pass=true;
         }
-      }else this.pushDelay=input.scripted?0:6;
+      }
       if(pass){
         this.wake(p.x,p.y);p.x=x;p.y=y;p.offset=18;this.wake(x,y);
         this.setLocomotionAnimation((t===0||t===9)&&p.dx?(p.dx>0?8:9):3+p.direction);
@@ -760,7 +896,7 @@ export class Simulation {
       if(!insideChest&&t===6){this.tiles[i]=-1;if(this.lives>=99)this.collectHealthOrDiamonds();else{this.permanentPickups.add(i);this.lives++;this.events.push('extra-life');}}
       if(!insideChest&&t===7){this.tiles[i]=-1;this.collectHealthOrDiamonds();}
       if(o===4&&this.level.parameters[i]>this.checkpointOrder){this.checkpoint=i;this.checkpointOrder=this.level.parameters[i];this.captureCheckpoint();this.events.push('checkpoint');}
-      if([14,33].includes(o)&&!this.opened.has(i)&&this.chestFrames[i]===0){
+      if([14,33].includes(o)&&!this.riddles.lockedChests.has(i)&&!this.opened.has(i)&&this.chestFrames[i]===0){
         this.chestCell=i;this.chestTicks=0;this.chestReward=-1;this.chestRewardAmount=0;this.chestFrames[i]=1;this.setAnimation(40);this.events.push('chest');
       }else if(!insideChest&&t===2&&!this.opened.has(i)){this.tiles[i]=-1;this.redDiamonds++;this.events.push('red-diamond');}
       if(o===5||o===28){this.exitDirection=p.direction;this.exitObject=o;}
@@ -775,7 +911,7 @@ export class Simulation {
   private updateCamera(){
     // DemoInterpreter updates the camera before scripted movement; normal
     // gameplay follows it after movement. Pans/dialogues keep their own view.
-    if(this.inputs.at(-1)?.scripted)return;
+    if(this.inputs.at(-1)?.scripted||this.riddles.phase||this.riddles.held)return;
     const p=this.player;this.camera.update(p.x*24-p.dx*p.offset,p.y*24-p.dy*p.offset,this.level.width,this.level.height);
   }
   private destroyGrass(x:number,y:number){
@@ -789,5 +925,5 @@ export class Simulation {
     else {this.health=4;this.events.push('health');}
   }
   replay():Replay{return {version:3,target:'1.2.0-s700',engine:ENGINE_REVISION,levelFingerprint:this.initialLevelFingerprint,world:this.level.world,level:this.level.index,initial:{...this.initial},inputs:this.inputs.map(i=>({...i,demoEdits:i.demoEdits?.map(edit=>({...edit}))}))};}
-  snapshot(){return {chestReward:this.chestReward,chestRewardAmount:this.chestRewardAmount,itemSparkles:this.itemSparkles.map(s=>({...s})),tick:this.tick,player:{...this.player},camera:{x:this.camera.x,y:this.camera.y},tiles:[...this.tiles],state:[...this.state],motion:[...this.motion],active:[...this.active],objects:[...this.level.objects],parameters:[...this.level.parameters],frozenKinds:[...this.frozenKinds],diamonds:this.diamonds,bonusDiamondTotal:this.bonusDiamondTotal,redDiamonds:this.redDiamonds,goldKeys:this.goldKeys,silverKeys:this.silverKeys,gatePhases:[...this.gatePhases],gateCounts:[...this.gateCounts],unlockedGates:[...this.unlockedGates],permanentPickups:[...this.permanentPickups],permanentEquipmentChests:[...this.permanentEquipmentChests],weaponTier:this.weaponTier,attackTicks:this.attackTicks,pendingHammer:this.pendingHammer?{...this.pendingHammer}:null,hook:this.hook?{...this.hook}:null,health:this.health,invulnerable:this.invulnerable,status:this.status,playerAnimation:this.playerAnimation,animationTick:this.animationTick,pushDelay:this.pushDelay,checkpoint:this.checkpoint,checkpointOrder:this.checkpointOrder,opened:[...this.opened],chestFrames:[...this.chestFrames],chestCell:this.chestCell,chestTicks:this.chestTicks,pendingCrystalCompletion:this.pendingCrystalCompletion,lives:this.lives,hurtTicks:this.hurtTicks,deathTicks:this.deathTicks,respawnTravel:this.respawnTravel,respawnFlash:this.respawnFlash,respawnTarget:{...this.respawnTarget},exitDirection:this.exitDirection,exitObject:this.exitObject,stonePressure:this.stonePressure,pendingDirection:this.pendingDirection,lastInputDirection:this.lastInputDirection,actionHeld:this.actionHeld,entranceGate:this.entranceGate,boss:this.boss?.snapshot()??null,enemySmoke:this.enemySmoke.map(s=>({...s})),hits:this.hits,retries:this.retries,savedCheckpoint:structuredClone(this.savedCheckpoint)};}
+  snapshot(){return {bridges:this.bridges.snapshot(),riddles:this.riddles.snapshot(),chestReward:this.chestReward,chestRewardAmount:this.chestRewardAmount,itemSparkles:this.itemSparkles.map(s=>({...s})),tick:this.tick,player:{...this.player},camera:{x:this.camera.x,y:this.camera.y},tiles:[...this.tiles],state:[...this.state],motion:[...this.motion],active:[...this.active],objects:[...this.level.objects],parameters:[...this.level.parameters],frozenKinds:[...this.frozenKinds],diamonds:this.diamonds,bonusDiamondTotal:this.bonusDiamondTotal,redDiamonds:this.redDiamonds,goldKeys:this.goldKeys,silverKeys:this.silverKeys,gatePhases:[...this.gatePhases],gateCounts:[...this.gateCounts],unlockedGates:[...this.unlockedGates],permanentPickups:[...this.permanentPickups],permanentEquipmentChests:[...this.permanentEquipmentChests],weaponTier:this.weaponTier,attackTicks:this.attackTicks,pendingHammer:this.pendingHammer?{...this.pendingHammer}:null,hook:this.hook?{...this.hook}:null,health:this.health,invulnerable:this.invulnerable,status:this.status,playerAnimation:this.playerAnimation,animationTick:this.animationTick,pushDelay:this.pushDelay,checkpoint:this.checkpoint,checkpointOrder:this.checkpointOrder,opened:[...this.opened],chestFrames:[...this.chestFrames],chestCell:this.chestCell,chestTicks:this.chestTicks,pendingCrystalCompletion:this.pendingCrystalCompletion,lives:this.lives,hurtTicks:this.hurtTicks,deathTicks:this.deathTicks,respawnTravel:this.respawnTravel,respawnFlash:this.respawnFlash,respawnTarget:{...this.respawnTarget},exitDirection:this.exitDirection,exitObject:this.exitObject,stonePressure:this.stonePressure,pendingDirection:this.pendingDirection,lastInputDirection:this.lastInputDirection,actionHeld:this.actionHeld,entranceGate:this.entranceGate,boss:this.boss?.snapshot()??null,enemySmoke:this.enemySmoke.map(s=>({...s})),hits:this.hits,retries:this.retries,savedCheckpoint:structuredClone(this.savedCheckpoint)};}
 }

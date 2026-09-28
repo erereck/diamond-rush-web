@@ -278,6 +278,27 @@ test('closed map gate blocks entry until its opening phase reaches two',()=>{
   const closed=new Simulation(level);step(closed,2);assert.equal(closed.player.x,1);
   const open=new Simulation(level);open.gatePhases[7]=2;step(open,2);assert.equal(open.player.x,2);
 });
+
+test('a moving boulder can be pushed through a gate that has begun opening',()=>{
+  const level=fixture(['#######','#@O   #','#######']),rock=9,gate=10;
+  level.objects[gate]=7;level.parameters[gate]=0;
+  for(const phase of [0,1]){
+    const sim=new Simulation(level);sim.gatePhases[gate]=phase;
+    sim.state[rock]=2;sim.motion[rock]=18;sim.pushDelay=0;
+    step(sim,2);
+    assert.equal(sim.player.x,phase===1?2:1);
+    assert.equal(sim.tile(phase===1?3:2,1),0);
+    if(phase===1)assert.equal(sim.motion[gate],18);
+  }
+});
+
+test('push effort is retained while changing direction and resets after releasing movement',()=>{
+  const sim=new Simulation(fixture(['######','#@O  #','######']));
+  step(sim,2,3);assert.equal(sim.pushDelay,3);
+  step(sim,1);assert.equal(sim.pushDelay,3);
+  step(sim,2,4);assert.equal(sim.player.x,2);assert.equal(sim.tile(3,1),0);
+  step(sim,0,4);assert.equal(sim.pushDelay,6);
+});
 test('both key colors unlock their numbered locks and open the matching gate',()=>{
   for(const [keyTile,lockKind,counter] of [[4,9,'goldKeys'],[5,8,'silverKeys']] as const){
   const level=fixture(['#######','#     #','#@    #','#     #','#######']);
@@ -620,6 +641,15 @@ test('the hammer bounces off a boulder only when its striking frame lands',()=>{
   step(sim,0,2);assert.equal(sim.playerAnimation,14);
   step(sim);assert.equal(sim.playerAnimation,42);assert.ok(sim.events.includes('hammer-block'));
   step(sim,0,16);assert.equal(sim.playerAnimation,1);assert.equal(sim.tile(2,1),0);
+});
+
+test('striking grass requires the ice hammer; walking still clears it with every weapon',()=>{
+  for(const weaponTier of [1,2,8] as const){
+    const sim=new Simulation(fixture(['#####','#@g##','#####']),{diamonds:0,redDiamonds:0,lives:5,health:4,weaponTier});
+    sim.step({direction:0,action:true});step(sim,0,20);
+    assert.equal(sim.tile(2,1),weaponTier===8?-1:10);
+    if(weaponTier!==8){step(sim,2,20);assert.equal(sim.player.x,2);assert.equal(sim.tile(2,1),-1);}
+  }
 });
 
 test('the hook pulls a distant boulder to the cell beside the hero',()=>{

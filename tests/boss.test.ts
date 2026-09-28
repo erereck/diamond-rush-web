@@ -145,7 +145,7 @@ test('the Tibet guardian wakes at the arena entrance with five health segments',
   const s=makeTibet(),boss=s.boss!;assert.ok(boss instanceof TibetBoss);
   assert.equal(boss.phase,-1);assert.equal(boss.health,5);
   assert.equal(s.tile(13,16),-1);assert.equal(s.tile(22,16),35);
-  for(let i=0;i<160;i++)s.step({direction:2,action:false});
+  for(let i=0;i<320;i++)s.step({direction:2,action:false});
   assert.ok(s.player.x>13);assert.notEqual(boss.phase,-1);
   assert.equal(boss.maxHealth,5);
 });
@@ -242,7 +242,7 @@ test('Tibet ceiling stones do not regenerate after their one-time fall',()=>{
 
 test('the Tibet fight and switch state reproduce from an input replay',()=>{
   const s=makeTibet();
-  for(let i=0;i<160;i++)s.step({direction:2,action:false});
+  for(let i=0;i<320;i++)s.step({direction:2,action:false});
   assert.notEqual(s.boss?.phase,-1);
   const restored=restoreReplay(s.replay(),[world,bavaria,tibet]);
   assert.deepEqual(restored.boss?.snapshot(),s.boss?.snapshot());

@@ -1,4 +1,6 @@
 import { Input } from './Input.ts';
+import type { GameLocale } from '../core/Localization.ts';
+import { shellCopy } from '../core/ShellLocalization.ts';
 
 export const TOUCH_SETTINGS_KEY='diamond-rush:touch-controls:v1';
 type Group='pad'|'action'|'utility';
@@ -32,6 +34,7 @@ export function validateTouchSettings(value:unknown):TouchSettings {
 
 export class MobileControls {
   settings:TouchSettings;editing=false;
+  private locale:GameLocale='pt-BR';
   private input:Input;
   private deck=document.getElementById('touch-deck')!;
   private editor=document.getElementById('touch-settings')!;
@@ -41,7 +44,7 @@ export class MobileControls {
     this.input=input;
     let saved:unknown;try{saved=JSON.parse(localStorage.getItem(TOUCH_SETTINGS_KEY)??'null');}catch{saved=null;}
     this.settings=validateTouchSettings(saved);
-    this.toggle.onclick=()=>{this.editing=!this.editing;this.deck.classList.toggle('is-editing',this.editing);this.editor.hidden=!this.editing;this.toggle.setAttribute('aria-expanded',String(this.editing));this.toggle.textContent=this.editing?'✓ Concluído':'⚙ Ajustar';this.layout();};
+    this.toggle.onclick=()=>{this.editing=!this.editing;this.deck.classList.toggle('is-editing',this.editing);this.editor.hidden=!this.editing;this.toggle.setAttribute('aria-expanded',String(this.editing));this.updateToggleLabel();this.layout();};
     for(const [name,group] of Object.entries(this.groups) as [Group,HTMLElement][]){
       let startX=0,startY=0;
       group.addEventListener('pointerdown',e=>{
@@ -75,6 +78,8 @@ export class MobileControls {
     this.apply();
   }
   private save(){try{localStorage.setItem(TOUCH_SETTINGS_KEY,JSON.stringify(this.settings));}catch{/* Controls remain usable without persistent storage. */}}
+  setLanguage(locale:GameLocale){this.locale=locale;this.updateToggleLabel();}
+  private updateToggleLabel(){this.toggle.textContent=this.editing?shellCopy[this.locale].done:shellCopy[this.locale].adjust;}
   setHaptics(enabled:boolean){this.settings.haptics=enabled;this.apply();this.save();}
   private apply(){
     this.input.stickDeadzone=this.settings.deadzone;this.input.haptics=this.settings.haptics;

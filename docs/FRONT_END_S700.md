@@ -16,6 +16,9 @@ Esta implementação segue a referência S700 1.2.0 fixada no commit [`5e05c42`]
 | Loja: quatro preços 150/400/1000/3000, compra direta se houver saldo, tier adquirido suprime os inferiores | `method_212–215`, `Define.itemPrices` | `Store.purchaseArmor` |
 | Energia máxima 4–8 fica no byte 8 do record 1; diamantes normais ficam nos bytes 4–5 | `method_214`, `method_109–128` | `CanonicalSave`, `CanonicalCampaign`, `Simulation` |
 | Idiomas | O pacote S700 contém só `lang.f` em inglês | `Localization.ts` fornece traduções web PT-BR/ES dos 115 textos e de todos os diálogos presentes em `demo.f` |
+| Sobre: créditos completos de `cr.f`, rolagem automática e ajuste por setas | `method_434–435` | `AssetManager.credits`, `FrontEndRenderer.drawCredits` |
+| Ajuda: texto completo de `lang.f` em blocos e espaçamento originais | `method_133` | `FrontEndRenderer.drawPage` |
+| Som: IDs 0–20 de `snd.f` acionados por entrada de mundo, menu, conclusão e eventos principais | `cSoundEngine.java` | `GameSound`, `main.ts` |
 
 O mapa usa as ligações de `map_*.out` e o contador `coletados/total` do RMS. O traço dos caminhos, os nós de ramificação, os ícones dos chefes e as marcas de diamantes vermelhos seguem `method_421`; a caixa de informação da fase segue `method_414`. A marca de uma fase usa os diamantes vermelhos da própria fase, não a conclusão dela. O cursor anda entre posições do mapa em vez de saltar. A introdução continua entrando em Angkor pelo tutorial original. O seletor de idioma fica fora do Canvas para manter os dois itens da tela original de opções.
 

@@ -5,7 +5,7 @@ import type { DemoScript } from '../core/DemoScript.ts';
 export interface AssetManifest {version:string;sprites:string[];worlds:{world:number;levels:number}[];audio:string[];resources:{name:string;bytes:number;sha256:string}[]}
 export class AssetManager {
   sprites=new Map<string,DecodedSprite>();
-  splash:HTMLImageElement[]=[];
+  splash:HTMLImageElement[]=[];credits='';
   worlds:WorldDefinition[]=[]; maps:MapNode[][]=[]; strings:string[]=[]; originalStrings:string[]=[]; fontMap=new Uint8Array();demoScripts=new Map<number,DemoScript>();
   manifest!:AssetManifest;
   async json<T>(name:string):Promise<T> {
@@ -19,6 +19,7 @@ export class AssetManager {
     this.worlds=await Promise.all([0,1,2].map(i=>this.json<WorldDefinition>(`world-${i}`)));
     this.maps=await Promise.all([0,1,2].map(i=>this.json<MapNode[]>(`map-${i}`)));
     this.strings=await this.json<string[]>('lang-0');
+    this.credits=(await this.json<string>('cr-0')).replace('v$.$.$','v1.2.0');
     this.originalStrings=[...this.strings];
     const demo=await fetch(`${import.meta.env.BASE_URL}assets/demo-0.bin`);if(!demo.ok)throw new Error('Original demo scripts unavailable');
     this.demoScripts=parseDemoScripts(new Uint8Array(await demo.arrayBuffer()));

@@ -150,6 +150,7 @@ export class FrontEndRenderer {
   drawStore(ctx:CanvasRenderingContext2D,c:Campaign,selected:number,message:number,toast=false){
     this.sealBackdrop(ctx,true);
     ctx.fillStyle='#000';ctx.fillRect(0,0,240,15);
+    ctx.strokeStyle='#fff';ctx.beginPath();ctx.moveTo(0,15.5);ctx.lineTo(240,15.5);ctx.stroke();
     this.text(ctx,this.assets.strings[72],120,0,'center',1);
     this.panel(ctx,10,35,220,90,'#41340d');this.panel(ctx,10,155,220,70,'#41340d');
     for(let i=0;i<4;i++){
@@ -167,7 +168,7 @@ export class FrontEndRenderer {
     this.sprites.module(ctx,hud,17,100+hud.modules[11].width+segment*8,160);
     const max=c.resources.maxHealth??4;
     const owned=max>=5+selected;
-    this.text(ctx,owned?this.assets.strings[81]:`${this.assets.strings[74]} ${ARMOR_PRICES[selected]} ${this.assets.strings[42]}`,120,199,'center');
+    this.text(ctx,owned?this.assets.strings[81]:`${this.assets.strings[74]} ${ARMOR_PRICES[selected]}\n${this.assets.strings[42]}`,120,owned?191:185,'center');
     this.text(ctx,`${this.assets.strings[110]} ${c.resources.diamonds} ${this.assets.strings[109]}`,120,260,'center');
     this.text(ctx,this.assets.strings[owned?81:message||90],120,280,'center');
     if(toast){this.panel(ctx,17,231,206,31,'#41340d');this.text(ctx,this.assets.strings[91],120,239,'center',1);}
@@ -194,15 +195,30 @@ export class FrontEndRenderer {
     });
     this.button(ctx,true);this.button(ctx);
   }
+  drawCredits(ctx:CanvasRenderingContext2D,scroll:number){
+    ctx.fillStyle='#000';ctx.fillRect(0,0,240,320);
+    const lines=this.assets.credits.split(/\r?\n/);
+    lines.forEach((line,i)=>{
+      const y=320+i*17-scroll;
+      if(y>=-17&&y<340&&line)this.text(ctx,line,120,y,'center');
+    });
+    let inset=0;
+    for(let height=6;height>0;height--){
+      ctx.fillStyle='#000';ctx.fillRect(0,inset,240,height);ctx.fillRect(0,320-inset-height,240,height);
+      inset+=height+1;
+    }
+    this.button(ctx,true);
+  }
   drawPage(ctx:CanvasRenderingContext2D,scene:Exclude<FrontScene,'menu'|'map'|'seal'|'store'>,sound:boolean,vibration:boolean,selected:number,confirmExit=false){
     if(scene==='help'){
       ctx.fillStyle='#000';ctx.fillRect(0,0,240,320);
-      this.text(ctx,this.assets.strings[4],120,10,'center',1);
-      const entries=[103,104,105,106,107,108],ys=[39,65,82,125,173,221];
-      entries.forEach((entry,i)=>{
-        const lines=wrapDemoTextPixels(this.assets.strings[entry],224,this.assets.sprite('ui-1'),this.assets.fontMap);
-        lines.forEach((line,j)=>this.text(ctx,line,120,ys[i]+j*15,'center'));
-      });
+      const entries=[4,-1,103,104,105,-1,106,-1,107,-1,108];
+      let y=10;
+      for(const entry of entries){
+        if(entry<0){y+=17;continue;}
+        const lines=wrapDemoTextPixels(this.assets.strings[entry],235,this.assets.sprite('ui-1'),this.assets.fontMap);
+        for(const line of lines){this.text(ctx,line,120,y,'center');y+=17;}
+      }
       this.button(ctx,true);return;
     }
     if(scene==='options'||scene==='confirm'){

@@ -24,7 +24,7 @@ Estado em 02/10/2026. Fonte canônica S700 1.2.0. Referências Nokia e ferrament
 | Save RMS | Codec e modelo inicial de 994 bytes; importação/exportação de campanha com recursos, conclusão, desbloqueios normais, recompensas, segredos, baús consumidos e bytes desconhecidos preservados; revisitadas somam diamantes vermelhos; recarga aceita o slot oculto da introdução e as 14 posições de Angkor | Comparação das compras e da vida máxima com um save real de execução S700 |
 | Selo, loja e idiomas | Menu na ordem S700; selo com quatro posições e limiares de 10/25 diamantes vermelhos; loja com quatro preços originais, compra e energia 4–8 persistida no RMS; opções de som/vibração; 115 strings e todos os diálogos de demo.f em inglês original, português e espanhol | Ajustar os efeitos e transições finas das telas pelo Java; traduções PT/ES são do port, não do pacote S700 |
 | Replay de desenvolvimento | Versionado, validado e restaurável, inclusive equipamento inicial e puxão do gancho | Golden traces comparados ao original |
-| MIDI | Parsing das 21 faixas e prévia | Eventos de jogo, sintetizador/timbres equivalentes |
+| MIDI | Parsing das 21 faixas; menu, entrada de mundo, conclusão e efeitos centrais acionam os índices originais de `snd.f` | Sintetizador/timbres equivalentes ao J2ME, cobertura fina de todos os eventos e temporização |
 
 ## Próximo marco de gameplay
 

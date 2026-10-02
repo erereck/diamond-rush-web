@@ -10,6 +10,7 @@ import { languageStrings, localizeDemoText } from '../src/core/Localization.ts';
 import { parseDemoScripts } from '../src/core/DemoScript.ts';
 import type { DemoCommand } from '../src/core/DemoScript.ts';
 import { loadRouteResources } from '../tools/routes/loadResources.ts';
+import { mapTitle } from '../src/core/OriginalText.ts';
 
 test('S700 seal unlocks worlds at red-diamond thresholds without spending them',()=>{
   const {maps}=loadRouteResources(),c=newCampaign();
@@ -55,6 +56,7 @@ test('web translations cover every original menu entry and demo dialogue',()=>{
     const strings=languageStrings(locale,original);
     assert.equal(strings.length,115);
     for(const index of [0,2,3,31,68,72,85,88,89,90,91,103,108])assert.notEqual(strings[index],original[index],`${locale} string ${index}`);
+    assert.equal(mapTitle(strings,13,11),`${strings[20].slice(0,-1)}3`);
     for(const line of dialogue)assert.notEqual(localizeDemoText(locale,line),line,`${locale} demo: ${line}`);
   }
   assert.deepEqual(languageStrings('en',original),original);

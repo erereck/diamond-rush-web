@@ -5,6 +5,11 @@ const STAGE_TITLES=[[8,9,10,11,12,14,15,16,17,20,21,22,23],[8,9,10,11,12,14,15,1
 export const introLines=['The Great Temple Of Angkor Wat...','I\'m finally in!','Let\'s go!'];
 export const worldTitle=(strings:string[],world:number)=>strings[WORLD_TITLES[world]]??'';
 export const stageTitle=(strings:string[],level:LevelDefinition)=>strings[STAGE_TITLES[level.world]?.[level.index]??8]??`STAGE ${level.index+1}`;
+/** cGame.method_413 builds map labels from the first stage/secret strings. */
+export function mapTitle(strings:string[],level:number,firstSecret:number):string {
+  const secret=level>=firstSecret,prefix=strings[secret?20:8]??(secret?'SECRET STAGE 1':'STAGE 1');
+  return `${prefix.slice(0,-1)}${secret?level-firstSecret+1:level+1}`;
+}
 export function stageCollectibleTotals(level:LevelDefinition){
   let diamonds=0,redDiamonds=0;
   level.tiles.forEach((tile,i)=>{if(tile===1)diamonds++;else if(tile===2)redDiamonds++;else if(tile===41)diamonds+=level.parameters[i]===255?1:Math.max(1,level.parameters[i]);});

@@ -54,6 +54,7 @@ export class CanonicalSave {
   get maxHealth(){return this.data[8];}
   setMaxHealth(value:number){if(!Number.isInteger(value)||value<4||value>8)throw new Error('RMS: energia máxima inválida.');this.data[8]=value;}
   get worldFlags(){return this.data[2];}
+  get sealFlags(){return this.data[1];}
   /** recordData[9]: 0 = none, 1 = hammer, 2 = hook, 8 = ice hammer. */
   get weaponTier(){return this.data[9];}
   setWeaponTier(tier:0|1|2|8){if(![0,1,2,8].includes(tier))throw new Error('RMS: equipamento inválido.');this.data[9]=tier;}
@@ -63,6 +64,7 @@ export class CanonicalSave {
     this.data[6]=redDiamonds&255;this.data[7]=redDiamonds>>8;this.setWeaponTier(tier);
   }
   unlockWorld(world:1|2){this.data[2]|=world===1?8:16;}
+  discoverSealWorld(world:1|2){this.data[1]|=world===1?1:2;}
   export(){return this.data.slice();}
   setLevelStatus(world:number,level:number,status:number){
     if(!Number.isInteger(status)||status<0||status>255)throw new Error('RMS: status inválido.');

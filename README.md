@@ -18,7 +18,7 @@ npm run dev -- --port 5173
 
 Acesse http://127.0.0.1:5173. Os recursos já foram extraídos para `public/assets`. O servidor atende apenas a máquina local. Para gerar a versão estática: `npm run build`; para conferir essa versão: `npm run preview`.
 
-O jogo abre no menu S700. Escolha **New Game** para assistir à abertura de Angkor e entrar no mapa, ou **Continue** para voltar ao mapa salvo. Use setas ou WASD para seguir as ligações entre fases e Enter/Espaço para entrar; Escape abre a seleção de mundos. No celular, o direcional e o botão de ação também navegam no menu e no mapa. Durante a fase, Escape pausa, R inicia o retorno ao checkpoint (consumindo uma vida quando o personagem está longe dele), e Espaço/Enter ou **AGIR** usa o equipamento obtido; sobre o checkpoint, a ação o restaura. O jogo tem tela lógica de 240 × 320 e roda a simulação a 20 Hz; a interface usa escala inteira de pixels.
+O jogo abre no menu S700. Escolha **New Game** para assistir à abertura de Angkor e entrar no mapa, ou **Continue** para voltar ao selo e escolher um mundo. No mapa, use setas ou WASD para seguir as ligações entre fases e Enter/Espaço para entrar; Escape retorna ao selo. No celular, o direcional e o botão de ação também navegam no menu e no mapa. Durante a fase, Escape pausa, R inicia o retorno ao checkpoint (consumindo uma vida quando o personagem está longe dele), e Espaço/Enter ou **AGIR** usa o equipamento obtido; sobre o checkpoint, a ação o restaura. O jogo tem tela lógica de 240 × 320 e roda a simulação a 20 Hz; a interface usa escala inteira de pixels.
 
 No selo, Angkor está disponível desde o começo, Bavaria exige 10 diamantes vermelhos e Tibet exige 25; essas gemas não são gastas. A quarta posição abre a loja, que vende as quatro melhorias originais de energia por 150, 400, 1000 e 3000 diamantes normais. Compra, energia máxima e recarga no checkpoint são gravadas no save RMS. O seletor **Idioma do jogo** troca textos de interface e diálogos entre inglês original, português brasileiro e espanhol. Os dois últimos são traduções feitas para este port: o pacote S700 contém só o inglês.
 
@@ -31,7 +31,7 @@ No **Laboratório de preservação** é possível:
 - Renderizar todos os recursos para detectar erros de acesso.
 - Inspecionar, importar e exportar o record 1 do save RMS original; a campanha sincroniza recursos, progresso e baús com esse formato.
 
-O navegador salva o progresso do mapa e os recursos obtidos ao concluir uma fase. **Continue** retorna ao mapa; a partida dentro de uma fase não é retomada automaticamente. As saídas secretas revelam seus próprios ramos; concluir uma fase pela saída comum não os abre. O replay experimental exportável continua separado do progresso do mapa e do save canônico RMS. Replays de versões anteriores do motor são rejeitados para evitar restauração divergente.
+O navegador salva o progresso do mapa e os recursos obtidos ao concluir uma fase. **Continue** abre o selo para escolher mundo e mapa; a partida dentro de uma fase não é retomada automaticamente. Durante a fase, Escape ou o botão de pausa abre o menu original, com opções de retomar, reiniciar, ajuda, mapa e saída. As saídas secretas revelam seus próprios ramos; concluir uma fase pela saída comum não os abre. O replay experimental exportável continua separado do progresso do mapa e do save canônico RMS. Replays de versões anteriores do motor são rejeitados para evitar restauração divergente.
 
 ## Reproduzir a extração
 

@@ -7,12 +7,12 @@
     "playableStages": 40,
     "secretStages": 10,
     "goals": 47,
-    "verifiedMaps": 9,
+    "verifiedMaps": 10,
     "verifiedBosses": 3,
-    "completedRoutes": 9,
+    "completedRoutes": 10,
     "attemptedMaps": 0,
     "campaignPrefixes": 1,
-    "campaignPrefixStages": 5
+    "campaignPrefixStages": 6
   },
   "campaignPrefixes": [
     {
@@ -231,6 +231,41 @@
             "bossCleared": false
           },
           "awards": 0
+        },
+        {
+          "file": "angkor-06-normal.json",
+          "world": 0,
+          "level": 5,
+          "initial": {
+            "diamonds": 58,
+            "redDiamonds": 0,
+            "lives": 6,
+            "health": 3,
+            "weaponTier": 1
+          },
+          "outcome": {
+            "status": "complete",
+            "ticks": 662,
+            "x": 36,
+            "y": 5,
+            "exitObject": 5,
+            "diamonds": 68,
+            "redDiamonds": 1,
+            "lives": 6,
+            "health": 1,
+            "weaponTier": 1,
+            "hits": 1,
+            "retries": 0,
+            "opened": [
+              172
+            ],
+            "demos": [
+              3
+            ],
+            "bossHealth": null,
+            "bossCleared": false
+          },
+          "awards": 40
         }
       ],
       "completed": [
@@ -239,7 +274,8 @@
           1,
           2,
           3,
-          4
+          4,
+          5
         ],
         [],
         []
@@ -250,16 +286,17 @@
           32,
           32,
           0,
-          0
+          0,
+          40
         ],
         [],
         []
       ],
       "resources": {
-        "diamonds": 58,
-        "redDiamonds": 0,
-        "lives": 6,
-        "health": 3,
+        "diamonds": 68,
+        "redDiamonds": 1,
+        "lives": 8,
+        "health": 1,
         "weaponTier": 1
       },
       "unlocked": [
@@ -269,7 +306,8 @@
           2,
           3,
           4,
-          5
+          5,
+          6
         ],
         [],
         []
@@ -312,9 +350,16 @@
             1016,
             1098
           ]
+        },
+        {
+          "world": 0,
+          "level": 5,
+          "cells": [
+            172
+          ]
         }
       ],
-      "recordHash": "e3bdeebca02b0666437d4d5c4d549ce8e8e8f7eb69da78a27ab479d63c5c9159"
+      "recordHash": "0fdedd148887f46d743740f24304c43349fe0f836d2432717b10f6baebe7b5e0"
     }
   ],
   "levels": [
@@ -718,8 +763,54 @@
           "y": 5
         }
       ],
-      "status": "unverified",
-      "evidence": [],
+      "status": "verified",
+      "evidence": [
+        {
+          "file": "tests/fixtures/routes/angkor-06-normal.json",
+          "world": 0,
+          "level": 5,
+          "goal": "normal",
+          "initial": {
+            "diamonds": 58,
+            "redDiamonds": 0,
+            "lives": 6,
+            "health": 3,
+            "weaponTier": 1
+          },
+          "outcome": {
+            "status": "complete",
+            "ticks": 662,
+            "x": 36,
+            "y": 5,
+            "exitObject": 5,
+            "diamonds": 68,
+            "redDiamonds": 1,
+            "lives": 6,
+            "health": 1,
+            "weaponTier": 1,
+            "hits": 1,
+            "retries": 0,
+            "opened": [
+              172
+            ],
+            "demos": [
+              3
+            ],
+            "bossHealth": null,
+            "bossCleared": false
+          },
+          "events": {
+            "grass": 8,
+            "diamond": 10,
+            "boulder": 10,
+            "hurt": 1,
+            "checkpoint": 1,
+            "chest": 1,
+            "chest-reward": 1,
+            "complete": 1
+          }
+        }
+      ],
       "pendingAttempts": [],
       "reviews": []
     },

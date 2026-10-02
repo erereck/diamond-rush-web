@@ -1029,7 +1029,63 @@
           }
         }
       ],
-      "pendingAttempts": [],
+      "pendingAttempts": [
+        {
+          "file": "tests/fixtures/route-attempts/angkor-07-secret-hook-plate.json",
+          "world": 0,
+          "level": 6,
+          "goal": "normal",
+          "initial": {
+            "diamonds": 68,
+            "redDiamonds": 1,
+            "lives": 8,
+            "health": 4,
+            "weaponTier": 2
+          },
+          "outcome": {
+            "status": "playing",
+            "ticks": 1552,
+            "x": 10,
+            "y": 42,
+            "exitObject": 0,
+            "diamonds": 79,
+            "redDiamonds": 2,
+            "lives": 8,
+            "health": 3,
+            "weaponTier": 2,
+            "hits": 4,
+            "retries": 0,
+            "opened": [
+              552,
+              773,
+              836
+            ],
+            "demos": [],
+            "bossHealth": null,
+            "bossCleared": false
+          },
+          "events": {
+            "grass": 8,
+            "chest": 3,
+            "chest-reward": 3,
+            "checkpoint": 2,
+            "hammer": 3,
+            "break": 2,
+            "hurt": 4,
+            "gate-close": 2,
+            "riddle": 1,
+            "hook": 7,
+            "hook-pull": 7,
+            "hammer-block": 1,
+            "enemy-death": 1,
+            "gate-open": 3,
+            "riddle-solved": 1,
+            "gate-opening": 6,
+            "boulder": 5,
+            "diamond": 1
+          }
+        }
+      ],
       "reviews": []
     },
     {

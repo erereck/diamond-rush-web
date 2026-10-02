@@ -20,7 +20,7 @@ O executor aceita somente direção, ação e retorno ao checkpoint. Diálogos e
 | Angkor 4 (3) | Saída comum (37,5) | Percurso aprovado · [1930 ticks](../tests/fixtures/routes/angkor-04-hammer-normal.json) | — |
 | Angkor 5 (4) | Saída comum (2,10) | Percurso aprovado · [1953 ticks](../tests/fixtures/routes/angkor-05-normal.json) | — |
 | Angkor 6 (5) | Saída comum (26,5) | Percurso aprovado · [662 ticks](../tests/fixtures/routes/angkor-06-normal.json) | — |
-| Angkor 7 (6) | Saída comum (19,4); Saída secreta (21,40) | Saídas parcialmente aprovadas · [1205 ticks](../tests/fixtures/routes/angkor-07-normal.json) | — |
+| Angkor 7 (6) | Saída comum (19,4); Saída secreta (21,40) | Saídas parcialmente aprovadas · [1205 ticks](../tests/fixtures/routes/angkor-07-normal.json) · [tentativa em (10,42)](../tests/fixtures/route-attempts/angkor-07-secret-hook-plate.json) | — |
 | Angkor 8 (7) | Saída secreta (4,3); Saída comum (5,19) | Percurso aprovado · [2867 ticks](../tests/fixtures/routes/angkor-08-normal.json), [791 ticks](../tests/fixtures/routes/angkor-08-secret-ice.json) | — |
 | Angkor 9 · chefe (8) | Cristal após vencer o chefe (27,6) | Percurso aprovado · [1121 ticks](../tests/fixtures/routes/angkor-boss-crystal.json) | — |
 | Angkor 10 · secreta (9) | Saída secreta (42,11) | Ainda não verificada | — |

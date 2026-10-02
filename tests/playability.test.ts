@@ -8,6 +8,9 @@ import { loadRouteResources } from '../tools/routes/loadResources.ts';
 import { restoreReplay, validateReplay } from '../src/platform/Session.ts';
 import { playCampaignRoute, verifyCampaignRoute } from '../tools/routes/CampaignRoute.ts';
 import type { CampaignRouteFixture } from '../tools/routes/CampaignRoute.ts';
+import { newCampaign, unlockedNode, validateCampaign } from '../src/core/Campaign.ts';
+import { campaignFromRecord, campaignRecord, completeCampaignLevel } from '../src/platform/CanonicalCampaign.ts';
+import { CanonicalSave } from '../src/platform/CanonicalSave.ts';
 
 const resources=loadRouteResources();
 const root=new URL('fixtures/routes/',import.meta.url);
@@ -130,6 +133,9 @@ test('the playability inventory covers all maps and every alternative exit witho
   assert.equal(report.counts.completedRoutes,13);
   assert.equal(report.counts.verifiedMaps,11);
   assert.equal(report.levels.find(level=>level.world===0&&level.level===7)!.status,'verified');
+  const seventh=report.levels.find(level=>level.world===0&&level.level===6)!;
+  assert.equal(seventh.status,'partial');
+  assert.equal(seventh.pendingAttempts[0]?.file,'tests/fixtures/route-attempts/angkor-07-secret-hook-plate.json');
   assert.equal(report.counts.campaignPrefixes,1);
   assert.equal(report.counts.campaignPrefixStages,9);
   assert.deepEqual(JSON.parse(readFileSync(new URL('../docs/PLAYABILITY.json',import.meta.url),'utf8')),report);
@@ -184,4 +190,28 @@ test('Angkor 8 revisit freezes its upper snake onto the plate and exits to the s
  assert.equal(runner.sim.gatePhases[runner.sim.index(6,3)],3);
  assert.equal(runner.sim.exitObject,28);
  assert.equal(runner.sim.retries,0);
+ const revisiting=newCampaign();
+ revisiting.completed[0]=[0,1,2,3,4,5,6];
+ revisiting.selected=7;
+ revisiting.resources={...runner.sim.initial};
+ const saved=completeCampaignLevel(revisiting,runner.sim,resources.worlds,resources.maps);
+ assert.equal(saved.selected,12);
+ assert.deepEqual(saved.secretUnlocked[0],[12]);
+ const secret=resources.maps[0].find(node=>node.level===12)!;
+ assert.equal(unlockedNode(saved,0,secret,resources.maps),true);
+ const json=validateCampaign(JSON.parse(JSON.stringify(saved)),resources.maps);
+ const record=campaignRecord(json,resources.worlds,resources.maps);
+ const restored=validateCampaign(campaignFromRecord(new CanonicalSave(record.export()),resources.worlds,resources.maps),resources.maps);
+ assert.equal(unlockedNode(restored,0,secret,resources.maps),true);
+ assert.deepEqual(restored.secretUnlocked[0],[12]);
+});
+
+test('Angkor 7 hook attempt weights the secret door without claiming the exit',()=>{
+ const fixture=JSON.parse(readFileSync(new URL('fixtures/route-attempts/angkor-07-secret-hook-plate.json',import.meta.url),'utf8')) as RouteFixture;
+ const runner=playRoute(fixture,resources);
+ assert.equal(completedRoute(runner),false);
+ assert.equal(runner.sim.tile(9,43),0);
+ assert.equal(runner.sim.gatePhases[runner.sim.index(13,42)],3);
+ assert.ok(runner.eventCounts['hook-pull']>=4);
+ assert.equal(runner.sim.exitObject,0);
 });

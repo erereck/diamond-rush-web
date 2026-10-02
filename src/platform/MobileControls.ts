@@ -75,6 +75,7 @@ export class MobileControls {
     this.apply();
   }
   private save(){try{localStorage.setItem(TOUCH_SETTINGS_KEY,JSON.stringify(this.settings));}catch{/* Controls remain usable without persistent storage. */}}
+  setHaptics(enabled:boolean){this.settings.haptics=enabled;this.apply();this.save();}
   private apply(){
     this.input.stickDeadzone=this.settings.deadzone;this.input.haptics=this.settings.haptics;
     const pad=this.groups.pad.querySelector<HTMLElement>('.dpad')!,stick=this.groups.pad.querySelector<HTMLElement>('[data-stick]')!;

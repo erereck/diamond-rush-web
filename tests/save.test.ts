@@ -129,6 +129,8 @@ test('Angkor main route stays unlocked after each original RMS round-trip',()=>{
     if(level<8)assert.ok(save.worlds[0].levels[level+1].flags&64,`Angkor ${level+1} must carry the source unlock flag`);
     campaign=campaignFromRecord(save,worlds,maps);
   }
+  assert.equal(unlockedWorld(campaign,1,maps),false);
+  campaign.resources.redDiamonds=10;
   assert.equal(unlockedWorld(campaign,1,maps),true);
   const secret=finishLevel(campaign,0,6,campaign.resources,0,true,maps);
   const restored=campaignFromRecord(campaignRecord(secret,worlds,maps),worlds,maps);

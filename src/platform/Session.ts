@@ -14,7 +14,8 @@ export function validateReplay(value:unknown,worlds:WorldDefinition[]):Replay {
   if(!initial||!Number.isInteger(initial.diamonds)||initial.diamonds<0||initial.diamonds>65535||
     !Number.isInteger(initial.redDiamonds)||initial.redDiamonds<0||initial.redDiamonds>65535||
     !Number.isInteger(initial.lives)||initial.lives<0||initial.lives>99||
-    !Number.isInteger(initial.health)||initial.health<1||initial.health>4||![0,1,2,8].includes(initial.weaponTier??0))
+    (initial.maxHealth!==undefined&&(!Number.isInteger(initial.maxHealth)||initial.maxHealth<4||initial.maxHealth>8))||
+    !Number.isInteger(initial.health)||initial.health<1||initial.health>(initial.maxHealth??4)||![0,1,2,8].includes(initial.weaponTier??0))
     throw new Error('Estado inicial da fase inválido.');
   const cellCount=worlds[r.world].levels[r.level].tiles.length;
   if(initial.openedChests!==undefined&&(!Array.isArray(initial.openedChests)||initial.openedChests.length>128||

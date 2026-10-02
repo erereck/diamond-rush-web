@@ -52,6 +52,7 @@ export class CanonicalSave {
   get diamonds(){return this.u16(4);}
   get redDiamonds(){return this.u16(6);}
   get maxHealth(){return this.data[8];}
+  setMaxHealth(value:number){if(!Number.isInteger(value)||value<4||value>8)throw new Error('RMS: energia máxima inválida.');this.data[8]=value;}
   get worldFlags(){return this.data[2];}
   /** recordData[9]: 0 = none, 1 = hammer, 2 = hook, 8 = ice hammer. */
   get weaponTier(){return this.data[9];}

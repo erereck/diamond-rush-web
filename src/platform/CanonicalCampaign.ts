@@ -11,6 +11,7 @@ export function campaignRecord(c:Campaign,worlds:WorldDefinition[],maps:MapNode[
   if(save.worlds.some((w,i)=>w.levels.length!==worlds[i]?.levels.length))throw new Error('RMS: mapas incompatíveis com a versão S700.');
   const {lives,diamonds,redDiamonds,weaponTier=0}=c.resources;
   save.setResources(lives,diamonds,redDiamonds,weaponTier);
+  save.setMaxHealth(c.resources.maxHealth??4);
   for(const w of [1,2] as const)if(unlockedWorld(c,w,maps))save.unlockWorld(w);
   for(let w=0;w<3;w++){
     const maxNormal=Math.max(0,...maps[w].filter(n=>n.type===0&&(
@@ -53,7 +54,7 @@ export function completeCampaignLevel(c:Campaign,stage:Simulation,worlds:WorldDe
   const {world,index}=stage.level;
   const awarded=pendingRewards(c,world,index,eligibleStageRewards(stage),stage.lives);
   const next=finishLevel(c,world,index,{diamonds:stage.diamonds,redDiamonds:stage.redDiamonds,
-    lives:awarded.lives,health:stage.health,weaponTier:stage.weaponTier},awarded.mask,stage.exitObject===28,maps);
+    lives:awarded.lives,health:stage.health,...(stage.maxHealth>4?{maxHealth:stage.maxHealth}:{}),weaponTier:stage.weaponTier},awarded.mask,stage.exitObject===28,maps);
   next.canonicalRecord=[...campaignRecord(next,worlds,maps,stage).export()];
   return next;
 }
@@ -77,7 +78,7 @@ export function campaignFromRecord(save:CanonicalSave,worlds:WorldDefinition[],m
   c.worldAccess=[true,!!(save.worldFlags&8),!!(save.worldFlags&16)];
   c.world=c.worldAccess[2]?2:c.worldAccess[1]?1:0;
   c.selected=0;
-  c.resources={diamonds:save.diamonds,redDiamonds:save.redDiamonds,lives:Math.max(0,save.lives),health:Math.max(1,Math.min(4,save.maxHealth)),weaponTier:save.weaponTier as 0|1|2|8};
+  c.resources={diamonds:save.diamonds,redDiamonds:save.redDiamonds,lives:Math.max(0,save.lives),health:Math.max(1,save.maxHealth),...(save.maxHealth>4?{maxHealth:save.maxHealth}:{}),weaponTier:save.weaponTier as 0|1|2|8};
   c.canonicalRecord=[...save.export()];
   return c;
 }

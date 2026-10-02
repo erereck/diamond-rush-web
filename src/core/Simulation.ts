@@ -13,7 +13,7 @@ export type Direction=0|1|2|3|4;
 export const DX=[0,0,1,0,-1], DY=[0,-1,0,1,0];
 export interface DemoEdit {cell:number;object?:number;parameter?:number;state?:number;checkpoint?:boolean}
 export interface InputFrame {direction:Direction;action:boolean;reset?:boolean;scripted?:boolean;scriptedView?:{x:number;y:number;follow:boolean};demoEdits?:DemoEdit[]}
-export interface StageStart {diamonds:number;redDiamonds:number;lives:number;health:number;weaponTier?:0|1|2|8;openedChests?:number[]}
+export interface StageStart {diamonds:number;redDiamonds:number;lives:number;health:number;maxHealth?:number;weaponTier?:0|1|2|8;openedChests?:number[]}
 export interface Replay {version:3;target:'1.2.0-s700';engine:typeof ENGINE_REVISION;levelFingerprint:string;world:number;level:number;initial:StageStart;inputs:InputFrame[]}
 /** Tile cases which set var15=true in cGame.method_288. */
 export const WALKABLE_TILES=new Set([-1,1,2,4,5,6,7,11,14,19,24,26,27,33,40,41,42,43,45,50,51,52,53]);
@@ -29,7 +29,7 @@ interface CheckpointState {
 export class Simulation {
   level:LevelDefinition; tiles:Int16Array; state:Int32Array; motion:Int16Array; active:Int16Array;
   player={x:0,y:0,dx:1,dy:0,offset:0,direction:2 as Direction};
-  camera=new Camera();tick=0;diamonds=0;redDiamonds=0;health=4;invulnerable=0;
+  camera=new Camera();tick=0;diamonds=0;redDiamonds=0;health=4;maxHealth=4;invulnerable=0;
   playerAnimation=1;animationTick=0;pushDelay=6;checkpoint=-1;status:'playing'|'dead'|'complete'='playing';
   opened=new Set<number>();events:string[]=[];inputs:InputFrame[]=[];
   chestFrames:Int16Array;checkpointOrder=-1;private savedCheckpoint!:CheckpointState;
@@ -55,7 +55,7 @@ export class Simulation {
   constructor(level:LevelDefinition,initial:StageStart={diamonds:0,redDiamonds:0,lives:5,health:4}){
     this.initialLevelFingerprint=levelFingerprint(level);
     this.initial={...initial,...(initial.openedChests?{openedChests:[...initial.openedChests]}:{})};this.diamonds=initial.diamonds;this.redDiamonds=initial.redDiamonds;
-    this.lives=initial.lives;this.health=initial.health;this.weaponTier=initial.weaponTier??0;
+    this.lives=initial.lives;this.maxHealth=initial.maxHealth??4;this.health=initial.health;this.weaponTier=initial.weaponTier??0;
     this.level={...level,tiles:[...level.tiles],parameters:[...level.parameters],objects:[...level.objects]};
     if(level.world===0&&level.index===8)this.boss=new AngkorBoss();
     if(level.world===1&&level.index===9)this.boss=new BavariaBoss();
@@ -186,7 +186,7 @@ export class Simulation {
     this.hurtTicks=0;this.deathTicks=0;this.chestCell=-1;this.chestTicks=0;this.exitDirection=0;this.exitObject=0;this.pendingDirection=0;this.pushDelay=6;this.stonePressure=0;this.attackTicks=0;this.pendingHammer=null;this.hook=null;
     this.pendingCrystalCompletion=false;
     this.chestReward=-1;this.chestRewardAmount=0;this.itemSparkles=[];
-    if(heal){this.health=4;this.invulnerable=40;}
+    if(heal){this.health=this.maxHealth;this.invulnerable=40;}
     this.playerAnimation=2;this.animationTick=0;
     // method_347 reactivates the saved objects; it does not reset the global clock.
     for(let i=0;i<this.tiles.length;i++)if(this.tiles[i]>=0&&this.tiles[i]<80)this.wake(i%this.level.width,Math.floor(i/this.level.width));
@@ -809,7 +809,7 @@ export class Simulation {
         this.chestReward=this.tiles[this.chestCell];this.tiles[this.chestCell]=-1;
         this.chestRewardAmount=this.level.parameters[this.chestCell];
         if(this.chestReward===6&&this.lives>=99)this.chestReward=7;
-        if(this.chestReward===7&&this.health===4){this.chestReward=41;this.chestRewardAmount=10;this.bonusDiamondTotal+=10;}
+        if(this.chestReward===7&&this.health===this.maxHealth){this.chestReward=41;this.chestRewardAmount=10;this.bonusDiamondTotal+=10;}
       }
       if(animationFrameAt(CHEST_OPEN_DURATIONS,this.chestTicks-1,false)>=13&&!this.opened.has(this.chestCell)){
         this.opened.add(this.chestCell);
@@ -818,7 +818,7 @@ export class Simulation {
         else if(reward===4)this.goldKeys++;
         else if(reward===5)this.silverKeys++;
         else if(reward===6){this.lives=Math.min(99,this.lives+1);this.permanentPickups.add(this.chestCell);}
-        else if(reward===7)this.health=4;
+        else if(reward===7)this.health=this.maxHealth;
         else if(reward===41){const amount=this.chestRewardAmount;this.diamonds+=amount===255?1:Math.max(1,amount);}
         else if(reward===24||reward===27||reward===26){
           this.weaponTier=reward===24?Math.max(this.weaponTier,1) as 1|2|8:reward===27?Math.max(this.weaponTier,2) as 2|8:8;
@@ -921,8 +921,8 @@ export class Simulation {
   }
   /** cGame.method_322 converts a field health pickup into ten diamonds at full health. */
   private collectHealthOrDiamonds(){
-    if(this.health===4){this.diamonds+=10;this.bonusDiamondTotal+=10;this.events.push('diamond');}
-    else {this.health=4;this.events.push('health');}
+    if(this.health===this.maxHealth){this.diamonds+=10;this.bonusDiamondTotal+=10;this.events.push('diamond');}
+    else {this.health=this.maxHealth;this.events.push('health');}
   }
   replay():Replay{return {version:3,target:'1.2.0-s700',engine:ENGINE_REVISION,levelFingerprint:this.initialLevelFingerprint,world:this.level.world,level:this.level.index,initial:{...this.initial},inputs:this.inputs.map(i=>({...i,demoEdits:i.demoEdits?.map(edit=>({...edit}))}))};}
   snapshot(){return {bridges:this.bridges.snapshot(),riddles:this.riddles.snapshot(),chestReward:this.chestReward,chestRewardAmount:this.chestRewardAmount,itemSparkles:this.itemSparkles.map(s=>({...s})),tick:this.tick,player:{...this.player},camera:{x:this.camera.x,y:this.camera.y},tiles:[...this.tiles],state:[...this.state],motion:[...this.motion],active:[...this.active],objects:[...this.level.objects],parameters:[...this.level.parameters],frozenKinds:[...this.frozenKinds],diamonds:this.diamonds,bonusDiamondTotal:this.bonusDiamondTotal,redDiamonds:this.redDiamonds,goldKeys:this.goldKeys,silverKeys:this.silverKeys,gatePhases:[...this.gatePhases],gateCounts:[...this.gateCounts],unlockedGates:[...this.unlockedGates],permanentPickups:[...this.permanentPickups],permanentEquipmentChests:[...this.permanentEquipmentChests],weaponTier:this.weaponTier,attackTicks:this.attackTicks,pendingHammer:this.pendingHammer?{...this.pendingHammer}:null,hook:this.hook?{...this.hook}:null,health:this.health,invulnerable:this.invulnerable,status:this.status,playerAnimation:this.playerAnimation,animationTick:this.animationTick,pushDelay:this.pushDelay,checkpoint:this.checkpoint,checkpointOrder:this.checkpointOrder,opened:[...this.opened],chestFrames:[...this.chestFrames],chestCell:this.chestCell,chestTicks:this.chestTicks,pendingCrystalCompletion:this.pendingCrystalCompletion,lives:this.lives,hurtTicks:this.hurtTicks,deathTicks:this.deathTicks,respawnTravel:this.respawnTravel,respawnFlash:this.respawnFlash,respawnTarget:{...this.respawnTarget},exitDirection:this.exitDirection,exitObject:this.exitObject,stonePressure:this.stonePressure,pendingDirection:this.pendingDirection,lastInputDirection:this.lastInputDirection,actionHeld:this.actionHeld,entranceGate:this.entranceGate,boss:this.boss?.snapshot()??null,enemySmoke:this.enemySmoke.map(s=>({...s})),hits:this.hits,retries:this.retries,savedCheckpoint:structuredClone(this.savedCheckpoint)};}

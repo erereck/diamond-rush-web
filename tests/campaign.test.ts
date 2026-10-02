@@ -21,9 +21,11 @@ test('world access and saved campaign validation cannot skip locked maps',()=>{
   assert.equal(unlockedWorld(c,1,maps),false);
   assert.throws(()=>validateCampaign({...c,world:1},maps));
   c=finishLevel(c,0,8,{diamonds:28,redDiamonds:2,lives:4,health:3});
+  assert.equal(unlockedWorld(c,1,maps),false,'boss completion alone does not buy the red-diamond seal');
+  c.resources.redDiamonds=10;
   assert.equal(unlockedWorld(c,1,maps),true);
   const restored=validateCampaign(JSON.parse(JSON.stringify(c)),maps);
-  assert.deepEqual(restored.resources,{diamonds:28,redDiamonds:2,lives:4,health:3,weaponTier:0});
+  assert.deepEqual(restored.resources,{diamonds:28,redDiamonds:10,lives:4,health:3,weaponTier:0});
   assert.equal(validateCampaign({...c,resources:{diamonds:28,redDiamonds:2,lives:4,health:3,weaponTier:8}},maps).resources.weaponTier,8);
   assert.throws(()=>validateCampaign({...c,resources:{...c.resources,weaponTier:3}},maps));
   assert.throws(()=>validateCampaign({...c,selected:10},maps));
@@ -59,7 +61,7 @@ test('canonical secret branches require the secret exit, then chain only to thei
   ];
   for(const [world,from,target] of entrances){
     let c=newCampaign();
-    if(world>0)c.completed[world-1].push([8,9][world-1]);
+    if(world>0)c.resources.redDiamonds=world===1?10:25;
     const secret=maps[world].find(n=>n.level===target)!;
     c=finishLevel(c,world,from,c.resources,0,false,maps);
     assert.equal(unlockedNode(c,world,secret,maps),false,`${world}/${from} normal exit exposed ${target}`);
@@ -74,7 +76,7 @@ test('canonical secret branches require the secret exit, then chain only to thei
   assert.equal(unlockedNode(c,0,maps[0].find(n=>n.level===10)!,maps),true);
   c=finishLevel(c,0,10,c.resources,0,true,maps);
   assert.equal(unlockedNode(c,0,maps[0].find(n=>n.level===11)!,maps),true);
-  const tibet=newCampaign();tibet.completed[0].push(8);tibet.completed[1].push(9);
+  const tibet=newCampaign();tibet.resources.redDiamonds=25;
   tibet.secretUnlocked[2].push(12);
   const afterTibetSecret=finishLevel(tibet,2,12,tibet.resources,0,false,maps);
   assert.equal(unlockedNode(afterTibetSecret,2,maps[2].find(n=>n.level===13)!,maps),true);

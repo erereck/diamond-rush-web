@@ -107,11 +107,12 @@ export function playRoute(fixture:RouteFixture,resources:RouteResources):RouteRu
   if(!definition||fixture.levelFingerprint!==levelFingerprint(definition))throw new Error('Route map fingerprint changed');
   const initial=fixture.initial;
   // Never accept pre-opened chests or injected keys/positions in certification.
-  if(!initial||Object.keys(initial).some(key=>!['diamonds','redDiamonds','lives','health','weaponTier'].includes(key))||
+  if(!initial||Object.keys(initial).some(key=>!['diamonds','redDiamonds','lives','health','maxHealth','weaponTier'].includes(key))||
     !Number.isInteger(initial.diamonds)||initial.diamonds<0||initial.diamonds>65535||
     !Number.isInteger(initial.redDiamonds)||initial.redDiamonds<0||initial.redDiamonds>65535||
     !Number.isInteger(initial.lives)||initial.lives<0||initial.lives>99||
-    !Number.isInteger(initial.health)||initial.health<1||initial.health>4||![0,1,2,8].includes(initial.weaponTier??0))throw new Error('Invalid route initial resources');
+    (initial.maxHealth!==undefined&&(!Number.isInteger(initial.maxHealth)||initial.maxHealth<4||initial.maxHealth>8))||
+    !Number.isInteger(initial.health)||initial.health<1||initial.health>(initial.maxHealth??4)||![0,1,2,8].includes(initial.weaponTier??0))throw new Error('Invalid route initial resources');
   if(!Array.isArray(fixture.controls)||!fixture.controls.length)throw new Error('Route has no controls');
   let ticks=0;
   const runner=new RouteRunner(resources,fixture.world,fixture.level,initial,fixture.kind);

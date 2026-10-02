@@ -55,6 +55,7 @@ export class IntroSequence {
   readonly sim:Simulation;readonly scripts:Map<number,DemoScript>;
   readonly stops:readonly {id:number;x:number;y:number}[];readonly standalone:boolean;
   readonly font?:DecodedSprite;readonly fontMap?:Uint8Array;
+  readonly translateText:(value:string)=>string;
   section=0;phase:'opening'|'free'|'script'|'done'='free';
   commandIndex=0;active:RunningCommand|null=null;tick=0;
   cameraX=0;cameraY=0;
@@ -65,12 +66,12 @@ export class IntroSequence {
   private rockLessonPending=false;private blockedLessonPending=false;
   private recoveryRestoreTick=-1;
   private recoveryTravelQueued=false;
-  constructor(level:LevelDefinition,scripts:Map<number,DemoScript>,sim?:Simulation,scriptId?:number,font?:DecodedSprite,fontMap?:Uint8Array){
+  constructor(level:LevelDefinition,scripts:Map<number,DemoScript>,sim?:Simulation,scriptId?:number,font?:DecodedSprite,fontMap?:Uint8Array,translateText:(value:string)=>string=value=>value){
     this.standalone=scriptId!==undefined;
     this.stops=this.standalone?[{id:scriptId!,x:0,y:0}]:STOPS;
     for(const stop of this.stops)if(!scripts.has(stop.id))throw new Error(`Missing original demo script ${stop.id}`);
     const copy={...level,tiles:[...level.tiles],parameters:[...level.parameters],objects:[...level.objects]};
-    this.sim=sim??new Simulation(copy);this.scripts=scripts;this.font=font;this.fontMap=fontMap;
+    this.sim=sim??new Simulation(copy);this.scripts=scripts;this.font=font;this.fontMap=fontMap;this.translateText=translateText;
     this.phase=this.standalone?'script':'opening';
     if(!this.standalone){
       // S700 starts the tutorial five cells left of the map's checkpoint.
@@ -169,7 +170,8 @@ export class IntroSequence {
     }
   }
   private wrap(value:string,popup:boolean){
-    return this.font&&this.fontMap?wrapDemoTextPixels(value,popup?196:222,this.font,this.fontMap):wrapDemoText(value,popup?23:18);
+    const localized=this.translateText(value);
+    return this.font&&this.fontMap?wrapDemoTextPixels(localized,popup?196:222,this.font,this.fontMap):wrapDemoText(localized,popup?23:18);
   }
   private atTrigger(){
     if(this.sim.status!=='playing'||this.sim.player.offset!==0||this.sim.hurtTicks||this.sim.deathTicks||this.sim.respawnTravel)return false;

@@ -6,7 +6,7 @@ export interface AssetManifest {version:string;sprites:string[];worlds:{world:nu
 export class AssetManager {
   sprites=new Map<string,DecodedSprite>();
   splash:HTMLImageElement[]=[];
-  worlds:WorldDefinition[]=[]; maps:MapNode[][]=[]; strings:string[]=[]; fontMap=new Uint8Array();demoScripts=new Map<number,DemoScript>();
+  worlds:WorldDefinition[]=[]; maps:MapNode[][]=[]; strings:string[]=[]; originalStrings:string[]=[]; fontMap=new Uint8Array();demoScripts=new Map<number,DemoScript>();
   manifest!:AssetManifest;
   async json<T>(name:string):Promise<T> {
     const response=await fetch(`${import.meta.env.BASE_URL}assets/${name}.json`);
@@ -19,6 +19,7 @@ export class AssetManager {
     this.worlds=await Promise.all([0,1,2].map(i=>this.json<WorldDefinition>(`world-${i}`)));
     this.maps=await Promise.all([0,1,2].map(i=>this.json<MapNode[]>(`map-${i}`)));
     this.strings=await this.json<string[]>('lang-0');
+    this.originalStrings=[...this.strings];
     const demo=await fetch(`${import.meta.env.BASE_URL}assets/demo-0.bin`);if(!demo.ok)throw new Error('Original demo scripts unavailable');
     this.demoScripts=parseDemoScripts(new Uint8Array(await demo.arrayBuffer()));
     const r=await fetch(`${import.meta.env.BASE_URL}assets/font-map.bin`); if(!r.ok)throw new Error('Font map unavailable');

@@ -72,6 +72,8 @@
 html,body,#app{max-width:100%;overflow-x:hidden}
 main{min-width:0}
 .player-panel,.player-bar,#game-status{min-width:0}
+.language-picker{margin-top:16px;width:100%;max-width:370px;color:#aab8a4}
+.language-picker select{width:100%;font-size:12px}
 .player-panel{width:min(100%,498px)}
 .player-panel .stage{width:fit-content;margin:0 auto}
 .player-bar{width:100%}

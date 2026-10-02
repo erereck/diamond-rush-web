@@ -3,6 +3,7 @@ import type { MapNode } from '../level/LevelParser.ts';
 import { CanonicalSave } from '../platform/CanonicalSave.ts';
 import type { Simulation } from './Simulation.ts';
 import { stageCollectibleTotals } from './OriginalText.ts';
+import { WORLD_RED_PRICES } from './Store.ts';
 
 export const CAMPAIGN_KEY='diamond-rush:campaign:v1';
 export const REWARD_FLAGS=[4,8,16,32] as const;
@@ -36,9 +37,8 @@ export function eligibleStageRewards(s:Simulation){
 }
 export function unlockedWorld(c:Campaign,world:number,maps:MapNode[][]):boolean {
   if(world===0)return true;
-  if(c.worldAccess?.[world])return true;
-  const previous=maps[world-1]?.filter(n=>n.type===0).sort((a,b)=>b.level-a.level)[0];
-  return !!previous&&c.completed[world-1].includes(previous.level);
+  if(world<0||world>=WORLD_RED_PRICES.length||!maps[world])return false;
+  return !!c.worldAccess?.[world]||c.resources.redDiamonds>=WORLD_RED_PRICES[world];
 }
 export function unlockedNode(c:Campaign,world:number,node:MapNode,maps:MapNode[][]):boolean {
   if(!unlockedWorld(c,world,maps))return false;
@@ -106,6 +106,7 @@ export function validateCampaign(value:unknown,maps:MapNode[][]):Campaign {
   const normalized={...c,secretUnlocked,explicitUnlocked,worldAccess};
   if(!Number.isInteger(c.world)||c.world<0||c.world>2||!unlockedWorld(normalized,c.world,maps)||!maps[c.world].some(n=>n.level===c.selected&&unlockedNode(normalized,c.world,n,maps)))throw new Error('Mapa salvo inválido');
   const r=c.resources;
-  if(!r||![r.diamonds,r.redDiamonds,r.lives,r.health].every(Number.isInteger)||r.diamonds<0||r.diamonds>65535||r.redDiamonds<0||r.redDiamonds>65535||r.lives<0||r.lives>99||r.health<1||r.health>4||![0,1,2,8].includes(r.weaponTier??0))throw new Error('Recursos salvos inválidos');
+  const maxHealth=r?.maxHealth??4;
+  if(!r||![r.diamonds,r.redDiamonds,r.lives,r.health,maxHealth].every(Number.isInteger)||r.diamonds<0||r.diamonds>65535||r.redDiamonds<0||r.redDiamonds>65535||r.lives<0||r.lives>99||maxHealth<4||maxHealth>8||r.health<1||r.health>maxHealth||![0,1,2,8].includes(r.weaponTier??0))throw new Error('Recursos salvos inválidos');
   return {version:1,completed:c.completed.map(a=>[...new Set(a)]),secretUnlocked:secretUnlocked.map(a=>[...new Set(a)]),explicitUnlocked:explicitUnlocked.map(a=>[...new Set(a)]),awards:awards.map(row=>[...row]),worldAccess:[...worldAccess],canonicalRecord:c.canonicalRecord?[...c.canonicalRecord]:undefined,world:c.world,selected:c.selected,resources:{...r,weaponTier:r.weaponTier??0}};
 }

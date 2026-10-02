@@ -13,6 +13,9 @@ export function campaignRecord(c:Campaign,worlds:WorldDefinition[],maps:MapNode[
   save.setResources(lives,diamonds,redDiamonds,weaponTier);
   save.setMaxHealth(c.resources.maxHealth??4);
   for(const w of [1,2] as const)if(unlockedWorld(c,w,maps))save.unlockWorld(w);
+  // The final-chamber chest writes bit 0/1/2 of recordData[2]. Completed
+  // boss stages also repair older web saves that predate this RMS field.
+  for(const w of [0,1,2] as const)if(c.completed[w].includes([8,9,10][w]))save.collectCrystal(w);
   for(let w=0;w<3;w++){
     const maxNormal=Math.max(0,...maps[w].filter(n=>n.type===0&&(
       c.completed[w].includes(n.level)||maps[w].some(previous=>c.completed[w].includes(previous.level)&&previous.links.some(link=>link.x===n.x&&link.y===n.y))

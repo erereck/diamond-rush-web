@@ -115,13 +115,24 @@ export class FrontEndRenderer {
     this.sprites.frame(ctx,this.assets.sprite('mmv-0'),0,60,76);
     if(store)for(let y=0;y<320;y+=24)for(let x=0;x<240;x+=24)this.sprites.frame(ctx,overlay,16,x,y);
   }
-  drawSeal(ctx:CanvasRenderingContext2D,c:Campaign,selected:number,tick:number){
+  sealUnlockDuration(){
+    const sprite=this.assets.sprite('cm-7'),animation=sprite.animations[5];
+    return sprite.animationFrames.slice(animation.start,animation.start+animation.count).reduce((sum,frame)=>sum+Math.max(1,frame.duration),0);
+  }
+  drawSeal(ctx:CanvasRenderingContext2D,c:Campaign,selected:number,tick:number,unlockWorld:number|null=null,unlockTick=0){
     this.sealBackdrop(ctx);
     const itemOffsets=[[-24,-23],[24,-23],[0,23]];
+    let flags=0;
+    try{flags=new CanonicalSave(Uint8Array.from(c.canonicalRecord??[])).worldFlags;}catch{/* A new campaign has no RMS bytes yet. */}
     for(let w=0;w<3;w++){
       const [dx,dy]=itemOffsets[w];
-      this.sprites.frame(ctx,this.assets.sprite(`mmv-${3-w}`),0,120+dx,136+dy);
-      if(!unlockedWorld(c,w,this.assets.maps)){ctx.fillStyle='#0009';ctx.fillRect(120+dx-13,136+dy-12,27,26);}
+      if(unlockedWorld(c,w,this.assets.maps)&&(unlockWorld!==w||unlockTick>=this.sealUnlockDuration()&&unlockTick%4<2))
+        this.sprites.frame(ctx,this.assets.sprite('mmv-0'),w+1,60,76);
+      if(flags&(1<<w))this.sprites.frame(ctx,this.assets.sprite(`mmv-${3-w}`),0,120+dx,136+dy);
+    }
+    if(unlockWorld!==null&&unlockTick<this.sealUnlockDuration()){
+      const [dx,dy]=itemOffsets[unlockWorld];
+      this.sprites.animation(ctx,this.assets.sprite('cm-7'),5,unlockTick,120+dx-12,124+dy);
     }
     this.sprites.frame(ctx,this.assets.sprite('ms-0'),11,144,159);
     const arrows=[[-33,-54],[14,-54],[-8,-8],[22,2]],arrow=arrows[selected];
@@ -165,18 +176,20 @@ export class FrontEndRenderer {
   drawPause(ctx:CanvasRenderingContext2D,scene:PauseScene,selected:number,sound:boolean,vibration:boolean,canMap:boolean,confirmExit=false){
     if(scene==='help'){this.drawPage(ctx,'help',sound,vibration,0);return;}
     ctx.fillStyle='#000d';ctx.fillRect(0,0,240,320);
-    const entries=scene==='menu'?PAUSE_ITEMS.filter(id=>id!==49||canMap).map(id=>this.assets.strings[id]):
+    const entries=scene==='menu'?PAUSE_ITEMS.map(id=>this.assets.strings[id]):
       scene==='options'?[this.assets.strings[sound?32:33],this.assets.strings[vibration?50:51]]:
       [this.assets.strings[101],this.assets.strings[100]];
     const top=Math.floor(160-(entries.length*15+3)/2);
     if(scene==='confirm')this.text(ctx,this.assets.strings[confirmExit?102:113],120,top-20,'center',1);
     entries.forEach((line,i)=>{
       const y=top+i*15;
-      if(i===selected){ctx.fillStyle='#ce9b00';ctx.fillRect(0,y,240,16);
+      const disabled=scene==='menu'&&i===4&&!canMap;
+      if(i===selected){ctx.fillStyle=disabled?'#666':'#ce9b00';ctx.fillRect(0,y,240,16);
         const width=Math.min(210,demoFontWidth(this.assets.sprite('ui-1'),this.assets.fontMap,line));
         this.sprites.frame(ctx,this.assets.sprite('ui-3'),2,120-width/2-8,y+7);
         this.sprites.frame(ctx,this.assets.sprite('ui-3'),2,120+width/2+8,y+7,1);
       }
+      else if(disabled){ctx.fillStyle='#ccc';ctx.fillRect(0,y+1,240,14);}
       this.text(ctx,line,120,y+1,'center');
     });
     this.button(ctx,true);this.button(ctx);

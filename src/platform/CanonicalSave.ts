@@ -64,6 +64,7 @@ export class CanonicalSave {
     this.data[6]=redDiamonds&255;this.data[7]=redDiamonds>>8;this.setWeaponTier(tier);
   }
   unlockWorld(world:1|2){this.data[2]|=world===1?8:16;}
+  collectCrystal(world:0|1|2){this.data[2]|=1<<world;}
   discoverSealWorld(world:1|2){this.data[1]|=world===1?1:2;}
   export(){return this.data.slice();}
   setLevelStatus(world:number,level:number,status:number){

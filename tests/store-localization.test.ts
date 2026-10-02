@@ -24,6 +24,14 @@ test('S700 seal unlocks worlds at red-diamond thresholds without spending them',
   assert.equal(c.resources.redDiamonds,25);
 });
 
+test('boss crystals persist in the S700 world flag bits',()=>{
+  const {worlds,maps}=loadRouteResources(),c=newCampaign();
+  assert.equal(campaignRecord(c,worlds,maps).worldFlags&7,0);
+  c.completed[0].push(8);assert.equal(campaignRecord(c,worlds,maps).worldFlags&7,1);
+  c.completed[1].push(9);assert.equal(campaignRecord(c,worlds,maps).worldFlags&7,3);
+  c.completed[2].push(10);assert.equal(campaignRecord(c,worlds,maps).worldFlags&7,7);
+});
+
 test('four armor tiers use original prices, persist in RMS and raise healing cap',()=>{
   const {worlds,maps}=loadRouteResources();
   for(let item=0;item<4;item++){

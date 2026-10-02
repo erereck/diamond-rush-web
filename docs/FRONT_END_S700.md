@@ -9,6 +9,8 @@ Esta implementação segue a referência S700 1.2.0 fixada no commit [`5e05c42`]
 | Menu de pausa: Resume, Restart, Options, Help, Go to Map, Main Menu, Exit | `menuData[1]` | `FrontEndRenderer.PAUSE_ITEMS`, `main.ts` |
 | Opções: som e vibração | `menuData[5]`, `method_84` | `main.ts`, `MobileControls.setHaptics` |
 | Selo: Angkor, Bavaria, Tibet, loja; movimento cardinal sem salto entre posições | `method_75`, `Define.sealMoveDirection` | `Store.SEAL_MOVE`, `main.ts` |
+| Ao liberar um mundo, brilho de `cm.f/7` seguido da piscada da imagem do selo | `method_71`, `method_137` | `FrontEndRenderer.drawSeal`, `main.ts` |
+| Os três cristais só aparecem no selo após serem obtidos e ficam nos bits 0–2 do byte 2 do RMS | `method_71`, `method_137`, prêmio de baú 51–53 | `CanonicalSave.collectCrystal`, `CanonicalCampaign.campaignRecord` |
 | Bavaria requer 10 diamantes vermelhos, Tibet 25; nenhum é gasto | `method_73`, `Define.worldPrices` | `Store.WORLD_RED_PRICES`, `Campaign.unlockedWorld` |
 | Entrada em Bavaria assegura martelo; entrada em Tibet assegura gancho | `method_75` | `main.ts` |
 | Loja: quatro preços 150/400/1000/3000, compra direta se houver saldo, tier adquirido suprime os inferiores | `method_212–215`, `Define.itemPrices` | `Store.purchaseArmor` |

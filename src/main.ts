@@ -36,6 +36,7 @@ let simulation:Simulation|null=null,paused=false,ready=false,sceneTick=0,view:'l
 let scene:FrontScene|'playing'|'intro'|'demo'='menu',campaign:Campaign|null=null,menuSelected=0,sealSelected=0,storeSelected=0,storeMessage=0,storeToastTicks=0,pageSelected=0,soundEnabled=true,campaignStage=false,confirmExit=false,frontCooldown=0,frontActionHeld=false;
 let pauseScene:PauseScene='menu',pauseSelected=0,pauseConfirmAction:'restart'|'map'|'menu'|'exit'='restart',pauseCooldown=0,pauseActionHeld=false;
 let mapTravel:{from:MapNode;to:MapNode;step:number;steps:number}|null=null;
+let sealUnlockWorld:1|2|null=null,sealUnlockTick=0;
 let locale:GameLocale=validLocale(localStorage.getItem(LANGUAGE_KEY));
 let intro:IntroSequence|null=null,demo:IntroSequence|null=null,stageIntroTicks=0;
 const world=$<HTMLSelectElement>('world'),level=$<HTMLSelectElement>('level'),sprite=$<HTMLSelectElement>('sprite'),palette=$<HTMLSelectElement>('palette');
@@ -52,7 +53,8 @@ function openMenu(){scene='menu';simulation=null;campaignStage=false;paused=fals
 function openSeal(){
   if(!campaign)return;
   const save=campaignRecord(campaign,assets.worlds,assets.maps);
-  for(const w of [1,2] as const)if(unlockedWorld(campaign,w,assets.maps)&&!(save.sealFlags&(w===1?1:2))){save.discoverSealWorld(w);sealSelected=w;}
+  sealUnlockWorld=null;sealUnlockTick=0;
+  for(const w of [1,2] as const)if(unlockedWorld(campaign,w,assets.maps)&&!(save.sealFlags&(w===1?1:2))){save.discoverSealWorld(w);sealSelected=w;sealUnlockWorld=w;}
   campaign.canonicalRecord=[...save.export()];
   scene='seal';simulation=null;campaignStage=false;paused=false;input.clear();clock.reset();frontCooldown=0;saveCampaign();game.focus();
 }
@@ -162,7 +164,7 @@ function drawFront(){
   if(scene==='intro'||scene==='demo'){drawIntro();return;}
   if(scene==='menu')front.drawMenu(ctx,menuSelected,!!campaign,sceneTick);
   else if(scene==='map'&&campaign)front.drawMap(ctx,campaign,sceneTick,mapTravelCursor());
-  else if(scene==='seal'&&campaign)front.drawSeal(ctx,campaign,sealSelected,sceneTick);
+  else if(scene==='seal'&&campaign)front.drawSeal(ctx,campaign,sealSelected,sceneTick,sealUnlockWorld,sealUnlockTick);
   else if(scene==='store'&&campaign)front.drawStore(ctx,campaign,storeSelected,storeMessage,storeToastTicks>0);
   else if(scene==='options'||scene==='help'||scene==='about'||scene==='confirm'||scene==='more'||scene==='exit')front.drawPage(ctx,scene,soundEnabled,touchControls.settings.haptics,pageSelected,confirmExit);
   $('game-status').textContent=scene==='map'&&campaign?`${assets.strings[28+campaign.world]} · ${mapTitle(assets.strings,campaign.selected,assets.maps[campaign.world].find(n=>n.type===1)?.level??assets.maps[campaign.world].length)}`:scene==='seal'?'Seleção de mundos':scene==='store'?assets.strings[72]:'Menu original S700';
@@ -183,7 +185,7 @@ function drawGame(){
     ctx.fillStyle='#000';ctx.fillRect(0,0,240,320);
     text(assets.strings[35],120,50,'center',1);
     text(`${assets.strings[111]} ${Math.min(500,simulation.diamonds)} ${assets.strings[109]}`,120,160,'center');
-    text(assets.strings[98],8,301);
+    text(assets.strings[1],8,301);
     $('game-status').textContent='GAME OVER · confirme para continuar';
     $<HTMLButtonElement>('pause').disabled=true;$<HTMLButtonElement>('restart').disabled=false;
     $('restart').setAttribute('aria-label','Continuar após game over');$('next-level').hidden=true;
@@ -242,16 +244,18 @@ function drawInspector(){
   }
 }
 function updateSprite(){const s=assets.sprite(sprite.value);options(palette,s.palettes.map((_,i)=>({value:String(i),label:`Paleta ${i}`})));$('sprite-info').textContent=`${s.modules.length} módulos · ${s.frames.length} frames · ${s.animations.length} animações`;inspectionDirty=true;}
-async function importFile(file:File|null){if(!file)return;try{const data=validateReplay(JSON.parse(await file.text()),assets.worlds);simulation=restoreReplay(data,assets.worlds);scene='playing';campaignStage=false;paused=true;clock.reset();lastError='';saveSession();}catch(e){report(String(e));}}
+async function importFile(file:File|null){if(!file)return;try{const data=validateReplay(JSON.parse(await file.text()),assets.worlds);simulation=restoreReplay(data,assets.worlds);scene='playing';campaignStage=false;paused=true;pauseScene='menu';pauseSelected=0;clock.reset();lastError='';saveSession();}catch(e){report(String(e));}}
 function backFront(){
   if(scene==='intro'){openSeal();return;}
   if(scene==='demo'){scene='playing';demo=null;return;}
   if(scene==='map'){sealSelected=campaign?.world??0;openSeal();return;}
+  if(scene==='seal'&&sealUnlockWorld!==null)return;
   else if(scene==='store'){scene='seal';sealSelected=3;storeMessage=0;storeToastTicks=0;}
   else if(scene==='seal'||scene==='options'||scene==='help'||scene==='about'||scene==='confirm'||scene==='more'||scene==='exit')scene='menu';
   input.clear();frontActionHeld=false;frontCooldown=0;
 }
 function moveFront(direction:number){
+  if(scene==='seal'&&sealUnlockWorld!==null)return;
   if(scene==='menu'){
     const items=MENU_ITEMS.filter(id=>id!==1||!!campaign),index=items.indexOf(menuSelected as typeof MENU_ITEMS[number]);
     if(direction===1||direction===3)menuSelected=items[(index+(direction===1?items.length-1:1))%items.length];
@@ -264,6 +268,7 @@ function moveFront(direction:number){
   else if(scene==='confirm'&&(direction===1||direction===3))pageSelected=1-pageSelected;
 }
 function enterFront(){
+  if(scene==='seal'&&sealUnlockWorld!==null)return;
   if(scene==='intro'){intro?.press();return;}
   if(scene==='demo'){demo?.press();return;}
   if(scene==='menu'){
@@ -298,6 +303,10 @@ function stepFront(){
     return;
   }
   const frame=input.read();
+  if(scene==='seal'&&sealUnlockWorld!==null){
+    if(++sealUnlockTick>=front.sealUnlockDuration()+30){sealUnlockWorld=null;sealUnlockTick=0;}
+    frontActionHeld=frame.action;return;
+  }
   if(scene==='map'&&mapTravel){
     mapTravel.step++;
     if(mapTravel.step>=mapTravel.steps){if(campaign){campaign.selected=mapTravel.to.level;saveCampaign();}mapTravel=null;}
@@ -316,11 +325,11 @@ function backPause(){
 function enterPause(){
   if(!simulation)return;
   if(pauseScene==='menu'){
-    const items=PAUSE_ITEMS.filter(id=>id!==49||campaignStage&&!!campaign&&simulation!.level.index!==13);
-    const selected=items[pauseSelected];
+    const selected=PAUSE_ITEMS[pauseSelected];
     if(selected===25){togglePause();return;}
     if(selected===2){pauseScene='options';pauseSelected=0;return;}
     if(selected===4){pauseScene='help';return;}
+    if(selected===49&&(!campaignStage||!campaign||simulation.level.index===13))return;
     pauseConfirmAction=selected===26?'restart':selected===49?'map':selected===27?'menu':'exit';
     pauseScene='confirm';pauseSelected=0;
   }else if(pauseScene==='options'){
@@ -338,7 +347,7 @@ function enterPause(){
 function stepPause(){
   const frame=input.read();if(pauseCooldown>0)pauseCooldown--;
   if(frame.direction&&pauseCooldown===0&&(frame.direction===1||frame.direction===3)){
-    const count=pauseScene==='menu'?PAUSE_ITEMS.filter(id=>id!==49||campaignStage&&!!campaign&&simulation?.level.index!==13).length:2;
+    const count=pauseScene==='menu'?PAUSE_ITEMS.length:2;
     if(pauseScene!=='help')pauseSelected=(pauseSelected+(frame.direction===1?count-1:1))%count;
     pauseCooldown=4;
   }
@@ -366,7 +375,7 @@ game.addEventListener('pointerup',event=>{
     if(!paused)return;
     if(y>303&&x<26){backPause();return;}
     if(pauseScene==='help'){backPause();return;}
-    const count=pauseScene==='menu'?PAUSE_ITEMS.filter(id=>id!==49||campaignStage&&!!campaign&&simulation?.level.index!==13).length:2;
+    const count=pauseScene==='menu'?PAUSE_ITEMS.length:2;
     const top=Math.floor(160-(count*15+3)/2),row=Math.floor((y-top)/15);
     if(row>=0&&row<count){pauseSelected=row;enterPause();}
     return;
@@ -440,7 +449,7 @@ $<HTMLInputElement>('rms-file').onchange=async e=>{
   try{if(file.size>1000)throw new Error('Forneça o payload do record 1, com até 1000 bytes; contêiner RMS não é aceito.');const save=new CanonicalSave(new Uint8Array(await file.arrayBuffer()));showRms(save);if(importRmsAsCampaign){const imported=campaignFromRecord(save,assets.worlds,assets.maps);campaign=validateCampaign(imported,assets.maps);saveCampaign();openMap(campaign.world);}}catch(error){$('rms-info').textContent=String(error);}finally{element.value='';}
 };
 inspection.onpointermove=e=>{if(view!=='levels')return;const rect=inspection.getBoundingClientRect(),x=Math.floor((e.clientX-rect.left)*inspection.width/rect.width/24),y=Math.floor((e.clientY-rect.top)*inspection.height/rect.height/24),l=selectedLevel(),i=x+y*l.width;$('hover-info').textContent=`(${x}, ${y}) · tile ${l.tiles[i]} · parâmetro ${l.parameters[i]} · objeto ${l.objects[i]}`;};
-document.addEventListener('visibilitychange',()=>{if(document.hidden){paused=true;clock.reset();input.clear();audio.stop();saveSession();}});
+document.addEventListener('visibilitychange',()=>{if(document.hidden){paused=true;pauseScene='menu';pauseSelected=0;clock.reset();input.clear();audio.stop();saveSession();}});
 window.addEventListener('pagehide',saveSession);
 function updateFullscreenScale(){game.style.setProperty('--fullscreen-scale',String(Math.max(1,Math.floor(Math.min(window.innerWidth/240,window.innerHeight/320)))));}
 window.addEventListener('resize',updateFullscreenScale);document.addEventListener('fullscreenchange',updateFullscreenScale);updateFullscreenScale();

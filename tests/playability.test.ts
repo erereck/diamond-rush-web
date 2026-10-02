@@ -123,11 +123,13 @@ test('the playability inventory covers all maps and every alternative exit witho
   assert.equal(report.counts.goals,47);
   for(const level of report.levels.filter(level=>level.goals.some(goal=>goal.kind==='secret')&&level.kind!=='secret')){
     assert.equal(level.goals.length,2);
-    assert.notEqual(level.status,'verified','no ordinary-exit replay may certify its secret exit');
+    if(level.status==='verified')assert.deepEqual(new Set(level.evidence.map(route=>route.goal)),new Set(['normal','secret']));
   }
   assert.equal(report.levels.find(level=>level.world===2&&level.level===10)!.status,'verified');
   assert.equal(report.counts.verifiedBosses,3);
-  assert.equal(report.counts.completedRoutes,12);
+  assert.equal(report.counts.completedRoutes,13);
+  assert.equal(report.counts.verifiedMaps,11);
+  assert.equal(report.levels.find(level=>level.world===0&&level.level===7)!.status,'verified');
   assert.equal(report.counts.campaignPrefixes,1);
   assert.equal(report.counts.campaignPrefixStages,9);
   assert.deepEqual(JSON.parse(readFileSync(new URL('../docs/PLAYABILITY.json',import.meta.url),'utf8')),report);
@@ -172,4 +174,14 @@ test('Angkor 8 opens both silver locks, defeats the snake room and weights the r
  assert.equal(runner.eventCounts['gold-gate'],1);
  assert.equal(runner.sim.exitObject,5);
  assert.equal(runner.sim.retries,1);
+});
+
+test('Angkor 8 revisit freezes its upper snake onto the plate and exits to the secret branch',()=>{
+ const runner=playRoute(fixtures.find(f=>f.name==='angkor-08-secret-ice.json')!.fixture,resources);
+ assert.equal(runner.sim.initial.weaponTier,8);
+ assert.equal(runner.eventCounts.freeze,1);
+ assert.equal(runner.sim.tile(7,4),9);
+ assert.equal(runner.sim.gatePhases[runner.sim.index(6,3)],3);
+ assert.equal(runner.sim.exitObject,28);
+ assert.equal(runner.sim.retries,0);
 });

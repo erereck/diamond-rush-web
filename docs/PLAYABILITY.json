@@ -7,9 +7,9 @@
     "playableStages": 40,
     "secretStages": 10,
     "goals": 47,
-    "verifiedMaps": 10,
+    "verifiedMaps": 11,
     "verifiedBosses": 3,
-    "completedRoutes": 12,
+    "completedRoutes": 13,
     "attemptedMaps": 0,
     "campaignPrefixes": 1,
     "campaignPrefixStages": 9
@@ -1050,7 +1050,7 @@
           "y": 19
         }
       ],
-      "status": "partial",
+      "status": "verified",
       "evidence": [
         {
           "file": "tests/fixtures/routes/angkor-08-normal.json",
@@ -1110,6 +1110,54 @@
             "enemy-hit": 3,
             "riddle-solved": 1,
             "gold-gate": 1,
+            "complete": 1
+          }
+        },
+        {
+          "file": "tests/fixtures/routes/angkor-08-secret-ice.json",
+          "world": 0,
+          "level": 7,
+          "goal": "secret",
+          "initial": {
+            "diamonds": 70,
+            "redDiamonds": 1,
+            "lives": 9,
+            "health": 2,
+            "weaponTier": 8
+          },
+          "outcome": {
+            "status": "complete",
+            "ticks": 791,
+            "x": -6,
+            "y": 3,
+            "exitObject": 28,
+            "diamonds": 70,
+            "redDiamonds": 1,
+            "lives": 9,
+            "health": 2,
+            "weaponTier": 8,
+            "hits": 2,
+            "retries": 0,
+            "opened": [
+              679
+            ],
+            "demos": [],
+            "bossHealth": null,
+            "bossCleared": false
+          },
+          "events": {
+            "grass": 2,
+            "hammer": 5,
+            "break": 3,
+            "boulder": 10,
+            "checkpoint": 1,
+            "chest": 1,
+            "chest-reward": 1,
+            "hurt": 2,
+            "enemy-death": 2,
+            "freeze": 1,
+            "gate-open": 1,
+            "gate-opening": 2,
             "complete": 1
           }
         }

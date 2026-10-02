@@ -13,7 +13,7 @@ import { GameSound, soundForEvents } from './platform/GameSound.ts';
 import { SESSION_KEY, validateReplay, restoreReplay } from './platform/Session.ts';
 import { CanonicalSave } from './platform/CanonicalSave.ts';
 import { campaignFromRecord, campaignRecord, campaignStageStart, completeCampaignLevel } from './platform/CanonicalCampaign.ts';
-import { CAMPAIGN_KEY, REWARD_FLAGS, adjacentNode, eligibleStageRewards, newCampaign, pendingRewards, unlockedNode, unlockedWorld, validateCampaign } from './core/Campaign.ts';
+import { CAMPAIGN_KEY, REWARD_FLAGS, adjacentNode, eligibleStageRewards, newCampaign, pendingRewards, unlockedMapPath, unlockedNode, unlockedWorld, validateCampaign } from './core/Campaign.ts';
 import type { Campaign } from './core/Campaign.ts';
 import { FrontEndRenderer, MENU_ITEMS, PAUSE_ITEMS } from './render/FrontEndRenderer.ts';
 import type { FrontScene, PauseScene } from './render/FrontEndRenderer.ts';
@@ -38,6 +38,7 @@ let simulation:Simulation|null=null,paused=false,ready=false,sceneTick=0,view:'l
 let scene:FrontScene|'playing'|'intro'|'demo'='menu',campaign:Campaign|null=null,menuSelected=0,sealSelected=0,storeSelected=0,storeMessage=0,storeToastTicks=0,pageSelected=0,soundEnabled=true,campaignStage=false,confirmExit=false,frontCooldown=0,frontActionHeld=false;
 let pauseScene:PauseScene='menu',pauseSelected=0,pauseConfirmAction:'restart'|'map'|'menu'|'exit'='restart',pauseCooldown=0,pauseActionHeld=false;
 let mapTravel:{from:MapNode;to:MapNode;step:number;steps:number}|null=null;
+let mapTravelQueue:MapNode[]=[];
 let sealUnlockWorld:1|2|null=null,sealUnlockTick=0;
 let creditsScroll=0;
 let locale:GameLocale=validLocale(localStorage.getItem(LANGUAGE_KEY));
@@ -72,7 +73,7 @@ function stageDemoTrigger(){
   const id=nextStageDemo(simulation,assets.demoScripts);
   if(id!==null)startStageDemo(id);
 }
-function openMap(world=campaign?.world??0){if(!campaign)return;campaign.world=world;campaign.selected=assets.maps[world].find(n=>n.level===campaign!.selected&&unlockedNode(campaign!,world,n,assets.maps))?.level??0;mapTravel=null;scene='map';simulation=null;campaignStage=false;paused=false;gameSound.stop();input.clear();clock.reset();frontCooldown=0;saveCampaign();game.focus();}
+function openMap(world=campaign?.world??0){if(!campaign)return;campaign.world=world;campaign.selected=assets.maps[world].find(n=>n.level===campaign!.selected&&unlockedNode(campaign!,world,n,assets.maps))?.level??0;mapTravel=null;mapTravelQueue=[];scene='map';simulation=null;campaignStage=false;paused=false;gameSound.stop();input.clear();clock.reset();frontCooldown=0;saveCampaign();game.focus();}
 function beginMapTravel(to:MapNode){
   if(!campaign||mapTravel)return;
   const from=assets.maps[campaign.world].find(n=>n.level===campaign!.selected);
@@ -315,7 +316,7 @@ function stepFront(){
   }
   if(scene==='map'&&mapTravel){
     mapTravel.step++;
-    if(mapTravel.step>=mapTravel.steps){if(campaign){campaign.selected=mapTravel.to.level;saveCampaign();}mapTravel=null;}
+    if(mapTravel.step>=mapTravel.steps){if(campaign){campaign.selected=mapTravel.to.level;saveCampaign();}mapTravel=null;const next=mapTravelQueue.shift();if(next)beginMapTravel(next);}
     frontActionHeld=frame.action;return;
   }
   if(scene==='store'&&storeToastTicks>0)storeToastTicks--;
@@ -398,7 +399,10 @@ game.addEventListener('pointerup',event=>{
   }else if(scene==='map'&&campaign){
     if(y>303&&x>180){backFront();return;}
     const node=front.nodeAt(campaign,x,y);
-    if(node&&!mapTravel&&unlockedNode(campaign,campaign.world,node,assets.maps)){if(campaign.selected===node.level)startSelected();else beginMapTravel(node);}
+    if(node&&!mapTravel&&unlockedNode(campaign,campaign.world,node,assets.maps)){
+      if(campaign.selected===node.level)startSelected();
+      else {const path=unlockedMapPath(campaign,node,assets.maps);if(path?.length){mapTravelQueue=path.slice(1);beginMapTravel(path[0]);}}
+    }
   }else if(scene==='seal'){
     const item=x<119&&y<139?0:x>=119&&y<139?1:y<180&&x<137?2:3;
     sealSelected=item;enterFront();

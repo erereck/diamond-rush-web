@@ -2,7 +2,7 @@ import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
 import type { MapNode } from '../src/level/LevelParser.ts';
-import { adjacentNode, finishLevel, newCampaign, pendingRewards, unlockedNode, unlockedWorld, validateCampaign } from '../src/core/Campaign.ts';
+import { adjacentNode, finishLevel, newCampaign, pendingRewards, unlockedMapPath, unlockedNode, unlockedWorld, validateCampaign } from '../src/core/Campaign.ts';
 
 const maps=[0,1,2].map(w=>JSON.parse(readFileSync(new URL(`../public/assets/map-${w}.json`,import.meta.url),'utf8')) as MapNode[]);
 test('map navigation follows original links and completed stages unlock neighbors',()=>{
@@ -15,6 +15,13 @@ test('map navigation follows original links and completed stages unlock neighbor
   c.selected=1;
   assert.equal(adjacentNode(c,4,maps)?.level,0);
   assert.equal(adjacentNode(c,2,maps),null);
+});
+test('touch navigation follows accessible map links instead of cutting across the world',()=>{
+  const c=newCampaign();c.completed[0]=[0,1,2];
+  assert.deepEqual(unlockedMapPath(c,maps[0][3],maps)?.map(node=>node.level),[1,2,3]);
+  assert.equal(unlockedMapPath(c,maps[0][4],maps),null);
+  const secret=maps[0].find(node=>node.type===1)!;
+  assert.equal(unlockedMapPath(c,secret,maps),null);
 });
 test('world access and saved campaign validation cannot skip locked maps',()=>{
   let c=newCampaign();

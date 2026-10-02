@@ -56,6 +56,27 @@ export function adjacentNode(c:Campaign,direction:Direction,maps:MapNode[][]):Ma
   directed.sort((a,b)=>Math.hypot(a.x-from.x,a.y-from.y)-Math.hypot(b.x-from.x,b.y-from.y));
   return directed[0]??null;
 }
+/** A touch destination must follow the same unlocked links as directional map input. */
+export function unlockedMapPath(c:Campaign,target:MapNode,maps:MapNode[][]):MapNode[]|null {
+  const nodes=maps[c.world]??[],start=nodes.find(node=>node.level===c.selected);
+  if(!start||!unlockedNode(c,c.world,target,maps))return null;
+  if(start.level===target.level)return [];
+  const previous=new Map<number,number>([[start.level,start.level]]),queue=[start];
+  for(let head=0;head<queue.length;head++){
+    const current=queue[head];
+    for(const link of current.links){
+      const next=nodes.find(node=>node.x===link.x&&node.y===link.y);
+      if(!next||previous.has(next.level)||!unlockedNode(c,c.world,next,maps))continue;
+      previous.set(next.level,current.level);queue.push(next);
+      if(next.level===target.level){
+        const path:MapNode[]=[];let level=target.level;
+        while(level!==start.level){path.unshift(nodes.find(node=>node.level===level)!);level=previous.get(level)!;}
+        return path;
+      }
+    }
+  }
+  return null;
+}
 export function finishLevel(c:Campaign,world:number,level:number,resources:StageStart,awarded=0,secretExit=false,maps?:MapNode[][]):Campaign {
   const completed=c.completed.map(levels=>[...levels]);
   if(!completed[world].includes(level))completed[world].push(level);

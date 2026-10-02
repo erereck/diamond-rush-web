@@ -9,7 +9,8 @@
     "angkor-03-normal.json",
     "angkor-04-hammer-normal.json",
     "angkor-05-normal.json",
-    "angkor-06-normal.json"
+    "angkor-06-normal.json",
+    "angkor-07-normal.json"
   ],
   "expected": {
     "stages": [
@@ -261,6 +262,40 @@
           "bossCleared": false
         },
         "awards": 40
+      },
+      {
+        "file": "angkor-07-normal.json",
+        "world": 0,
+        "level": 6,
+        "initial": {
+          "diamonds": 68,
+          "redDiamonds": 1,
+          "lives": 8,
+          "health": 1,
+          "weaponTier": 1
+        },
+        "outcome": {
+          "status": "complete",
+          "ticks": 1205,
+          "x": 32,
+          "y": 4,
+          "exitObject": 5,
+          "diamonds": 70,
+          "redDiamonds": 1,
+          "lives": 8,
+          "health": 2,
+          "weaponTier": 1,
+          "hits": 2,
+          "retries": 0,
+          "opened": [
+            306,
+            552
+          ],
+          "demos": [],
+          "bossHealth": null,
+          "bossCleared": false
+        },
+        "awards": 32
       }
     ],
     "completed": [
@@ -270,7 +305,8 @@
         2,
         3,
         4,
-        5
+        5,
+        6
       ],
       [],
       []
@@ -282,16 +318,17 @@
         32,
         0,
         0,
-        40
+        40,
+        32
       ],
       [],
       []
     ],
     "resources": {
-      "diamonds": 68,
+      "diamonds": 70,
       "redDiamonds": 1,
-      "lives": 8,
-      "health": 1,
+      "lives": 9,
+      "health": 2,
       "weaponTier": 1
     },
     "unlocked": [
@@ -302,7 +339,8 @@
         3,
         4,
         5,
-        6
+        6,
+        7
       ],
       [],
       []
@@ -352,8 +390,16 @@
         "cells": [
           172
         ]
+      },
+      {
+        "world": 0,
+        "level": 6,
+        "cells": [
+          306,
+          552
+        ]
       }
     ],
-    "recordHash": "0fdedd148887f46d743740f24304c43349fe0f836d2432717b10f6baebe7b5e0"
+    "recordHash": "63fe95a77c752bcc13e93a811b49d0dd46c8135536f2ceb8699c023fd10ab5b9"
   }
 }

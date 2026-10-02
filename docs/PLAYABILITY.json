@@ -9,10 +9,10 @@
     "goals": 47,
     "verifiedMaps": 10,
     "verifiedBosses": 3,
-    "completedRoutes": 10,
+    "completedRoutes": 11,
     "attemptedMaps": 0,
     "campaignPrefixes": 1,
-    "campaignPrefixStages": 6
+    "campaignPrefixStages": 7
   },
   "campaignPrefixes": [
     {
@@ -266,6 +266,40 @@
             "bossCleared": false
           },
           "awards": 40
+        },
+        {
+          "file": "angkor-07-normal.json",
+          "world": 0,
+          "level": 6,
+          "initial": {
+            "diamonds": 68,
+            "redDiamonds": 1,
+            "lives": 8,
+            "health": 1,
+            "weaponTier": 1
+          },
+          "outcome": {
+            "status": "complete",
+            "ticks": 1205,
+            "x": 32,
+            "y": 4,
+            "exitObject": 5,
+            "diamonds": 70,
+            "redDiamonds": 1,
+            "lives": 8,
+            "health": 2,
+            "weaponTier": 1,
+            "hits": 2,
+            "retries": 0,
+            "opened": [
+              306,
+              552
+            ],
+            "demos": [],
+            "bossHealth": null,
+            "bossCleared": false
+          },
+          "awards": 32
         }
       ],
       "completed": [
@@ -275,7 +309,8 @@
           2,
           3,
           4,
-          5
+          5,
+          6
         ],
         [],
         []
@@ -287,16 +322,17 @@
           32,
           0,
           0,
-          40
+          40,
+          32
         ],
         [],
         []
       ],
       "resources": {
-        "diamonds": 68,
+        "diamonds": 70,
         "redDiamonds": 1,
-        "lives": 8,
-        "health": 1,
+        "lives": 9,
+        "health": 2,
         "weaponTier": 1
       },
       "unlocked": [
@@ -307,7 +343,8 @@
           3,
           4,
           5,
-          6
+          6,
+          7
         ],
         [],
         []
@@ -357,9 +394,17 @@
           "cells": [
             172
           ]
+        },
+        {
+          "world": 0,
+          "level": 6,
+          "cells": [
+            306,
+            552
+          ]
         }
       ],
-      "recordHash": "0fdedd148887f46d743740f24304c43349fe0f836d2432717b10f6baebe7b5e0"
+      "recordHash": "63fe95a77c752bcc13e93a811b49d0dd46c8135536f2ceb8699c023fd10ab5b9"
     }
   ],
   "levels": [
@@ -832,8 +877,64 @@
           "y": 40
         }
       ],
-      "status": "unverified",
-      "evidence": [],
+      "status": "partial",
+      "evidence": [
+        {
+          "file": "tests/fixtures/routes/angkor-07-normal.json",
+          "world": 0,
+          "level": 6,
+          "goal": "normal",
+          "initial": {
+            "diamonds": 68,
+            "redDiamonds": 1,
+            "lives": 8,
+            "health": 1,
+            "weaponTier": 1
+          },
+          "outcome": {
+            "status": "complete",
+            "ticks": 1205,
+            "x": 32,
+            "y": 4,
+            "exitObject": 5,
+            "diamonds": 70,
+            "redDiamonds": 1,
+            "lives": 8,
+            "health": 2,
+            "weaponTier": 1,
+            "hits": 2,
+            "retries": 0,
+            "opened": [
+              306,
+              552
+            ],
+            "demos": [],
+            "bossHealth": null,
+            "bossCleared": false
+          },
+          "events": {
+            "grass": 5,
+            "chest": 2,
+            "chest-reward": 2,
+            "checkpoint": 3,
+            "hammer": 6,
+            "break": 2,
+            "hurt": 2,
+            "gate-close": 2,
+            "riddle": 1,
+            "enemy-hit": 3,
+            "enemy-death": 1,
+            "gate-open": 4,
+            "riddle-solved": 1,
+            "gate-opening": 8,
+            "diamond": 2,
+            "hammer-block": 1,
+            "boulder": 10,
+            "gold-gate": 1,
+            "complete": 1
+          }
+        }
+      ],
       "pendingAttempts": [],
       "reviews": []
     },

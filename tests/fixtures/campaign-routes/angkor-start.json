@@ -10,7 +10,9 @@
     "angkor-04-hammer-normal.json",
     "angkor-05-normal.json",
     "angkor-06-normal.json",
-    "angkor-07-normal.json"
+    "angkor-07-normal.json",
+    "angkor-08-normal.json",
+    "angkor-boss-crystal.json"
   ],
   "expected": {
     "stages": [
@@ -296,6 +298,78 @@
           "bossCleared": false
         },
         "awards": 32
+      },
+      {
+        "file": "angkor-08-normal.json",
+        "world": 0,
+        "level": 7,
+        "initial": {
+          "diamonds": 70,
+          "redDiamonds": 1,
+          "lives": 9,
+          "health": 2,
+          "weaponTier": 1
+        },
+        "outcome": {
+          "status": "complete",
+          "ticks": 2867,
+          "x": -6,
+          "y": 19,
+          "exitObject": 5,
+          "diamonds": 82,
+          "redDiamonds": 1,
+          "lives": 8,
+          "health": 1,
+          "weaponTier": 1,
+          "hits": 6,
+          "retries": 1,
+          "opened": [
+            334,
+            679,
+            900,
+            1181
+          ],
+          "demos": [],
+          "bossHealth": null,
+          "bossCleared": false
+        },
+        "awards": 0
+      },
+      {
+        "file": "angkor-boss-crystal.json",
+        "world": 0,
+        "level": 8,
+        "initial": {
+          "diamonds": 82,
+          "redDiamonds": 1,
+          "lives": 8,
+          "health": 1,
+          "weaponTier": 1
+        },
+        "outcome": {
+          "status": "complete",
+          "ticks": 1121,
+          "x": 27,
+          "y": 6,
+          "exitObject": 0,
+          "diamonds": 82,
+          "redDiamonds": 1,
+          "lives": 8,
+          "health": 1,
+          "weaponTier": 1,
+          "hits": 0,
+          "retries": 0,
+          "opened": [
+            237
+          ],
+          "demos": [
+            33,
+            32
+          ],
+          "bossHealth": 0,
+          "bossCleared": true
+        },
+        "awards": 60
       }
     ],
     "completed": [
@@ -306,7 +380,9 @@
         3,
         4,
         5,
-        6
+        6,
+        7,
+        8
       ],
       [],
       []
@@ -319,16 +395,18 @@
         0,
         0,
         40,
-        32
+        32,
+        0,
+        60
       ],
       [],
       []
     ],
     "resources": {
-      "diamonds": 70,
+      "diamonds": 82,
       "redDiamonds": 1,
-      "lives": 9,
-      "health": 2,
+      "lives": 12,
+      "health": 1,
       "weaponTier": 1
     },
     "unlocked": [
@@ -340,7 +418,8 @@
         4,
         5,
         6,
-        7
+        7,
+        8
       ],
       [],
       []
@@ -398,8 +477,25 @@
           306,
           552
         ]
+      },
+      {
+        "world": 0,
+        "level": 7,
+        "cells": [
+          334,
+          679,
+          900,
+          1181
+        ]
+      },
+      {
+        "world": 0,
+        "level": 8,
+        "cells": [
+          237
+        ]
       }
     ],
-    "recordHash": "63fe95a77c752bcc13e93a811b49d0dd46c8135536f2ceb8699c023fd10ab5b9"
+    "recordHash": "16b690e2380b99ef57e0236046d4668c15cf8d6b5d2636f35e2c9fa8d5fcb683"
   }
 }

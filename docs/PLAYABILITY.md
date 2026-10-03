@@ -28,7 +28,7 @@ O executor aceita somente direção, ação e retorno ao checkpoint. Diálogos e
 | Angkor 12 · secreta (11) | Saída secreta (35,25) | Ainda não verificada | — |
 | Angkor 13 · secreta (12) | Saída secreta (39,27) | Ainda não verificada | — |
 | Introdução (13) | Tutorial (61,3) | Percurso aprovado · [1428 ticks](../tests/fixtures/routes/angkor-introduction.json) | — |
-| Bavaria 1 (0) | Saída comum (35,20) | Tentativa pendente · [tentativa em (16,11)](../tests/fixtures/route-attempts/bavaria-01-two-crushers.json) | — |
+| Bavaria 1 (0) | Saída comum (35,20) | Tentativa pendente · [tentativa em (23,14)](../tests/fixtures/route-attempts/bavaria-01-brick-shaft.json), [tentativa em (16,11)](../tests/fixtures/route-attempts/bavaria-01-two-crushers.json) | — |
 | Bavaria 2 (1) | Saída comum (34,6) | Ainda não verificada | — |
 | Bavaria 3 (2) | Saída comum (25,17) | Ainda não verificada | — |
 | Bavaria 4 (3) | Saída comum (36,6); Saída secreta (2,10) | Ainda não verificada | — |

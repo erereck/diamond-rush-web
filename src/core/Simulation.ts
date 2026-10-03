@@ -955,7 +955,6 @@ export class Simulation {
     this.diamonds+=amount;
     if(this.magicLockCell<0||this.magicLockRemaining<=0)return;
     this.magicLockRemaining=Math.max(0,this.magicLockRemaining-amount);
-    if(this.magicLockRemaining===0)this.events.push('magic-lock-open');
   }
   /** cGame.method_322 converts a field health pickup into ten diamonds at full health. */
   private collectHealthOrDiamonds(){

@@ -946,7 +946,6 @@
             "checkpoint": 1,
             "chest": 1,
             "chest-reward": 1,
-            "magic-lock-open": 1,
             "complete": 1
           }
         }
@@ -1511,6 +1510,48 @@
       "status": "attempted",
       "evidence": [],
       "pendingAttempts": [
+        {
+          "file": "tests/fixtures/route-attempts/bavaria-01-brick-shaft.json",
+          "world": 1,
+          "level": 0,
+          "goal": "normal",
+          "initial": {
+            "diamonds": 82,
+            "redDiamonds": 10,
+            "lives": 12,
+            "health": 4,
+            "weaponTier": 1
+          },
+          "outcome": {
+            "status": "playing",
+            "ticks": 640,
+            "x": 23,
+            "y": 14,
+            "exitObject": 0,
+            "diamonds": 92,
+            "redDiamonds": 10,
+            "lives": 12,
+            "health": 1,
+            "weaponTier": 1,
+            "hits": 3,
+            "retries": 0,
+            "opened": [],
+            "demos": [],
+            "bossHealth": null,
+            "bossCleared": false
+          },
+          "events": {
+            "grass": 8,
+            "diamond": 10,
+            "boulder": 9,
+            "checkpoint": 2,
+            "hurt": 3,
+            "enemy-death": 4,
+            "crusher-break": 2,
+            "hammer": 1,
+            "break": 1
+          }
+        },
         {
           "file": "tests/fixtures/route-attempts/bavaria-01-two-crushers.json",
           "world": 1,

@@ -48,6 +48,20 @@ test('all Bavaria stages load their source diamond-lock thresholds',()=>{
     assert.equal(s.magicLockCell>=0,threshold>0);
   }
 });
+test('Bavaria lock count includes ten-gem chest and full-health conversion awards',()=>{
+  for(const chest of [false,true]){
+    const level=fixture(['######','#@   #','######']);level.world=1;
+    const reward=level.width+2,lock=level.width+3;
+    level.tiles[reward]=chest?41:7;
+    if(chest){level.objects[reward]=33;level.parameters[reward]=10;}
+    level.tiles[lock]=12;level.parameters[lock]=10;
+    const sim=new Simulation(level,{diamonds:0,redDiamonds:0,health:4,lives:5});
+    step(sim,2,4);
+    if(chest){while(!sim.opened.has(reward))step(sim);}
+    assert.equal(sim.diamonds,10);
+    assert.equal(sim.magicLockRemaining,0);
+  }
+});
 test('wall collision and cleared grass preserve data definitions',()=>{
   const level=fixture(['#####','#@g##','#####']),s=new Simulation(level);step(s,2,8);assert.equal(s.player.x,2);assert.equal(s.tile(2,1),-1);assert.equal(level.tiles[7],10);
 });

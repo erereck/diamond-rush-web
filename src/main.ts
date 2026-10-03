@@ -222,8 +222,17 @@ function drawGame(){
   let healthX=87;sprites.module(ctx,hud,cap,healthX,291);healthX+=hud.modules[cap].width;
   for(let i=0;i<s.maxHealth;i++){sprites.module(ctx,hud,i<s.health?filled:empty,healthX,291);healthX+=hud.modules[15].width;}
   sprites.module(ctx,hud,low?18:17,healthX,291);
-  hudNumber(hud,s.diamonds,190,308);hudNumber(hud,s.redDiamonds,227,308);
+  // cGame.collectedDiamonds and collectedRedDiamonds are stage-local; the RMS
+  // carries the lifetime totals separately.
+  hudNumber(hud,Math.max(0,s.diamonds-s.initial.diamonds),190,308);
+  hudNumber(hud,Math.max(0,s.redDiamonds-s.initial.redDiamonds),227,308);
   hudNumber(hud,s.lives,91,18);hudNumber(hud,s.goldKeys,167,18);hudNumber(hud,s.silverKeys,207,18);
+  if(s.magicLockCell>=0&&s.magicLockRemaining>0){
+    // The original cm.f/5 lock is composed from modules 1 and 0.
+    const lock=assets.sprite('cm-5');
+    sprites.module(ctx,lock,1,113,2);sprites.module(ctx,lock,0,110,9);
+    hudNumber(hud,s.magicLockRemaining,131,22);
+  }
   drawRiddleHint(ctx,s,assets,sprites);
   if(stageIntroTicks>0){
     const progress=60-stageIntroTicks,slide=progress<15?Math.round((15-progress)*16):stageIntroTicks<15?Math.round((15-stageIntroTicks)*16):0;

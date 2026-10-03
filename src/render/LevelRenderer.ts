@@ -86,6 +86,13 @@ export class LevelRenderer {
         const visual=scotlandExplosiveVisual(sim?.state[i]??(level.parameters[i]===1?16:0),motion,tick);
         if(visual)r.module(ctx,a.sprite('gen1-4'),visual.module,x*24+visual.x,y*24+visual.y);
       } else if(t===6||t===7)r.module(ctx,a.sprite('cm-4'),t===6?0:1,px,py);
+      else if(t===12){
+        // cGame.method_162 composes the magic padlock from cm.f/5 modules.
+        const lock=a.sprite('cm-5'),digits=a.sprite('ui-2');
+        r.module(ctx,lock,1,px+6,py);r.module(ctx,lock,0,px+3,py+7);
+        const remaining=sim?.magicLockRemaining??level.parameters[i];let right=px+21;
+        for(let n=remaining;n>0;n=Math.floor(n/10)){const digit=n%10;right-=digits.modules[digit].width;r.module(ctx,digits,digit,right,py+13);}
+      }
       else if(t===30)frame('gen0-7',Math.min(7,Math.floor(Math.max(0,(sim?.state[i]??0)-1)*7/16)),px,py);
       else if(t===36){
         const sprite=a.sprite('gen0-8'),animation=sprite.animations[(sim?.state[i]??level.parameters[i])===1?1:0];

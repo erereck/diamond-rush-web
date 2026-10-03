@@ -946,6 +946,7 @@
             "checkpoint": 1,
             "chest": 1,
             "chest-reward": 1,
+            "magic-lock-open": 1,
             "complete": 1
           }
         }

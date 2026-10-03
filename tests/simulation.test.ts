@@ -31,6 +31,23 @@ test('movement advances a 24-pixel tile in four simulation ticks',()=>{
   const s=new Simulation(fixture(['#######','#@    #','#######']));step(s,2);assert.equal(s.player.x,2);assert.equal(s.player.offset,18);
   step(s,2,3);assert.equal(s.player.x,2);assert.equal(s.player.offset,0);step(s,2);assert.equal(s.player.x,3);
 });
+test('Bavaria tile 12 tracks its own diamond count and checkpoint return',()=>{
+  const level=fixture(['########','#@*    #','#      #','########']);
+  level.world=1;const lock=2+2*level.width;level.tiles[lock]=12;level.parameters[lock]=1;
+  const s=new Simulation(level,{diamonds:82,redDiamonds:10,lives:5,health:4});
+  assert.equal(s.magicLockCell,lock);assert.equal(s.magicLockRemaining,1);assert.equal(s.tile(2,2),-1);
+  step(s,2,4);assert.equal(s.diamonds,83);assert.equal(s.magicLockRemaining,0);assert.equal(s.tile(2,2),-1);
+  s.restoreCheckpoint();assert.equal(s.diamonds,82);assert.equal(s.magicLockRemaining,1);assert.equal(s.tile(2,2),-1);
+});
+test('all Bavaria stages load their source diamond-lock thresholds',()=>{
+  const world=parseWorld(readFileSync(new URL('../../../work/reference-s700/res/w1.bin',import.meta.url)),1);
+  const thresholds=[30,35,40,45,55,60,65,70,75,0,25,85,10];
+  for(const [index,threshold] of thresholds.entries()){
+    const s=new Simulation(world.levels[index]);
+    assert.equal(s.magicLockRemaining,threshold,`Bavaria ${index+1}`);
+    assert.equal(s.magicLockCell>=0,threshold>0);
+  }
+});
 test('wall collision and cleared grass preserve data definitions',()=>{
   const level=fixture(['#####','#@g##','#####']),s=new Simulation(level);step(s,2,8);assert.equal(s.player.x,2);assert.equal(s.tile(2,1),-1);assert.equal(level.tiles[7],10);
 });

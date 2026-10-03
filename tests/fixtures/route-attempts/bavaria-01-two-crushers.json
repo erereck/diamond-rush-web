@@ -1,0 +1,257 @@
+{
+  "version": 1,
+  "engine": "fidelity-24",
+  "levelFingerprint": "b307453d",
+  "world": 1,
+  "level": 0,
+  "kind": "stage",
+  "scope": "isolated-stage",
+  "initial": {
+    "diamonds": 82,
+    "redDiamonds": 10,
+    "lives": 12,
+    "health": 4,
+    "weaponTier": 1
+  },
+  "provenance": "Control-only Bavaria 1 investigation: the first two falling-stone crusher pairs break, and the second checkpoint is reached.",
+  "controls": [
+    {
+      "ticks": 21,
+      "direction": 2,
+      "action": false
+    },
+    {
+      "ticks": 3,
+      "direction": 0,
+      "action": false
+    },
+    {
+      "ticks": 1,
+      "direction": 3,
+      "action": false
+    },
+    {
+      "ticks": 8,
+      "direction": 2,
+      "action": false
+    },
+    {
+      "ticks": 4,
+      "direction": 1,
+      "action": false
+    },
+    {
+      "ticks": 3,
+      "direction": 0,
+      "action": false
+    },
+    {
+      "ticks": 22,
+      "direction": 2,
+      "action": false
+    },
+    {
+      "ticks": 8,
+      "direction": 1,
+      "action": false
+    },
+    {
+      "ticks": 16,
+      "direction": 2,
+      "action": false
+    },
+    {
+      "ticks": 3,
+      "direction": 0,
+      "action": false
+    },
+    {
+      "ticks": 1,
+      "direction": 2,
+      "action": false
+    },
+    {
+      "ticks": 4,
+      "direction": 1,
+      "action": false
+    },
+    {
+      "ticks": 24,
+      "direction": 2,
+      "action": false
+    },
+    {
+      "ticks": 3,
+      "direction": 0,
+      "action": false
+    },
+    {
+      "ticks": 1,
+      "direction": 4,
+      "action": false
+    },
+    {
+      "ticks": 33,
+      "direction": 0,
+      "action": false
+    },
+    {
+      "ticks": 5,
+      "direction": 3,
+      "action": false
+    },
+    {
+      "ticks": 3,
+      "direction": 0,
+      "action": false
+    },
+    {
+      "ticks": 30,
+      "direction": 2,
+      "action": false
+    },
+    {
+      "ticks": 4,
+      "direction": 1,
+      "action": false
+    },
+    {
+      "ticks": 3,
+      "direction": 0,
+      "action": false
+    },
+    {
+      "ticks": 13,
+      "direction": 1,
+      "action": false
+    },
+    {
+      "ticks": 4,
+      "direction": 2,
+      "action": false
+    },
+    {
+      "ticks": 8,
+      "direction": 1,
+      "action": false
+    },
+    {
+      "ticks": 4,
+      "direction": 4,
+      "action": false
+    },
+    {
+      "ticks": 20,
+      "direction": 1,
+      "action": false
+    },
+    {
+      "ticks": 3,
+      "direction": 0,
+      "action": false
+    },
+    {
+      "ticks": 21,
+      "direction": 4,
+      "action": false
+    },
+    {
+      "ticks": 4,
+      "direction": 3,
+      "action": false
+    },
+    {
+      "ticks": 5,
+      "direction": 4,
+      "action": false
+    },
+    {
+      "ticks": 8,
+      "direction": 3,
+      "action": false
+    },
+    {
+      "ticks": 24,
+      "direction": 4,
+      "action": false
+    },
+    {
+      "ticks": 4,
+      "direction": 3,
+      "action": false
+    },
+    {
+      "ticks": 4,
+      "direction": 4,
+      "action": false
+    },
+    {
+      "ticks": 3,
+      "direction": 0,
+      "action": false
+    },
+    {
+      "ticks": 1,
+      "direction": 4,
+      "action": false
+    },
+    {
+      "ticks": 3,
+      "direction": 0,
+      "action": false
+    },
+    {
+      "ticks": 25,
+      "direction": 4,
+      "action": false
+    },
+    {
+      "ticks": 1,
+      "direction": 3,
+      "action": false
+    },
+    {
+      "ticks": 3,
+      "direction": 0,
+      "action": false
+    },
+    {
+      "ticks": 1,
+      "direction": 4,
+      "action": false
+    },
+    {
+      "ticks": 3,
+      "direction": 0,
+      "action": false
+    },
+    {
+      "ticks": 8,
+      "direction": 2,
+      "action": false
+    },
+    {
+      "ticks": 35,
+      "direction": 0,
+      "action": false
+    }
+  ],
+  "expected": {
+    "status": "playing",
+    "ticks": 405,
+    "x": 16,
+    "y": 11,
+    "exitObject": 0,
+    "diamonds": 88,
+    "redDiamonds": 10,
+    "lives": 12,
+    "health": 2,
+    "weaponTier": 1,
+    "hits": 2,
+    "retries": 0,
+    "opened": [],
+    "demos": [],
+    "bossHealth": null,
+    "bossCleared": false
+  }
+}

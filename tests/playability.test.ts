@@ -130,11 +130,11 @@ test('the playability inventory covers all maps and every alternative exit witho
   }
   assert.equal(report.levels.find(level=>level.world===2&&level.level===10)!.status,'verified');
   assert.equal(report.counts.verifiedBosses,3);
-  assert.equal(report.counts.completedRoutes,13);
-  assert.equal(report.counts.verifiedMaps,11);
+  assert.equal(report.counts.completedRoutes,14);
+  assert.equal(report.counts.verifiedMaps,12);
   assert.equal(report.levels.find(level=>level.world===0&&level.level===7)!.status,'verified');
   const seventh=report.levels.find(level=>level.world===0&&level.level===6)!;
-  assert.equal(seventh.status,'partial');
+  assert.equal(seventh.status,'verified');
   assert.equal(seventh.pendingAttempts[0]?.file,'tests/fixtures/route-attempts/angkor-07-secret-hook-plate.json');
   assert.equal(report.counts.campaignPrefixes,1);
   assert.equal(report.counts.campaignPrefixStages,9);
@@ -167,6 +167,26 @@ test('Angkor 7 weights its plate with a boulder, wins the snake room, obtains th
  assert.equal(runner.sim.gatePhases[runner.sim.index(19,11)],3);
  assert.equal(runner.sim.exitObject,5);
  assert.equal(runner.sim.retries,0);
+});
+
+test('Angkor 7 revisit clears both corridor boulders and opens the secret branch',()=>{
+ const runner=playRoute(fixtures.find(f=>f.name==='angkor-07-secret-hook.json')!.fixture,resources);
+ assert.equal(completedRoute(runner),true);
+ assert.equal(runner.sim.initial.weaponTier,2);
+ assert.equal(runner.sim.tile(9,43),0);
+ assert.equal(runner.sim.tile(1,42),0);
+ assert.equal(runner.sim.gatePhases[runner.sim.index(13,42)],3);
+ assert.ok(runner.eventCounts['hook-pull']>=4);
+ assert.equal(runner.sim.exitObject,28);
+ const revisiting=newCampaign();
+ revisiting.completed[0]=[0,1,2,3,4,5,6];
+ revisiting.selected=6;
+ revisiting.resources={...runner.sim.initial};
+ const saved=completeCampaignLevel(revisiting,runner.sim,resources.worlds,resources.maps);
+ assert.equal(saved.selected,9);
+ assert.deepEqual(saved.secretUnlocked[0],[9]);
+ const restored=validateCampaign(campaignFromRecord(campaignRecord(saved,resources.worlds,resources.maps),resources.worlds,resources.maps),resources.maps);
+ assert.deepEqual(restored.secretUnlocked[0],[9]);
 });
 
 test('Angkor 8 opens both silver locks, defeats the snake room and weights the right gate',()=>{

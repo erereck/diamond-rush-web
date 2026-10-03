@@ -176,6 +176,20 @@ test('Bavaria paired crusher copies its upper half and attacks after approaching
   assert.equal(sim.motion[upper],11);
   sim.restoreCheckpoint();assert.equal(sim.motion[lower],0);assert.equal(sim.tiles[upper],16);
 });
+test('a descending boulder destroys both Bavaria crusher halves and checkpoint restores them',()=>{
+  const sim=new Simulation(worlds[1].levels[0]);
+  const rock=sim.index(27,18),upper=sim.index(27,19),lower=sim.index(27,20);
+  assert.equal(sim.tile(27,19),16);assert.equal(sim.tile(27,20),16);
+  sim.tiles[rock]=0;sim.state[rock]=0;sim.motion[rock]=0;
+  sim.updateCrusher(27,19);
+  assert.equal(sim.tile(27,19),16,'a resting stone does not break the crusher');
+  sim.state[rock]=3;sim.motion[rock]=6;
+  sim.updateCrusher(27,19);
+  assert.equal(sim.tile(27,19),-1);assert.equal(sim.tile(27,20),-1);
+  assert.equal(sim.events.at(-1),'crusher-break');
+  sim.restoreCheckpoint();
+  assert.equal(sim.tile(27,19),16);assert.equal(sim.tile(27,20),16);
+});
 test('Tibet ceiling stone warns, falls, injures and shatters',()=>{
   const level=fixture(['#####','#   #','#   #','# @ #','#####']);
   level.world=2;level.tiles[7]=44;

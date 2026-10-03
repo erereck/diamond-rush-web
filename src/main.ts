@@ -41,6 +41,7 @@ let pauseScene:PauseScene='menu',pauseSelected=0,pauseConfirmAction:'restart'|'m
 let mapTravel:{from:MapNode;to:MapNode;step:number;steps:number}|null=null;
 let mapTravelQueue:MapNode[]=[];
 let sealUnlockWorld:1|2|null=null,sealUnlockTick=0;
+let mapUnlockNotice:1|2|null=null,mapUnlockNoticeTicks=0;
 let creditsScroll=0;
 let locale:GameLocale=validLocale(localStorage.getItem(LANGUAGE_KEY));
 let intro:IntroSequence|null=null,demo:IntroSequence|null=null,stageIntroTicks=0;
@@ -57,6 +58,7 @@ function saveCampaign(){if(campaign)try{campaign.canonicalRecord=[...campaignRec
 function openMenu(){scene='menu';simulation=null;campaignStage=false;paused=false;audio.stop();gameSound.stop();void gameSound.play(19);input.clear();clock.reset();frontCooldown=0;menuSelected=campaign?1:0;}
 function openSeal(){
   if(!campaign)return;
+  mapUnlockNotice=null;mapUnlockNoticeTicks=0;
   const save=campaignRecord(campaign,assets.worlds,assets.maps);
   sealUnlockWorld=null;sealUnlockTick=0;
   for(const w of [1,2] as const)if(unlockedWorld(campaign,w,assets.maps)&&!(save.sealFlags&(w===1?1:2))){save.discoverSealWorld(w);sealSelected=w;sealUnlockWorld=w;}
@@ -74,7 +76,7 @@ function stageDemoTrigger(){
   const id=nextStageDemo(simulation,assets.demoScripts);
   if(id!==null)startStageDemo(id);
 }
-function openMap(world=campaign?.world??0){if(!campaign)return;campaign.world=world;campaign.selected=assets.maps[world].find(n=>n.level===campaign!.selected&&unlockedNode(campaign!,world,n,assets.maps))?.level??0;mapTravel=null;mapTravelQueue=[];scene='map';simulation=null;campaignStage=false;paused=false;gameSound.stop();input.clear();clock.reset();frontCooldown=0;saveCampaign();game.focus();}
+function openMap(world=campaign?.world??0){if(!campaign)return;mapUnlockNotice=null;mapUnlockNoticeTicks=0;campaign.world=world;campaign.selected=assets.maps[world].find(n=>n.level===campaign!.selected&&unlockedNode(campaign!,world,n,assets.maps))?.level??0;mapTravel=null;mapTravelQueue=[];scene='map';simulation=null;campaignStage=false;paused=false;gameSound.stop();input.clear();clock.reset();frontCooldown=0;saveCampaign();game.focus();}
 function beginMapTravel(to:MapNode){
   if(!campaign||mapTravel)return;
   const from=assets.maps[campaign.world].find(n=>n.level===campaign!.selected);
@@ -90,7 +92,16 @@ function mapTravelCursor(){
 function start(l=assets.worlds[0].levels[0],initial?:StageStart,fromCampaign=false){simulation=new Simulation(l,initial);scene='playing';campaignStage=fromCampaign;paused=false;stageIntroTicks=60;gameSound.stop();void gameSound.play(16+l.world);results.reset();clock.reset();input.clear();lastError='';$('pause').textContent='Ⅱ';$('next-level').hidden=true;game.focus();saveSession();}
 function startSelected(){if(!campaign)return;const node=assets.maps[campaign.world].find(n=>n.level===campaign!.selected);if(!node||!unlockedNode(campaign,campaign.world,node,assets.maps))return;start(assets.worlds[campaign.world].levels[node.level],campaignStageStart(campaign,assets.worlds,assets.maps,campaign.world,node.level),true);}
 function completionBonus(s:Simulation){return pendingRewards(newCampaign(),s.level.world,s.level.index,eligibleStageRewards(s),s.lives).lives-s.lives;}
-function completeCampaignStage(){const s=simulation;if(!s||!campaign||s.status!=='complete')return;campaign=completeCampaignLevel(campaign,s,assets.worlds,assets.maps);saveCampaign();openMap(s.level.world);}
+function completeCampaignStage(){
+  const s=simulation;if(!s||!campaign||s.status!=='complete')return;
+  const previous=campaign;
+  campaign=completeCampaignLevel(campaign,s,assets.worlds,assets.maps);
+  const unlocked=([1,2] as const).find(w=>!unlockedWorld(previous,w,assets.maps)&&unlockedWorld(campaign!,w,assets.maps));
+  saveCampaign();openMap(s.level.world);
+  // cGame.method_249(5) queues the world notice; method_74 shows it when
+  // the level result returns to the map, for five seconds or until a key.
+  if(unlocked){mapUnlockNotice=unlocked;mapUnlockNoticeTicks=100;}
+}
 function advanceLevel(){
   const current=simulation;
   if(!current||current.status!=='complete')return;
@@ -169,7 +180,7 @@ function drawResult(s:Simulation){
 function drawFront(){
   if(scene==='intro'||scene==='demo'){drawIntro();return;}
   if(scene==='menu')front.drawMenu(ctx,menuSelected,!!campaign,sceneTick);
-  else if(scene==='map'&&campaign)front.drawMap(ctx,campaign,sceneTick,mapTravelCursor());
+  else if(scene==='map'&&campaign){front.drawMap(ctx,campaign,sceneTick,mapTravelCursor());if(mapUnlockNotice)front.drawWorldNotice(ctx,mapUnlockNotice);}
   else if(scene==='seal'&&campaign)front.drawSeal(ctx,campaign,sealSelected,sceneTick,sealUnlockWorld,sealUnlockTick);
   else if(scene==='store'&&campaign)front.drawStore(ctx,campaign,storeSelected,storeMessage,storeToastTicks>0);
   else if(scene==='about')front.drawCredits(ctx,creditsScroll);
@@ -254,6 +265,7 @@ function drawInspector(){
 function updateSprite(){const s=assets.sprite(sprite.value);options(palette,s.palettes.map((_,i)=>({value:String(i),label:`Paleta ${i}`})));$('sprite-info').textContent=`${s.modules.length} módulos · ${s.frames.length} frames · ${s.animations.length} animações`;inspectionDirty=true;}
 async function importFile(file:File|null){if(!file)return;try{const data=validateReplay(JSON.parse(await file.text()),assets.worlds);simulation=restoreReplay(data,assets.worlds);scene='playing';campaignStage=false;paused=true;pauseScene='menu';pauseSelected=0;clock.reset();lastError='';saveSession();}catch(e){report(String(e));}}
 function backFront(){
+  if(scene==='map'&&mapUnlockNotice){mapUnlockNotice=null;mapUnlockNoticeTicks=0;return;}
   if(scene==='intro'){openSeal();return;}
   if(scene==='demo'){scene='playing';demo=null;return;}
   if(scene==='map'){sealSelected=campaign?.world??0;openSeal();return;}
@@ -313,6 +325,10 @@ function stepFront(){
     return;
   }
   const frame=input.read();
+  if(scene==='map'&&mapUnlockNotice){
+    if(frame.action||frame.direction||--mapUnlockNoticeTicks<=0){mapUnlockNotice=null;mapUnlockNoticeTicks=0;}
+    frontActionHeld=frame.action;return;
+  }
   if(scene==='seal'&&sealUnlockWorld!==null){
     if(++sealUnlockTick>=front.sealUnlockDuration()+30){sealUnlockWorld=null;sealUnlockTick=0;}
     frontActionHeld=frame.action;return;
@@ -384,6 +400,7 @@ document.querySelectorAll<HTMLButtonElement>('[data-command]').forEach(button=>b
 });
 game.addEventListener('pointerup',event=>{
   if(!ready)return;
+  if(scene==='map'&&mapUnlockNotice){mapUnlockNotice=null;mapUnlockNoticeTicks=0;return;}
   const rect=game.getBoundingClientRect(),x=(event.clientX-rect.left)*240/rect.width,y=(event.clientY-rect.top)*320/rect.height;
   if(scene==='playing'){
     if(!paused)return;

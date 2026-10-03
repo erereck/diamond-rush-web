@@ -4,7 +4,7 @@ Motor: `fidelity-24`. Dados S700 fixados em `5e05c42aa1aae3377790600eb6d27497101
 
 Inventário: **41 mapas**, sendo 40 fases e a introdução; 10 fases são secretas. Há 47 conclusões a verificar, contando as saídas alternativas.
 
-Cobertura atual: **13 percursos aprovados**, incluindo os 3 chefes. Os percursos isolados partem do spawn, com recursos iniciais explícitos. Os chefes usam armas predefinidas; obter essas armas e liberar os chefes durante uma campanha nova ainda não está certificado.
+Cobertura atual: **14 percursos aprovados**, incluindo os 3 chefes. Os percursos isolados partem do spawn, com recursos iniciais explícitos. Os chefes usam armas predefinidas; obter essas armas e liberar os chefes durante uma campanha nova ainda não está certificado.
 
 O executor aceita somente direção, ação e retorno ao checkpoint. Diálogos e edições de cena vêm dos mesmos gatilhos e intérprete usados no jogo. Não aceita posições, chaves, baús previamente abertos ou edições de mapa no arquivo de controles. Para aprovar um chefe, exige o evento de derrota concluída e zero de vida antes de terminar o percurso.
 
@@ -20,7 +20,7 @@ O executor aceita somente direção, ação e retorno ao checkpoint. Diálogos e
 | Angkor 4 (3) | Saída comum (37,5) | Percurso aprovado · [1930 ticks](../tests/fixtures/routes/angkor-04-hammer-normal.json) | — |
 | Angkor 5 (4) | Saída comum (2,10) | Percurso aprovado · [1953 ticks](../tests/fixtures/routes/angkor-05-normal.json) | — |
 | Angkor 6 (5) | Saída comum (26,5) | Percurso aprovado · [662 ticks](../tests/fixtures/routes/angkor-06-normal.json) | — |
-| Angkor 7 (6) | Saída comum (19,4); Saída secreta (21,40) | Saídas parcialmente aprovadas · [1205 ticks](../tests/fixtures/routes/angkor-07-normal.json) · [tentativa em (10,42)](../tests/fixtures/route-attempts/angkor-07-secret-hook-plate.json) | — |
+| Angkor 7 (6) | Saída comum (19,4); Saída secreta (21,40) | Percurso aprovado · [1205 ticks](../tests/fixtures/routes/angkor-07-normal.json), [1755 ticks](../tests/fixtures/routes/angkor-07-secret-hook.json) · [tentativa anterior em (10,42)](../tests/fixtures/route-attempts/angkor-07-secret-hook-plate.json) | — |
 | Angkor 8 (7) | Saída secreta (4,3); Saída comum (5,19) | Percurso aprovado · [2867 ticks](../tests/fixtures/routes/angkor-08-normal.json), [791 ticks](../tests/fixtures/routes/angkor-08-secret-ice.json) | — |
 | Angkor 9 · chefe (8) | Cristal após vencer o chefe (27,6) | Percurso aprovado · [1121 ticks](../tests/fixtures/routes/angkor-boss-crystal.json) | — |
 | Angkor 10 · secreta (9) | Saída secreta (42,11) | Ainda não verificada | — |
@@ -28,7 +28,7 @@ O executor aceita somente direção, ação e retorno ao checkpoint. Diálogos e
 | Angkor 12 · secreta (11) | Saída secreta (35,25) | Ainda não verificada | — |
 | Angkor 13 · secreta (12) | Saída secreta (39,27) | Ainda não verificada | — |
 | Introdução (13) | Tutorial (61,3) | Percurso aprovado · [1428 ticks](../tests/fixtures/routes/angkor-introduction.json) | — |
-| Bavaria 1 (0) | Saída comum (35,20) | Ainda não verificada | — |
+| Bavaria 1 (0) | Saída comum (35,20) | Tentativa pendente · [tentativa em (16,11)](../tests/fixtures/route-attempts/bavaria-01-two-crushers.json) | — |
 | Bavaria 2 (1) | Saída comum (34,6) | Ainda não verificada | — |
 | Bavaria 3 (2) | Saída comum (25,17) | Ainda não verificada | — |
 | Bavaria 4 (3) | Saída comum (36,6); Saída secreta (2,10) | Ainda não verificada | — |
@@ -65,6 +65,7 @@ O executor aceita somente direção, ação e retorno ao checkpoint. Diálogos e
 - [Angkor 5](../tests/fixtures/routes/angkor-05-normal.json): 1953 ticks de controles, 5 danos, 1 retorno; equipamento inicial 1; diálogos nenhum.
 - [Angkor 6](../tests/fixtures/routes/angkor-06-normal.json): 662 ticks de controles, 1 dano, 0 retornos; equipamento inicial 1; diálogos 3.
 - [Angkor 7](../tests/fixtures/routes/angkor-07-normal.json): 1205 ticks de controles, 2 danos, 0 retornos; equipamento inicial 1; diálogos nenhum.
+- [Angkor 7](../tests/fixtures/routes/angkor-07-secret-hook.json): 1755 ticks de controles, 5 danos, 0 retornos; equipamento inicial 2; diálogos nenhum.
 - [Angkor 8](../tests/fixtures/routes/angkor-08-normal.json): 2867 ticks de controles, 6 danos, 1 retorno; equipamento inicial 1; diálogos nenhum.
 - [Angkor 8](../tests/fixtures/routes/angkor-08-secret-ice.json): 791 ticks de controles, 2 danos, 0 retornos; equipamento inicial 8; diálogos nenhum.
 - [Angkor 9](../tests/fixtures/routes/angkor-boss-crystal.json): 1121 ticks de controles, 0 danos, 0 retornos; equipamento inicial 1; diálogos 33, 32.
@@ -72,7 +73,7 @@ O executor aceita somente direção, ação e retorno ao checkpoint. Diálogos e
 - [Bavaria 10](../tests/fixtures/routes/bavaria-boss-crystal.json): 1465 ticks de controles, 2 danos, 0 retornos; equipamento inicial 2; diálogos 34, 30.
 - [Tibet 11](../tests/fixtures/routes/tibet-boss-crystal.json): 3145 ticks de controles, 1 dano, 0 retornos; equipamento inicial 8; diálogos 35.
 
-Angkor 1–8 comprovam a saída comum, sem exigir coleta de todos os diamantes/baús. Angkor 3 abre as fechaduras prateada e dourada. Angkor 4 resolve sua sala de combate e usa pedras nas duas placas, obtém o martelo, executa seu aviso 22 e quebra tijolos para sair; começa com os recursos explicitados da campanha e inclui uma morte com retorno ao círculo. Angkor 5 resolve as duas placas, vence a cobra vermelha com golpes reais de martelo, pega a chave dourada e sai; seu percurso inclui uma morte e recuperação da sala inicial. Angkor 6 atravessa o poço das pedras, aciona o checkpoint, executa a cena 3, abre o baú vermelho e chega à saída. Angkor 7 vence outra sala de combate, empilha duas pedras para manter a placa pressionada, obtém a chave dourada e sai. Angkor 8 abre duas fechaduras prateadas, derrota as cobras da sala, leva uma pedra à placa, usa a chave dourada e sai. A saída secreta de Angkor 8 foi aprovada com martelo de gelo predefinido; a de Angkor 7 ainda não foi aprovada. Os chefes de Angkor e Bavaria comprovam todos os golpes, reposição das pedras, derrota, cristal e diálogo final. Tibet comprova cinco impactos após congelar/puxar inimigos reais, as cinco alternâncias da ponte, a derrota, o cristal e a apresentação de entrada 35. O cristal pede o roteiro 31 em method_322, mas esse ID está ausente do demo.f canônico; nenhum diálogo final de Tibet foi reproduzido ou inventado. A introdução cobre a caminhada automática e os oito roteiros, incluindo os dois retornos ao círculo.
+Angkor 1–8 comprovam a saída comum, sem exigir coleta de todos os diamantes/baús. Angkor 3 abre as fechaduras prateada e dourada. Angkor 4 resolve sua sala de combate e usa pedras nas duas placas, obtém o martelo, executa seu aviso 22 e quebra tijolos para sair; começa com os recursos explicitados da campanha e inclui uma morte com retorno ao círculo. Angkor 5 resolve as duas placas, vence a cobra vermelha com golpes reais de martelo, pega a chave dourada e sai; seu percurso inclui uma morte e recuperação da sala inicial. Angkor 6 atravessa o poço das pedras, aciona o checkpoint, executa a cena 3, abre o baú vermelho e chega à saída. Angkor 7 vence outra sala de combate, empilha duas pedras para manter a placa pressionada, obtém a chave dourada e sai. Sua saída secreta também foi aprovada com gancho predefinido: desloca a segunda pedra para liberar o retorno e atravessa o portão ainda mantido pela primeira pedra. Angkor 8 abre duas fechaduras prateadas, derrota as cobras da sala, leva uma pedra à placa, usa a chave dourada e sai. Sua saída secreta foi aprovada com martelo de gelo predefinido. Os chefes de Angkor e Bavaria comprovam todos os golpes, reposição das pedras, derrota, cristal e diálogo final. Tibet comprova cinco impactos após congelar/puxar inimigos reais, as cinco alternâncias da ponte, a derrota, o cristal e a apresentação de entrada 35. O cristal pede o roteiro 31 em method_322, mas esse ID está ausente do demo.f canônico; nenhum diálogo final de Tibet foi reproduzido ou inventado. A introdução cobre a caminhada automática e os oito roteiros, incluindo os dois retornos ao círculo. Bavaria 1 tem uma tentativa por controles até o segundo checkpoint e a destruição de dois trituradores por pedras; a saída ainda não foi certificada.
 
 ## Começo de campanha desde New Game
 
@@ -83,7 +84,7 @@ A fase 5 recebe 37 diamantes, sete vidas, saúde 1 e o martelo da fase 4; termin
 
 ## Próximas verificações
 
-1. Aprovar a saída secreta de Angkor 7 e obter os diamantes vermelhos necessários para abrir Bavaria após o chefe de Angkor. Conferir a continuidade de física/animações com uma execução Java completa.
+1. Obter os diamantes vermelhos necessários para abrir Bavaria após o chefe de Angkor e certificar a primeira fase. Conferir a continuidade de física/animações com uma execução Java completa.
 2. Obter gancho e gelo durante a campanha nova e encadear os percursos com os recursos, recompensas e save reais.
 3. Aprovar cada saída comum/secreta e as dez fases secretas. Exigir todas as saídas de um mapa antes de marcá-lo como aprovado.
 4. Repetir os demais percursos com mortes/checkpoints e recarga do save; depois comparar percursos e tempos com a execução Java.

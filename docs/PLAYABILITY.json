@@ -7,10 +7,10 @@
     "playableStages": 40,
     "secretStages": 10,
     "goals": 47,
-    "verifiedMaps": 11,
+    "verifiedMaps": 12,
     "verifiedBosses": 3,
-    "completedRoutes": 13,
-    "attemptedMaps": 0,
+    "completedRoutes": 14,
+    "attemptedMaps": 1,
     "campaignPrefixes": 1,
     "campaignPrefixStages": 9
   },
@@ -971,7 +971,7 @@
           "y": 40
         }
       ],
-      "status": "partial",
+      "status": "verified",
       "evidence": [
         {
           "file": "tests/fixtures/routes/angkor-07-normal.json",
@@ -1025,6 +1025,62 @@
             "hammer-block": 1,
             "boulder": 10,
             "gold-gate": 1,
+            "complete": 1
+          }
+        },
+        {
+          "file": "tests/fixtures/routes/angkor-07-secret-hook.json",
+          "world": 0,
+          "level": 6,
+          "goal": "secret",
+          "initial": {
+            "diamonds": 68,
+            "redDiamonds": 1,
+            "lives": 8,
+            "health": 4,
+            "weaponTier": 2
+          },
+          "outcome": {
+            "status": "complete",
+            "ticks": 1755,
+            "x": 32,
+            "y": 40,
+            "exitObject": 28,
+            "diamonds": 81,
+            "redDiamonds": 2,
+            "lives": 8,
+            "health": 2,
+            "weaponTier": 2,
+            "hits": 5,
+            "retries": 0,
+            "opened": [
+              552,
+              773,
+              836
+            ],
+            "demos": [],
+            "bossHealth": null,
+            "bossCleared": false
+          },
+          "events": {
+            "grass": 8,
+            "chest": 3,
+            "chest-reward": 3,
+            "checkpoint": 2,
+            "hammer": 3,
+            "break": 2,
+            "hurt": 5,
+            "gate-close": 2,
+            "riddle": 1,
+            "hook": 7,
+            "hook-pull": 7,
+            "hammer-block": 1,
+            "enemy-death": 1,
+            "gate-open": 3,
+            "riddle-solved": 1,
+            "gate-opening": 6,
+            "boulder": 5,
+            "diamond": 3,
             "complete": 1
           }
         }
@@ -1451,9 +1507,50 @@
           "y": 20
         }
       ],
-      "status": "unverified",
+      "status": "attempted",
       "evidence": [],
-      "pendingAttempts": [],
+      "pendingAttempts": [
+        {
+          "file": "tests/fixtures/route-attempts/bavaria-01-two-crushers.json",
+          "world": 1,
+          "level": 0,
+          "goal": "normal",
+          "initial": {
+            "diamonds": 82,
+            "redDiamonds": 10,
+            "lives": 12,
+            "health": 4,
+            "weaponTier": 1
+          },
+          "outcome": {
+            "status": "playing",
+            "ticks": 405,
+            "x": 16,
+            "y": 11,
+            "exitObject": 0,
+            "diamonds": 88,
+            "redDiamonds": 10,
+            "lives": 12,
+            "health": 2,
+            "weaponTier": 1,
+            "hits": 2,
+            "retries": 0,
+            "opened": [],
+            "demos": [],
+            "bossHealth": null,
+            "bossCleared": false
+          },
+          "events": {
+            "grass": 8,
+            "diamond": 6,
+            "boulder": 8,
+            "checkpoint": 2,
+            "hurt": 2,
+            "enemy-death": 4,
+            "crusher-break": 2
+          }
+        }
+      ],
       "reviews": []
     },
     {

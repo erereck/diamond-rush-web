@@ -455,6 +455,19 @@ export class Simulation {
   updateCrusher(x:number,y:number){
     const i=this.index(x,y);
     this.active[i]=24;
+    // method_337 calls method_343 before continuing the strike cycle. A
+    // descending stone destroys both halves of the crusher (Bavaria 1 uses
+    // this to open its only passage out of the entrance corridor).
+    const overhead=this.index(x,y-1);
+    if(overhead>=0&&[0,1,8,9].includes(this.tiles[overhead])&&
+      this.motion[overhead]<=6&&(this.state[overhead]&7)===3){
+      const lower=this.tile(x,y+1)===16?this.index(x,y+1):i;
+      for(const cell of new Set([i,lower])){
+        this.tiles[cell]=-1;this.state[cell]=0;this.motion[cell]=0;this.active[cell]=0;
+        this.destroyEffect(cell);
+      }
+      this.wake(x,y);this.events.push('crusher-break');return;
+    }
     if(this.tile(x,y+1)===16)return; // Upper half shares the lower timer.
     const above=this.index(x,y-1),paired=this.tiles[above]===16;
     const side=(this.state[i]&7)===4?1:-1;

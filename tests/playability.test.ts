@@ -9,7 +9,7 @@ import { restoreReplay, validateReplay } from '../src/platform/Session.ts';
 import { playCampaignRoute, verifyCampaignRoute } from '../tools/routes/CampaignRoute.ts';
 import type { CampaignRouteFixture } from '../tools/routes/CampaignRoute.ts';
 import { newCampaign, unlockedNode, validateCampaign } from '../src/core/Campaign.ts';
-import { campaignFromRecord, campaignRecord, completeCampaignLevel } from '../src/platform/CanonicalCampaign.ts';
+import { campaignFromRecord, campaignRecord, campaignStageStart, completeCampaignLevel } from '../src/platform/CanonicalCampaign.ts';
 import { CanonicalSave } from '../src/platform/CanonicalSave.ts';
 
 const resources=loadRouteResources();
@@ -97,6 +97,28 @@ test('New Game completes Angkor and its boss with campaign resources and save re
   assert.deepEqual(result.awards,[[32,32,32,0,0,40,32,0,60],[],[]]);
   assert.deepEqual(result.stages.at(-1)?.initial,{diamonds:82,redDiamonds:1,lives:8,health:1,weaponTier:1});
   assert.equal(result.stages.at(-1)?.outcome.bossCleared,true);
+});
+
+test('Angkor boss dialogue, result, world notice flags and Bavaria spawn stay in sequence at ten red gems',()=>{
+  const fixture=fixtures.find(f=>f.name==='angkor-boss-crystal.json')!.fixture;
+  const runner=new RouteRunner(resources,0,8,{...fixture.initial,redDiamonds:10});
+  for(const run of fixture.controls)for(let tick=0;tick<run.ticks;tick++)runner.step({direction:run.direction,action:run.action,...(run.reset?{reset:true}:{})});
+  assert.equal(runner.sim.status,'complete');
+  assert.deepEqual(runner.demos,[33,32]);
+  assert.equal(runner.eventCounts['boss-defeated'],1);
+  const campaign=newCampaign();campaign.completed[0]=[0,1,2,3,4,5,6,7];campaign.selected=8;
+  campaign.resources={...runner.sim.initial};
+  const saved=completeCampaignLevel(campaign,runner.sim,resources.worlds,resources.maps);
+  assert.deepEqual(saved.worldAccess,[true,true,false]);
+  assert.equal(saved.resources.redDiamonds,10);
+  const record=new CanonicalSave(Uint8Array.from(saved.canonicalRecord!));
+  assert.equal(record.worldFlags&9,9,'Angkor crystal and Bavaria notice bits are saved');
+  const restored=campaignFromRecord(record,resources.worlds,resources.maps);
+  assert.equal(restored.world,1);
+  const start=campaignStageStart(restored,resources.worlds,resources.maps,1,0);
+  const bavaria=new RouteRunner(resources,1,0,start);
+  assert.deepEqual([bavaria.sim.player.x,bavaria.sim.player.y],[2,19]);
+  assert.equal(bavaria.sim.redDiamonds,10);
 });
 
 test('Angkor 3 opens both key doors and Angkor 4 uses weighted plates before obtaining and using its hammer',()=>{

@@ -285,8 +285,17 @@ export class Simulation {
   /** Shared method_325 patrol and boulder collision for ordinary and red snakes. */
   updateSnake(x:number,y:number){
     const i=this.index(x,y),kind=this.tiles[i];let s=this.state[i],dir=s&7,m=this.motion[i],tx=x,ty=y;
-    const above=this.index(x,y-1);
-    if(above>=0&&[0,1].includes(this.tiles[above])&&this.motion[above]<=6&&(this.state[above]&7)===3){this.tiles[i]=-1;this.destroyEffect(i);this.wake(x,y);return;}
+    const above=this.index(x,y-1),left=this.index(x-1,y),right=this.index(x+1,y);
+    // The broader resting-stone branch of method_343 still needs route-wide
+    // recertification: enabling it changes Angkor 4's recorded stone room.
+    const topHit=above>=0&&this.motion[above]<=6&&(
+      [0,1].includes(this.tiles[above])&&(this.state[above]&7)===3||
+      [14,46,48].includes(this.tiles[above]));
+    const rightHit=right>=0&&this.tiles[right]===14&&this.motion[right]<=0&&
+      (this.state[right]&8)!==0&&(this.state[right]&7)!==3;
+    const leftHit=left>=0&&this.tiles[left]===14&&this.motion[left]<=0&&
+      (this.state[left]&8)===0&&(this.state[left]&7)!==3;
+    if(topHit||rightHit||leftHit){this.tiles[i]=-1;this.destroyEffect(i);this.wake(x,y);return;}
     if(s&248){
       if((this.tick&3)===0){s-=8;if(kind===43&&(s&248)===0)s=s&~3840|3072;this.state[i]=s;}
       this.active[i]=24;return;
@@ -458,9 +467,15 @@ export class Simulation {
     // method_337 calls method_343 before continuing the strike cycle. A
     // descending stone destroys both halves of the crusher (Bavaria 1 uses
     // this to open its only passage out of the entrance corridor).
-    const overhead=this.index(x,y-1);
-    if(overhead>=0&&[0,1,8,9].includes(this.tiles[overhead])&&
-      this.motion[overhead]<=6&&(this.state[overhead]&7)===3){
+    const overhead=this.index(x,y-1),left=this.index(x-1,y),right=this.index(x+1,y);
+    const fallsOnTop=overhead>=0&&this.motion[overhead]<=6&&(
+      [0,1,8,9].includes(this.tiles[overhead])&&(this.state[overhead]&7)===3||
+      [14,46,48].includes(this.tiles[overhead]));
+    const rollsInFromRight=right>=0&&this.tiles[right]===14&&this.motion[right]<=0&&
+      (this.state[right]&8)!==0&&(this.state[right]&7)!==3;
+    const rollsInFromLeft=left>=0&&this.tiles[left]===14&&this.motion[left]<=0&&
+      (this.state[left]&8)===0&&(this.state[left]&7)!==3;
+    if(fallsOnTop||rollsInFromRight||rollsInFromLeft){
       const lower=this.tile(x,y+1)===16?this.index(x,y+1):i;
       for(const cell of new Set([i,lower])){
         this.tiles[cell]=-1;this.state[cell]=0;this.motion[cell]=0;this.active[cell]=0;

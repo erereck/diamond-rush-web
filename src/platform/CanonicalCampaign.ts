@@ -1,6 +1,6 @@
 import type { WorldDefinition, MapNode } from '../level/LevelParser.ts';
 import type { Campaign } from '../core/Campaign.ts';
-import { eligibleStageRewards, finishLevel, newCampaign, pendingRewards, unlockedNode, unlockedWorld } from '../core/Campaign.ts';
+import { eligibleStageRewards, finishLevel, newCampaign, pendingRewards, unlockedNode } from '../core/Campaign.ts';
 import type { Simulation } from '../core/Simulation.ts';
 import type { StageStart } from '../core/Simulation.ts';
 import { CanonicalSave } from './CanonicalSave.ts';
@@ -12,7 +12,9 @@ export function campaignRecord(c:Campaign,worlds:WorldDefinition[],maps:MapNode[
   const {lives,diamonds,redDiamonds,weaponTier=0}=c.resources;
   save.setResources(lives,diamonds,redDiamonds,weaponTier);
   save.setMaxHealth(c.resources.maxHealth??4);
-  for(const w of [1,2] as const)if(unlockedWorld(c,w,maps))save.unlockWorld(w);
+  // method_74 writes one world bit when its queued notice is shown. The
+  // threshold used for seal selection (method_73) can be reached earlier.
+  for(const w of [1,2] as const)if(c.worldAccess?.[w])save.unlockWorld(w);
   // The final-chamber chest writes bit 0/1/2 of recordData[2]. Completed
   // boss stages also repair older web saves that predate this RMS field.
   for(const w of [0,1,2] as const)if(c.completed[w].includes([8,9,10][w]))save.collectCrystal(w);
@@ -58,7 +60,13 @@ export function completeCampaignLevel(c:Campaign,stage:Simulation,worlds:WorldDe
   const awarded=pendingRewards(c,world,index,eligibleStageRewards(stage),stage.lives);
   const next=finishLevel(c,world,index,{diamonds:stage.diamonds,redDiamonds:stage.redDiamonds,
     lives:awarded.lives,health:stage.health,...(stage.maxHealth>4?{maxHealth:stage.maxHealth}:{}),weaponTier:stage.weaponTier},awarded.mask,stage.exitObject===28,maps);
-  next.canonicalRecord=[...campaignRecord(next,worlds,maps,stage).export()];
+  // cGame.method_249(5) checks Bavaria before Tibet against the stored
+  // record flags. Only the first newly eligible notice runs per result.
+  const unlocked=([1,2] as const).find(w=>!c.worldAccess?.[w]&&next.resources.redDiamonds>=[0,10,25][w]);
+  if(unlocked){next.worldAccess=[...(next.worldAccess??[true,false,false])];next.worldAccess[unlocked]=true;}
+  const record=campaignRecord(next,worlds,maps,stage);
+  record.unlockAffordableArmor();
+  next.canonicalRecord=[...record.export()];
   return next;
 }
 

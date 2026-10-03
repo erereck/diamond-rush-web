@@ -119,9 +119,10 @@ export class FrontEndRenderer {
     const sprite=this.assets.sprite('cm-7'),animation=sprite.animations[5];
     return sprite.animationFrames.slice(animation.start,animation.start+animation.count).reduce((sum,frame)=>sum+Math.max(1,frame.duration),0);
   }
-  /** cGame.method_74/437: the five-second notice after reaching a red seal. */
-  drawWorldNotice(ctx:CanvasRenderingContext2D,world:1|2){
-    const message=`${this.assets.strings[92]}\n${this.assets.strings[28+world]}`;
+  /** cGame.method_74/437: combined world and item notice after results. */
+  drawWorldNotice(ctx:CanvasRenderingContext2D,notice:{world?:1|2;armor?:1|2|3|4}){
+    const message=[notice.world?`${this.assets.strings[92]}\n${this.assets.strings[28+notice.world]}`:null,
+      notice.armor?`${this.assets.strings[99]}\n${this.assets.strings[84+notice.armor]}`:null].filter(Boolean).join('\n\n');
     const lines=wrapDemoTextPixels(message,220,this.assets.sprite('ui-1'),this.assets.fontMap);
     const width=Math.min(220,Math.max(...lines.map(line=>demoFontWidth(this.assets.sprite('ui-1'),this.assets.fontMap,line))));
     const height=lines.length*15+2,left=Math.floor((240-width)/2),top=Math.floor((320-height)/2);

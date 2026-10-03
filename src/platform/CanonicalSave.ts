@@ -1,4 +1,5 @@
 import type { WorldDefinition, MapNode } from '../level/LevelParser.ts';
+import { ARMOR_PRICES } from '../core/Store.ts';
 
 /** The payload of RMS DiamondRush record 1, not an emulator's RMS container. */
 export interface SavedLevel {
@@ -54,6 +55,14 @@ export class CanonicalSave {
   get maxHealth(){return this.data[8];}
   setMaxHealth(value:number){if(!Number.isInteger(value)||value<4||value>8)throw new Error('RMS: energia máxima inválida.');this.data[8]=value;}
   get worldFlags(){return this.data[2];}
+  /** method_249(8): highest armor tier announced as available (0–4). */
+  get armorUnlockTier(){return this.data[2]>>>5;}
+  unlockAffordableArmor(){
+    let tier=this.armorUnlockTier;
+    while(tier<ARMOR_PRICES.length&&this.diamonds>=ARMOR_PRICES[tier])tier++;
+    if(tier>this.armorUnlockTier)this.data[2]=(this.data[2]&31)|(tier<<5);
+    return tier;
+  }
   get sealFlags(){return this.data[1];}
   /** recordData[9]: 0 = none, 1 = hammer, 2 = hook, 8 = ice hammer. */
   get weaponTier(){return this.data[9];}

@@ -190,6 +190,17 @@ test('a descending boulder destroys both Bavaria crusher halves and checkpoint r
   sim.restoreCheckpoint();
   assert.equal(sim.tile(27,19),16);assert.equal(sim.tile(27,20),16);
 });
+test('Bavaria crushers also break under the source rolling-hazard side impacts',()=>{
+  for(const [side,state] of [[-1,2],[1,12]] as const){
+    const level=fixture(['#######','#     #','#@    #','#     #','#######']);
+    level.world=1;level.tiles[2+2*level.width]=16;level.parameters[2+2*level.width]=2;
+    const sim=new Simulation(level),hazard=sim.index(2+side,1);
+    sim.tiles[hazard]=14;sim.state[hazard]=state;sim.motion[hazard]=0;
+    sim.updateCrusher(2,1);
+    assert.equal(sim.tile(2,1),-1);assert.equal(sim.tile(2,2),-1);
+    assert.equal(sim.events.at(-1),'crusher-break');
+  }
+});
 test('Tibet ceiling stone warns, falls, injures and shatters',()=>{
   const level=fixture(['#####','#   #','#   #','# @ #','#####']);
   level.world=2;level.tiles[7]=44;
@@ -454,6 +465,15 @@ test('a falling stone kills a snake and leaves the original smoke effect briefly
   sim.updateSnake(3,2);
   assert.equal(sim.tiles[snake],-1);assert.deepEqual(sim.enemySmoke,[{cell:snake,age:0}]);
   step(sim,0,14);assert.deepEqual(sim.enemySmoke,[]);
+});
+test('a Scotland rolling hazard defeats a snake from the directed side',()=>{
+  const level=fixture(['#######','#     #','#@    #','#     #','#######']);
+  level.world=1;level.tiles[3+2*level.width]=19;
+  const sim=new Simulation(level),hazard=sim.index(2,2);
+  sim.tiles[hazard]=14;sim.state[hazard]=2;sim.motion[hazard]=0;
+  sim.updateSnake(3,2);
+  assert.equal(sim.tile(3,2),-1);
+  assert.equal(sim.events.at(-1),'enemy-death');
 });
 test('red snakes patrol with the same cell movement and can be crushed',()=>{
   const sim=new Simulation(fixture(['########','# @V   #','#      #','########']));

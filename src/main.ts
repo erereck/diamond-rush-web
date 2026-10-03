@@ -41,7 +41,7 @@ let pauseScene:PauseScene='menu',pauseSelected=0,pauseConfirmAction:'restart'|'m
 let mapTravel:{from:MapNode;to:MapNode;step:number;steps:number}|null=null;
 let mapTravelQueue:MapNode[]=[];
 let sealUnlockWorld:1|2|null=null,sealUnlockTick=0;
-let mapUnlockNotice:1|2|null=null,mapUnlockNoticeTicks=0;
+let mapUnlockNotice:{world?:1|2;armor?:1|2|3|4}|null=null,mapUnlockNoticeTicks=0;
 let creditsScroll=0;
 let locale:GameLocale=validLocale(localStorage.getItem(LANGUAGE_KEY));
 let intro:IntroSequence|null=null,demo:IntroSequence|null=null,stageIntroTicks=0;
@@ -95,12 +95,13 @@ function completionBonus(s:Simulation){return pendingRewards(newCampaign(),s.lev
 function completeCampaignStage(){
   const s=simulation;if(!s||!campaign||s.status!=='complete')return;
   const previous=campaign;
+  const previousArmor=campaignRecord(previous,assets.worlds,assets.maps).armorUnlockTier;
   campaign=completeCampaignLevel(campaign,s,assets.worlds,assets.maps);
-  const unlocked=([1,2] as const).find(w=>!unlockedWorld(previous,w,assets.maps)&&unlockedWorld(campaign!,w,assets.maps));
+  const unlocked=([1,2] as const).find(w=>!previous.worldAccess?.[w]&&campaign!.worldAccess?.[w]);
+  const newArmor=campaignRecord(campaign,assets.worlds,assets.maps).armorUnlockTier;
   saveCampaign();openMap(s.level.world);
-  // cGame.method_249(5) queues the world notice; method_74 shows it when
-  // the level result returns to the map, for five seconds or until a key.
-  if(unlocked){mapUnlockNotice=unlocked;mapUnlockNoticeTicks=100;}
+  // cGame.method_74 joins the queued world and item notices on the map.
+  if(unlocked||newArmor>previousArmor){mapUnlockNotice={...(unlocked?{world:unlocked}:{}),...(newArmor>previousArmor?{armor:newArmor as 1|2|3|4}:{})};mapUnlockNoticeTicks=100;}
 }
 function advanceLevel(){
   const current=simulation;

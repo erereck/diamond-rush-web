@@ -3,7 +3,7 @@ import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
 import { newCampaign, unlockedWorld } from '../src/core/Campaign.ts';
 import { ARMOR_PRICES, nextSealItem, purchaseArmor, storeStatus } from '../src/core/Store.ts';
-import { campaignFromRecord, campaignRecord, campaignStageStart } from '../src/platform/CanonicalCampaign.ts';
+import { campaignFromRecord, campaignRecord, campaignStageStart, completeCampaignLevel } from '../src/platform/CanonicalCampaign.ts';
 import { CanonicalSave } from '../src/platform/CanonicalSave.ts';
 import { Simulation } from '../src/core/Simulation.ts';
 import { languageStrings, localizeDemoText } from '../src/core/Localization.ts';
@@ -22,6 +22,35 @@ test('S700 seal unlocks worlds at red-diamond thresholds without spending them',
   assert.equal(unlockedWorld(c,2,maps),false);
   c.resources.redDiamonds=25;assert.equal(unlockedWorld(c,2,maps),true);
   assert.equal(c.resources.redDiamonds,25);
+});
+
+test('world notices set Bavaria and Tibet RMS bits in the original order',()=>{
+  const {worlds,maps}=loadRouteResources();let campaign=newCampaign();
+  const first=new Simulation(worlds[0].levels[0],campaign.resources);
+  first.redDiamonds=25;first.diamonds=150;first.status='complete';
+  campaign=completeCampaignLevel(campaign,first,worlds,maps);
+  assert.deepEqual(campaign.worldAccess,[true,true,false]);
+  const firstRecord=new CanonicalSave(Uint8Array.from(campaign.canonicalRecord!));
+  assert.equal(firstRecord.worldFlags&24,8);assert.equal(firstRecord.armorUnlockTier,1);
+  assert.equal(unlockedWorld(campaign,2,maps),true,'the price can already grant access');
+  const second=new Simulation(worlds[0].levels[0],campaignStageStart(campaign,worlds,maps,0,0));
+  second.status='complete';
+  campaign=completeCampaignLevel(campaign,second,worlds,maps);
+  assert.deepEqual(campaign.worldAccess,[true,true,true]);
+  const secondRecord=new CanonicalSave(Uint8Array.from(campaign.canonicalRecord!));
+  assert.equal(secondRecord.worldFlags&24,24);assert.equal(secondRecord.armorUnlockTier,1);
+  assert.equal(campaign.resources.redDiamonds,25);assert.equal(campaign.resources.diamonds,150);
+});
+
+test('one result can announce the highest newly affordable armor without buying it',()=>{
+  const {worlds,maps}=loadRouteResources();let campaign=newCampaign();
+  const stage=new Simulation(worlds[0].levels[0],campaign.resources);
+  stage.diamonds=3000;stage.status='complete';
+  campaign=completeCampaignLevel(campaign,stage,worlds,maps);
+  const record=new CanonicalSave(Uint8Array.from(campaign.canonicalRecord!));
+  assert.equal(record.armorUnlockTier,4);
+  assert.equal(record.diamonds,3000);
+  assert.equal(record.maxHealth,4,'the item still needs a shop purchase');
 });
 
 test('boss crystals persist in the S700 world flag bits',()=>{

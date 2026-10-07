@@ -205,6 +205,16 @@ test('Bavaria 7 switches the lower bridge with the hook-tier hammer after a mine
   assert.equal(sim.status,'playing');
 });
 
+test('Tibet 12 crosses ceiling traps and breaks its first brick to activate two checkpoints',()=>{
+  const attempt=JSON.parse(readFileSync(new URL('fixtures/route-attempts/tibet-12-two-checkpoints.json',import.meta.url),'utf8')) as RouteFixture;
+  const runner=playRoute(attempt,resources),sim=runner.sim;
+  assert.deepEqual([sim.player.x,sim.player.y,sim.checkpointOrder,sim.status],[36,9,2,'playing']);
+  assert.equal(runner.eventCounts.checkpoint,2);
+  assert.ok((runner.eventCounts['trap-trigger']??0)>=8);
+  assert.ok((runner.eventCounts['trap-impact']??0)>=7);
+  assert.equal(runner.eventCounts.break,1);
+});
+
 test('Angkor 3 opens both key doors and Angkor 4 uses weighted plates before obtaining and using its hammer',()=>{
   const third=playRoute(fixtures.find(f=>f.name==='angkor-03-normal.json')!.fixture,resources);
   assert.equal(third.eventCounts['silver-gate'],1);assert.equal(third.eventCounts['gold-gate'],1);

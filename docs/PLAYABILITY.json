@@ -9,7 +9,7 @@
     "goals": 47,
     "verifiedMaps": 12,
     "verifiedBosses": 3,
-    "completedRoutes": 14,
+    "completedRoutes": 16,
     "attemptedMaps": 1,
     "campaignPrefixes": 1,
     "campaignPrefixStages": 9
@@ -2081,8 +2081,55 @@
           "y": 33
         }
       ],
-      "status": "unverified",
-      "evidence": [],
+      "status": "partial",
+      "evidence": [
+        {
+          "file": "tests/fixtures/routes/tibet-02-secret.json",
+          "world": 2,
+          "level": 1,
+          "goal": "secret",
+          "initial": {
+            "diamonds": 82,
+            "redDiamonds": 25,
+            "lives": 12,
+            "health": 4,
+            "weaponTier": 2
+          },
+          "outcome": {
+            "status": "complete",
+            "ticks": 321,
+            "x": -6,
+            "y": 33,
+            "exitObject": 28,
+            "diamonds": 83,
+            "redDiamonds": 26,
+            "lives": 12,
+            "health": 3,
+            "weaponTier": 2,
+            "hits": 1,
+            "retries": 0,
+            "opened": [
+              1306
+            ],
+            "demos": [],
+            "bossHealth": null,
+            "bossCleared": false
+          },
+          "events": {
+            "trap-trigger": 5,
+            "trap-fall": 5,
+            "grass": 11,
+            "trap-impact": 5,
+            "diamond": 1,
+            "checkpoint": 1,
+            "boulder": 2,
+            "hurt": 1,
+            "chest": 1,
+            "chest-reward": 1,
+            "complete": 1
+          }
+        }
+      ],
       "pendingAttempts": [],
       "reviews": []
     },
@@ -2147,8 +2194,47 @@
           "y": 23
         }
       ],
-      "status": "unverified",
-      "evidence": [],
+      "status": "partial",
+      "evidence": [
+        {
+          "file": "tests/fixtures/routes/tibet-05-secret.json",
+          "world": 2,
+          "level": 4,
+          "goal": "secret",
+          "initial": {
+            "diamonds": 82,
+            "redDiamonds": 25,
+            "lives": 12,
+            "health": 4,
+            "weaponTier": 2
+          },
+          "outcome": {
+            "status": "complete",
+            "ticks": 209,
+            "x": -6,
+            "y": 23,
+            "exitObject": 28,
+            "diamonds": 82,
+            "redDiamonds": 25,
+            "lives": 12,
+            "health": 3,
+            "weaponTier": 2,
+            "hits": 1,
+            "retries": 0,
+            "opened": [],
+            "demos": [],
+            "bossHealth": null,
+            "bossCleared": false
+          },
+          "events": {
+            "enemy-shot": 5,
+            "enemy-death": 1,
+            "dart-impact": 5,
+            "hurt": 1,
+            "complete": 1
+          }
+        }
+      ],
       "pendingAttempts": [],
       "reviews": [
         {

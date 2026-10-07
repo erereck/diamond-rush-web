@@ -177,7 +177,7 @@ test('the playability inventory covers all maps and every alternative exit witho
   }
   assert.equal(report.levels.find(level=>level.world===2&&level.level===10)!.status,'verified');
   assert.equal(report.counts.verifiedBosses,3);
-  assert.equal(report.counts.completedRoutes,14);
+  assert.equal(report.counts.completedRoutes,16);
   assert.equal(report.counts.verifiedMaps,12);
   assert.equal(report.levels.find(level=>level.world===0&&level.level===7)!.status,'verified');
   const seventh=report.levels.find(level=>level.world===0&&level.level===6)!;
@@ -271,6 +271,23 @@ test('Angkor 8 revisit freezes its upper snake onto the plate and exits to the s
  const restored=validateCampaign(campaignFromRecord(new CanonicalSave(record.export()),resources.worlds,resources.maps),resources.maps);
  assert.equal(unlockedNode(restored,0,secret,resources.maps),true);
  assert.deepEqual(restored.secretUnlocked[0],[12]);
+});
+
+test('Tibet 2 and 5 secret exits open their exact map branches and survive RMS reload',()=>{
+ for(const [file,level,target] of [['tibet-02-secret.json',1,11],['tibet-05-secret.json',4,12]] as const){
+  const runner=playRoute(fixtures.find(f=>f.name===file)!.fixture,resources);
+  assert.equal(runner.sim.initial.weaponTier,2);
+  assert.equal(runner.sim.exitObject,28);
+  assert.equal(runner.sim.retries,0);
+  let campaign=newCampaign();campaign.world=2;campaign.worldAccess=[true,true,true];campaign.selected=level;
+  campaign.completed[2]=Array.from({length:level},(_,index)=>index);
+  campaign.resources={...runner.sim.initial};
+  const saved=completeCampaignLevel(campaign,runner.sim,resources.worlds,resources.maps);
+  assert.equal(saved.selected,target);
+  assert.ok(saved.secretUnlocked[2].includes(target));
+  const restored=validateCampaign(campaignFromRecord(campaignRecord(saved,resources.worlds,resources.maps),resources.worlds,resources.maps),resources.maps);
+  assert.equal(unlockedNode(restored,2,resources.maps[2].find(node=>node.level===target)!,resources.maps),true);
+ }
 });
 
 test('Angkor 7 hook attempt weights the secret door without claiming the exit',()=>{

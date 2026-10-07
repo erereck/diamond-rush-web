@@ -4,7 +4,7 @@ Motor: `fidelity-24`. Dados S700 fixados em `5e05c42aa1aae3377790600eb6d27497101
 
 Inventário: **41 mapas**, sendo 40 fases e a introdução; 10 fases são secretas. Há 47 conclusões a verificar, contando as saídas alternativas.
 
-Cobertura atual: **14 percursos aprovados**, incluindo os 3 chefes. Os percursos isolados partem do spawn, com recursos iniciais explícitos. Os chefes usam armas predefinidas; obter essas armas e liberar os chefes durante uma campanha nova ainda não está certificado.
+Cobertura atual: **16 percursos aprovados**, incluindo os 3 chefes. Os percursos isolados partem do spawn, com recursos iniciais explícitos. Os chefes usam armas predefinidas; obter essas armas e liberar os chefes durante uma campanha nova ainda não está certificado.
 
 O executor aceita somente direção, ação e retorno ao checkpoint. Diálogos e edições de cena vêm dos mesmos gatilhos e intérprete usados no jogo. Não aceita posições, chaves, baús previamente abertos ou edições de mapa no arquivo de controles. Para aprovar um chefe, exige o evento de derrota concluída e zero de vida antes de terminar o percurso.
 
@@ -42,10 +42,10 @@ O executor aceita somente direção, ação e retorno ao checkpoint. Diálogos e
 | Bavaria 12 · secreta (11) | Saída secreta (56,5) | Ainda não verificada | 8, 37, 38 |
 | Bavaria 13 · secreta (12) | Saída secreta (10,3) | Ainda não verificada | 8, 37, 38 |
 | Tibet 1 (0) | Saída comum (51,9) | Ainda não verificada | 38 |
-| Tibet 2 (1) | Saída comum (4,6); Saída secreta (4,33) | Ainda não verificada | — |
+| Tibet 2 (1) | Saída comum (4,6); Saída secreta (4,33) | Saídas parcialmente aprovadas · [321 ticks](../tests/fixtures/routes/tibet-02-secret.json) | — |
 | Tibet 3 (2) | Saída comum (3,25) | Ainda não verificada | — |
 | Tibet 4 (3) | Saída comum (33,3) | Ainda não verificada | 47 |
-| Tibet 5 (4) | Saída comum (41,3); Saída secreta (6,23) | Ainda não verificada | 47 |
+| Tibet 5 (4) | Saída comum (41,3); Saída secreta (6,23) | Saídas parcialmente aprovadas · [209 ticks](../tests/fixtures/routes/tibet-05-secret.json) | 47 |
 | Tibet 6 (5) | Saída comum (46,7) | Ainda não verificada | 48 |
 | Tibet 7 (6) | Saída comum (9,22) | Ainda não verificada | 47, 48 |
 | Tibet 8 (7) | Saída comum (5,14) | Ainda não verificada | 47, 48 |
@@ -71,6 +71,8 @@ O executor aceita somente direção, ação e retorno ao checkpoint. Diálogos e
 - [Angkor 9](../tests/fixtures/routes/angkor-boss-crystal.json): 1121 ticks de controles, 0 danos, 0 retornos; equipamento inicial 1; diálogos 33, 32.
 - [Angkor introdução](../tests/fixtures/routes/angkor-introduction.json): 1428 ticks de controles, 0 danos, 2 retornos; equipamento inicial 0; diálogos 29, 10, 11, 13, 15, 16, 17, 28.
 - [Bavaria 10](../tests/fixtures/routes/bavaria-boss-crystal.json): 1465 ticks de controles, 2 danos, 0 retornos; equipamento inicial 2; diálogos 34, 30.
+- [Tibet 2](../tests/fixtures/routes/tibet-02-secret.json): 321 ticks de controles, 1 dano, 0 retornos; equipamento inicial 2; diálogos nenhum.
+- [Tibet 5](../tests/fixtures/routes/tibet-05-secret.json): 209 ticks de controles, 1 dano, 0 retornos; equipamento inicial 2; diálogos nenhum.
 - [Tibet 11](../tests/fixtures/routes/tibet-boss-crystal.json): 3145 ticks de controles, 1 dano, 0 retornos; equipamento inicial 8; diálogos 35.
 
 Angkor 1–8 comprovam a saída comum, sem exigir coleta de todos os diamantes/baús. Angkor 3 abre as fechaduras prateada e dourada. Angkor 4 resolve sua sala de combate e usa pedras nas duas placas, obtém o martelo, executa seu aviso 22 e quebra tijolos para sair; começa com os recursos explicitados da campanha e inclui uma morte com retorno ao círculo. Angkor 5 resolve as duas placas, vence a cobra vermelha com golpes reais de martelo, pega a chave dourada e sai; seu percurso inclui uma morte e recuperação da sala inicial. Angkor 6 atravessa o poço das pedras, aciona o checkpoint, executa a cena 3, abre o baú vermelho e chega à saída. Angkor 7 vence outra sala de combate, empilha duas pedras para manter a placa pressionada, obtém a chave dourada e sai. Sua saída secreta também foi aprovada com gancho predefinido: desloca a segunda pedra para liberar o retorno e atravessa o portão ainda mantido pela primeira pedra. Angkor 8 abre duas fechaduras prateadas, derrota as cobras da sala, leva uma pedra à placa, usa a chave dourada e sai. Sua saída secreta foi aprovada com martelo de gelo predefinido. Os chefes de Angkor e Bavaria comprovam todos os golpes, reposição das pedras, derrota, cristal e diálogo final. Tibet comprova cinco impactos após congelar/puxar inimigos reais, as cinco alternâncias da ponte, a derrota, o cristal e a apresentação de entrada 35. O cristal pede o roteiro 31 em method_322, mas esse ID está ausente do demo.f canônico; nenhum diálogo final de Tibet foi reproduzido ou inventado. A introdução cobre a caminhada automática e os oito roteiros, incluindo os dois retornos ao círculo. Bavaria 1 tem tentativas por controles até o segundo checkpoint e um poço de tijolos aberto pelo martelo, com dois trituradores destruídos por pedras e quatro joias adicionais; outra tentativa usa o martelo comum para destruir duas gramas sob uma coluna de pedras, sem atravessar a passagem; a saída ainda não foi certificada.

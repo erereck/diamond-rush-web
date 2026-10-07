@@ -10,7 +10,7 @@
     "verifiedMaps": 12,
     "verifiedBosses": 3,
     "completedRoutes": 16,
-    "attemptedMaps": 5,
+    "attemptedMaps": 6,
     "campaignPrefixes": 1,
     "campaignPrefixStages": 9
   },
@@ -1889,9 +1889,52 @@
           "y": 38
         }
       ],
-      "status": "unverified",
+      "status": "attempted",
       "evidence": [],
-      "pendingAttempts": [],
+      "pendingAttempts": [
+        {
+          "file": "tests/fixtures/route-attempts/bavaria-07-hook-switch.json",
+          "world": 1,
+          "level": 6,
+          "goal": "normal",
+          "initial": {
+            "diamonds": 82,
+            "redDiamonds": 10,
+            "lives": 12,
+            "health": 4,
+            "weaponTier": 2
+          },
+          "outcome": {
+            "status": "playing",
+            "ticks": 155,
+            "x": 24,
+            "y": 37,
+            "exitObject": 0,
+            "diamonds": 87,
+            "redDiamonds": 10,
+            "lives": 12,
+            "health": 2,
+            "weaponTier": 2,
+            "hits": 1,
+            "retries": 0,
+            "opened": [],
+            "demos": [],
+            "bossHealth": null,
+            "bossCleared": false
+          },
+          "events": {
+            "grass": 7,
+            "diamond": 5,
+            "boulder": 4,
+            "mine-blast": 1,
+            "checkpoint": 1,
+            "hammer": 1,
+            "bridge-switch": 1,
+            "bridge-change": 1,
+            "hurt": 1
+          }
+        }
+      ],
       "reviews": [
         {
           "plane": "tile",

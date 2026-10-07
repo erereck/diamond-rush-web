@@ -636,7 +636,8 @@ export class Simulation {
     if(kind===9){this.thaw(x,y);return;}
     if(kind===30){this.triggerBrick(x,y);return;}
     if(kind===10&&this.environmentMode===3&&this.state[i]<=0){this.state[i]=1;this.active[i]=24;this.events.push('grass');return;}
-    if(kind===18&&this.weaponTier===8){
+    // cGame.method_230 dispatches tile 18 to method_232 for every hammer tier.
+    if(kind===18&&this.weaponTier>=1){
       if(this.boss instanceof TibetBoss){if(![15,16].includes(this.object(this.player.x,this.player.y)))this.boss.flipBridge(this);}
       else this.bridges.flip(this);
       return;

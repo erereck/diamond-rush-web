@@ -4,7 +4,8 @@ import type { Simulation } from './Simulation.ts';
 export class IceBridges {
   position=0;direction=0;
   flip(s:Simulation){
-    if(s.weaponTier!==8)return false;
+    // method_232 checks the dry environment, not the weapon upgrade tier.
+    if(s.environmentMode!==3)return false;
     if(!this.direction&&![15,16].includes(s.object(s.player.x,s.player.y))){
       this.direction=this.position<=0?1:-1;s.events.push('bridge-switch');
     }

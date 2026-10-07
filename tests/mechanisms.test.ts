@@ -91,8 +91,8 @@ test('Tibet tile 48 loads and drops as a paired slider, then hooks both halves t
  const worlds=[{version:0,world:0,levels:[]},{version:0,world:1,levels:[]},{version:0,world:2,levels:[l]}];
  assert.deepEqual(restoreReplay(validateReplay(s.replay(),worlds),worlds).snapshot(),s.snapshot());
 });
-test('ice switch barriers alternate outside the boss arena and restore at a checkpoint',()=>{
+test('ordinary hammer toggles barrier switches outside the boss arena and checkpoint restores them',()=>{
  const l=level(),at=(x:number,y:number)=>x+y*12;l.tiles[at(3,2)]=18;l.tiles[at(5,3)]=34;l.tiles[at(6,3)]=35;
- const s=new Simulation(l,{diamonds:0,redDiamonds:0,lives:5,health:4,weaponTier:8});s.step({direction:0,action:true});for(let n=0;n<35;n++)s.step({direction:0,action:false});
+ const s=new Simulation(l,{diamonds:0,redDiamonds:0,lives:5,health:4,weaponTier:1});s.step({direction:0,action:true});for(let n=0;n<35;n++)s.step({direction:0,action:false});
  assert.equal(s.bridges.position,9);assert.equal(s.tile(5,3),34);assert.equal(s.tile(6,3),-1);s.step({direction:0,action:true});for(let n=0;n<35;n++)s.step({direction:0,action:false});assert.equal(s.bridges.position,0);assert.equal(s.tile(5,3),-1);assert.equal(s.tile(6,3),35);s.restoreCheckpoint();assert.deepEqual(s.bridges.snapshot(),{position:0,direction:0});
 });

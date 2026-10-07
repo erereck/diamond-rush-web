@@ -193,6 +193,18 @@ test('Tibet 14 replays both ceiling traps and ice weight effects without a false
   assert.equal(runner.eventCounts.diamond,9);
 });
 
+test('Bavaria 7 switches the lower bridge with the hook-tier hammer after a mine and checkpoint',()=>{
+  const attempt=JSON.parse(readFileSync(new URL('fixtures/route-attempts/bavaria-07-hook-switch.json',import.meta.url),'utf8')) as RouteFixture;
+  const runner=playRoute(attempt,resources),sim=runner.sim;
+  assert.equal(sim.initial.weaponTier,2);
+  assert.equal(runner.eventCounts.checkpoint,1);
+  assert.equal(runner.eventCounts['mine-blast'],1);
+  assert.equal(runner.eventCounts['bridge-switch'],1);
+  assert.equal(runner.eventCounts['bridge-change'],1);
+  assert.equal(sim.tile(27,34),-1);
+  assert.equal(sim.status,'playing');
+});
+
 test('Angkor 3 opens both key doors and Angkor 4 uses weighted plates before obtaining and using its hammer',()=>{
   const third=playRoute(fixtures.find(f=>f.name==='angkor-03-normal.json')!.fixture,resources);
   assert.equal(third.eventCounts['silver-gate'],1);assert.equal(third.eventCounts['gold-gate'],1);

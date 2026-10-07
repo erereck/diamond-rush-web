@@ -96,8 +96,8 @@ A fase 5 recebe 37 diamantes, sete vidas, saúde 1 e o martelo da fase 4; termin
 - 8: Minas: queda padrão/explosão implementadas; água e demais casos de method_351.
 - 37: Escombros explosivos implementados; inundação de method_397 pendente.
 - 38: Mecanismo 38 e gatilhos associados.
-- 47: Objeto 47: method_351/311.
-- 48: Objeto 48: method_306/305 e puxão de method_263.
+- 47: Peso de gelo 47: queda e placa implementadas, deposição comparada com Java; água pendente.
+- 48: Deslizador 48: par, queda e puxão implementados, descida comparada com Java; ligação visual e água pendentes.
 
 As placas de objeto 6 foram implementadas com abertura/fechamento, esmagamento, scan antes da queda e afundamento visual. Há 137 casos comparados com métodos originais extraídos e executados em Java (`tests/pressure.test.ts`, `tools/trace-pressure-s700.ts`). O harness isola os métodos e substitui som, invalidação visual, efeito de destruição e callback de dano; não certifica execução integral do jogo ou os comportamentos ainda ausentes dos tiles 47/48.
 

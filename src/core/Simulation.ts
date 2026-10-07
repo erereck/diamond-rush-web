@@ -77,7 +77,8 @@ export class Simulation {
       // the alternating ice bridge (background object 15). Tile 35 stays solid.
       if(t===34){this.tiles[i]=-1;this.level.objects[i]=15;}
       if(t===35)this.level.objects[i]=255;
-      if(t===0||t===1||t===8)this.active[i]=48;
+      if(t===0||t===1||t===8||t===47)this.active[i]=48;
+      if(t===48){this.state[i]=p===4?16:0;this.active[i]=48;}
       if(t===19||t===43||t===49){this.state[i]=p;this.active[i]=48;}
       if(t===43)this.state[i]=(p&~98304)|65536;
       if(t===11){this.state[i]=p===1?16:0;this.active[i]=48;}
@@ -90,6 +91,11 @@ export class Simulation {
       if(t===36){this.state[i]=p===1?1:0;this.active[i]=24;}
       if(t===37){this.state[i]=0;this.active[i]=24;}
     });
+    // loadLevelData creates the upper half of each paired Tibet slider.
+    for(let y=1;y<level.height-1;y++)for(let x=1;x<level.width-1;x++){
+      const i=this.index(x,y),above=this.index(x,y-1);
+      if(level.tiles[i]===48){this.tiles[above]=48;this.state[above]=8;this.active[above]=48;}
+    }
     // loadLevelData creates the upper half of each paired Bavaria crusher.
     for(let y=1;y<level.height-1;y++)for(let x=1;x<level.width-1;x++){
       const i=this.index(x,y),above=this.index(x,y-1),below=this.index(x,y+1);
@@ -272,6 +278,35 @@ export class Simulation {
         if(m>=12){this.moveObject(i,this.index(x+side,y+1),t,s&~512&~7|3,12);this.wake(x,y);}
         else {this.motion[i]=m;this.state[i]=s;this.active[i]=24;}
       }else {m=Math.max(0,m-6);if(!m)s=s&~512&~7;this.motion[i]=m;this.state[i]=s;this.active[i]=24;}
+    }
+  }
+  /** method_311 deposits an ice patch above a resting Tibet weight. */
+  updateTibetWeightPatch(x:number,y:number){
+    const i=this.index(x,y),above=this.index(x,y-1),below=this.index(x,y+1);
+    if(i<0||above<0||below<0||this.tiles[i]!==47||(this.state[i]&7)!==0||
+      this.level.objects[above]===35||this.tiles[above]>=80||
+      [30,10,37,34,35].includes(this.tiles[above])||
+      [14,33,15,4,16].includes(this.level.objects[above])||
+      this.tiles[below]<0)return;
+    this.level.objects[above]=35;this.level.parameters[above]=255;
+    this.motion[above]=18;this.active[above]=24;
+    this.events.push('ice-patch');
+  }
+  /** Dry-stage method_306: the two stacked halves of slider 48 fall together. */
+  updateTibetSlider(x:number,y:number){
+    const i=this.index(x,y),above=this.index(x,y-1),below=this.index(x,y+1);
+    if(i<0||above<0||below<0)return;
+    if(this.state[i]&8){this.active[i]=24;return;}
+    if(this.motion[i]>0){this.motion[i]=Math.max(0,this.motion[i]-6);this.active[i]=24;this.active[above]=24;return;}
+    const state=this.state[i];
+    if(this.tiles[below]===-1&&!this.isPlayer(x,y+1)){
+      this.tiles[above]=-1;this.state[above]=0;this.motion[above]=0;
+      this.tiles[below]=48;this.state[below]=(state&~7)|3;this.motion[below]=18;this.active[below]=48;
+      this.tiles[i]=48;this.state[i]=8;this.motion[i]=0;this.active[i]=24;
+      this.wake(x,y);this.events.push('slider-fall');
+    }else{
+      if((state&7)===3&&this.isPlayer(x,y+1))this.hurt(2);
+      this.state[i]=state&~7;this.active[i]=24;this.active[above]=24;
     }
   }
   moveObject(from:number,to:number,t:number,state:number,motion:number){
@@ -661,6 +696,12 @@ export class Simulation {
     if(Math.abs(hook.x-this.player.x)<=1)return;
     const nextX=hook.x-DX[hook.direction],from=this.index(hook.x,hook.y),to=this.index(nextX,hook.y);
     if(from<0||to<0||this.tiles[from]<0||!this.free(nextX,hook.y)){this.hook=null;return;}
+    if(this.tiles[from]===48){
+      const pairY=hook.y+((this.state[from]&8)?1:-1),pair=this.index(hook.x,pairY),pairTo=this.index(nextX,pairY);
+      if(pair<0||pairTo<0||this.tiles[pair]!==48||!this.free(nextX,pairY)){this.hook=null;return;}
+      this.moveObject(pair,pairTo,48,this.state[pair],this.motion[pair]);
+      this.active[pairTo]=48;this.wake(nextX,pairY);
+    }
     this.moveObject(from,to,this.tiles[from],this.state[from],0);hook.x=nextX;
     this.wake(nextX,hook.y);this.events.push('hook-pull');
   }
@@ -786,7 +827,12 @@ export class Simulation {
           else this.active[i]=24;
         }
         if(this.hook?.x===x&&this.hook.y===y){this.active[i]=24;continue;}
-        if(this.tiles[i]===0||this.tiles[i]===1||this.tiles[i]===8||this.tiles[i]===9)this.updateFalling(x,y);
+        if(this.tiles[i]===0||this.tiles[i]===1||this.tiles[i]===8||this.tiles[i]===9||this.tiles[i]===47){
+          const wasTibetWeight=this.tiles[i]===47;
+          this.updateFalling(x,y);
+          if(wasTibetWeight)this.updateTibetWeightPatch(x,y);
+        }
+        else if(this.tiles[i]===48)this.updateTibetSlider(x,y);
         else if(this.tiles[i]===19||this.tiles[i]===43||this.tiles[i]===49)this.updateSnake(x,y);
         else if(this.tiles[i]===11)this.updateWallCrawler(x,y);
         else if(this.tiles[i]===36)this.updateTorch(x,y);

@@ -26,7 +26,7 @@ const HANDLERS_TO_REVIEW:Record<number,string>={
   8:'Minas: queda padrão/explosão implementadas; água e demais casos de method_351',
   37:'Escombros explosivos implementados; inundação de method_397 pendente',
   38:'Mecanismo 38 e gatilhos associados',
-  47:'Objeto 47: method_351/311',48:'Objeto 48: method_306/305 e puxão de method_263'
+  47:'Peso de gelo 47: queda e placa implementadas, deposição comparada com Java; água pendente',48:'Deslizador 48: par, queda e puxão implementados, descida comparada com Java; ligação visual e água pendentes'
 };
 export function buildPlayabilityReport(){
   const resources=loadRouteResources(),routes=verifyRouteFiles(),attempts=verifyRouteFiles('route-attempts',false);

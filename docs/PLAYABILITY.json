@@ -2171,7 +2171,7 @@
         {
           "plane": "tile",
           "tile": 47,
-          "description": "Objeto 47: method_351/311",
+          "description": "Peso de gelo 47: queda e placa implementadas, deposição comparada com Java; água pendente",
           "count": 7
         }
       ]
@@ -2230,6 +2230,7 @@
             "enemy-shot": 5,
             "enemy-death": 1,
             "dart-impact": 5,
+            "ice-patch": 3,
             "hurt": 1,
             "complete": 1
           }
@@ -2240,7 +2241,7 @@
         {
           "plane": "tile",
           "tile": 47,
-          "description": "Objeto 47: method_351/311",
+          "description": "Peso de gelo 47: queda e placa implementadas, deposição comparada com Java; água pendente",
           "count": 5
         }
       ]
@@ -2265,7 +2266,7 @@
         {
           "plane": "tile",
           "tile": 48,
-          "description": "Objeto 48: method_306/305 e puxão de method_263",
+          "description": "Deslizador 48: par, queda e puxão implementados, descida comparada com Java; ligação visual e água pendentes",
           "count": 6
         }
       ]
@@ -2290,13 +2291,13 @@
         {
           "plane": "tile",
           "tile": 47,
-          "description": "Objeto 47: method_351/311",
+          "description": "Peso de gelo 47: queda e placa implementadas, deposição comparada com Java; água pendente",
           "count": 1
         },
         {
           "plane": "tile",
           "tile": 48,
-          "description": "Objeto 48: method_306/305 e puxão de method_263",
+          "description": "Deslizador 48: par, queda e puxão implementados, descida comparada com Java; ligação visual e água pendentes",
           "count": 7
         }
       ]
@@ -2321,13 +2322,13 @@
         {
           "plane": "tile",
           "tile": 47,
-          "description": "Objeto 47: method_351/311",
+          "description": "Peso de gelo 47: queda e placa implementadas, deposição comparada com Java; água pendente",
           "count": 1
         },
         {
           "plane": "tile",
           "tile": 48,
-          "description": "Objeto 48: method_306/305 e puxão de method_263",
+          "description": "Deslizador 48: par, queda e puxão implementados, descida comparada com Java; ligação visual e água pendentes",
           "count": 1
         }
       ]
@@ -2352,13 +2353,13 @@
         {
           "plane": "tile",
           "tile": 47,
-          "description": "Objeto 47: method_351/311",
+          "description": "Peso de gelo 47: queda e placa implementadas, deposição comparada com Java; água pendente",
           "count": 8
         },
         {
           "plane": "tile",
           "tile": 48,
-          "description": "Objeto 48: method_306/305 e puxão de method_263",
+          "description": "Deslizador 48: par, queda e puxão implementados, descida comparada com Java; ligação visual e água pendentes",
           "count": 6
         }
       ]
@@ -2383,13 +2384,13 @@
         {
           "plane": "tile",
           "tile": 47,
-          "description": "Objeto 47: method_351/311",
+          "description": "Peso de gelo 47: queda e placa implementadas, deposição comparada com Java; água pendente",
           "count": 6
         },
         {
           "plane": "tile",
           "tile": 48,
-          "description": "Objeto 48: method_306/305 e puxão de method_263",
+          "description": "Deslizador 48: par, queda e puxão implementados, descida comparada com Java; ligação visual e água pendentes",
           "count": 7
         }
       ]
@@ -2564,7 +2565,7 @@
         {
           "plane": "tile",
           "tile": 47,
-          "description": "Objeto 47: method_351/311",
+          "description": "Peso de gelo 47: queda e placa implementadas, deposição comparada com Java; água pendente",
           "count": 1
         }
       ]
@@ -2595,7 +2596,7 @@
         {
           "plane": "tile",
           "tile": 47,
-          "description": "Objeto 47: method_351/311",
+          "description": "Peso de gelo 47: queda e placa implementadas, deposição comparada com Java; água pendente",
           "count": 6
         }
       ]

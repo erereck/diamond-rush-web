@@ -1,0 +1,6104 @@
+{
+  "reference": "5e05c42aa1aae3377790600eb6d27497101b79e7",
+  "scope": "isolated-source-methods",
+  "methods": [
+    "method_308",
+    "method_311",
+    "method_305",
+    "method_306"
+  ],
+  "sourceHash": "346df2f57ac9abd2741caa25a32a965778297b361bee6d8e9b70366db741054c",
+  "methodHash": "15b9e76996194b0c2dfd38e92d4d4ddfaf39cf68adc5ac0c3c68376b380da6b1",
+  "stubs": [
+    "water disabled",
+    "player overlap at tile center",
+    "audio/render invalidation omitted",
+    "linked slider span excluded from compared fields"
+  ],
+  "cases": [
+    {
+      "input": {
+        "op": "patch",
+        "state": 0,
+        "motion": 0,
+        "above": -1,
+        "aboveTile": -1,
+        "below": -1,
+        "hero": 0
+      },
+      "expected": [
+        0,
+        -1,
+        0,
+        0,
+        255,
+        47,
+        0,
+        0,
+        255,
+        -1,
+        0,
+        0,
+        255
+      ]
+    },
+    {
+      "input": {
+        "op": "patch",
+        "state": 0,
+        "motion": 0,
+        "above": -1,
+        "aboveTile": -1,
+        "below": -1,
+        "hero": 1
+      },
+      "expected": [
+        0,
+        -1,
+        0,
+        0,
+        255,
+        47,
+        0,
+        0,
+        255,
+        -1,
+        0,
+        0,
+        255
+      ]
+    },
+    {
+      "input": {
+        "op": "patch",
+        "state": 0,
+        "motion": 0,
+        "above": -1,
+        "aboveTile": -1,
+        "below": -1,
+        "hero": 2
+      },
+      "expected": [
+        0,
+        -1,
+        0,
+        0,
+        255,
+        47,
+        0,
+        0,
+        255,
+        -1,
+        0,
+        0,
+        255
+      ]
+    },
+    {
+      "input": {
+        "op": "patch",
+        "state": 0,
+        "motion": 0,
+        "above": -1,
+        "aboveTile": -1,
+        "below": 0,
+        "hero": 0
+      },
+      "expected": [
+        0,
+        -1,
+        0,
+        0,
+        35,
+        47,
+        0,
+        0,
+        255,
+        0,
+        0,
+        0,
+        255
+      ]
+    },
+    {
+      "input": {
+        "op": "patch",
+        "state": 0,
+        "motion": 0,
+        "above": -1,
+        "aboveTile": -1,
+        "below": 0,
+        "hero": 1
+      },
+      "expected": [
+        0,
+        -1,
+        0,
+        0,
+        35,
+        47,
+        0,
+        0,
+        255,
+        0,
+        0,
+        0,
+        255
+      ]
+    },
+    {
+      "input": {
+        "op": "patch",
+        "state": 0,
+        "motion": 0,
+        "above": -1,
+        "aboveTile": -1,
+        "below": 0,
+        "hero": 2
+      },
+      "expected": [
+        0,
+        -1,
+        0,
+        0,
+        35,
+        47,
+        0,
+        0,
+        255,
+        0,
+        0,
+        0,
+        255
+      ]
+    },
+    {
+      "input": {
+        "op": "patch",
+        "state": 0,
+        "motion": 0,
+        "above": -1,
+        "aboveTile": -1,
+        "below": 80,
+        "hero": 0
+      },
+      "expected": [
+        0,
+        -1,
+        0,
+        0,
+        35,
+        47,
+        0,
+        0,
+        255,
+        80,
+        0,
+        0,
+        255
+      ]
+    },
+    {
+      "input": {
+        "op": "patch",
+        "state": 0,
+        "motion": 0,
+        "above": -1,
+        "aboveTile": -1,
+        "below": 80,
+        "hero": 1
+      },
+      "expected": [
+        0,
+        -1,
+        0,
+        0,
+        35,
+        47,
+        0,
+        0,
+        255,
+        80,
+        0,
+        0,
+        255
+      ]
+    },
+    {
+      "input": {
+        "op": "patch",
+        "state": 0,
+        "motion": 0,
+        "above": -1,
+        "aboveTile": -1,
+        "below": 80,
+        "hero": 2
+      },
+      "expected": [
+        0,
+        -1,
+        0,
+        0,
+        35,
+        47,
+        0,
+        0,
+        255,
+        80,
+        0,
+        0,
+        255
+      ]
+    },
+    {
+      "input": {
+        "op": "patch",
+        "state": 0,
+        "motion": 0,
+        "above": -1,
+        "aboveTile": 30,
+        "below": -1,
+        "hero": 0
+      },
+      "expected": [
+        0,
+        30,
+        0,
+        0,
+        255,
+        47,
+        0,
+        0,
+        255,
+        -1,
+        0,
+        0,
+        255
+      ]
+    },
+    {
+      "input": {
+        "op": "patch",
+        "state": 0,
+        "motion": 0,
+        "above": -1,
+        "aboveTile": 30,
+        "below": -1,
+        "hero": 1
+      },
+      "expected": [
+        0,
+        30,
+        0,
+        0,
+        255,
+        47,
+        0,
+        0,
+        255,
+        -1,
+        0,
+        0,
+        255
+      ]
+    },
+    {
+      "input": {
+        "op": "patch",
+        "state": 0,
+        "motion": 0,
+        "above": -1,
+        "aboveTile": 30,
+        "below": -1,
+        "hero": 2
+      },
+      "expected": [
+        0,
+        30,
+        0,
+        0,
+        255,
+        47,
+        0,
+        0,
+        255,
+        -1,
+        0,
+        0,
+        255
+      ]
+    },
+    {
+      "input": {
+        "op": "patch",
+        "state": 0,
+        "motion": 0,
+        "above": -1,
+        "aboveTile": 30,
+        "below": 0,
+        "hero": 0
+      },
+      "expected": [
+        0,
+        30,
+        0,
+        0,
+        255,
+        47,
+        0,
+        0,
+        255,
+        0,
+        0,
+        0,
+        255
+      ]
+    },
+    {
+      "input": {
+        "op": "patch",
+        "state": 0,
+        "motion": 0,
+        "above": -1,
+        "aboveTile": 30,
+        "below": 0,
+        "hero": 1
+      },
+      "expected": [
+        0,
+        30,
+        0,
+        0,
+        255,
+        47,
+        0,
+        0,
+        255,
+        0,
+        0,
+        0,
+        255
+      ]
+    },
+    {
+      "input": {
+        "op": "patch",
+        "state": 0,
+        "motion": 0,
+        "above": -1,
+        "aboveTile": 30,
+        "below": 0,
+        "hero": 2
+      },
+      "expected": [
+        0,
+        30,
+        0,
+        0,
+        255,
+        47,
+        0,
+        0,
+        255,
+        0,
+        0,
+        0,
+        255
+      ]
+    },
+    {
+      "input": {
+        "op": "patch",
+        "state": 0,
+        "motion": 0,
+        "above": -1,
+        "aboveTile": 30,
+        "below": 80,
+        "hero": 0
+      },
+      "expected": [
+        0,
+        30,
+        0,
+        0,
+        255,
+        47,
+        0,
+        0,
+        255,
+        80,
+        0,
+        0,
+        255
+      ]
+    },
+    {
+      "input": {
+        "op": "patch",
+        "state": 0,
+        "motion": 0,
+        "above": -1,
+        "aboveTile": 30,
+        "below": 80,
+        "hero": 1
+      },
+      "expected": [
+        0,
+        30,
+        0,
+        0,
+        255,
+        47,
+        0,
+        0,
+        255,
+        80,
+        0,
+        0,
+        255
+      ]
+    },
+    {
+      "input": {
+        "op": "patch",
+        "state": 0,
+        "motion": 0,
+        "above": -1,
+        "aboveTile": 30,
+        "below": 80,
+        "hero": 2
+      },
+      "expected": [
+        0,
+        30,
+        0,
+        0,
+        255,
+        47,
+        0,
+        0,
+        255,
+        80,
+        0,
+        0,
+        255
+      ]
+    },
+    {
+      "input": {
+        "op": "patch",
+        "state": 0,
+        "motion": 0,
+        "above": -1,
+        "aboveTile": 80,
+        "below": -1,
+        "hero": 0
+      },
+      "expected": [
+        0,
+        80,
+        0,
+        0,
+        255,
+        47,
+        0,
+        0,
+        255,
+        -1,
+        0,
+        0,
+        255
+      ]
+    },
+    {
+      "input": {
+        "op": "patch",
+        "state": 0,
+        "motion": 0,
+        "above": -1,
+        "aboveTile": 80,
+        "below": -1,
+        "hero": 1
+      },
+      "expected": [
+        0,
+        80,
+        0,
+        0,
+        255,
+        47,
+        0,
+        0,
+        255,
+        -1,
+        0,
+        0,
+        255
+      ]
+    },
+    {
+      "input": {
+        "op": "patch",
+        "state": 0,
+        "motion": 0,
+        "above": -1,
+        "aboveTile": 80,
+        "below": -1,
+        "hero": 2
+      },
+      "expected": [
+        0,
+        80,
+        0,
+        0,
+        255,
+        47,
+        0,
+        0,
+        255,
+        -1,
+        0,
+        0,
+        255
+      ]
+    },
+    {
+      "input": {
+        "op": "patch",
+        "state": 0,
+        "motion": 0,
+        "above": -1,
+        "aboveTile": 80,
+        "below": 0,
+        "hero": 0
+      },
+      "expected": [
+        0,
+        80,
+        0,
+        0,
+        255,
+        47,
+        0,
+        0,
+        255,
+        0,
+        0,
+        0,
+        255
+      ]
+    },
+    {
+      "input": {
+        "op": "patch",
+        "state": 0,
+        "motion": 0,
+        "above": -1,
+        "aboveTile": 80,
+        "below": 0,
+        "hero": 1
+      },
+      "expected": [
+        0,
+        80,
+        0,
+        0,
+        255,
+        47,
+        0,
+        0,
+        255,
+        0,
+        0,
+        0,
+        255
+      ]
+    },
+    {
+      "input": {
+        "op": "patch",
+        "state": 0,
+        "motion": 0,
+        "above": -1,
+        "aboveTile": 80,
+        "below": 0,
+        "hero": 2
+      },
+      "expected": [
+        0,
+        80,
+        0,
+        0,
+        255,
+        47,
+        0,
+        0,
+        255,
+        0,
+        0,
+        0,
+        255
+      ]
+    },
+    {
+      "input": {
+        "op": "patch",
+        "state": 0,
+        "motion": 0,
+        "above": -1,
+        "aboveTile": 80,
+        "below": 80,
+        "hero": 0
+      },
+      "expected": [
+        0,
+        80,
+        0,
+        0,
+        255,
+        47,
+        0,
+        0,
+        255,
+        80,
+        0,
+        0,
+        255
+      ]
+    },
+    {
+      "input": {
+        "op": "patch",
+        "state": 0,
+        "motion": 0,
+        "above": -1,
+        "aboveTile": 80,
+        "below": 80,
+        "hero": 1
+      },
+      "expected": [
+        0,
+        80,
+        0,
+        0,
+        255,
+        47,
+        0,
+        0,
+        255,
+        80,
+        0,
+        0,
+        255
+      ]
+    },
+    {
+      "input": {
+        "op": "patch",
+        "state": 0,
+        "motion": 0,
+        "above": -1,
+        "aboveTile": 80,
+        "below": 80,
+        "hero": 2
+      },
+      "expected": [
+        0,
+        80,
+        0,
+        0,
+        255,
+        47,
+        0,
+        0,
+        255,
+        80,
+        0,
+        0,
+        255
+      ]
+    },
+    {
+      "input": {
+        "op": "patch",
+        "state": 0,
+        "motion": 0,
+        "above": 35,
+        "aboveTile": -1,
+        "below": -1,
+        "hero": 0
+      },
+      "expected": [
+        0,
+        -1,
+        0,
+        0,
+        35,
+        47,
+        0,
+        0,
+        255,
+        -1,
+        0,
+        0,
+        255
+      ]
+    },
+    {
+      "input": {
+        "op": "patch",
+        "state": 0,
+        "motion": 0,
+        "above": 35,
+        "aboveTile": -1,
+        "below": -1,
+        "hero": 1
+      },
+      "expected": [
+        0,
+        -1,
+        0,
+        0,
+        35,
+        47,
+        0,
+        0,
+        255,
+        -1,
+        0,
+        0,
+        255
+      ]
+    },
+    {
+      "input": {
+        "op": "patch",
+        "state": 0,
+        "motion": 0,
+        "above": 35,
+        "aboveTile": -1,
+        "below": -1,
+        "hero": 2
+      },
+      "expected": [
+        0,
+        -1,
+        0,
+        0,
+        35,
+        47,
+        0,
+        0,
+        255,
+        -1,
+        0,
+        0,
+        255
+      ]
+    },
+    {
+      "input": {
+        "op": "patch",
+        "state": 0,
+        "motion": 0,
+        "above": 35,
+        "aboveTile": -1,
+        "below": 0,
+        "hero": 0
+      },
+      "expected": [
+        0,
+        -1,
+        0,
+        0,
+        35,
+        47,
+        0,
+        0,
+        255,
+        0,
+        0,
+        0,
+        255
+      ]
+    },
+    {
+      "input": {
+        "op": "patch",
+        "state": 0,
+        "motion": 0,
+        "above": 35,
+        "aboveTile": -1,
+        "below": 0,
+        "hero": 1
+      },
+      "expected": [
+        0,
+        -1,
+        0,
+        0,
+        35,
+        47,
+        0,
+        0,
+        255,
+        0,
+        0,
+        0,
+        255
+      ]
+    },
+    {
+      "input": {
+        "op": "patch",
+        "state": 0,
+        "motion": 0,
+        "above": 35,
+        "aboveTile": -1,
+        "below": 0,
+        "hero": 2
+      },
+      "expected": [
+        0,
+        -1,
+        0,
+        0,
+        35,
+        47,
+        0,
+        0,
+        255,
+        0,
+        0,
+        0,
+        255
+      ]
+    },
+    {
+      "input": {
+        "op": "patch",
+        "state": 0,
+        "motion": 0,
+        "above": 35,
+        "aboveTile": -1,
+        "below": 80,
+        "hero": 0
+      },
+      "expected": [
+        0,
+        -1,
+        0,
+        0,
+        35,
+        47,
+        0,
+        0,
+        255,
+        80,
+        0,
+        0,
+        255
+      ]
+    },
+    {
+      "input": {
+        "op": "patch",
+        "state": 0,
+        "motion": 0,
+        "above": 35,
+        "aboveTile": -1,
+        "below": 80,
+        "hero": 1
+      },
+      "expected": [
+        0,
+        -1,
+        0,
+        0,
+        35,
+        47,
+        0,
+        0,
+        255,
+        80,
+        0,
+        0,
+        255
+      ]
+    },
+    {
+      "input": {
+        "op": "patch",
+        "state": 0,
+        "motion": 0,
+        "above": 35,
+        "aboveTile": -1,
+        "below": 80,
+        "hero": 2
+      },
+      "expected": [
+        0,
+        -1,
+        0,
+        0,
+        35,
+        47,
+        0,
+        0,
+        255,
+        80,
+        0,
+        0,
+        255
+      ]
+    },
+    {
+      "input": {
+        "op": "patch",
+        "state": 0,
+        "motion": 0,
+        "above": 35,
+        "aboveTile": 30,
+        "below": -1,
+        "hero": 0
+      },
+      "expected": [
+        0,
+        30,
+        0,
+        0,
+        35,
+        47,
+        0,
+        0,
+        255,
+        -1,
+        0,
+        0,
+        255
+      ]
+    },
+    {
+      "input": {
+        "op": "patch",
+        "state": 0,
+        "motion": 0,
+        "above": 35,
+        "aboveTile": 30,
+        "below": -1,
+        "hero": 1
+      },
+      "expected": [
+        0,
+        30,
+        0,
+        0,
+        35,
+        47,
+        0,
+        0,
+        255,
+        -1,
+        0,
+        0,
+        255
+      ]
+    },
+    {
+      "input": {
+        "op": "patch",
+        "state": 0,
+        "motion": 0,
+        "above": 35,
+        "aboveTile": 30,
+        "below": -1,
+        "hero": 2
+      },
+      "expected": [
+        0,
+        30,
+        0,
+        0,
+        35,
+        47,
+        0,
+        0,
+        255,
+        -1,
+        0,
+        0,
+        255
+      ]
+    },
+    {
+      "input": {
+        "op": "patch",
+        "state": 0,
+        "motion": 0,
+        "above": 35,
+        "aboveTile": 30,
+        "below": 0,
+        "hero": 0
+      },
+      "expected": [
+        0,
+        30,
+        0,
+        0,
+        35,
+        47,
+        0,
+        0,
+        255,
+        0,
+        0,
+        0,
+        255
+      ]
+    },
+    {
+      "input": {
+        "op": "patch",
+        "state": 0,
+        "motion": 0,
+        "above": 35,
+        "aboveTile": 30,
+        "below": 0,
+        "hero": 1
+      },
+      "expected": [
+        0,
+        30,
+        0,
+        0,
+        35,
+        47,
+        0,
+        0,
+        255,
+        0,
+        0,
+        0,
+        255
+      ]
+    },
+    {
+      "input": {
+        "op": "patch",
+        "state": 0,
+        "motion": 0,
+        "above": 35,
+        "aboveTile": 30,
+        "below": 0,
+        "hero": 2
+      },
+      "expected": [
+        0,
+        30,
+        0,
+        0,
+        35,
+        47,
+        0,
+        0,
+        255,
+        0,
+        0,
+        0,
+        255
+      ]
+    },
+    {
+      "input": {
+        "op": "patch",
+        "state": 0,
+        "motion": 0,
+        "above": 35,
+        "aboveTile": 30,
+        "below": 80,
+        "hero": 0
+      },
+      "expected": [
+        0,
+        30,
+        0,
+        0,
+        35,
+        47,
+        0,
+        0,
+        255,
+        80,
+        0,
+        0,
+        255
+      ]
+    },
+    {
+      "input": {
+        "op": "patch",
+        "state": 0,
+        "motion": 0,
+        "above": 35,
+        "aboveTile": 30,
+        "below": 80,
+        "hero": 1
+      },
+      "expected": [
+        0,
+        30,
+        0,
+        0,
+        35,
+        47,
+        0,
+        0,
+        255,
+        80,
+        0,
+        0,
+        255
+      ]
+    },
+    {
+      "input": {
+        "op": "patch",
+        "state": 0,
+        "motion": 0,
+        "above": 35,
+        "aboveTile": 30,
+        "below": 80,
+        "hero": 2
+      },
+      "expected": [
+        0,
+        30,
+        0,
+        0,
+        35,
+        47,
+        0,
+        0,
+        255,
+        80,
+        0,
+        0,
+        255
+      ]
+    },
+    {
+      "input": {
+        "op": "patch",
+        "state": 0,
+        "motion": 0,
+        "above": 35,
+        "aboveTile": 80,
+        "below": -1,
+        "hero": 0
+      },
+      "expected": [
+        0,
+        80,
+        0,
+        0,
+        35,
+        47,
+        0,
+        0,
+        255,
+        -1,
+        0,
+        0,
+        255
+      ]
+    },
+    {
+      "input": {
+        "op": "patch",
+        "state": 0,
+        "motion": 0,
+        "above": 35,
+        "aboveTile": 80,
+        "below": -1,
+        "hero": 1
+      },
+      "expected": [
+        0,
+        80,
+        0,
+        0,
+        35,
+        47,
+        0,
+        0,
+        255,
+        -1,
+        0,
+        0,
+        255
+      ]
+    },
+    {
+      "input": {
+        "op": "patch",
+        "state": 0,
+        "motion": 0,
+        "above": 35,
+        "aboveTile": 80,
+        "below": -1,
+        "hero": 2
+      },
+      "expected": [
+        0,
+        80,
+        0,
+        0,
+        35,
+        47,
+        0,
+        0,
+        255,
+        -1,
+        0,
+        0,
+        255
+      ]
+    },
+    {
+      "input": {
+        "op": "patch",
+        "state": 0,
+        "motion": 0,
+        "above": 35,
+        "aboveTile": 80,
+        "below": 0,
+        "hero": 0
+      },
+      "expected": [
+        0,
+        80,
+        0,
+        0,
+        35,
+        47,
+        0,
+        0,
+        255,
+        0,
+        0,
+        0,
+        255
+      ]
+    },
+    {
+      "input": {
+        "op": "patch",
+        "state": 0,
+        "motion": 0,
+        "above": 35,
+        "aboveTile": 80,
+        "below": 0,
+        "hero": 1
+      },
+      "expected": [
+        0,
+        80,
+        0,
+        0,
+        35,
+        47,
+        0,
+        0,
+        255,
+        0,
+        0,
+        0,
+        255
+      ]
+    },
+    {
+      "input": {
+        "op": "patch",
+        "state": 0,
+        "motion": 0,
+        "above": 35,
+        "aboveTile": 80,
+        "below": 0,
+        "hero": 2
+      },
+      "expected": [
+        0,
+        80,
+        0,
+        0,
+        35,
+        47,
+        0,
+        0,
+        255,
+        0,
+        0,
+        0,
+        255
+      ]
+    },
+    {
+      "input": {
+        "op": "patch",
+        "state": 0,
+        "motion": 0,
+        "above": 35,
+        "aboveTile": 80,
+        "below": 80,
+        "hero": 0
+      },
+      "expected": [
+        0,
+        80,
+        0,
+        0,
+        35,
+        47,
+        0,
+        0,
+        255,
+        80,
+        0,
+        0,
+        255
+      ]
+    },
+    {
+      "input": {
+        "op": "patch",
+        "state": 0,
+        "motion": 0,
+        "above": 35,
+        "aboveTile": 80,
+        "below": 80,
+        "hero": 1
+      },
+      "expected": [
+        0,
+        80,
+        0,
+        0,
+        35,
+        47,
+        0,
+        0,
+        255,
+        80,
+        0,
+        0,
+        255
+      ]
+    },
+    {
+      "input": {
+        "op": "patch",
+        "state": 0,
+        "motion": 0,
+        "above": 35,
+        "aboveTile": 80,
+        "below": 80,
+        "hero": 2
+      },
+      "expected": [
+        0,
+        80,
+        0,
+        0,
+        35,
+        47,
+        0,
+        0,
+        255,
+        80,
+        0,
+        0,
+        255
+      ]
+    },
+    {
+      "input": {
+        "op": "patch",
+        "state": 0,
+        "motion": 0,
+        "above": 14,
+        "aboveTile": -1,
+        "below": -1,
+        "hero": 0
+      },
+      "expected": [
+        0,
+        -1,
+        0,
+        0,
+        14,
+        47,
+        0,
+        0,
+        255,
+        -1,
+        0,
+        0,
+        255
+      ]
+    },
+    {
+      "input": {
+        "op": "patch",
+        "state": 0,
+        "motion": 0,
+        "above": 14,
+        "aboveTile": -1,
+        "below": -1,
+        "hero": 1
+      },
+      "expected": [
+        0,
+        -1,
+        0,
+        0,
+        14,
+        47,
+        0,
+        0,
+        255,
+        -1,
+        0,
+        0,
+        255
+      ]
+    },
+    {
+      "input": {
+        "op": "patch",
+        "state": 0,
+        "motion": 0,
+        "above": 14,
+        "aboveTile": -1,
+        "below": -1,
+        "hero": 2
+      },
+      "expected": [
+        0,
+        -1,
+        0,
+        0,
+        14,
+        47,
+        0,
+        0,
+        255,
+        -1,
+        0,
+        0,
+        255
+      ]
+    },
+    {
+      "input": {
+        "op": "patch",
+        "state": 0,
+        "motion": 0,
+        "above": 14,
+        "aboveTile": -1,
+        "below": 0,
+        "hero": 0
+      },
+      "expected": [
+        0,
+        -1,
+        0,
+        0,
+        14,
+        47,
+        0,
+        0,
+        255,
+        0,
+        0,
+        0,
+        255
+      ]
+    },
+    {
+      "input": {
+        "op": "patch",
+        "state": 0,
+        "motion": 0,
+        "above": 14,
+        "aboveTile": -1,
+        "below": 0,
+        "hero": 1
+      },
+      "expected": [
+        0,
+        -1,
+        0,
+        0,
+        14,
+        47,
+        0,
+        0,
+        255,
+        0,
+        0,
+        0,
+        255
+      ]
+    },
+    {
+      "input": {
+        "op": "patch",
+        "state": 0,
+        "motion": 0,
+        "above": 14,
+        "aboveTile": -1,
+        "below": 0,
+        "hero": 2
+      },
+      "expected": [
+        0,
+        -1,
+        0,
+        0,
+        14,
+        47,
+        0,
+        0,
+        255,
+        0,
+        0,
+        0,
+        255
+      ]
+    },
+    {
+      "input": {
+        "op": "patch",
+        "state": 0,
+        "motion": 0,
+        "above": 14,
+        "aboveTile": -1,
+        "below": 80,
+        "hero": 0
+      },
+      "expected": [
+        0,
+        -1,
+        0,
+        0,
+        14,
+        47,
+        0,
+        0,
+        255,
+        80,
+        0,
+        0,
+        255
+      ]
+    },
+    {
+      "input": {
+        "op": "patch",
+        "state": 0,
+        "motion": 0,
+        "above": 14,
+        "aboveTile": -1,
+        "below": 80,
+        "hero": 1
+      },
+      "expected": [
+        0,
+        -1,
+        0,
+        0,
+        14,
+        47,
+        0,
+        0,
+        255,
+        80,
+        0,
+        0,
+        255
+      ]
+    },
+    {
+      "input": {
+        "op": "patch",
+        "state": 0,
+        "motion": 0,
+        "above": 14,
+        "aboveTile": -1,
+        "below": 80,
+        "hero": 2
+      },
+      "expected": [
+        0,
+        -1,
+        0,
+        0,
+        14,
+        47,
+        0,
+        0,
+        255,
+        80,
+        0,
+        0,
+        255
+      ]
+    },
+    {
+      "input": {
+        "op": "patch",
+        "state": 0,
+        "motion": 0,
+        "above": 14,
+        "aboveTile": 30,
+        "below": -1,
+        "hero": 0
+      },
+      "expected": [
+        0,
+        30,
+        0,
+        0,
+        14,
+        47,
+        0,
+        0,
+        255,
+        -1,
+        0,
+        0,
+        255
+      ]
+    },
+    {
+      "input": {
+        "op": "patch",
+        "state": 0,
+        "motion": 0,
+        "above": 14,
+        "aboveTile": 30,
+        "below": -1,
+        "hero": 1
+      },
+      "expected": [
+        0,
+        30,
+        0,
+        0,
+        14,
+        47,
+        0,
+        0,
+        255,
+        -1,
+        0,
+        0,
+        255
+      ]
+    },
+    {
+      "input": {
+        "op": "patch",
+        "state": 0,
+        "motion": 0,
+        "above": 14,
+        "aboveTile": 30,
+        "below": -1,
+        "hero": 2
+      },
+      "expected": [
+        0,
+        30,
+        0,
+        0,
+        14,
+        47,
+        0,
+        0,
+        255,
+        -1,
+        0,
+        0,
+        255
+      ]
+    },
+    {
+      "input": {
+        "op": "patch",
+        "state": 0,
+        "motion": 0,
+        "above": 14,
+        "aboveTile": 30,
+        "below": 0,
+        "hero": 0
+      },
+      "expected": [
+        0,
+        30,
+        0,
+        0,
+        14,
+        47,
+        0,
+        0,
+        255,
+        0,
+        0,
+        0,
+        255
+      ]
+    },
+    {
+      "input": {
+        "op": "patch",
+        "state": 0,
+        "motion": 0,
+        "above": 14,
+        "aboveTile": 30,
+        "below": 0,
+        "hero": 1
+      },
+      "expected": [
+        0,
+        30,
+        0,
+        0,
+        14,
+        47,
+        0,
+        0,
+        255,
+        0,
+        0,
+        0,
+        255
+      ]
+    },
+    {
+      "input": {
+        "op": "patch",
+        "state": 0,
+        "motion": 0,
+        "above": 14,
+        "aboveTile": 30,
+        "below": 0,
+        "hero": 2
+      },
+      "expected": [
+        0,
+        30,
+        0,
+        0,
+        14,
+        47,
+        0,
+        0,
+        255,
+        0,
+        0,
+        0,
+        255
+      ]
+    },
+    {
+      "input": {
+        "op": "patch",
+        "state": 0,
+        "motion": 0,
+        "above": 14,
+        "aboveTile": 30,
+        "below": 80,
+        "hero": 0
+      },
+      "expected": [
+        0,
+        30,
+        0,
+        0,
+        14,
+        47,
+        0,
+        0,
+        255,
+        80,
+        0,
+        0,
+        255
+      ]
+    },
+    {
+      "input": {
+        "op": "patch",
+        "state": 0,
+        "motion": 0,
+        "above": 14,
+        "aboveTile": 30,
+        "below": 80,
+        "hero": 1
+      },
+      "expected": [
+        0,
+        30,
+        0,
+        0,
+        14,
+        47,
+        0,
+        0,
+        255,
+        80,
+        0,
+        0,
+        255
+      ]
+    },
+    {
+      "input": {
+        "op": "patch",
+        "state": 0,
+        "motion": 0,
+        "above": 14,
+        "aboveTile": 30,
+        "below": 80,
+        "hero": 2
+      },
+      "expected": [
+        0,
+        30,
+        0,
+        0,
+        14,
+        47,
+        0,
+        0,
+        255,
+        80,
+        0,
+        0,
+        255
+      ]
+    },
+    {
+      "input": {
+        "op": "patch",
+        "state": 0,
+        "motion": 0,
+        "above": 14,
+        "aboveTile": 80,
+        "below": -1,
+        "hero": 0
+      },
+      "expected": [
+        0,
+        80,
+        0,
+        0,
+        14,
+        47,
+        0,
+        0,
+        255,
+        -1,
+        0,
+        0,
+        255
+      ]
+    },
+    {
+      "input": {
+        "op": "patch",
+        "state": 0,
+        "motion": 0,
+        "above": 14,
+        "aboveTile": 80,
+        "below": -1,
+        "hero": 1
+      },
+      "expected": [
+        0,
+        80,
+        0,
+        0,
+        14,
+        47,
+        0,
+        0,
+        255,
+        -1,
+        0,
+        0,
+        255
+      ]
+    },
+    {
+      "input": {
+        "op": "patch",
+        "state": 0,
+        "motion": 0,
+        "above": 14,
+        "aboveTile": 80,
+        "below": -1,
+        "hero": 2
+      },
+      "expected": [
+        0,
+        80,
+        0,
+        0,
+        14,
+        47,
+        0,
+        0,
+        255,
+        -1,
+        0,
+        0,
+        255
+      ]
+    },
+    {
+      "input": {
+        "op": "patch",
+        "state": 0,
+        "motion": 0,
+        "above": 14,
+        "aboveTile": 80,
+        "below": 0,
+        "hero": 0
+      },
+      "expected": [
+        0,
+        80,
+        0,
+        0,
+        14,
+        47,
+        0,
+        0,
+        255,
+        0,
+        0,
+        0,
+        255
+      ]
+    },
+    {
+      "input": {
+        "op": "patch",
+        "state": 0,
+        "motion": 0,
+        "above": 14,
+        "aboveTile": 80,
+        "below": 0,
+        "hero": 1
+      },
+      "expected": [
+        0,
+        80,
+        0,
+        0,
+        14,
+        47,
+        0,
+        0,
+        255,
+        0,
+        0,
+        0,
+        255
+      ]
+    },
+    {
+      "input": {
+        "op": "patch",
+        "state": 0,
+        "motion": 0,
+        "above": 14,
+        "aboveTile": 80,
+        "below": 0,
+        "hero": 2
+      },
+      "expected": [
+        0,
+        80,
+        0,
+        0,
+        14,
+        47,
+        0,
+        0,
+        255,
+        0,
+        0,
+        0,
+        255
+      ]
+    },
+    {
+      "input": {
+        "op": "patch",
+        "state": 0,
+        "motion": 0,
+        "above": 14,
+        "aboveTile": 80,
+        "below": 80,
+        "hero": 0
+      },
+      "expected": [
+        0,
+        80,
+        0,
+        0,
+        14,
+        47,
+        0,
+        0,
+        255,
+        80,
+        0,
+        0,
+        255
+      ]
+    },
+    {
+      "input": {
+        "op": "patch",
+        "state": 0,
+        "motion": 0,
+        "above": 14,
+        "aboveTile": 80,
+        "below": 80,
+        "hero": 1
+      },
+      "expected": [
+        0,
+        80,
+        0,
+        0,
+        14,
+        47,
+        0,
+        0,
+        255,
+        80,
+        0,
+        0,
+        255
+      ]
+    },
+    {
+      "input": {
+        "op": "patch",
+        "state": 0,
+        "motion": 0,
+        "above": 14,
+        "aboveTile": 80,
+        "below": 80,
+        "hero": 2
+      },
+      "expected": [
+        0,
+        80,
+        0,
+        0,
+        14,
+        47,
+        0,
+        0,
+        255,
+        80,
+        0,
+        0,
+        255
+      ]
+    },
+    {
+      "input": {
+        "op": "patch",
+        "state": 3,
+        "motion": 0,
+        "above": -1,
+        "aboveTile": -1,
+        "below": -1,
+        "hero": 0
+      },
+      "expected": [
+        0,
+        -1,
+        0,
+        0,
+        255,
+        47,
+        3,
+        0,
+        255,
+        -1,
+        0,
+        0,
+        255
+      ]
+    },
+    {
+      "input": {
+        "op": "patch",
+        "state": 3,
+        "motion": 0,
+        "above": -1,
+        "aboveTile": -1,
+        "below": -1,
+        "hero": 1
+      },
+      "expected": [
+        0,
+        -1,
+        0,
+        0,
+        255,
+        47,
+        3,
+        0,
+        255,
+        -1,
+        0,
+        0,
+        255
+      ]
+    },
+    {
+      "input": {
+        "op": "patch",
+        "state": 3,
+        "motion": 0,
+        "above": -1,
+        "aboveTile": -1,
+        "below": -1,
+        "hero": 2
+      },
+      "expected": [
+        0,
+        -1,
+        0,
+        0,
+        255,
+        47,
+        3,
+        0,
+        255,
+        -1,
+        0,
+        0,
+        255
+      ]
+    },
+    {
+      "input": {
+        "op": "patch",
+        "state": 3,
+        "motion": 0,
+        "above": -1,
+        "aboveTile": -1,
+        "below": 0,
+        "hero": 0
+      },
+      "expected": [
+        0,
+        -1,
+        0,
+        0,
+        255,
+        47,
+        3,
+        0,
+        255,
+        0,
+        0,
+        0,
+        255
+      ]
+    },
+    {
+      "input": {
+        "op": "patch",
+        "state": 3,
+        "motion": 0,
+        "above": -1,
+        "aboveTile": -1,
+        "below": 0,
+        "hero": 1
+      },
+      "expected": [
+        0,
+        -1,
+        0,
+        0,
+        255,
+        47,
+        3,
+        0,
+        255,
+        0,
+        0,
+        0,
+        255
+      ]
+    },
+    {
+      "input": {
+        "op": "patch",
+        "state": 3,
+        "motion": 0,
+        "above": -1,
+        "aboveTile": -1,
+        "below": 0,
+        "hero": 2
+      },
+      "expected": [
+        0,
+        -1,
+        0,
+        0,
+        255,
+        47,
+        3,
+        0,
+        255,
+        0,
+        0,
+        0,
+        255
+      ]
+    },
+    {
+      "input": {
+        "op": "patch",
+        "state": 3,
+        "motion": 0,
+        "above": -1,
+        "aboveTile": -1,
+        "below": 80,
+        "hero": 0
+      },
+      "expected": [
+        0,
+        -1,
+        0,
+        0,
+        255,
+        47,
+        3,
+        0,
+        255,
+        80,
+        0,
+        0,
+        255
+      ]
+    },
+    {
+      "input": {
+        "op": "patch",
+        "state": 3,
+        "motion": 0,
+        "above": -1,
+        "aboveTile": -1,
+        "below": 80,
+        "hero": 1
+      },
+      "expected": [
+        0,
+        -1,
+        0,
+        0,
+        255,
+        47,
+        3,
+        0,
+        255,
+        80,
+        0,
+        0,
+        255
+      ]
+    },
+    {
+      "input": {
+        "op": "patch",
+        "state": 3,
+        "motion": 0,
+        "above": -1,
+        "aboveTile": -1,
+        "below": 80,
+        "hero": 2
+      },
+      "expected": [
+        0,
+        -1,
+        0,
+        0,
+        255,
+        47,
+        3,
+        0,
+        255,
+        80,
+        0,
+        0,
+        255
+      ]
+    },
+    {
+      "input": {
+        "op": "patch",
+        "state": 3,
+        "motion": 0,
+        "above": -1,
+        "aboveTile": 30,
+        "below": -1,
+        "hero": 0
+      },
+      "expected": [
+        0,
+        30,
+        0,
+        0,
+        255,
+        47,
+        3,
+        0,
+        255,
+        -1,
+        0,
+        0,
+        255
+      ]
+    },
+    {
+      "input": {
+        "op": "patch",
+        "state": 3,
+        "motion": 0,
+        "above": -1,
+        "aboveTile": 30,
+        "below": -1,
+        "hero": 1
+      },
+      "expected": [
+        0,
+        30,
+        0,
+        0,
+        255,
+        47,
+        3,
+        0,
+        255,
+        -1,
+        0,
+        0,
+        255
+      ]
+    },
+    {
+      "input": {
+        "op": "patch",
+        "state": 3,
+        "motion": 0,
+        "above": -1,
+        "aboveTile": 30,
+        "below": -1,
+        "hero": 2
+      },
+      "expected": [
+        0,
+        30,
+        0,
+        0,
+        255,
+        47,
+        3,
+        0,
+        255,
+        -1,
+        0,
+        0,
+        255
+      ]
+    },
+    {
+      "input": {
+        "op": "patch",
+        "state": 3,
+        "motion": 0,
+        "above": -1,
+        "aboveTile": 30,
+        "below": 0,
+        "hero": 0
+      },
+      "expected": [
+        0,
+        30,
+        0,
+        0,
+        255,
+        47,
+        3,
+        0,
+        255,
+        0,
+        0,
+        0,
+        255
+      ]
+    },
+    {
+      "input": {
+        "op": "patch",
+        "state": 3,
+        "motion": 0,
+        "above": -1,
+        "aboveTile": 30,
+        "below": 0,
+        "hero": 1
+      },
+      "expected": [
+        0,
+        30,
+        0,
+        0,
+        255,
+        47,
+        3,
+        0,
+        255,
+        0,
+        0,
+        0,
+        255
+      ]
+    },
+    {
+      "input": {
+        "op": "patch",
+        "state": 3,
+        "motion": 0,
+        "above": -1,
+        "aboveTile": 30,
+        "below": 0,
+        "hero": 2
+      },
+      "expected": [
+        0,
+        30,
+        0,
+        0,
+        255,
+        47,
+        3,
+        0,
+        255,
+        0,
+        0,
+        0,
+        255
+      ]
+    },
+    {
+      "input": {
+        "op": "patch",
+        "state": 3,
+        "motion": 0,
+        "above": -1,
+        "aboveTile": 30,
+        "below": 80,
+        "hero": 0
+      },
+      "expected": [
+        0,
+        30,
+        0,
+        0,
+        255,
+        47,
+        3,
+        0,
+        255,
+        80,
+        0,
+        0,
+        255
+      ]
+    },
+    {
+      "input": {
+        "op": "patch",
+        "state": 3,
+        "motion": 0,
+        "above": -1,
+        "aboveTile": 30,
+        "below": 80,
+        "hero": 1
+      },
+      "expected": [
+        0,
+        30,
+        0,
+        0,
+        255,
+        47,
+        3,
+        0,
+        255,
+        80,
+        0,
+        0,
+        255
+      ]
+    },
+    {
+      "input": {
+        "op": "patch",
+        "state": 3,
+        "motion": 0,
+        "above": -1,
+        "aboveTile": 30,
+        "below": 80,
+        "hero": 2
+      },
+      "expected": [
+        0,
+        30,
+        0,
+        0,
+        255,
+        47,
+        3,
+        0,
+        255,
+        80,
+        0,
+        0,
+        255
+      ]
+    },
+    {
+      "input": {
+        "op": "patch",
+        "state": 3,
+        "motion": 0,
+        "above": -1,
+        "aboveTile": 80,
+        "below": -1,
+        "hero": 0
+      },
+      "expected": [
+        0,
+        80,
+        0,
+        0,
+        255,
+        47,
+        3,
+        0,
+        255,
+        -1,
+        0,
+        0,
+        255
+      ]
+    },
+    {
+      "input": {
+        "op": "patch",
+        "state": 3,
+        "motion": 0,
+        "above": -1,
+        "aboveTile": 80,
+        "below": -1,
+        "hero": 1
+      },
+      "expected": [
+        0,
+        80,
+        0,
+        0,
+        255,
+        47,
+        3,
+        0,
+        255,
+        -1,
+        0,
+        0,
+        255
+      ]
+    },
+    {
+      "input": {
+        "op": "patch",
+        "state": 3,
+        "motion": 0,
+        "above": -1,
+        "aboveTile": 80,
+        "below": -1,
+        "hero": 2
+      },
+      "expected": [
+        0,
+        80,
+        0,
+        0,
+        255,
+        47,
+        3,
+        0,
+        255,
+        -1,
+        0,
+        0,
+        255
+      ]
+    },
+    {
+      "input": {
+        "op": "patch",
+        "state": 3,
+        "motion": 0,
+        "above": -1,
+        "aboveTile": 80,
+        "below": 0,
+        "hero": 0
+      },
+      "expected": [
+        0,
+        80,
+        0,
+        0,
+        255,
+        47,
+        3,
+        0,
+        255,
+        0,
+        0,
+        0,
+        255
+      ]
+    },
+    {
+      "input": {
+        "op": "patch",
+        "state": 3,
+        "motion": 0,
+        "above": -1,
+        "aboveTile": 80,
+        "below": 0,
+        "hero": 1
+      },
+      "expected": [
+        0,
+        80,
+        0,
+        0,
+        255,
+        47,
+        3,
+        0,
+        255,
+        0,
+        0,
+        0,
+        255
+      ]
+    },
+    {
+      "input": {
+        "op": "patch",
+        "state": 3,
+        "motion": 0,
+        "above": -1,
+        "aboveTile": 80,
+        "below": 0,
+        "hero": 2
+      },
+      "expected": [
+        0,
+        80,
+        0,
+        0,
+        255,
+        47,
+        3,
+        0,
+        255,
+        0,
+        0,
+        0,
+        255
+      ]
+    },
+    {
+      "input": {
+        "op": "patch",
+        "state": 3,
+        "motion": 0,
+        "above": -1,
+        "aboveTile": 80,
+        "below": 80,
+        "hero": 0
+      },
+      "expected": [
+        0,
+        80,
+        0,
+        0,
+        255,
+        47,
+        3,
+        0,
+        255,
+        80,
+        0,
+        0,
+        255
+      ]
+    },
+    {
+      "input": {
+        "op": "patch",
+        "state": 3,
+        "motion": 0,
+        "above": -1,
+        "aboveTile": 80,
+        "below": 80,
+        "hero": 1
+      },
+      "expected": [
+        0,
+        80,
+        0,
+        0,
+        255,
+        47,
+        3,
+        0,
+        255,
+        80,
+        0,
+        0,
+        255
+      ]
+    },
+    {
+      "input": {
+        "op": "patch",
+        "state": 3,
+        "motion": 0,
+        "above": -1,
+        "aboveTile": 80,
+        "below": 80,
+        "hero": 2
+      },
+      "expected": [
+        0,
+        80,
+        0,
+        0,
+        255,
+        47,
+        3,
+        0,
+        255,
+        80,
+        0,
+        0,
+        255
+      ]
+    },
+    {
+      "input": {
+        "op": "patch",
+        "state": 3,
+        "motion": 0,
+        "above": 35,
+        "aboveTile": -1,
+        "below": -1,
+        "hero": 0
+      },
+      "expected": [
+        0,
+        -1,
+        0,
+        0,
+        35,
+        47,
+        3,
+        0,
+        255,
+        -1,
+        0,
+        0,
+        255
+      ]
+    },
+    {
+      "input": {
+        "op": "patch",
+        "state": 3,
+        "motion": 0,
+        "above": 35,
+        "aboveTile": -1,
+        "below": -1,
+        "hero": 1
+      },
+      "expected": [
+        0,
+        -1,
+        0,
+        0,
+        35,
+        47,
+        3,
+        0,
+        255,
+        -1,
+        0,
+        0,
+        255
+      ]
+    },
+    {
+      "input": {
+        "op": "patch",
+        "state": 3,
+        "motion": 0,
+        "above": 35,
+        "aboveTile": -1,
+        "below": -1,
+        "hero": 2
+      },
+      "expected": [
+        0,
+        -1,
+        0,
+        0,
+        35,
+        47,
+        3,
+        0,
+        255,
+        -1,
+        0,
+        0,
+        255
+      ]
+    },
+    {
+      "input": {
+        "op": "patch",
+        "state": 3,
+        "motion": 0,
+        "above": 35,
+        "aboveTile": -1,
+        "below": 0,
+        "hero": 0
+      },
+      "expected": [
+        0,
+        -1,
+        0,
+        0,
+        35,
+        47,
+        3,
+        0,
+        255,
+        0,
+        0,
+        0,
+        255
+      ]
+    },
+    {
+      "input": {
+        "op": "patch",
+        "state": 3,
+        "motion": 0,
+        "above": 35,
+        "aboveTile": -1,
+        "below": 0,
+        "hero": 1
+      },
+      "expected": [
+        0,
+        -1,
+        0,
+        0,
+        35,
+        47,
+        3,
+        0,
+        255,
+        0,
+        0,
+        0,
+        255
+      ]
+    },
+    {
+      "input": {
+        "op": "patch",
+        "state": 3,
+        "motion": 0,
+        "above": 35,
+        "aboveTile": -1,
+        "below": 0,
+        "hero": 2
+      },
+      "expected": [
+        0,
+        -1,
+        0,
+        0,
+        35,
+        47,
+        3,
+        0,
+        255,
+        0,
+        0,
+        0,
+        255
+      ]
+    },
+    {
+      "input": {
+        "op": "patch",
+        "state": 3,
+        "motion": 0,
+        "above": 35,
+        "aboveTile": -1,
+        "below": 80,
+        "hero": 0
+      },
+      "expected": [
+        0,
+        -1,
+        0,
+        0,
+        35,
+        47,
+        3,
+        0,
+        255,
+        80,
+        0,
+        0,
+        255
+      ]
+    },
+    {
+      "input": {
+        "op": "patch",
+        "state": 3,
+        "motion": 0,
+        "above": 35,
+        "aboveTile": -1,
+        "below": 80,
+        "hero": 1
+      },
+      "expected": [
+        0,
+        -1,
+        0,
+        0,
+        35,
+        47,
+        3,
+        0,
+        255,
+        80,
+        0,
+        0,
+        255
+      ]
+    },
+    {
+      "input": {
+        "op": "patch",
+        "state": 3,
+        "motion": 0,
+        "above": 35,
+        "aboveTile": -1,
+        "below": 80,
+        "hero": 2
+      },
+      "expected": [
+        0,
+        -1,
+        0,
+        0,
+        35,
+        47,
+        3,
+        0,
+        255,
+        80,
+        0,
+        0,
+        255
+      ]
+    },
+    {
+      "input": {
+        "op": "patch",
+        "state": 3,
+        "motion": 0,
+        "above": 35,
+        "aboveTile": 30,
+        "below": -1,
+        "hero": 0
+      },
+      "expected": [
+        0,
+        30,
+        0,
+        0,
+        35,
+        47,
+        3,
+        0,
+        255,
+        -1,
+        0,
+        0,
+        255
+      ]
+    },
+    {
+      "input": {
+        "op": "patch",
+        "state": 3,
+        "motion": 0,
+        "above": 35,
+        "aboveTile": 30,
+        "below": -1,
+        "hero": 1
+      },
+      "expected": [
+        0,
+        30,
+        0,
+        0,
+        35,
+        47,
+        3,
+        0,
+        255,
+        -1,
+        0,
+        0,
+        255
+      ]
+    },
+    {
+      "input": {
+        "op": "patch",
+        "state": 3,
+        "motion": 0,
+        "above": 35,
+        "aboveTile": 30,
+        "below": -1,
+        "hero": 2
+      },
+      "expected": [
+        0,
+        30,
+        0,
+        0,
+        35,
+        47,
+        3,
+        0,
+        255,
+        -1,
+        0,
+        0,
+        255
+      ]
+    },
+    {
+      "input": {
+        "op": "patch",
+        "state": 3,
+        "motion": 0,
+        "above": 35,
+        "aboveTile": 30,
+        "below": 0,
+        "hero": 0
+      },
+      "expected": [
+        0,
+        30,
+        0,
+        0,
+        35,
+        47,
+        3,
+        0,
+        255,
+        0,
+        0,
+        0,
+        255
+      ]
+    },
+    {
+      "input": {
+        "op": "patch",
+        "state": 3,
+        "motion": 0,
+        "above": 35,
+        "aboveTile": 30,
+        "below": 0,
+        "hero": 1
+      },
+      "expected": [
+        0,
+        30,
+        0,
+        0,
+        35,
+        47,
+        3,
+        0,
+        255,
+        0,
+        0,
+        0,
+        255
+      ]
+    },
+    {
+      "input": {
+        "op": "patch",
+        "state": 3,
+        "motion": 0,
+        "above": 35,
+        "aboveTile": 30,
+        "below": 0,
+        "hero": 2
+      },
+      "expected": [
+        0,
+        30,
+        0,
+        0,
+        35,
+        47,
+        3,
+        0,
+        255,
+        0,
+        0,
+        0,
+        255
+      ]
+    },
+    {
+      "input": {
+        "op": "patch",
+        "state": 3,
+        "motion": 0,
+        "above": 35,
+        "aboveTile": 30,
+        "below": 80,
+        "hero": 0
+      },
+      "expected": [
+        0,
+        30,
+        0,
+        0,
+        35,
+        47,
+        3,
+        0,
+        255,
+        80,
+        0,
+        0,
+        255
+      ]
+    },
+    {
+      "input": {
+        "op": "patch",
+        "state": 3,
+        "motion": 0,
+        "above": 35,
+        "aboveTile": 30,
+        "below": 80,
+        "hero": 1
+      },
+      "expected": [
+        0,
+        30,
+        0,
+        0,
+        35,
+        47,
+        3,
+        0,
+        255,
+        80,
+        0,
+        0,
+        255
+      ]
+    },
+    {
+      "input": {
+        "op": "patch",
+        "state": 3,
+        "motion": 0,
+        "above": 35,
+        "aboveTile": 30,
+        "below": 80,
+        "hero": 2
+      },
+      "expected": [
+        0,
+        30,
+        0,
+        0,
+        35,
+        47,
+        3,
+        0,
+        255,
+        80,
+        0,
+        0,
+        255
+      ]
+    },
+    {
+      "input": {
+        "op": "patch",
+        "state": 3,
+        "motion": 0,
+        "above": 35,
+        "aboveTile": 80,
+        "below": -1,
+        "hero": 0
+      },
+      "expected": [
+        0,
+        80,
+        0,
+        0,
+        35,
+        47,
+        3,
+        0,
+        255,
+        -1,
+        0,
+        0,
+        255
+      ]
+    },
+    {
+      "input": {
+        "op": "patch",
+        "state": 3,
+        "motion": 0,
+        "above": 35,
+        "aboveTile": 80,
+        "below": -1,
+        "hero": 1
+      },
+      "expected": [
+        0,
+        80,
+        0,
+        0,
+        35,
+        47,
+        3,
+        0,
+        255,
+        -1,
+        0,
+        0,
+        255
+      ]
+    },
+    {
+      "input": {
+        "op": "patch",
+        "state": 3,
+        "motion": 0,
+        "above": 35,
+        "aboveTile": 80,
+        "below": -1,
+        "hero": 2
+      },
+      "expected": [
+        0,
+        80,
+        0,
+        0,
+        35,
+        47,
+        3,
+        0,
+        255,
+        -1,
+        0,
+        0,
+        255
+      ]
+    },
+    {
+      "input": {
+        "op": "patch",
+        "state": 3,
+        "motion": 0,
+        "above": 35,
+        "aboveTile": 80,
+        "below": 0,
+        "hero": 0
+      },
+      "expected": [
+        0,
+        80,
+        0,
+        0,
+        35,
+        47,
+        3,
+        0,
+        255,
+        0,
+        0,
+        0,
+        255
+      ]
+    },
+    {
+      "input": {
+        "op": "patch",
+        "state": 3,
+        "motion": 0,
+        "above": 35,
+        "aboveTile": 80,
+        "below": 0,
+        "hero": 1
+      },
+      "expected": [
+        0,
+        80,
+        0,
+        0,
+        35,
+        47,
+        3,
+        0,
+        255,
+        0,
+        0,
+        0,
+        255
+      ]
+    },
+    {
+      "input": {
+        "op": "patch",
+        "state": 3,
+        "motion": 0,
+        "above": 35,
+        "aboveTile": 80,
+        "below": 0,
+        "hero": 2
+      },
+      "expected": [
+        0,
+        80,
+        0,
+        0,
+        35,
+        47,
+        3,
+        0,
+        255,
+        0,
+        0,
+        0,
+        255
+      ]
+    },
+    {
+      "input": {
+        "op": "patch",
+        "state": 3,
+        "motion": 0,
+        "above": 35,
+        "aboveTile": 80,
+        "below": 80,
+        "hero": 0
+      },
+      "expected": [
+        0,
+        80,
+        0,
+        0,
+        35,
+        47,
+        3,
+        0,
+        255,
+        80,
+        0,
+        0,
+        255
+      ]
+    },
+    {
+      "input": {
+        "op": "patch",
+        "state": 3,
+        "motion": 0,
+        "above": 35,
+        "aboveTile": 80,
+        "below": 80,
+        "hero": 1
+      },
+      "expected": [
+        0,
+        80,
+        0,
+        0,
+        35,
+        47,
+        3,
+        0,
+        255,
+        80,
+        0,
+        0,
+        255
+      ]
+    },
+    {
+      "input": {
+        "op": "patch",
+        "state": 3,
+        "motion": 0,
+        "above": 35,
+        "aboveTile": 80,
+        "below": 80,
+        "hero": 2
+      },
+      "expected": [
+        0,
+        80,
+        0,
+        0,
+        35,
+        47,
+        3,
+        0,
+        255,
+        80,
+        0,
+        0,
+        255
+      ]
+    },
+    {
+      "input": {
+        "op": "patch",
+        "state": 3,
+        "motion": 0,
+        "above": 14,
+        "aboveTile": -1,
+        "below": -1,
+        "hero": 0
+      },
+      "expected": [
+        0,
+        -1,
+        0,
+        0,
+        14,
+        47,
+        3,
+        0,
+        255,
+        -1,
+        0,
+        0,
+        255
+      ]
+    },
+    {
+      "input": {
+        "op": "patch",
+        "state": 3,
+        "motion": 0,
+        "above": 14,
+        "aboveTile": -1,
+        "below": -1,
+        "hero": 1
+      },
+      "expected": [
+        0,
+        -1,
+        0,
+        0,
+        14,
+        47,
+        3,
+        0,
+        255,
+        -1,
+        0,
+        0,
+        255
+      ]
+    },
+    {
+      "input": {
+        "op": "patch",
+        "state": 3,
+        "motion": 0,
+        "above": 14,
+        "aboveTile": -1,
+        "below": -1,
+        "hero": 2
+      },
+      "expected": [
+        0,
+        -1,
+        0,
+        0,
+        14,
+        47,
+        3,
+        0,
+        255,
+        -1,
+        0,
+        0,
+        255
+      ]
+    },
+    {
+      "input": {
+        "op": "patch",
+        "state": 3,
+        "motion": 0,
+        "above": 14,
+        "aboveTile": -1,
+        "below": 0,
+        "hero": 0
+      },
+      "expected": [
+        0,
+        -1,
+        0,
+        0,
+        14,
+        47,
+        3,
+        0,
+        255,
+        0,
+        0,
+        0,
+        255
+      ]
+    },
+    {
+      "input": {
+        "op": "patch",
+        "state": 3,
+        "motion": 0,
+        "above": 14,
+        "aboveTile": -1,
+        "below": 0,
+        "hero": 1
+      },
+      "expected": [
+        0,
+        -1,
+        0,
+        0,
+        14,
+        47,
+        3,
+        0,
+        255,
+        0,
+        0,
+        0,
+        255
+      ]
+    },
+    {
+      "input": {
+        "op": "patch",
+        "state": 3,
+        "motion": 0,
+        "above": 14,
+        "aboveTile": -1,
+        "below": 0,
+        "hero": 2
+      },
+      "expected": [
+        0,
+        -1,
+        0,
+        0,
+        14,
+        47,
+        3,
+        0,
+        255,
+        0,
+        0,
+        0,
+        255
+      ]
+    },
+    {
+      "input": {
+        "op": "patch",
+        "state": 3,
+        "motion": 0,
+        "above": 14,
+        "aboveTile": -1,
+        "below": 80,
+        "hero": 0
+      },
+      "expected": [
+        0,
+        -1,
+        0,
+        0,
+        14,
+        47,
+        3,
+        0,
+        255,
+        80,
+        0,
+        0,
+        255
+      ]
+    },
+    {
+      "input": {
+        "op": "patch",
+        "state": 3,
+        "motion": 0,
+        "above": 14,
+        "aboveTile": -1,
+        "below": 80,
+        "hero": 1
+      },
+      "expected": [
+        0,
+        -1,
+        0,
+        0,
+        14,
+        47,
+        3,
+        0,
+        255,
+        80,
+        0,
+        0,
+        255
+      ]
+    },
+    {
+      "input": {
+        "op": "patch",
+        "state": 3,
+        "motion": 0,
+        "above": 14,
+        "aboveTile": -1,
+        "below": 80,
+        "hero": 2
+      },
+      "expected": [
+        0,
+        -1,
+        0,
+        0,
+        14,
+        47,
+        3,
+        0,
+        255,
+        80,
+        0,
+        0,
+        255
+      ]
+    },
+    {
+      "input": {
+        "op": "patch",
+        "state": 3,
+        "motion": 0,
+        "above": 14,
+        "aboveTile": 30,
+        "below": -1,
+        "hero": 0
+      },
+      "expected": [
+        0,
+        30,
+        0,
+        0,
+        14,
+        47,
+        3,
+        0,
+        255,
+        -1,
+        0,
+        0,
+        255
+      ]
+    },
+    {
+      "input": {
+        "op": "patch",
+        "state": 3,
+        "motion": 0,
+        "above": 14,
+        "aboveTile": 30,
+        "below": -1,
+        "hero": 1
+      },
+      "expected": [
+        0,
+        30,
+        0,
+        0,
+        14,
+        47,
+        3,
+        0,
+        255,
+        -1,
+        0,
+        0,
+        255
+      ]
+    },
+    {
+      "input": {
+        "op": "patch",
+        "state": 3,
+        "motion": 0,
+        "above": 14,
+        "aboveTile": 30,
+        "below": -1,
+        "hero": 2
+      },
+      "expected": [
+        0,
+        30,
+        0,
+        0,
+        14,
+        47,
+        3,
+        0,
+        255,
+        -1,
+        0,
+        0,
+        255
+      ]
+    },
+    {
+      "input": {
+        "op": "patch",
+        "state": 3,
+        "motion": 0,
+        "above": 14,
+        "aboveTile": 30,
+        "below": 0,
+        "hero": 0
+      },
+      "expected": [
+        0,
+        30,
+        0,
+        0,
+        14,
+        47,
+        3,
+        0,
+        255,
+        0,
+        0,
+        0,
+        255
+      ]
+    },
+    {
+      "input": {
+        "op": "patch",
+        "state": 3,
+        "motion": 0,
+        "above": 14,
+        "aboveTile": 30,
+        "below": 0,
+        "hero": 1
+      },
+      "expected": [
+        0,
+        30,
+        0,
+        0,
+        14,
+        47,
+        3,
+        0,
+        255,
+        0,
+        0,
+        0,
+        255
+      ]
+    },
+    {
+      "input": {
+        "op": "patch",
+        "state": 3,
+        "motion": 0,
+        "above": 14,
+        "aboveTile": 30,
+        "below": 0,
+        "hero": 2
+      },
+      "expected": [
+        0,
+        30,
+        0,
+        0,
+        14,
+        47,
+        3,
+        0,
+        255,
+        0,
+        0,
+        0,
+        255
+      ]
+    },
+    {
+      "input": {
+        "op": "patch",
+        "state": 3,
+        "motion": 0,
+        "above": 14,
+        "aboveTile": 30,
+        "below": 80,
+        "hero": 0
+      },
+      "expected": [
+        0,
+        30,
+        0,
+        0,
+        14,
+        47,
+        3,
+        0,
+        255,
+        80,
+        0,
+        0,
+        255
+      ]
+    },
+    {
+      "input": {
+        "op": "patch",
+        "state": 3,
+        "motion": 0,
+        "above": 14,
+        "aboveTile": 30,
+        "below": 80,
+        "hero": 1
+      },
+      "expected": [
+        0,
+        30,
+        0,
+        0,
+        14,
+        47,
+        3,
+        0,
+        255,
+        80,
+        0,
+        0,
+        255
+      ]
+    },
+    {
+      "input": {
+        "op": "patch",
+        "state": 3,
+        "motion": 0,
+        "above": 14,
+        "aboveTile": 30,
+        "below": 80,
+        "hero": 2
+      },
+      "expected": [
+        0,
+        30,
+        0,
+        0,
+        14,
+        47,
+        3,
+        0,
+        255,
+        80,
+        0,
+        0,
+        255
+      ]
+    },
+    {
+      "input": {
+        "op": "patch",
+        "state": 3,
+        "motion": 0,
+        "above": 14,
+        "aboveTile": 80,
+        "below": -1,
+        "hero": 0
+      },
+      "expected": [
+        0,
+        80,
+        0,
+        0,
+        14,
+        47,
+        3,
+        0,
+        255,
+        -1,
+        0,
+        0,
+        255
+      ]
+    },
+    {
+      "input": {
+        "op": "patch",
+        "state": 3,
+        "motion": 0,
+        "above": 14,
+        "aboveTile": 80,
+        "below": -1,
+        "hero": 1
+      },
+      "expected": [
+        0,
+        80,
+        0,
+        0,
+        14,
+        47,
+        3,
+        0,
+        255,
+        -1,
+        0,
+        0,
+        255
+      ]
+    },
+    {
+      "input": {
+        "op": "patch",
+        "state": 3,
+        "motion": 0,
+        "above": 14,
+        "aboveTile": 80,
+        "below": -1,
+        "hero": 2
+      },
+      "expected": [
+        0,
+        80,
+        0,
+        0,
+        14,
+        47,
+        3,
+        0,
+        255,
+        -1,
+        0,
+        0,
+        255
+      ]
+    },
+    {
+      "input": {
+        "op": "patch",
+        "state": 3,
+        "motion": 0,
+        "above": 14,
+        "aboveTile": 80,
+        "below": 0,
+        "hero": 0
+      },
+      "expected": [
+        0,
+        80,
+        0,
+        0,
+        14,
+        47,
+        3,
+        0,
+        255,
+        0,
+        0,
+        0,
+        255
+      ]
+    },
+    {
+      "input": {
+        "op": "patch",
+        "state": 3,
+        "motion": 0,
+        "above": 14,
+        "aboveTile": 80,
+        "below": 0,
+        "hero": 1
+      },
+      "expected": [
+        0,
+        80,
+        0,
+        0,
+        14,
+        47,
+        3,
+        0,
+        255,
+        0,
+        0,
+        0,
+        255
+      ]
+    },
+    {
+      "input": {
+        "op": "patch",
+        "state": 3,
+        "motion": 0,
+        "above": 14,
+        "aboveTile": 80,
+        "below": 0,
+        "hero": 2
+      },
+      "expected": [
+        0,
+        80,
+        0,
+        0,
+        14,
+        47,
+        3,
+        0,
+        255,
+        0,
+        0,
+        0,
+        255
+      ]
+    },
+    {
+      "input": {
+        "op": "patch",
+        "state": 3,
+        "motion": 0,
+        "above": 14,
+        "aboveTile": 80,
+        "below": 80,
+        "hero": 0
+      },
+      "expected": [
+        0,
+        80,
+        0,
+        0,
+        14,
+        47,
+        3,
+        0,
+        255,
+        80,
+        0,
+        0,
+        255
+      ]
+    },
+    {
+      "input": {
+        "op": "patch",
+        "state": 3,
+        "motion": 0,
+        "above": 14,
+        "aboveTile": 80,
+        "below": 80,
+        "hero": 1
+      },
+      "expected": [
+        0,
+        80,
+        0,
+        0,
+        14,
+        47,
+        3,
+        0,
+        255,
+        80,
+        0,
+        0,
+        255
+      ]
+    },
+    {
+      "input": {
+        "op": "patch",
+        "state": 3,
+        "motion": 0,
+        "above": 14,
+        "aboveTile": 80,
+        "below": 80,
+        "hero": 2
+      },
+      "expected": [
+        0,
+        80,
+        0,
+        0,
+        14,
+        47,
+        3,
+        0,
+        255,
+        80,
+        0,
+        0,
+        255
+      ]
+    },
+    {
+      "input": {
+        "op": "slider",
+        "state": 0,
+        "motion": 0,
+        "above": -1,
+        "aboveTile": 48,
+        "below": -1,
+        "hero": 0
+      },
+      "expected": [
+        0,
+        -1,
+        0,
+        0,
+        255,
+        48,
+        8,
+        0,
+        255,
+        48,
+        3,
+        18,
+        255
+      ]
+    },
+    {
+      "input": {
+        "op": "slider",
+        "state": 0,
+        "motion": 0,
+        "above": -1,
+        "aboveTile": 48,
+        "below": -1,
+        "hero": 3
+      },
+      "expected": [
+        0,
+        48,
+        8,
+        0,
+        255,
+        48,
+        0,
+        0,
+        255,
+        -1,
+        0,
+        0,
+        255
+      ]
+    },
+    {
+      "input": {
+        "op": "slider",
+        "state": 0,
+        "motion": 0,
+        "above": -1,
+        "aboveTile": 48,
+        "below": 0,
+        "hero": 0
+      },
+      "expected": [
+        0,
+        48,
+        8,
+        0,
+        255,
+        48,
+        0,
+        0,
+        255,
+        0,
+        0,
+        0,
+        255
+      ]
+    },
+    {
+      "input": {
+        "op": "slider",
+        "state": 0,
+        "motion": 0,
+        "above": -1,
+        "aboveTile": 48,
+        "below": 0,
+        "hero": 3
+      },
+      "expected": [
+        0,
+        48,
+        8,
+        0,
+        255,
+        48,
+        0,
+        0,
+        255,
+        0,
+        0,
+        0,
+        255
+      ]
+    },
+    {
+      "input": {
+        "op": "slider",
+        "state": 0,
+        "motion": 0,
+        "above": -1,
+        "aboveTile": 48,
+        "below": 80,
+        "hero": 0
+      },
+      "expected": [
+        0,
+        48,
+        8,
+        0,
+        255,
+        48,
+        0,
+        0,
+        255,
+        80,
+        0,
+        0,
+        255
+      ]
+    },
+    {
+      "input": {
+        "op": "slider",
+        "state": 0,
+        "motion": 0,
+        "above": -1,
+        "aboveTile": 48,
+        "below": 80,
+        "hero": 3
+      },
+      "expected": [
+        0,
+        48,
+        8,
+        0,
+        255,
+        48,
+        0,
+        0,
+        255,
+        80,
+        0,
+        0,
+        255
+      ]
+    },
+    {
+      "input": {
+        "op": "slider",
+        "state": 0,
+        "motion": 6,
+        "above": -1,
+        "aboveTile": 48,
+        "below": -1,
+        "hero": 0
+      },
+      "expected": [
+        0,
+        48,
+        8,
+        0,
+        255,
+        48,
+        0,
+        0,
+        255,
+        -1,
+        0,
+        0,
+        255
+      ]
+    },
+    {
+      "input": {
+        "op": "slider",
+        "state": 0,
+        "motion": 6,
+        "above": -1,
+        "aboveTile": 48,
+        "below": -1,
+        "hero": 3
+      },
+      "expected": [
+        0,
+        48,
+        8,
+        0,
+        255,
+        48,
+        0,
+        0,
+        255,
+        -1,
+        0,
+        0,
+        255
+      ]
+    },
+    {
+      "input": {
+        "op": "slider",
+        "state": 0,
+        "motion": 6,
+        "above": -1,
+        "aboveTile": 48,
+        "below": 0,
+        "hero": 0
+      },
+      "expected": [
+        0,
+        48,
+        8,
+        0,
+        255,
+        48,
+        0,
+        0,
+        255,
+        0,
+        0,
+        0,
+        255
+      ]
+    },
+    {
+      "input": {
+        "op": "slider",
+        "state": 0,
+        "motion": 6,
+        "above": -1,
+        "aboveTile": 48,
+        "below": 0,
+        "hero": 3
+      },
+      "expected": [
+        0,
+        48,
+        8,
+        0,
+        255,
+        48,
+        0,
+        0,
+        255,
+        0,
+        0,
+        0,
+        255
+      ]
+    },
+    {
+      "input": {
+        "op": "slider",
+        "state": 0,
+        "motion": 6,
+        "above": -1,
+        "aboveTile": 48,
+        "below": 80,
+        "hero": 0
+      },
+      "expected": [
+        0,
+        48,
+        8,
+        0,
+        255,
+        48,
+        0,
+        0,
+        255,
+        80,
+        0,
+        0,
+        255
+      ]
+    },
+    {
+      "input": {
+        "op": "slider",
+        "state": 0,
+        "motion": 6,
+        "above": -1,
+        "aboveTile": 48,
+        "below": 80,
+        "hero": 3
+      },
+      "expected": [
+        0,
+        48,
+        8,
+        0,
+        255,
+        48,
+        0,
+        0,
+        255,
+        80,
+        0,
+        0,
+        255
+      ]
+    },
+    {
+      "input": {
+        "op": "slider",
+        "state": 0,
+        "motion": 12,
+        "above": -1,
+        "aboveTile": 48,
+        "below": -1,
+        "hero": 0
+      },
+      "expected": [
+        0,
+        48,
+        8,
+        0,
+        255,
+        48,
+        0,
+        6,
+        255,
+        -1,
+        0,
+        0,
+        255
+      ]
+    },
+    {
+      "input": {
+        "op": "slider",
+        "state": 0,
+        "motion": 12,
+        "above": -1,
+        "aboveTile": 48,
+        "below": -1,
+        "hero": 3
+      },
+      "expected": [
+        0,
+        48,
+        8,
+        0,
+        255,
+        48,
+        0,
+        6,
+        255,
+        -1,
+        0,
+        0,
+        255
+      ]
+    },
+    {
+      "input": {
+        "op": "slider",
+        "state": 0,
+        "motion": 12,
+        "above": -1,
+        "aboveTile": 48,
+        "below": 0,
+        "hero": 0
+      },
+      "expected": [
+        0,
+        48,
+        8,
+        0,
+        255,
+        48,
+        0,
+        6,
+        255,
+        0,
+        0,
+        0,
+        255
+      ]
+    },
+    {
+      "input": {
+        "op": "slider",
+        "state": 0,
+        "motion": 12,
+        "above": -1,
+        "aboveTile": 48,
+        "below": 0,
+        "hero": 3
+      },
+      "expected": [
+        0,
+        48,
+        8,
+        0,
+        255,
+        48,
+        0,
+        6,
+        255,
+        0,
+        0,
+        0,
+        255
+      ]
+    },
+    {
+      "input": {
+        "op": "slider",
+        "state": 0,
+        "motion": 12,
+        "above": -1,
+        "aboveTile": 48,
+        "below": 80,
+        "hero": 0
+      },
+      "expected": [
+        0,
+        48,
+        8,
+        0,
+        255,
+        48,
+        0,
+        6,
+        255,
+        80,
+        0,
+        0,
+        255
+      ]
+    },
+    {
+      "input": {
+        "op": "slider",
+        "state": 0,
+        "motion": 12,
+        "above": -1,
+        "aboveTile": 48,
+        "below": 80,
+        "hero": 3
+      },
+      "expected": [
+        0,
+        48,
+        8,
+        0,
+        255,
+        48,
+        0,
+        6,
+        255,
+        80,
+        0,
+        0,
+        255
+      ]
+    },
+    {
+      "input": {
+        "op": "slider",
+        "state": 3,
+        "motion": 0,
+        "above": -1,
+        "aboveTile": 48,
+        "below": -1,
+        "hero": 0
+      },
+      "expected": [
+        0,
+        -1,
+        0,
+        0,
+        255,
+        48,
+        8,
+        0,
+        255,
+        48,
+        3,
+        18,
+        255
+      ]
+    },
+    {
+      "input": {
+        "op": "slider",
+        "state": 3,
+        "motion": 0,
+        "above": -1,
+        "aboveTile": 48,
+        "below": -1,
+        "hero": 3
+      },
+      "expected": [
+        2,
+        48,
+        8,
+        0,
+        255,
+        48,
+        0,
+        0,
+        255,
+        -1,
+        0,
+        0,
+        255
+      ]
+    },
+    {
+      "input": {
+        "op": "slider",
+        "state": 3,
+        "motion": 0,
+        "above": -1,
+        "aboveTile": 48,
+        "below": 0,
+        "hero": 0
+      },
+      "expected": [
+        0,
+        48,
+        8,
+        0,
+        255,
+        48,
+        0,
+        0,
+        255,
+        0,
+        0,
+        0,
+        255
+      ]
+    },
+    {
+      "input": {
+        "op": "slider",
+        "state": 3,
+        "motion": 0,
+        "above": -1,
+        "aboveTile": 48,
+        "below": 0,
+        "hero": 3
+      },
+      "expected": [
+        2,
+        48,
+        8,
+        0,
+        255,
+        48,
+        0,
+        0,
+        255,
+        0,
+        0,
+        0,
+        255
+      ]
+    },
+    {
+      "input": {
+        "op": "slider",
+        "state": 3,
+        "motion": 0,
+        "above": -1,
+        "aboveTile": 48,
+        "below": 80,
+        "hero": 0
+      },
+      "expected": [
+        0,
+        48,
+        8,
+        0,
+        255,
+        48,
+        0,
+        0,
+        255,
+        80,
+        0,
+        0,
+        255
+      ]
+    },
+    {
+      "input": {
+        "op": "slider",
+        "state": 3,
+        "motion": 0,
+        "above": -1,
+        "aboveTile": 48,
+        "below": 80,
+        "hero": 3
+      },
+      "expected": [
+        2,
+        48,
+        8,
+        0,
+        255,
+        48,
+        0,
+        0,
+        255,
+        80,
+        0,
+        0,
+        255
+      ]
+    },
+    {
+      "input": {
+        "op": "slider",
+        "state": 3,
+        "motion": 6,
+        "above": -1,
+        "aboveTile": 48,
+        "below": -1,
+        "hero": 0
+      },
+      "expected": [
+        0,
+        48,
+        8,
+        0,
+        255,
+        48,
+        3,
+        0,
+        255,
+        -1,
+        0,
+        0,
+        255
+      ]
+    },
+    {
+      "input": {
+        "op": "slider",
+        "state": 3,
+        "motion": 6,
+        "above": -1,
+        "aboveTile": 48,
+        "below": -1,
+        "hero": 3
+      },
+      "expected": [
+        0,
+        48,
+        8,
+        0,
+        255,
+        48,
+        3,
+        0,
+        255,
+        -1,
+        0,
+        0,
+        255
+      ]
+    },
+    {
+      "input": {
+        "op": "slider",
+        "state": 3,
+        "motion": 6,
+        "above": -1,
+        "aboveTile": 48,
+        "below": 0,
+        "hero": 0
+      },
+      "expected": [
+        0,
+        48,
+        8,
+        0,
+        255,
+        48,
+        3,
+        0,
+        255,
+        0,
+        0,
+        0,
+        255
+      ]
+    },
+    {
+      "input": {
+        "op": "slider",
+        "state": 3,
+        "motion": 6,
+        "above": -1,
+        "aboveTile": 48,
+        "below": 0,
+        "hero": 3
+      },
+      "expected": [
+        0,
+        48,
+        8,
+        0,
+        255,
+        48,
+        3,
+        0,
+        255,
+        0,
+        0,
+        0,
+        255
+      ]
+    },
+    {
+      "input": {
+        "op": "slider",
+        "state": 3,
+        "motion": 6,
+        "above": -1,
+        "aboveTile": 48,
+        "below": 80,
+        "hero": 0
+      },
+      "expected": [
+        0,
+        48,
+        8,
+        0,
+        255,
+        48,
+        3,
+        0,
+        255,
+        80,
+        0,
+        0,
+        255
+      ]
+    },
+    {
+      "input": {
+        "op": "slider",
+        "state": 3,
+        "motion": 6,
+        "above": -1,
+        "aboveTile": 48,
+        "below": 80,
+        "hero": 3
+      },
+      "expected": [
+        0,
+        48,
+        8,
+        0,
+        255,
+        48,
+        3,
+        0,
+        255,
+        80,
+        0,
+        0,
+        255
+      ]
+    },
+    {
+      "input": {
+        "op": "slider",
+        "state": 3,
+        "motion": 12,
+        "above": -1,
+        "aboveTile": 48,
+        "below": -1,
+        "hero": 0
+      },
+      "expected": [
+        0,
+        48,
+        8,
+        0,
+        255,
+        48,
+        3,
+        6,
+        255,
+        -1,
+        0,
+        0,
+        255
+      ]
+    },
+    {
+      "input": {
+        "op": "slider",
+        "state": 3,
+        "motion": 12,
+        "above": -1,
+        "aboveTile": 48,
+        "below": -1,
+        "hero": 3
+      },
+      "expected": [
+        0,
+        48,
+        8,
+        0,
+        255,
+        48,
+        3,
+        6,
+        255,
+        -1,
+        0,
+        0,
+        255
+      ]
+    },
+    {
+      "input": {
+        "op": "slider",
+        "state": 3,
+        "motion": 12,
+        "above": -1,
+        "aboveTile": 48,
+        "below": 0,
+        "hero": 0
+      },
+      "expected": [
+        0,
+        48,
+        8,
+        0,
+        255,
+        48,
+        3,
+        6,
+        255,
+        0,
+        0,
+        0,
+        255
+      ]
+    },
+    {
+      "input": {
+        "op": "slider",
+        "state": 3,
+        "motion": 12,
+        "above": -1,
+        "aboveTile": 48,
+        "below": 0,
+        "hero": 3
+      },
+      "expected": [
+        0,
+        48,
+        8,
+        0,
+        255,
+        48,
+        3,
+        6,
+        255,
+        0,
+        0,
+        0,
+        255
+      ]
+    },
+    {
+      "input": {
+        "op": "slider",
+        "state": 3,
+        "motion": 12,
+        "above": -1,
+        "aboveTile": 48,
+        "below": 80,
+        "hero": 0
+      },
+      "expected": [
+        0,
+        48,
+        8,
+        0,
+        255,
+        48,
+        3,
+        6,
+        255,
+        80,
+        0,
+        0,
+        255
+      ]
+    },
+    {
+      "input": {
+        "op": "slider",
+        "state": 3,
+        "motion": 12,
+        "above": -1,
+        "aboveTile": 48,
+        "below": 80,
+        "hero": 3
+      },
+      "expected": [
+        0,
+        48,
+        8,
+        0,
+        255,
+        48,
+        3,
+        6,
+        255,
+        80,
+        0,
+        0,
+        255
+      ]
+    },
+    {
+      "input": {
+        "op": "slider",
+        "state": 16,
+        "motion": 0,
+        "above": -1,
+        "aboveTile": 48,
+        "below": -1,
+        "hero": 0
+      },
+      "expected": [
+        0,
+        -1,
+        0,
+        0,
+        255,
+        48,
+        8,
+        0,
+        255,
+        48,
+        19,
+        18,
+        255
+      ]
+    },
+    {
+      "input": {
+        "op": "slider",
+        "state": 16,
+        "motion": 0,
+        "above": -1,
+        "aboveTile": 48,
+        "below": -1,
+        "hero": 3
+      },
+      "expected": [
+        0,
+        48,
+        8,
+        0,
+        255,
+        48,
+        16,
+        0,
+        255,
+        -1,
+        0,
+        0,
+        255
+      ]
+    },
+    {
+      "input": {
+        "op": "slider",
+        "state": 16,
+        "motion": 0,
+        "above": -1,
+        "aboveTile": 48,
+        "below": 0,
+        "hero": 0
+      },
+      "expected": [
+        0,
+        48,
+        8,
+        0,
+        255,
+        48,
+        16,
+        0,
+        255,
+        0,
+        0,
+        0,
+        255
+      ]
+    },
+    {
+      "input": {
+        "op": "slider",
+        "state": 16,
+        "motion": 0,
+        "above": -1,
+        "aboveTile": 48,
+        "below": 0,
+        "hero": 3
+      },
+      "expected": [
+        0,
+        48,
+        8,
+        0,
+        255,
+        48,
+        16,
+        0,
+        255,
+        0,
+        0,
+        0,
+        255
+      ]
+    },
+    {
+      "input": {
+        "op": "slider",
+        "state": 16,
+        "motion": 0,
+        "above": -1,
+        "aboveTile": 48,
+        "below": 80,
+        "hero": 0
+      },
+      "expected": [
+        0,
+        48,
+        8,
+        0,
+        255,
+        48,
+        16,
+        0,
+        255,
+        80,
+        0,
+        0,
+        255
+      ]
+    },
+    {
+      "input": {
+        "op": "slider",
+        "state": 16,
+        "motion": 0,
+        "above": -1,
+        "aboveTile": 48,
+        "below": 80,
+        "hero": 3
+      },
+      "expected": [
+        0,
+        48,
+        8,
+        0,
+        255,
+        48,
+        16,
+        0,
+        255,
+        80,
+        0,
+        0,
+        255
+      ]
+    },
+    {
+      "input": {
+        "op": "slider",
+        "state": 16,
+        "motion": 6,
+        "above": -1,
+        "aboveTile": 48,
+        "below": -1,
+        "hero": 0
+      },
+      "expected": [
+        0,
+        48,
+        8,
+        0,
+        255,
+        48,
+        16,
+        0,
+        255,
+        -1,
+        0,
+        0,
+        255
+      ]
+    },
+    {
+      "input": {
+        "op": "slider",
+        "state": 16,
+        "motion": 6,
+        "above": -1,
+        "aboveTile": 48,
+        "below": -1,
+        "hero": 3
+      },
+      "expected": [
+        0,
+        48,
+        8,
+        0,
+        255,
+        48,
+        16,
+        0,
+        255,
+        -1,
+        0,
+        0,
+        255
+      ]
+    },
+    {
+      "input": {
+        "op": "slider",
+        "state": 16,
+        "motion": 6,
+        "above": -1,
+        "aboveTile": 48,
+        "below": 0,
+        "hero": 0
+      },
+      "expected": [
+        0,
+        48,
+        8,
+        0,
+        255,
+        48,
+        16,
+        0,
+        255,
+        0,
+        0,
+        0,
+        255
+      ]
+    },
+    {
+      "input": {
+        "op": "slider",
+        "state": 16,
+        "motion": 6,
+        "above": -1,
+        "aboveTile": 48,
+        "below": 0,
+        "hero": 3
+      },
+      "expected": [
+        0,
+        48,
+        8,
+        0,
+        255,
+        48,
+        16,
+        0,
+        255,
+        0,
+        0,
+        0,
+        255
+      ]
+    },
+    {
+      "input": {
+        "op": "slider",
+        "state": 16,
+        "motion": 6,
+        "above": -1,
+        "aboveTile": 48,
+        "below": 80,
+        "hero": 0
+      },
+      "expected": [
+        0,
+        48,
+        8,
+        0,
+        255,
+        48,
+        16,
+        0,
+        255,
+        80,
+        0,
+        0,
+        255
+      ]
+    },
+    {
+      "input": {
+        "op": "slider",
+        "state": 16,
+        "motion": 6,
+        "above": -1,
+        "aboveTile": 48,
+        "below": 80,
+        "hero": 3
+      },
+      "expected": [
+        0,
+        48,
+        8,
+        0,
+        255,
+        48,
+        16,
+        0,
+        255,
+        80,
+        0,
+        0,
+        255
+      ]
+    },
+    {
+      "input": {
+        "op": "slider",
+        "state": 16,
+        "motion": 12,
+        "above": -1,
+        "aboveTile": 48,
+        "below": -1,
+        "hero": 0
+      },
+      "expected": [
+        0,
+        48,
+        8,
+        0,
+        255,
+        48,
+        16,
+        6,
+        255,
+        -1,
+        0,
+        0,
+        255
+      ]
+    },
+    {
+      "input": {
+        "op": "slider",
+        "state": 16,
+        "motion": 12,
+        "above": -1,
+        "aboveTile": 48,
+        "below": -1,
+        "hero": 3
+      },
+      "expected": [
+        0,
+        48,
+        8,
+        0,
+        255,
+        48,
+        16,
+        6,
+        255,
+        -1,
+        0,
+        0,
+        255
+      ]
+    },
+    {
+      "input": {
+        "op": "slider",
+        "state": 16,
+        "motion": 12,
+        "above": -1,
+        "aboveTile": 48,
+        "below": 0,
+        "hero": 0
+      },
+      "expected": [
+        0,
+        48,
+        8,
+        0,
+        255,
+        48,
+        16,
+        6,
+        255,
+        0,
+        0,
+        0,
+        255
+      ]
+    },
+    {
+      "input": {
+        "op": "slider",
+        "state": 16,
+        "motion": 12,
+        "above": -1,
+        "aboveTile": 48,
+        "below": 0,
+        "hero": 3
+      },
+      "expected": [
+        0,
+        48,
+        8,
+        0,
+        255,
+        48,
+        16,
+        6,
+        255,
+        0,
+        0,
+        0,
+        255
+      ]
+    },
+    {
+      "input": {
+        "op": "slider",
+        "state": 16,
+        "motion": 12,
+        "above": -1,
+        "aboveTile": 48,
+        "below": 80,
+        "hero": 0
+      },
+      "expected": [
+        0,
+        48,
+        8,
+        0,
+        255,
+        48,
+        16,
+        6,
+        255,
+        80,
+        0,
+        0,
+        255
+      ]
+    },
+    {
+      "input": {
+        "op": "slider",
+        "state": 16,
+        "motion": 12,
+        "above": -1,
+        "aboveTile": 48,
+        "below": 80,
+        "hero": 3
+      },
+      "expected": [
+        0,
+        48,
+        8,
+        0,
+        255,
+        48,
+        16,
+        6,
+        255,
+        80,
+        0,
+        0,
+        255
+      ]
+    },
+    {
+      "input": {
+        "op": "slider",
+        "state": 19,
+        "motion": 0,
+        "above": -1,
+        "aboveTile": 48,
+        "below": -1,
+        "hero": 0
+      },
+      "expected": [
+        0,
+        -1,
+        0,
+        0,
+        255,
+        48,
+        8,
+        0,
+        255,
+        48,
+        19,
+        18,
+        255
+      ]
+    },
+    {
+      "input": {
+        "op": "slider",
+        "state": 19,
+        "motion": 0,
+        "above": -1,
+        "aboveTile": 48,
+        "below": -1,
+        "hero": 3
+      },
+      "expected": [
+        2,
+        48,
+        8,
+        0,
+        255,
+        48,
+        16,
+        0,
+        255,
+        -1,
+        0,
+        0,
+        255
+      ]
+    },
+    {
+      "input": {
+        "op": "slider",
+        "state": 19,
+        "motion": 0,
+        "above": -1,
+        "aboveTile": 48,
+        "below": 0,
+        "hero": 0
+      },
+      "expected": [
+        0,
+        48,
+        8,
+        0,
+        255,
+        48,
+        16,
+        0,
+        255,
+        0,
+        0,
+        0,
+        255
+      ]
+    },
+    {
+      "input": {
+        "op": "slider",
+        "state": 19,
+        "motion": 0,
+        "above": -1,
+        "aboveTile": 48,
+        "below": 0,
+        "hero": 3
+      },
+      "expected": [
+        2,
+        48,
+        8,
+        0,
+        255,
+        48,
+        16,
+        0,
+        255,
+        0,
+        0,
+        0,
+        255
+      ]
+    },
+    {
+      "input": {
+        "op": "slider",
+        "state": 19,
+        "motion": 0,
+        "above": -1,
+        "aboveTile": 48,
+        "below": 80,
+        "hero": 0
+      },
+      "expected": [
+        0,
+        48,
+        8,
+        0,
+        255,
+        48,
+        16,
+        0,
+        255,
+        80,
+        0,
+        0,
+        255
+      ]
+    },
+    {
+      "input": {
+        "op": "slider",
+        "state": 19,
+        "motion": 0,
+        "above": -1,
+        "aboveTile": 48,
+        "below": 80,
+        "hero": 3
+      },
+      "expected": [
+        2,
+        48,
+        8,
+        0,
+        255,
+        48,
+        16,
+        0,
+        255,
+        80,
+        0,
+        0,
+        255
+      ]
+    },
+    {
+      "input": {
+        "op": "slider",
+        "state": 19,
+        "motion": 6,
+        "above": -1,
+        "aboveTile": 48,
+        "below": -1,
+        "hero": 0
+      },
+      "expected": [
+        0,
+        48,
+        8,
+        0,
+        255,
+        48,
+        19,
+        0,
+        255,
+        -1,
+        0,
+        0,
+        255
+      ]
+    },
+    {
+      "input": {
+        "op": "slider",
+        "state": 19,
+        "motion": 6,
+        "above": -1,
+        "aboveTile": 48,
+        "below": -1,
+        "hero": 3
+      },
+      "expected": [
+        0,
+        48,
+        8,
+        0,
+        255,
+        48,
+        19,
+        0,
+        255,
+        -1,
+        0,
+        0,
+        255
+      ]
+    },
+    {
+      "input": {
+        "op": "slider",
+        "state": 19,
+        "motion": 6,
+        "above": -1,
+        "aboveTile": 48,
+        "below": 0,
+        "hero": 0
+      },
+      "expected": [
+        0,
+        48,
+        8,
+        0,
+        255,
+        48,
+        19,
+        0,
+        255,
+        0,
+        0,
+        0,
+        255
+      ]
+    },
+    {
+      "input": {
+        "op": "slider",
+        "state": 19,
+        "motion": 6,
+        "above": -1,
+        "aboveTile": 48,
+        "below": 0,
+        "hero": 3
+      },
+      "expected": [
+        0,
+        48,
+        8,
+        0,
+        255,
+        48,
+        19,
+        0,
+        255,
+        0,
+        0,
+        0,
+        255
+      ]
+    },
+    {
+      "input": {
+        "op": "slider",
+        "state": 19,
+        "motion": 6,
+        "above": -1,
+        "aboveTile": 48,
+        "below": 80,
+        "hero": 0
+      },
+      "expected": [
+        0,
+        48,
+        8,
+        0,
+        255,
+        48,
+        19,
+        0,
+        255,
+        80,
+        0,
+        0,
+        255
+      ]
+    },
+    {
+      "input": {
+        "op": "slider",
+        "state": 19,
+        "motion": 6,
+        "above": -1,
+        "aboveTile": 48,
+        "below": 80,
+        "hero": 3
+      },
+      "expected": [
+        0,
+        48,
+        8,
+        0,
+        255,
+        48,
+        19,
+        0,
+        255,
+        80,
+        0,
+        0,
+        255
+      ]
+    },
+    {
+      "input": {
+        "op": "slider",
+        "state": 19,
+        "motion": 12,
+        "above": -1,
+        "aboveTile": 48,
+        "below": -1,
+        "hero": 0
+      },
+      "expected": [
+        0,
+        48,
+        8,
+        0,
+        255,
+        48,
+        19,
+        6,
+        255,
+        -1,
+        0,
+        0,
+        255
+      ]
+    },
+    {
+      "input": {
+        "op": "slider",
+        "state": 19,
+        "motion": 12,
+        "above": -1,
+        "aboveTile": 48,
+        "below": -1,
+        "hero": 3
+      },
+      "expected": [
+        0,
+        48,
+        8,
+        0,
+        255,
+        48,
+        19,
+        6,
+        255,
+        -1,
+        0,
+        0,
+        255
+      ]
+    },
+    {
+      "input": {
+        "op": "slider",
+        "state": 19,
+        "motion": 12,
+        "above": -1,
+        "aboveTile": 48,
+        "below": 0,
+        "hero": 0
+      },
+      "expected": [
+        0,
+        48,
+        8,
+        0,
+        255,
+        48,
+        19,
+        6,
+        255,
+        0,
+        0,
+        0,
+        255
+      ]
+    },
+    {
+      "input": {
+        "op": "slider",
+        "state": 19,
+        "motion": 12,
+        "above": -1,
+        "aboveTile": 48,
+        "below": 0,
+        "hero": 3
+      },
+      "expected": [
+        0,
+        48,
+        8,
+        0,
+        255,
+        48,
+        19,
+        6,
+        255,
+        0,
+        0,
+        0,
+        255
+      ]
+    },
+    {
+      "input": {
+        "op": "slider",
+        "state": 19,
+        "motion": 12,
+        "above": -1,
+        "aboveTile": 48,
+        "below": 80,
+        "hero": 0
+      },
+      "expected": [
+        0,
+        48,
+        8,
+        0,
+        255,
+        48,
+        19,
+        6,
+        255,
+        80,
+        0,
+        0,
+        255
+      ]
+    },
+    {
+      "input": {
+        "op": "slider",
+        "state": 19,
+        "motion": 12,
+        "above": -1,
+        "aboveTile": 48,
+        "below": 80,
+        "hero": 3
+      },
+      "expected": [
+        0,
+        48,
+        8,
+        0,
+        255,
+        48,
+        19,
+        6,
+        255,
+        80,
+        0,
+        0,
+        255
+      ]
+    }
+  ]
+}

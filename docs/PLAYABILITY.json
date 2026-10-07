@@ -1553,6 +1553,47 @@
           }
         },
         {
+          "file": "tests/fixtures/route-attempts/bavaria-01-grass-column.json",
+          "world": 1,
+          "level": 0,
+          "goal": "normal",
+          "initial": {
+            "diamonds": 82,
+            "redDiamonds": 10,
+            "lives": 12,
+            "health": 4,
+            "weaponTier": 1
+          },
+          "outcome": {
+            "status": "playing",
+            "ticks": 481,
+            "x": 12,
+            "y": 13,
+            "exitObject": 0,
+            "diamonds": 89,
+            "redDiamonds": 10,
+            "lives": 12,
+            "health": 2,
+            "weaponTier": 1,
+            "hits": 2,
+            "retries": 0,
+            "opened": [],
+            "demos": [],
+            "bossHealth": null,
+            "bossCleared": false
+          },
+          "events": {
+            "grass": 10,
+            "diamond": 7,
+            "boulder": 14,
+            "checkpoint": 2,
+            "hurt": 2,
+            "enemy-death": 4,
+            "crusher-break": 2,
+            "hammer": 2
+          }
+        },
+        {
           "file": "tests/fixtures/route-attempts/bavaria-01-two-crushers.json",
           "world": 1,
           "level": 0,

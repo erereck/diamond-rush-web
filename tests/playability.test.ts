@@ -134,6 +134,18 @@ test('Bavaria brick shaft returns to its second checkpoint with stone, brick and
   assert.deepEqual([sim.lives,sim.health,sim.retries],[11,4,1]);
 });
 
+test('Bavaria upper passage accepts two ordinary-hammer grass strikes and advances its stone column',()=>{
+  const attempt=JSON.parse(readFileSync(new URL('fixtures/route-attempts/bavaria-01-grass-column.json',import.meta.url),'utf8')) as RouteFixture;
+  const runner=playRoute(attempt,resources),sim=runner.sim;
+  const previous=JSON.parse(readFileSync(new URL('fixtures/route-attempts/bavaria-01-two-crushers.json',import.meta.url),'utf8')) as RouteFixture;
+  const previousGrass=playRoute(previous,resources).eventCounts.grass??0;
+  assert.deepEqual([sim.player.x,sim.player.y,sim.weaponTier,sim.health],[12,13,1,2]);
+  assert.deepEqual([11,12,13].map(y=>sim.tile(11,y)),[0,0,0]);
+  assert.equal(sim.tile(11,14),1);
+  assert.equal(runner.eventCounts.grass-previousGrass,2);
+  assert.equal(sim.status,'playing');
+});
+
 test('Angkor 3 opens both key doors and Angkor 4 uses weighted plates before obtaining and using its hammer',()=>{
   const third=playRoute(fixtures.find(f=>f.name==='angkor-03-normal.json')!.fixture,resources);
   assert.equal(third.eventCounts['silver-gate'],1);assert.equal(third.eventCounts['gold-gate'],1);

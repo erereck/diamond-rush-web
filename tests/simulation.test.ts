@@ -718,6 +718,13 @@ test('every hammer tier clears grass on impact in dry levels',()=>{
   flooded.environmentMode=2;
   flooded.step({direction:0,action:true});step(flooded,0,20);
   assert.equal(flooded.tile(2,1),10);
+  step(flooded,2,20);
+  assert.equal(flooded.player.x,1);
+  assert.equal(flooded.tile(2,1),10);
+  flooded.restoreCheckpoint();
+  assert.equal(flooded.environmentMode,3);
+  step(flooded,2,20);
+  assert.equal(flooded.player.x,2);
 });
 
 test('the hook pulls a distant boulder to the cell beside the hero',()=>{

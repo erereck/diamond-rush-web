@@ -21,7 +21,7 @@ interface CheckpointState {
   tiles:Int16Array; state:Int32Array; motion:Int16Array; active:Int16Array; chestFrames:Int16Array; frozenKinds:Int16Array;
   objects:number[];parameters:number[];
   gatePhases:Int16Array;gateCounts:Int16Array;unlockedGates:number[];goldKeys:number;silverKeys:number;
-  x:number;y:number;diamonds:number;redDiamonds:number;magicLockRemaining:number;opened:number[];
+  x:number;y:number;diamonds:number;redDiamonds:number;magicLockRemaining:number;environmentMode:number;opened:number[];
   riddles:RiddleState;
   bridges:{position:number;direction:number};
 }
@@ -171,7 +171,7 @@ export class Simulation {
       objects:[...this.level.objects],parameters:[...this.level.parameters],
       chestFrames:this.chestFrames.slice(),frozenKinds:this.frozenKinds.slice(),gatePhases:this.gatePhases.slice(),gateCounts:this.gateCounts.slice(),
       unlockedGates:[...this.unlockedGates],goldKeys:this.goldKeys,silverKeys:this.silverKeys,
-      x:this.player.x,y:this.player.y,diamonds:this.diamonds,redDiamonds:this.redDiamonds,magicLockRemaining:this.magicLockRemaining,opened:[...this.opened],riddles:this.riddles.snapshot(),bridges:this.bridges.snapshot()};
+      x:this.player.x,y:this.player.y,diamonds:this.diamonds,redDiamonds:this.redDiamonds,magicLockRemaining:this.magicLockRemaining,environmentMode:this.environmentMode,opened:[...this.opened],riddles:this.riddles.snapshot(),bridges:this.bridges.snapshot()};
   }
   restoreCheckpoint(heal=false,travel=false){
     const previousCamera={x:this.camera.x,y:this.camera.y};
@@ -187,7 +187,7 @@ export class Simulation {
     this.bridges.restore(save.bridges);
     this.boss?.reset();
     this.player={x:save.x,y:save.y,dx:0,dy:1,offset:0,direction:3};
-    this.diamonds=save.diamonds;this.redDiamonds=save.redDiamonds;this.magicLockRemaining=save.magicLockRemaining;this.opened=new Set([...save.opened,...this.permanentEquipmentChests,...[...this.permanentPickups].filter(i=>[14,33].includes(this.level.objects[i]))]);
+    this.diamonds=save.diamonds;this.redDiamonds=save.redDiamonds;this.magicLockRemaining=save.magicLockRemaining;this.environmentMode=save.environmentMode;this.opened=new Set([...save.opened,...this.permanentEquipmentChests,...[...this.permanentPickups].filter(i=>[14,33].includes(this.level.objects[i]))]);
     this.hurtTicks=0;this.deathTicks=0;this.chestCell=-1;this.chestTicks=0;this.exitDirection=0;this.exitObject=0;this.pendingDirection=0;this.pushDelay=6;this.stonePressure=0;this.attackTicks=0;this.pendingHammer=null;this.hook=null;
     this.pendingCrystalCompletion=false;
     this.chestReward=-1;this.chestRewardAmount=0;this.itemSparkles=[];
@@ -893,7 +893,8 @@ export class Simulation {
     else if(direction){
       this.pendingDirection=0;p.direction=direction;p.dx=DX[p.direction];p.dy=DY[p.direction];
       const x=p.x+p.dx,y=p.y+p.dy,i=this.index(x,y),t=this.tile(x,y),o=this.object(x,y);
-      let pass=WALKABLE_TILES.has(t)||t===10,blockedBySweep=false;
+      // method_288 case 10 only admits grass while field_487 is 3.
+      let pass=WALKABLE_TILES.has(t)||(t===10&&this.environmentMode===3),blockedBySweep=false;
       // Gate object 7 is solid while its opening phase is below 2.
       if(o===7&&this.gatePhases[i]<2)pass=false;
       // The entrance corridor is closed after spawning. Exterior cells are only
@@ -964,5 +965,5 @@ export class Simulation {
     else {this.health=this.maxHealth;this.events.push('health');}
   }
   replay():Replay{return {version:3,target:'1.2.0-s700',engine:ENGINE_REVISION,levelFingerprint:this.initialLevelFingerprint,world:this.level.world,level:this.level.index,initial:{...this.initial},inputs:this.inputs.map(i=>({...i,demoEdits:i.demoEdits?.map(edit=>({...edit}))}))};}
-  snapshot(){return {bridges:this.bridges.snapshot(),riddles:this.riddles.snapshot(),chestReward:this.chestReward,chestRewardAmount:this.chestRewardAmount,itemSparkles:this.itemSparkles.map(s=>({...s})),tick:this.tick,player:{...this.player},camera:{x:this.camera.x,y:this.camera.y},tiles:[...this.tiles],state:[...this.state],motion:[...this.motion],active:[...this.active],objects:[...this.level.objects],parameters:[...this.level.parameters],frozenKinds:[...this.frozenKinds],diamonds:this.diamonds,bonusDiamondTotal:this.bonusDiamondTotal,magicLockCell:this.magicLockCell,magicLockRemaining:this.magicLockRemaining,redDiamonds:this.redDiamonds,goldKeys:this.goldKeys,silverKeys:this.silverKeys,gatePhases:[...this.gatePhases],gateCounts:[...this.gateCounts],unlockedGates:[...this.unlockedGates],permanentPickups:[...this.permanentPickups],permanentEquipmentChests:[...this.permanentEquipmentChests],weaponTier:this.weaponTier,attackTicks:this.attackTicks,pendingHammer:this.pendingHammer?{...this.pendingHammer}:null,hook:this.hook?{...this.hook}:null,health:this.health,invulnerable:this.invulnerable,status:this.status,playerAnimation:this.playerAnimation,animationTick:this.animationTick,pushDelay:this.pushDelay,checkpoint:this.checkpoint,checkpointOrder:this.checkpointOrder,opened:[...this.opened],chestFrames:[...this.chestFrames],chestCell:this.chestCell,chestTicks:this.chestTicks,pendingCrystalCompletion:this.pendingCrystalCompletion,lives:this.lives,hurtTicks:this.hurtTicks,deathTicks:this.deathTicks,respawnTravel:this.respawnTravel,respawnFlash:this.respawnFlash,respawnTarget:{...this.respawnTarget},exitDirection:this.exitDirection,exitObject:this.exitObject,stonePressure:this.stonePressure,pendingDirection:this.pendingDirection,lastInputDirection:this.lastInputDirection,actionHeld:this.actionHeld,entranceGate:this.entranceGate,boss:this.boss?.snapshot()??null,enemySmoke:this.enemySmoke.map(s=>({...s})),hits:this.hits,retries:this.retries,savedCheckpoint:structuredClone(this.savedCheckpoint)};}
+  snapshot(){return {bridges:this.bridges.snapshot(),riddles:this.riddles.snapshot(),chestReward:this.chestReward,chestRewardAmount:this.chestRewardAmount,itemSparkles:this.itemSparkles.map(s=>({...s})),tick:this.tick,player:{...this.player},camera:{x:this.camera.x,y:this.camera.y},tiles:[...this.tiles],state:[...this.state],motion:[...this.motion],active:[...this.active],objects:[...this.level.objects],parameters:[...this.level.parameters],frozenKinds:[...this.frozenKinds],diamonds:this.diamonds,bonusDiamondTotal:this.bonusDiamondTotal,magicLockCell:this.magicLockCell,magicLockRemaining:this.magicLockRemaining,redDiamonds:this.redDiamonds,goldKeys:this.goldKeys,silverKeys:this.silverKeys,gatePhases:[...this.gatePhases],gateCounts:[...this.gateCounts],unlockedGates:[...this.unlockedGates],permanentPickups:[...this.permanentPickups],permanentEquipmentChests:[...this.permanentEquipmentChests],environmentMode:this.environmentMode,weaponTier:this.weaponTier,attackTicks:this.attackTicks,pendingHammer:this.pendingHammer?{...this.pendingHammer}:null,hook:this.hook?{...this.hook}:null,health:this.health,invulnerable:this.invulnerable,status:this.status,playerAnimation:this.playerAnimation,animationTick:this.animationTick,pushDelay:this.pushDelay,checkpoint:this.checkpoint,checkpointOrder:this.checkpointOrder,opened:[...this.opened],chestFrames:[...this.chestFrames],chestCell:this.chestCell,chestTicks:this.chestTicks,pendingCrystalCompletion:this.pendingCrystalCompletion,lives:this.lives,hurtTicks:this.hurtTicks,deathTicks:this.deathTicks,respawnTravel:this.respawnTravel,respawnFlash:this.respawnFlash,respawnTarget:{...this.respawnTarget},exitDirection:this.exitDirection,exitObject:this.exitObject,stonePressure:this.stonePressure,pendingDirection:this.pendingDirection,lastInputDirection:this.lastInputDirection,actionHeld:this.actionHeld,entranceGate:this.entranceGate,boss:this.boss?.snapshot()??null,enemySmoke:this.enemySmoke.map(s=>({...s})),hits:this.hits,retries:this.retries,savedCheckpoint:structuredClone(this.savedCheckpoint)};}
 }

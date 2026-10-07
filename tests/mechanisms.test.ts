@@ -49,6 +49,15 @@ test('a crawler lights counted torches once, solves its room and burns a hero ov
  const s=new Simulation(l);s.riddles.active=0;s.gatePhases[at(8,5)]=0;s.updateTorch(5,5);assert.equal(s.state[at(5,5)],1);assert.equal(s.riddles.remaining[0],0);assert.equal(s.gatePhases[at(8,5)],1);
  s.updateTorch(5,5);assert.equal(s.riddles.remaining[0],0);s.player.x=5;s.player.y=4;s.updateTorch(5,5);assert.equal(s.health,3);s.restoreCheckpoint();assert.equal(s.state[at(5,5)],0);assert.equal(s.riddles.remaining[0],1);
 });
+test('a ball striking the lower crusher half clears both halves as method_337 does',()=>{
+ const l=level(),at=(x:number,y:number)=>x+y*12;
+ l.tiles[at(5,5)]=16;l.parameters[at(5,5)]=4;l.tiles[at(4,5)]=14;
+ const s=new Simulation(l);s.state[at(4,5)]=0;s.motion[at(4,5)]=0;
+ assert.deepEqual([s.tile(5,4),s.tile(5,5)],[16,16]);
+ s.updateCrusher(5,5);
+ assert.deepEqual([s.tile(5,4),s.tile(5,5)],[-1,-1]);
+ assert.equal(s.events.includes('crusher-break'),true);
+});
 test('falling mines detonate after two rows, trigger adjacent mines and break explosive rubble',()=>{
  const l=level(),at=(x:number,y:number)=>x+y*12;l.tiles[at(5,2)]=8;l.tiles[at(5,5)]=80;l.tiles[at(6,4)]=37;l.tiles[at(4,4)]=8;l.tiles[at(4,5)]=80;
  const s=new Simulation(l);for(let n=0;n<45;n++)s.step({direction:0,action:false});assert.equal(s.tile(5,4),-1);assert.equal(s.tile(4,4),-1);assert.equal(s.tile(6,4),-1);assert.equal(s.events.includes('mine-blast'),false);

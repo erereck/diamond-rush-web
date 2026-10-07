@@ -516,8 +516,11 @@ export class Simulation {
     const rollsInFromLeft=left>=0&&this.tiles[left]===14&&this.motion[left]<=0&&
       (this.state[left]&8)===0&&(this.state[left]&7)!==3;
     if(fallsOnTop||rollsInFromRight||rollsInFromLeft){
-      const lower=this.tile(x,y+1)===16?this.index(x,y+1):i;
-      for(const cell of new Set([i,lower])){
+      // method_337 clears both cells regardless of which half receives the
+      // impact. A rolling ball usually hits the lower half from the side.
+      const other=this.tile(x,y+1)===16?this.index(x,y+1):this.index(x,y-1);
+      for(const cell of new Set([i,other])){
+        if(cell<0||this.tiles[cell]!==16)continue;
         this.tiles[cell]=-1;this.state[cell]=0;this.motion[cell]=0;this.active[cell]=0;
         this.destroyEffect(cell);
       }

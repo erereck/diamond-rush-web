@@ -10,7 +10,7 @@
     "verifiedMaps": 12,
     "verifiedBosses": 3,
     "completedRoutes": 16,
-    "attemptedMaps": 1,
+    "attemptedMaps": 2,
     "campaignPrefixes": 1,
     "campaignPrefixStages": 9
   },
@@ -1649,9 +1649,92 @@
           "y": 6
         }
       ],
-      "status": "unverified",
+      "status": "attempted",
       "evidence": [],
-      "pendingAttempts": [],
+      "pendingAttempts": [
+        {
+          "file": "tests/fixtures/route-attempts/bavaria-02-first-crusher.json",
+          "world": 1,
+          "level": 1,
+          "goal": "normal",
+          "initial": {
+            "diamonds": 82,
+            "redDiamonds": 10,
+            "lives": 12,
+            "health": 4,
+            "weaponTier": 1
+          },
+          "outcome": {
+            "status": "playing",
+            "ticks": 131,
+            "x": 21,
+            "y": 4,
+            "exitObject": 0,
+            "diamonds": 84,
+            "redDiamonds": 10,
+            "lives": 12,
+            "health": 2,
+            "weaponTier": 1,
+            "hits": 1,
+            "retries": 0,
+            "opened": [],
+            "demos": [],
+            "bossHealth": null,
+            "bossCleared": false
+          },
+          "events": {
+            "grass": 4,
+            "diamond": 2,
+            "boulder": 2,
+            "hurt": 1,
+            "hammer": 2,
+            "break": 1,
+            "checkpoint": 1
+          }
+        },
+        {
+          "file": "tests/fixtures/route-attempts/bavaria-02-two-crushers.json",
+          "world": 1,
+          "level": 1,
+          "goal": "normal",
+          "initial": {
+            "diamonds": 82,
+            "redDiamonds": 10,
+            "lives": 12,
+            "health": 4,
+            "weaponTier": 1
+          },
+          "outcome": {
+            "status": "playing",
+            "ticks": 420,
+            "x": 30,
+            "y": 9,
+            "exitObject": 0,
+            "diamonds": 84,
+            "redDiamonds": 10,
+            "lives": 12,
+            "health": 2,
+            "weaponTier": 1,
+            "hits": 1,
+            "retries": 0,
+            "opened": [],
+            "demos": [],
+            "bossHealth": null,
+            "bossCleared": false
+          },
+          "events": {
+            "grass": 10,
+            "diamond": 2,
+            "boulder": 8,
+            "hurt": 1,
+            "hammer": 6,
+            "break": 3,
+            "checkpoint": 2,
+            "enemy-death": 4,
+            "crusher-break": 2
+          }
+        }
+      ],
       "reviews": []
     },
     {

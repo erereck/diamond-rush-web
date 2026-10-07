@@ -1,0 +1,97 @@
+{
+  "version": 1,
+  "engine": "fidelity-24",
+  "levelFingerprint": "e73813bc",
+  "world": 1,
+  "level": 1,
+  "kind": "stage",
+  "scope": "isolated-stage",
+  "initial": {
+    "diamonds": 82,
+    "redDiamonds": 10,
+    "lives": 12,
+    "health": 4,
+    "weaponTier": 1
+  },
+  "provenance": "Control-only isolated Bavaria 2 attempt from original spawn with the hammer and Bavaria access resources. Pushes the entrance boulder, breaks the first brick, activates checkpoint 1 and reaches the first paired crusher at (22,3-4); no exit is certified.",
+  "controls": [
+    {
+      "ticks": 47,
+      "direction": 2,
+      "action": false
+    },
+    {
+      "ticks": 8,
+      "direction": 3,
+      "action": false
+    },
+    {
+      "ticks": 8,
+      "direction": 2,
+      "action": false
+    },
+    {
+      "ticks": 9,
+      "direction": 0,
+      "action": false
+    },
+    {
+      "ticks": 1,
+      "direction": 0,
+      "action": true
+    },
+    {
+      "ticks": 17,
+      "direction": 0,
+      "action": false
+    },
+    {
+      "ticks": 1,
+      "direction": 0,
+      "action": true
+    },
+    {
+      "ticks": 1,
+      "direction": 0,
+      "action": false
+    },
+    {
+      "ticks": 12,
+      "direction": 2,
+      "action": false
+    },
+    {
+      "ticks": 4,
+      "direction": 3,
+      "action": false
+    },
+    {
+      "ticks": 20,
+      "direction": 2,
+      "action": false
+    },
+    {
+      "ticks": 3,
+      "direction": 0,
+      "action": false
+    }
+  ],
+  "expected": {
+    "status": "playing",
+    "ticks": 131,
+    "x": 21,
+    "y": 4,
+    "exitObject": 0,
+    "diamonds": 84,
+    "redDiamonds": 10,
+    "lives": 12,
+    "health": 2,
+    "weaponTier": 1,
+    "hits": 1,
+    "retries": 0,
+    "opened": [],
+    "demos": [],
+    "bossHealth": null,
+    "bossCleared": false
+  }
+}

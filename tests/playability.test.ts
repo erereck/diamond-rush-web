@@ -146,6 +146,25 @@ test('Bavaria upper passage accepts two ordinary-hammer grass strikes and advanc
   assert.equal(sim.status,'playing');
 });
 
+test('Bavaria 2 reaches the first crusher with its checkpoint and brick puzzle activated',()=>{
+  const attempt=JSON.parse(readFileSync(new URL('fixtures/route-attempts/bavaria-02-first-crusher.json',import.meta.url),'utf8')) as RouteFixture;
+  const runner=playRoute(attempt,resources),sim=runner.sim;
+  assert.deepEqual([sim.player.x,sim.player.y,sim.checkpointOrder,sim.status],[21,4,1,'playing']);
+  assert.equal(runner.eventCounts.break,1);
+  assert.equal(runner.eventCounts.checkpoint,1);
+  assert.equal(sim.tile(16,3),-1);
+  assert.equal(sim.tile(22,3),16);
+});
+
+test('Bavaria 2 rolling hazards destroy both paired crushers after the second checkpoint',()=>{
+  const attempt=JSON.parse(readFileSync(new URL('fixtures/route-attempts/bavaria-02-two-crushers.json',import.meta.url),'utf8')) as RouteFixture;
+  const runner=playRoute(attempt,resources),sim=runner.sim;
+  assert.equal(runner.eventCounts['crusher-break'],2);
+  assert.equal(runner.eventCounts.checkpoint,2);
+  assert.deepEqual([sim.tile(22,3),sim.tile(22,4),sim.tile(31,5),sim.tile(31,6)],[-1,-1,-1,-1]);
+  assert.equal(sim.status,'playing');
+});
+
 test('Angkor 3 opens both key doors and Angkor 4 uses weighted plates before obtaining and using its hammer',()=>{
   const third=playRoute(fixtures.find(f=>f.name==='angkor-03-normal.json')!.fixture,resources);
   assert.equal(third.eventCounts['silver-gate'],1);assert.equal(third.eventCounts['gold-gate'],1);

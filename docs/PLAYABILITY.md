@@ -8,6 +8,8 @@ Cobertura atual: **16 percursos aprovados**, incluindo os 3 chefes. Os percursos
 
 O executor aceita somente direção, ação e retorno ao checkpoint. Diálogos e edições de cena vêm dos mesmos gatilhos e intérprete usados no jogo. Não aceita posições, chaves, baús previamente abertos ou edições de mapa no arquivo de controles. Para aprovar um chefe, exige o evento de derrota concluída e zero de vida antes de terminar o percurso.
 
+Uma [varredura exploratória separada](STAGE_SMOKE.md) executa controles em todos os 40 mapas e confere seus replays. Ela não altera o estado de aprovação de saídas nesta tabela.
+
 “Tentativa pendente” registra um percurso incompleto reproduzível. Ela não prova que a fase seja impossível. Tentativas antigas continuam vinculadas para registrar onde o planejamento anterior parava, mesmo quando outro percurso já aprovou a fase. Os objetos listados para revisão indicam funções ainda ausentes/parciais; sua presença também não prova que bloqueiem a saída.
 
 ## Lista por mapa

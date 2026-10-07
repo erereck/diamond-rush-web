@@ -7,10 +7,10 @@
     "playableStages": 40,
     "secretStages": 10,
     "goals": 47,
-    "verifiedMaps": 12,
+    "verifiedMaps": 13,
     "verifiedBosses": 3,
-    "completedRoutes": 16,
-    "attemptedMaps": 6,
+    "completedRoutes": 17,
+    "attemptedMaps": 7,
     "campaignPrefixes": 1,
     "campaignPrefixStages": 9
   },
@@ -2251,8 +2251,69 @@
           "y": 33
         }
       ],
-      "status": "partial",
+      "status": "verified",
       "evidence": [
+        {
+          "file": "tests/fixtures/routes/tibet-02-normal.json",
+          "world": 2,
+          "level": 1,
+          "goal": "normal",
+          "initial": {
+            "diamonds": 82,
+            "redDiamonds": 25,
+            "lives": 12,
+            "health": 8,
+            "weaponTier": 2,
+            "maxHealth": 8
+          },
+          "outcome": {
+            "status": "complete",
+            "ticks": 1949,
+            "x": -6,
+            "y": 6,
+            "exitObject": 5,
+            "diamonds": 83,
+            "redDiamonds": 25,
+            "lives": 12,
+            "health": 3,
+            "weaponTier": 2,
+            "hits": 5,
+            "retries": 0,
+            "opened": [
+              615,
+              771
+            ],
+            "demos": [],
+            "bossHealth": null,
+            "bossCleared": false
+          },
+          "events": {
+            "trap-trigger": 29,
+            "trap-fall": 29,
+            "grass": 22,
+            "trap-impact": 29,
+            "diamond": 1,
+            "checkpoint": 5,
+            "hurt": 5,
+            "boulder": 9,
+            "gate-close": 4,
+            "riddle": 2,
+            "hammer": 26,
+            "break": 2,
+            "enemy-hit": 9,
+            "enemy-death": 3,
+            "gate-open": 6,
+            "riddle-solved": 2,
+            "gate-opening": 12,
+            "chest": 2,
+            "chest-reward": 2,
+            "silver-gate": 1,
+            "bridge-switch": 1,
+            "bridge-change": 1,
+            "gold-gate": 1,
+            "complete": 1
+          }
+        },
         {
           "file": "tests/fixtures/routes/tibet-02-secret.json",
           "world": 2,
@@ -2747,9 +2808,53 @@
           "y": 23
         }
       ],
-      "status": "unverified",
+      "status": "attempted",
       "evidence": [],
-      "pendingAttempts": [],
+      "pendingAttempts": [
+        {
+          "file": "tests/fixtures/route-attempts/tibet-12-two-checkpoints.json",
+          "world": 2,
+          "level": 11,
+          "goal": "normal",
+          "initial": {
+            "diamonds": 82,
+            "redDiamonds": 25,
+            "lives": 12,
+            "health": 4,
+            "weaponTier": 8
+          },
+          "outcome": {
+            "status": "playing",
+            "ticks": 270,
+            "x": 36,
+            "y": 9,
+            "exitObject": 0,
+            "diamonds": 88,
+            "redDiamonds": 25,
+            "lives": 12,
+            "health": 3,
+            "weaponTier": 8,
+            "hits": 1,
+            "retries": 0,
+            "opened": [],
+            "demos": [],
+            "bossHealth": null,
+            "bossCleared": false
+          },
+          "events": {
+            "trap-trigger": 8,
+            "diamond": 6,
+            "trap-fall": 8,
+            "grass": 11,
+            "trap-impact": 7,
+            "hammer": 2,
+            "break": 1,
+            "boulder": 2,
+            "hurt": 1,
+            "checkpoint": 2
+          }
+        }
+      ],
       "reviews": []
     },
     {

@@ -246,8 +246,8 @@ test('the playability inventory covers all maps and every alternative exit witho
   }
   assert.equal(report.levels.find(level=>level.world===2&&level.level===10)!.status,'verified');
   assert.equal(report.counts.verifiedBosses,3);
-  assert.equal(report.counts.completedRoutes,16);
-  assert.equal(report.counts.verifiedMaps,12);
+  assert.equal(report.counts.completedRoutes,17);
+  assert.equal(report.counts.verifiedMaps,13);
   assert.equal(report.levels.find(level=>level.world===0&&level.level===7)!.status,'verified');
   const seventh=report.levels.find(level=>level.world===0&&level.level===6)!;
   assert.equal(seventh.status,'verified');
@@ -340,6 +340,21 @@ test('Angkor 8 revisit freezes its upper snake onto the plate and exits to the s
  const restored=validateCampaign(campaignFromRecord(new CanonicalSave(record.export()),resources.worlds,resources.maps),resources.maps);
  assert.equal(unlockedNode(restored,0,secret,resources.maps),true);
  assert.deepEqual(restored.secretUnlocked[0],[12]);
+});
+
+test('Tibet 2 normal route solves both combat rooms, earns both keys and flips the ice bridge',()=>{
+  const fixture=fixtures.find(({name})=>name==='tibet-02-normal.json')!.fixture;
+  const runner=playRoute(fixture,resources),s=runner.sim;
+  assert.equal(completedRoute(runner),true);
+  assert.deepEqual([s.status,s.exitObject,s.weaponTier,s.maxHealth],['complete',5,2,8]);
+  assert.equal(runner.eventCounts['riddle-solved'],2);
+  assert.equal(runner.eventCounts['enemy-death'],3);
+  assert.equal(runner.eventCounts['chest-reward'],2);
+  assert.equal(runner.eventCounts['silver-gate'],1);
+  assert.equal(runner.eventCounts['gold-gate'],1);
+  assert.equal(runner.eventCounts['bridge-switch'],1);
+  assert.equal(s.tile(28,18),-1);
+  assert.deepEqual([...s.opened].sort((a,b)=>a-b),[615,771]);
 });
 
 test('Tibet 2 and 5 secret exits open their exact map branches and survive RMS reload',()=>{

@@ -3,10 +3,11 @@ import type { MidiSong } from './Midi.ts';
 
 // cSoundEngine.java, S700 1.2.0. Each sound is one entry of snd.f.
 const eventSounds:Record<string,number>={
-  'hurt':5,'death':2,'boulder':14,'break':11,'rubble-break':11,
+  'hurt':5,'death':2,'boulder':14,'crusher-break':14,'break':11,'rubble-break':11,
   'mine-blast':7,'enemy-hit':10,'enemy-death':10,'checkpoint':9,
   'hook':12,'hammer-block':6,'chest':3,'chest-reward':4,
-  'gate-open':0,'gold-gate':0,'silver-gate':0,'complete':15,
+  'gate-open':0,'gold-gate':0,'silver-gate':0,'bridge-switch':0,'tibet-switch':0,
+  'riddle':1,'riddle-solved':8,'complete':15,
 };
 const high=new Set([1,2,4,15,16,17,18,19,20]);
 const medium=new Set([3,7,8,9,11,12,13]);

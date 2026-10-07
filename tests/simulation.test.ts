@@ -708,12 +708,11 @@ test('the hammer bounces off a boulder only when its striking frame lands',()=>{
   step(sim,0,16);assert.equal(sim.playerAnimation,1);assert.equal(sim.tile(2,1),0);
 });
 
-test('striking grass requires the ice hammer; walking still clears it with every weapon',()=>{
+test('every hammer tier clears grass on impact in dry levels',()=>{
   for(const weaponTier of [1,2,8] as const){
     const sim=new Simulation(fixture(['#####','#@g##','#####']),{diamonds:0,redDiamonds:0,lives:5,health:4,weaponTier});
     sim.step({direction:0,action:true});step(sim,0,20);
-    assert.equal(sim.tile(2,1),weaponTier===8?-1:10);
-    if(weaponTier!==8){step(sim,2,20);assert.equal(sim.player.x,2);assert.equal(sim.tile(2,1),-1);}
+    assert.equal(sim.tile(2,1),-1);
   }
 });
 

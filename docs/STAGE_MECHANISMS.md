@@ -14,7 +14,7 @@ Referência: [Diamond-Rush-Decomp, de palaceswitcher](https://github.com/palaces
 | Triturador 16 e bola rolante 14 | `method_337/343`: uma pedra que desce sobre o triturador destrói as duas metades; uma bola 14 também o destrói quando chega pelo lado configurado. O mesmo impacto lateral destrói cobras | O ramo mais amplo de pedra em repouso sobre inimigo de `method_343` muda a rota certificada de Angkor 4 e exige regravação/trace antes de ser ativado |
 | Cadeado mágico 12 | `field_156/157/158`, `method_352` e prêmio 41: a fase guarda seu próprio alvo de diamantes, diminui o contador durante a coleta e restaura-o no checkpoint | Os 12 alvos de Bavaria foram conferidos em `w1.bin`. O `i.class` do JAR `(a2)` escolhido também remove o tile 12 ao carregar (offset 2204, `bastore` em 2213). A gravação de outra variante mostra bloqueio físico e não foi usada como regra da S700 |
 
-As alterações das barreiras e entidades entram no checkpoint e no replay. A destruição chama o contador da sala de desafio e usa a fumaça original. O martelo comum quebra tijolos; destruir grama pelo golpe é uma operação do martelo de gelo no Java S700.
+As alterações das barreiras e entidades entram no checkpoint e no replay. A destruição chama o contador da sala de desafio e usa a fumaça original. O martelo comum quebra tijolos e também destrói grama nas fases secas: `method_230` verifica o estado ambiental `field_487 == 3`, não o nível do martelo. A explosão de mina usa a mesma condição ambiental em `method_317`. O estado de inundação ainda não é simulado pelo port.
 
 ## Comparação executada em Java
 

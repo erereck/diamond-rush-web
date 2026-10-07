@@ -121,6 +121,19 @@ test('Angkor boss dialogue, result, world notice flags and Bavaria spawn stay in
   assert.equal(bavaria.sim.redDiamonds,10);
 });
 
+test('Bavaria brick shaft returns to its second checkpoint with stone, brick and lock count restored',()=>{
+  const attempt=JSON.parse(readFileSync(new URL('fixtures/route-attempts/bavaria-01-brick-shaft.json',import.meta.url),'utf8')) as RouteFixture;
+  const runner=playRoute(attempt,resources),sim=runner.sim;
+  assert.equal(sim.tile(23,17),-1);
+  assert.equal(sim.magicLockRemaining,20);
+  runner.step({direction:0,action:false,reset:true});
+  for(let tick=0;tick<100;tick++)runner.step({direction:0,action:false});
+  assert.deepEqual([sim.player.x,sim.player.y],[18,10]);
+  assert.equal(sim.tile(23,17),30);
+  assert.equal(sim.magicLockRemaining,24);
+  assert.deepEqual([sim.lives,sim.health,sim.retries],[11,4,1]);
+});
+
 test('Angkor 3 opens both key doors and Angkor 4 uses weighted plates before obtaining and using its hammer',()=>{
   const third=playRoute(fixtures.find(f=>f.name==='angkor-03-normal.json')!.fixture,resources);
   assert.equal(third.eventCounts['silver-gate'],1);assert.equal(third.eventCounts['gold-gate'],1);

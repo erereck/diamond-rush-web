@@ -9,6 +9,8 @@ test('torch, explosive rubble, mine blast and switch barriers match 189 extracte
  const sprite=JSON.parse(readFileSync(new URL('../public/assets/gen0-3.json',import.meta.url),'utf8')),a=sprite.animations[0];assert.equal(sprite.animationFrames.slice(a.start,a.start+a.count).reduce((n:number,f:any)=>n+f.duration,0),12);
  for(const [n,{input:c,expected}] of trace.cases.entries()){
   const s=new Simulation(level(),{diamonds:0,redDiamonds:0,lives:5,health:4,weaponTier:([0,1,2,8] as const)[c.weapon??0]});
+  // The trace generator's legacy `weapon` input is assigned to Java field_487 (environment), not recordData[9].
+  s.environmentMode=c.weapon??0;
   let damage=0,solved=0,effects=0,switched=false;s.hurt=(a)=>{damage+=a;};s.riddles.destroyed=()=>{solved++;};s.destroyEffect=()=>{effects++;};
   s.bridges.position=c.position??0;s.bridges.direction=c.direction??0;s.tick=c.tick??0;s.level.objects[s.index(2,2)]=c.object===-1||c.object===undefined?255:c.object;s.state[s.index(5,5)]=c.state??0;
   if(c.op==='torch'){s.tiles[s.index(5,5)]=36;s.tiles[s.index(5,4)]=c.above;if(c.hero){s.player.x=5;s.player.y=4;}s.updateTorch(5,5);}

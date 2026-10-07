@@ -43,6 +43,8 @@ export class Simulation {
   // cGame.field_156/157/158: tile 12 marks the stage diamond lock.
   magicLockCell=-1;magicLockRemaining=0;
   weaponTier:0|1|2|8=0;attackTicks=0;
+  /** cGame.field_487: 3 is the ordinary, unflooded stage state. */
+  environmentMode=3;
   pendingHammer:{x:number;y:number}|null=null;
   hook:{x:number;y:number;direction:2|4;ticks:number}|null=null;
   frozenKinds:Int16Array;permanentEquipmentChests=new Set<number>();
@@ -575,7 +577,7 @@ export class Simulation {
       const j=this.index(x+dx,y+dy);if(j<0)continue;
       const kind=this.tiles[j];
       if(kind===8){this.tiles[j]=54;this.state[j]=0;this.wake(x+dx,y+dy);}
-      else if(kind===30||kind===37||(kind===10&&this.weaponTier===8)){this.state[j]=1;this.wake(x+dx,y+dy);}
+      else if(kind===30||kind===37||(kind===10&&this.environmentMode===3)){this.state[j]=1;this.wake(x+dx,y+dy);}
       else if([16,19,43,49].includes(kind)){this.tiles[j]=-1;this.destroyEffect(j);this.active[j]=24;}
       if(this.isPlayer(x+dx,y+dy))this.hurt(1);
     }
@@ -595,7 +597,7 @@ export class Simulation {
     const i=this.index(x,y),kind=this.tile(x,y);if(i<0)return;
     if(kind===9){this.thaw(x,y);return;}
     if(kind===30){this.triggerBrick(x,y);return;}
-    if(kind===10&&this.weaponTier===8&&this.state[i]<=0){this.state[i]=1;this.active[i]=24;this.events.push('grass');return;}
+    if(kind===10&&this.environmentMode===3&&this.state[i]<=0){this.state[i]=1;this.active[i]=24;this.events.push('grass');return;}
     if(kind===18&&this.weaponTier===8){
       if(this.boss instanceof TibetBoss){if(![15,16].includes(this.object(this.player.x,this.player.y)))this.boss.flipBridge(this);}
       else this.bridges.flip(this);

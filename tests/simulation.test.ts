@@ -714,6 +714,10 @@ test('every hammer tier clears grass on impact in dry levels',()=>{
     sim.step({direction:0,action:true});step(sim,0,20);
     assert.equal(sim.tile(2,1),-1);
   }
+  const flooded=new Simulation(fixture(['#####','#@g##','#####']),{diamonds:0,redDiamonds:0,lives:5,health:4,weaponTier:8});
+  flooded.environmentMode=2;
+  flooded.step({direction:0,action:true});step(flooded,0,20);
+  assert.equal(flooded.tile(2,1),10);
 });
 
 test('the hook pulls a distant boulder to the cell beside the hero',()=>{

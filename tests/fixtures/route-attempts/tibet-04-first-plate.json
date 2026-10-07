@@ -1,0 +1,97 @@
+{
+  "version": 1,
+  "engine": "fidelity-24",
+  "levelFingerprint": "d1dc1ca8",
+  "world": 2,
+  "level": 3,
+  "kind": "stage",
+  "scope": "isolated-stage",
+  "initial": {
+    "diamonds": 82,
+    "redDiamonds": 25,
+    "lives": 12,
+    "health": 4,
+    "weaponTier": 2
+  },
+  "provenance": "Control-only isolated Tibet 4 attempt through the first checkpoint and ice-weight effects to the first pressure plate; exit remains unverified.",
+  "controls": [
+    {
+      "ticks": 5,
+      "direction": 0,
+      "action": false
+    },
+    {
+      "ticks": 9,
+      "direction": 2,
+      "action": false
+    },
+    {
+      "ticks": 4,
+      "direction": 1,
+      "action": false
+    },
+    {
+      "ticks": 8,
+      "direction": 2,
+      "action": false
+    },
+    {
+      "ticks": 4,
+      "direction": 1,
+      "action": false
+    },
+    {
+      "ticks": 52,
+      "direction": 2,
+      "action": false
+    },
+    {
+      "ticks": 4,
+      "direction": 1,
+      "action": false
+    },
+    {
+      "ticks": 4,
+      "direction": 2,
+      "action": false
+    },
+    {
+      "ticks": 3,
+      "direction": 0,
+      "action": false
+    },
+    {
+      "ticks": 1,
+      "direction": 1,
+      "action": false
+    },
+    {
+      "ticks": 8,
+      "direction": 4,
+      "action": false
+    },
+    {
+      "ticks": 3,
+      "direction": 0,
+      "action": false
+    }
+  ],
+  "expected": {
+    "status": "playing",
+    "ticks": 105,
+    "x": 20,
+    "y": 4,
+    "exitObject": 0,
+    "diamonds": 82,
+    "redDiamonds": 25,
+    "lives": 12,
+    "health": 4,
+    "weaponTier": 2,
+    "hits": 0,
+    "retries": 0,
+    "opened": [],
+    "demos": [],
+    "bossHealth": null,
+    "bossCleared": false
+  }
+}

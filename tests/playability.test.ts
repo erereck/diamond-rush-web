@@ -165,6 +165,34 @@ test('Bavaria 2 rolling hazards destroy both paired crushers after the second ch
   assert.equal(sim.status,'playing');
 });
 
+test('Bavaria 3 crosses its first brick barrier, activates two checkpoints and opens a plate gate',()=>{
+  const attempt=JSON.parse(readFileSync(new URL('fixtures/route-attempts/bavaria-03-two-checkpoints.json',import.meta.url),'utf8')) as RouteFixture;
+  const runner=playRoute(attempt,resources),sim=runner.sim;
+  assert.deepEqual([sim.player.x,sim.player.y,sim.checkpointOrder,sim.status],[13,27,2,'playing']);
+  assert.equal(runner.eventCounts.break,1);
+  assert.equal(runner.eventCounts.checkpoint,2);
+  assert.equal(runner.eventCounts['gate-open'],1);
+  assert.ok((runner.eventCounts['enemy-death']??0)>=2);
+});
+
+test('Tibet 4 reaches its first plate with falling ice weights and a checkpoint',()=>{
+  const attempt=JSON.parse(readFileSync(new URL('fixtures/route-attempts/tibet-04-first-plate.json',import.meta.url),'utf8')) as RouteFixture;
+  const runner=playRoute(attempt,resources),sim=runner.sim;
+  assert.deepEqual([sim.player.x,sim.player.y,sim.checkpointOrder,sim.status],[20,4,1,'playing']);
+  assert.equal(runner.eventCounts.checkpoint,1);
+  assert.ok((runner.eventCounts['ice-patch']??0)>=4);
+  assert.equal(runner.eventCounts['gate-open'],1);
+});
+
+test('Tibet 14 replays both ceiling traps and ice weight effects without a false exit',()=>{
+  const attempt=JSON.parse(readFileSync(new URL('fixtures/route-attempts/tibet-14-traps.json',import.meta.url),'utf8')) as RouteFixture;
+  const runner=playRoute(attempt,resources),sim=runner.sim;
+  assert.deepEqual([sim.player.x,sim.player.y,sim.status],[18,16,'playing']);
+  assert.equal(runner.eventCounts['trap-impact'],2);
+  assert.ok((runner.eventCounts['ice-patch']??0)>=4);
+  assert.equal(runner.eventCounts.diamond,9);
+});
+
 test('Angkor 3 opens both key doors and Angkor 4 uses weighted plates before obtaining and using its hammer',()=>{
   const third=playRoute(fixtures.find(f=>f.name==='angkor-03-normal.json')!.fixture,resources);
   assert.equal(third.eventCounts['silver-gate'],1);assert.equal(third.eventCounts['gold-gate'],1);

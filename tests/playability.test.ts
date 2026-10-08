@@ -114,6 +114,17 @@ test('Tibet 9 trace crosses the first gate and activates the upper plate',()=>{
   assert.equal(sim.gatePhases[sim.index(29,5)]>0,true);
 });
 
+test('Bavaria 13 secret trace opens the first brick shaft and reaches its checkpoint',()=>{
+  const fixture=JSON.parse(readFileSync(new URL('fixtures/route-attempts/bavaria-13-brick-shaft.json',import.meta.url),'utf8')) as RouteFixture;
+  const runner=playRoute(fixture,resources),sim=runner.sim;
+  assert.equal(sim.status,'playing');
+  assert.deepEqual([sim.player.x,sim.player.y],[7,47]);
+  assert.equal(runner.eventCounts['hook-pull'],1);
+  assert.equal(runner.eventCounts.break,1);
+  assert.equal(runner.eventCounts.checkpoint,1);
+  assert.deepEqual(runner.outcome().demos,[19]);
+});
+
 test('Angkor 10 first gate remains open under a boulder while the hero reaches the next plate',()=>{
   const fixture=JSON.parse(readFileSync(new URL('fixtures/route-attempts/angkor-10-first-gate.json',import.meta.url),'utf8')) as RouteFixture;
   const runner=playRoute(fixture,resources),sim=runner.sim;

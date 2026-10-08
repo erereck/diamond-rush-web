@@ -42,7 +42,7 @@ Uma [varredura exploratória separada](STAGE_SMOKE.md) executa controles em todo
 | Bavaria 10 · chefe (9) | Cristal após vencer o chefe (29,13) | Percurso aprovado · [1465 ticks](../tests/fixtures/routes/bavaria-boss-crystal.json) | — |
 | Bavaria 11 · secreta (10) | Saída secreta (32,20) | Ainda não verificada | 8, 37, 38 |
 | Bavaria 12 · secreta (11) | Saída secreta (56,5) | Ainda não verificada | 8, 37, 38 |
-| Bavaria 13 · secreta (12) | Saída secreta (10,3) | Ainda não verificada | 8, 37, 38 |
+| Bavaria 13 · secreta (12) | Saída secreta (10,3) | Tentativa pendente · [tentativa em (7,47)](../tests/fixtures/route-attempts/bavaria-13-brick-shaft.json) | 8, 37, 38 |
 | Tibet 1 (0) | Saída comum (51,9) | Tentativa pendente · [tentativa em (34,4)](../tests/fixtures/route-attempts/tibet-01-upper-checkpoint.json) | 38 |
 | Tibet 2 (1) | Saída comum (4,6); Saída secreta (4,33) | Percurso aprovado · [1949 ticks](../tests/fixtures/routes/tibet-02-normal.json), [321 ticks](../tests/fixtures/routes/tibet-02-secret.json) | — |
 | Tibet 3 (2) | Saída comum (3,25) | Tentativa pendente · [tentativa em (10,25)](../tests/fixtures/route-attempts/tibet-03-exit-corridor.json) | — |
@@ -87,6 +87,8 @@ Bavaria 3 tem um percurso parcial que quebra a barreira inicial, ativa dois chec
 Tibet 1 tem uma tentativa desde o spawn que abre o baú vermelho, atravessa dez armadilhas de teto e chega ao primeiro checkpoint sem dano; o acesso às salas inferiores e à saída segue pendente. Tibet 3 tem uma tentativa que usa o gancho para retirar a pedra inicial, atravessa o mapa, ativa dois checkpoints, abre um baú de cura e chega ao corredor da saída; o atirador de gelo diante da porta ainda bloqueia esse percurso. Tibet 5 agora tem uma tentativa única que resolve a sala esquerda, coleta e usa a primeira chave prateada, volta ao ramo superior, desloca uma pedra com o gancho e abre o segundo baú de chave prateada. Ainda falta retornar desse baú, abrir a segunda fechadura e verificar as salas das chaves douradas e a saída comum. A saída secreta dessa fase já tem percurso aprovado. Tibet 13 agora tem uma tentativa reproduzível que quebra a primeira barreira de tijolos, alterna a ponte de gelo duas vezes e alcança a primeira fechadura prateada; suas chaves e saída ainda não foram verificadas.
 
 Tibet 8 tem uma tentativa desde o spawn com martelo de gelo predefinido: aciona o primeiro checkpoint, rompe a barreira superior, congela e desloca dois atiradores e registra a morte de um deles por projétil do outro. Falta a segunda eliminação exigida pelo enigma e a saída. Tibet 9 tem uma tentativa que rompe três barreiras, cruza o primeiro portão, alcança o checkpoint e ativa a placa superior que abre outro portão; a saída continua pendente.
+
+Bavaria 13, fase secreta, tem um percurso parcial sem dano: usa o gancho para retirar a pedra da base, abre o poço de tijolos e ativa o primeiro checkpoint com o diálogo original 19. A chave prateada e a saída ainda não foram verificadas.
 
 ## Começo de campanha desde New Game
 

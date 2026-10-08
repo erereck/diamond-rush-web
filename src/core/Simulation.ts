@@ -960,11 +960,28 @@ export class Simulation {
         if(spike<0||this.tiles[spike]!==28)continue;
         if(spikeExtension(this.tick,(this.state[spike]&8)!==0)>=24){pass=false;blockedBySweep=true;break;}
       }
-      if((t===0||t===8||t===9)&&p.dx){
+      // cGame.method_288 handles the Tibet weight (47) in the same push
+      // branch as ordinary stones, including its delayed sideways movement.
+      if((t===0||t===8||t===9||t===47)&&p.dx){
         this.pushDelay--;this.setLocomotionAnimation(p.dx>0?8:9);
         const destination=this.index(x+p.dx,y);
         if(this.pushDelay<0&&this.free(x+p.dx,y)&&!(this.object(x+p.dx,y)===7&&this.gatePhases[destination]===0)&&(![19,43,45,49].includes(this.tile(x,y+1))||this.object(x,y+1)===35)){
           this.moveObject(i,this.index(x+p.dx,y),t,(this.state[i]&~(7|3072|512))|p.direction| (p.dx>0?1024:2048),18);this.wake(x+p.dx,y);pass=true;
+        }
+      }
+      // The two-cell Tibet slider is pushed as a pair (method_288 case 48).
+      if(t===48&&p.dx){
+        this.pushDelay--;this.setLocomotionAnimation(p.dx>0?8:9);
+        const topY=y+((this.state[i]&8)?0:-1),bottomY=topY+1;
+        const top=this.index(x,topY),bottom=this.index(x,bottomY);
+        const nextTop=this.index(x+p.dx,topY),nextBottom=this.index(x+p.dx,bottomY);
+        if(this.pushDelay<0&&top>=0&&bottom>=0&&nextTop>=0&&nextBottom>=0&&
+          this.tiles[top]===48&&this.tiles[bottom]===48&&this.tiles[nextTop]===-1&&this.tiles[nextBottom]===-1&&
+          this.tile(x,bottomY+1)>=0){
+          const topState=this.state[top],bottomState=this.state[bottom];
+          this.moveObject(top,nextTop,48,topState,0);
+          this.moveObject(bottom,nextBottom,48,(bottomState&~15)|p.direction,18);
+          this.wake(x+p.dx,bottomY);pass=true;
         }
       }
       if(pass){

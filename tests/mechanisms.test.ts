@@ -77,6 +77,16 @@ test('Tibet tile 47 falls and deposits its original ice patch only after resting
  assert.deepEqual(restoreReplay(validateReplay(s.replay(),worlds),worlds).snapshot(),s.snapshot());
  s.restoreCheckpoint();assert.equal(s.tile(5,4),47);assert.equal(s.object(5,6),255);
 });
+test('Tibet ice weight can be pushed horizontally like the Java method_288 stone branch',()=>{
+ const l=level(),at=(x:number,y:number)=>x+y*12;l.world=2;
+ for(let x=2;x<=7;x++)l.tiles[at(x,5)]=80;
+ l.tiles[at(4,4)]=47;
+ const s=new Simulation(l);s.player.x=3;s.player.y=4;s.player.direction=2;
+ for(let n=0;n<8;n++)s.step({direction:2,action:false});
+ assert.equal(s.tile(4,4),-1);
+ assert.equal(s.tile(5,4),47);
+ assert.equal(s.player.x,4);
+});
 test('Tibet tile 48 loads and drops as a paired slider, then hooks both halves together',()=>{
  const l=level(),at=(x:number,y:number)=>x+y*12;l.world=2;
  l.tiles[at(6,4)]=48;l.parameters[at(6,4)]=4;
@@ -90,6 +100,15 @@ test('Tibet tile 48 loads and drops as a paired slider, then hooks both halves t
  assert.deepEqual([s.tile(4,6),s.tile(4,7),s.tile(6,6),s.tile(6,7)],[48,48,-1,-1]);
  const worlds=[{version:0,world:0,levels:[]},{version:0,world:1,levels:[]},{version:0,world:2,levels:[l]}];
  assert.deepEqual(restoreReplay(validateReplay(s.replay(),worlds),worlds).snapshot(),s.snapshot());
+});
+test('Tibet paired slider pushes both halves only while its base is supported',()=>{
+ const l=level(),at=(x:number,y:number)=>x+y*12;l.world=2;
+ for(let x=2;x<=7;x++)l.tiles[at(x,6)]=80;
+ l.tiles[at(4,4)]=48;l.tiles[at(4,5)]=48;
+ const s=new Simulation(l);s.player.x=3;s.player.y=5;s.player.direction=2;
+ for(let n=0;n<8;n++)s.step({direction:2,action:false});
+ assert.deepEqual([s.tile(4,4),s.tile(4,5),s.tile(5,4),s.tile(5,5)],[-1,-1,48,48]);
+ assert.equal(s.player.x,4);
 });
 test('ordinary hammer toggles barrier switches outside the boss arena and checkpoint restores them',()=>{
  const l=level(),at=(x:number,y:number)=>x+y*12;l.tiles[at(3,2)]=18;l.tiles[at(5,3)]=34;l.tiles[at(6,3)]=35;

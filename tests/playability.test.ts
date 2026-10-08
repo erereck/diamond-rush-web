@@ -79,6 +79,18 @@ test('Tibet 12 first silver key, lock and pressure plate occur in one control re
   assert.equal(sim.tile(33,17),0,'the first ceiling trap chain displaced the stone');
 });
 
+test('Tibet 5 obtains both silver chest rewards in one spawn-to-puzzle trace',()=>{
+  const fixture=JSON.parse(readFileSync(new URL('fixtures/route-attempts/tibet-05-two-silver-keys.json',import.meta.url),'utf8')) as RouteFixture;
+  const runner=playRoute(fixture,resources),sim=runner.sim;
+  assert.equal(sim.status,'playing');
+  assert.deepEqual([sim.player.x,sim.player.y],[23,7]);
+  assert.deepEqual([...sim.opened].sort((a,b)=>a-b),[280,345]);
+  assert.equal(runner.eventCounts['chest-reward'],2);
+  assert.equal(runner.eventCounts['silver-gate'],1);
+  assert.equal(runner.eventCounts['hook-pull'],1);
+  assert.equal(sim.silverKeys,1);
+});
+
 test('Angkor 10 first gate remains open under a boulder while the hero reaches the next plate',()=>{
   const fixture=JSON.parse(readFileSync(new URL('fixtures/route-attempts/angkor-10-first-gate.json',import.meta.url),'utf8')) as RouteFixture;
   const runner=playRoute(fixture,resources),sim=runner.sim;

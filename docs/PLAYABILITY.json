@@ -2796,6 +2796,65 @@
             "chest": 1,
             "chest-reward": 1
           }
+        },
+        {
+          "file": "tests/fixtures/route-attempts/tibet-05-two-silver-keys.json",
+          "world": 2,
+          "level": 4,
+          "goal": "normal",
+          "initial": {
+            "diamonds": 82,
+            "redDiamonds": 25,
+            "lives": 12,
+            "health": 4,
+            "weaponTier": 2
+          },
+          "outcome": {
+            "status": "playing",
+            "ticks": 1557,
+            "x": 23,
+            "y": 7,
+            "exitObject": 0,
+            "diamonds": 82,
+            "redDiamonds": 25,
+            "lives": 11,
+            "health": 3,
+            "weaponTier": 2,
+            "hits": 4,
+            "retries": 1,
+            "opened": [
+              280,
+              345
+            ],
+            "demos": [],
+            "bossHealth": null,
+            "bossCleared": false
+          },
+          "events": {
+            "enemy-shot": 24,
+            "enemy-death": 3,
+            "dart-impact": 24,
+            "ice-patch": 3,
+            "hurt": 4,
+            "hammer": 10,
+            "bridge-switch": 1,
+            "bridge-change": 1,
+            "checkpoint": 1,
+            "grass": 15,
+            "boulder": 26,
+            "death": 1,
+            "respawn-start": 1,
+            "respawn": 1,
+            "riddle": 1,
+            "break": 1,
+            "enemy-hit": 3,
+            "riddle-solved": 1,
+            "chest": 2,
+            "chest-reward": 2,
+            "silver-gate": 1,
+            "hook": 1,
+            "hook-pull": 1
+          }
         }
       ],
       "reviews": [

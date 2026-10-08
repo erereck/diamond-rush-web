@@ -91,6 +91,29 @@ test('Tibet 5 obtains both silver chest rewards in one spawn-to-puzzle trace',()
   assert.equal(sim.silverKeys,1);
 });
 
+test('Tibet 8 trace eliminates a marked ice shooter using another shooter dart',()=>{
+  const fixture=JSON.parse(readFileSync(new URL('fixtures/route-attempts/tibet-08-first-riddle-enemy.json',import.meta.url),'utf8')) as RouteFixture;
+  const runner=playRoute(fixture,resources),sim=runner.sim;
+  assert.equal(sim.status,'playing');
+  assert.deepEqual([sim.player.x,sim.player.y],[16,14]);
+  assert.equal(runner.eventCounts.checkpoint,1);
+  assert.equal(runner.eventCounts.break,1);
+  assert.equal(runner.eventCounts.freeze,2);
+  assert.equal(runner.eventCounts['enemy-death'],1);
+  assert.deepEqual(sim.riddles.remaining,[1,5]);
+});
+
+test('Tibet 9 trace crosses the first gate and activates the upper plate',()=>{
+  const fixture=JSON.parse(readFileSync(new URL('fixtures/route-attempts/tibet-09-upper-plate.json',import.meta.url),'utf8')) as RouteFixture;
+  const runner=playRoute(fixture,resources),sim=runner.sim;
+  assert.equal(sim.status,'playing');
+  assert.deepEqual([sim.player.x,sim.player.y],[31,5]);
+  assert.equal(runner.eventCounts.break,3);
+  assert.equal(runner.eventCounts.checkpoint,1);
+  assert.equal(runner.eventCounts['gate-open'],2);
+  assert.equal(sim.gatePhases[sim.index(29,5)]>0,true);
+});
+
 test('Angkor 10 first gate remains open under a boulder while the hero reaches the next plate',()=>{
   const fixture=JSON.parse(readFileSync(new URL('fixtures/route-attempts/angkor-10-first-gate.json',import.meta.url),'utf8')) as RouteFixture;
   const runner=playRoute(fixture,resources),sim=runner.sim;

@@ -1,0 +1,237 @@
+{
+  "version": 1,
+  "engine": "fidelity-24",
+  "levelFingerprint": "d1fb8a22",
+  "world": 2,
+  "level": 8,
+  "kind": "stage",
+  "scope": "isolated-stage",
+  "initial": {
+    "diamonds": 82,
+    "redDiamonds": 25,
+    "lives": 12,
+    "health": 4,
+    "weaponTier": 8
+  },
+  "provenance": "Tibet 9 control-only trace from the original spawn with ice hammer supplied: breaks three brick barriers, passes many falling sliders, opens the first plate gate, activates the first checkpoint and reaches the upper plate, temporarily opening its linked gate. The exit remains uncertified.",
+  "controls": [
+    {
+      "ticks": 5,
+      "direction": 2,
+      "action": false
+    },
+    {
+      "ticks": 8,
+      "direction": 1,
+      "action": false
+    },
+    {
+      "ticks": 5,
+      "direction": 0,
+      "action": false
+    },
+    {
+      "ticks": 1,
+      "direction": 0,
+      "action": true
+    },
+    {
+      "ticks": 17,
+      "direction": 0,
+      "action": false
+    },
+    {
+      "ticks": 1,
+      "direction": 0,
+      "action": true
+    },
+    {
+      "ticks": 1,
+      "direction": 0,
+      "action": false
+    },
+    {
+      "ticks": 12,
+      "direction": 2,
+      "action": false
+    },
+    {
+      "ticks": 20,
+      "direction": 1,
+      "action": false
+    },
+    {
+      "ticks": 2,
+      "direction": 0,
+      "action": false
+    },
+    {
+      "ticks": 1,
+      "direction": 0,
+      "action": true
+    },
+    {
+      "ticks": 17,
+      "direction": 0,
+      "action": false
+    },
+    {
+      "ticks": 1,
+      "direction": 0,
+      "action": true
+    },
+    {
+      "ticks": 17,
+      "direction": 0,
+      "action": false
+    },
+    {
+      "ticks": 1,
+      "direction": 0,
+      "action": true
+    },
+    {
+      "ticks": 1,
+      "direction": 0,
+      "action": false
+    },
+    {
+      "ticks": 27,
+      "direction": 1,
+      "action": false
+    },
+    {
+      "ticks": 7,
+      "direction": 0,
+      "action": false
+    },
+    {
+      "ticks": 1,
+      "direction": 0,
+      "action": true
+    },
+    {
+      "ticks": 17,
+      "direction": 0,
+      "action": false
+    },
+    {
+      "ticks": 1,
+      "direction": 0,
+      "action": true
+    },
+    {
+      "ticks": 1,
+      "direction": 0,
+      "action": false
+    },
+    {
+      "ticks": 27,
+      "direction": 1,
+      "action": false
+    },
+    {
+      "ticks": 12,
+      "direction": 2,
+      "action": false
+    },
+    {
+      "ticks": 8,
+      "direction": 1,
+      "action": false
+    },
+    {
+      "ticks": 4,
+      "direction": 2,
+      "action": false
+    },
+    {
+      "ticks": 4,
+      "direction": 1,
+      "action": false
+    },
+    {
+      "ticks": 16,
+      "direction": 2,
+      "action": false
+    },
+    {
+      "ticks": 3,
+      "direction": 0,
+      "action": false
+    },
+    {
+      "ticks": 25,
+      "direction": 1,
+      "action": false
+    },
+    {
+      "ticks": 8,
+      "direction": 2,
+      "action": false
+    },
+    {
+      "ticks": 3,
+      "direction": 0,
+      "action": false
+    },
+    {
+      "ticks": 17,
+      "direction": 2,
+      "action": false
+    },
+    {
+      "ticks": 4,
+      "direction": 3,
+      "action": false
+    },
+    {
+      "ticks": 36,
+      "direction": 2,
+      "action": false
+    },
+    {
+      "ticks": 4,
+      "direction": 1,
+      "action": false
+    },
+    {
+      "ticks": 4,
+      "direction": 2,
+      "action": false
+    },
+    {
+      "ticks": 8,
+      "direction": 1,
+      "action": false
+    },
+    {
+      "ticks": 4,
+      "direction": 4,
+      "action": false
+    },
+    {
+      "ticks": 3,
+      "direction": 0,
+      "action": false
+    }
+  ],
+  "expected": {
+    "status": "playing",
+    "ticks": 354,
+    "x": 31,
+    "y": 5,
+    "exitObject": 0,
+    "diamonds": 82,
+    "redDiamonds": 25,
+    "lives": 12,
+    "health": 2,
+    "weaponTier": 8,
+    "hits": 1,
+    "retries": 0,
+    "opened": [],
+    "demos": [],
+    "bossHealth": null,
+    "bossCleared": false
+  }
+}

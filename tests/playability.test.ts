@@ -288,6 +288,17 @@ test('Bavaria 2 rolling hazards destroy both paired crushers after the second ch
   assert.equal(sim.status,'playing');
 });
 
+test('Angkor 12 solves three boulder riddles and collects their gold keys from spawn',()=>{
+  const attempt=JSON.parse(readFileSync(new URL('fixtures/route-attempts/angkor-12-three-gold-keys.json',import.meta.url),'utf8')) as RouteFixture;
+  const runner=playRoute(attempt,resources),sim=runner.sim;
+  assert.deepEqual(sim.riddles.remaining,[0,0,0,3]);
+  assert.equal(sim.goldKeys,3);
+  assert.equal(runner.eventCounts['enemy-death'],6);
+  assert.equal(runner.eventCounts['riddle-solved'],3);
+  assert.equal(runner.eventCounts['chest-reward'],3);
+  assert.deepEqual([sim.player.x,sim.player.y,sim.status],[32,6,'playing']);
+});
+
 test('Bavaria 3 crosses its first brick barrier, activates two checkpoints and opens a plate gate',()=>{
   const attempt=JSON.parse(readFileSync(new URL('fixtures/route-attempts/bavaria-03-two-checkpoints.json',import.meta.url),'utf8')) as RouteFixture;
   const runner=playRoute(attempt,resources),sim=runner.sim;

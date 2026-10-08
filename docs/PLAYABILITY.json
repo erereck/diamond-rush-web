@@ -10,7 +10,7 @@
     "verifiedMaps": 15,
     "verifiedBosses": 3,
     "completedRoutes": 19,
-    "attemptedMaps": 15,
+    "attemptedMaps": 16,
     "campaignPrefixes": 1,
     "campaignPrefixStages": 9
   },
@@ -174,7 +174,7 @@
           },
           "outcome": {
             "status": "complete",
-            "ticks": 1930,
+            "ticks": 1894,
             "x": 46,
             "y": 5,
             "exitObject": 5,
@@ -762,7 +762,7 @@
           },
           "outcome": {
             "status": "complete",
-            "ticks": 1930,
+            "ticks": 1894,
             "x": 46,
             "y": 5,
             "exitObject": 5,
@@ -784,26 +784,27 @@
             "bossCleared": false
           },
           "events": {
-            "diamond": 16,
-            "gate-open": 6,
-            "gate-opening": 12,
-            "boulder": 12,
+            "diamond": 17,
+            "gate-open": 4,
+            "gate-opening": 8,
+            "boulder": 11,
             "hurt": 9,
-            "grass": 12,
+            "grass": 10,
             "checkpoint": 6,
             "chest": 2,
             "chest-reward": 2,
             "gate-close": 3,
             "riddle": 1,
-            "enemy-death": 4,
-            "riddle-solved": 2,
+            "enemy-death": 2,
+            "riddle-solved": 1,
+            "weapon": 1,
+            "demo:22": 1,
+            "hammer": 16,
+            "break": 8,
+            "hammer-block": 2,
             "death": 1,
             "respawn-start": 1,
             "respawn": 1,
-            "weapon": 1,
-            "demo:22": 1,
-            "hammer": 14,
-            "break": 7,
             "complete": 1
           }
         }
@@ -1493,9 +1494,61 @@
           "y": 25
         }
       ],
-      "status": "unverified",
+      "status": "attempted",
       "evidence": [],
-      "pendingAttempts": [],
+      "pendingAttempts": [
+        {
+          "file": "tests/fixtures/route-attempts/angkor-12-three-gold-keys.json",
+          "world": 0,
+          "level": 11,
+          "goal": "normal",
+          "initial": {
+            "diamonds": 82,
+            "redDiamonds": 10,
+            "lives": 12,
+            "health": 4,
+            "weaponTier": 2
+          },
+          "outcome": {
+            "status": "playing",
+            "ticks": 1497,
+            "x": 32,
+            "y": 6,
+            "exitObject": 0,
+            "diamonds": 84,
+            "redDiamonds": 10,
+            "lives": 12,
+            "health": 3,
+            "weaponTier": 2,
+            "hits": 1,
+            "retries": 0,
+            "opened": [
+              112,
+              192,
+              308
+            ],
+            "demos": [],
+            "bossHealth": null,
+            "bossCleared": false
+          },
+          "events": {
+            "grass": 18,
+            "boulder": 12,
+            "diamond": 2,
+            "checkpoint": 1,
+            "riddle": 3,
+            "hook": 8,
+            "hook-pull": 8,
+            "hammer": 5,
+            "enemy-hit": 5,
+            "enemy-death": 6,
+            "riddle-solved": 3,
+            "chest": 3,
+            "chest-reward": 3,
+            "hurt": 1
+          }
+        }
+      ],
       "reviews": []
     },
     {

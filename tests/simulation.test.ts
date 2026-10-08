@@ -497,6 +497,21 @@ test('a falling stone kills a snake and leaves the original smoke effect briefly
   assert.equal(sim.tiles[snake],-1);assert.deepEqual(sim.enemySmoke,[{cell:snake,age:0}]);
   step(sim,0,14);assert.deepEqual(sim.enemySmoke,[]);
 });
+test('method_343 also crushes snakes beneath a resting stone, but not a resting diamond',()=>{
+  for(const kind of [0,8,9]){
+    const sim=new Simulation(fixture(['#######','#  O  #','#  S  #','#  @  #','#######']));
+    const above=sim.index(3,1),snake=sim.index(3,2);
+    sim.tiles[above]=kind;sim.state[above]=0;sim.motion[above]=0;
+    sim.updateSnake(3,2);
+    assert.equal(sim.tiles[snake],-1,`resting tile ${kind} above must crush`);
+    assert.equal(sim.events.at(-1),'enemy-death');
+  }
+  const diamond=new Simulation(fixture(['#######','#  *  #','#  S  #','#  @  #','#######']));
+  const above=diamond.index(3,1);
+  diamond.state[above]=0;diamond.motion[above]=0;diamond.updateSnake(3,2);
+  assert.equal(diamond.events.includes('enemy-death'),false);
+  assert.equal(diamond.tiles.filter(tile=>tile===19).length,1);
+});
 test('a Scotland rolling hazard defeats a snake from the directed side',()=>{
   const level=fixture(['#######','#     #','#@    #','#     #','#######']);
   level.world=1;level.tiles[3+2*level.width]=19;
@@ -539,6 +554,26 @@ test('Tibet shooter drops to a ledge and then fires a moving dart',()=>{
   const firing=new Simulation(fixture(['########','# @ Q  #','########']));
   let shot=false;for(let n=0;n<25;n++){step(firing);shot ||= firing.events.includes('enemy-shot');}
   assert.equal(shot,true);assert.ok(firing.health<4);
+});
+test('Tibet shooter uses the Java method_343 stone and side-crusher collision rules',()=>{
+  const make=()=>new Simulation(fixture(['######','#    #','# @Q #','######']));
+  for(const kind of [0,8,9,14,46,48]){
+    const sim=make(),above=sim.index(3,1),shooter=sim.index(3,2);
+    sim.tiles[above]=kind;sim.motion[above]=0;sim.state[above]=0;
+    sim.updateIceShooter(3,2);
+    assert.equal(sim.tiles[shooter],-1,`resting tile ${kind} above must crush`);
+    assert.equal(sim.events.includes('enemy-death'),true);
+  }
+  const diamond=make(),above=diamond.index(3,1),shooter=diamond.index(3,2);
+  diamond.tiles[above]=1;diamond.state[above]=0;diamond.motion[above]=0;
+  diamond.updateIceShooter(3,2);
+  assert.equal(diamond.tiles[shooter],46,'resting diamond must not crush');
+  diamond.state[above]=3;diamond.updateIceShooter(3,2);
+  assert.equal(diamond.tiles[shooter],-1,'descending diamond crushes');
+  const side=make(),right=side.index(4,2);
+  side.tiles[right]=14;side.state[right]=8;side.motion[right]=0;
+  side.updateIceShooter(3,2);
+  assert.equal(side.tile(3,2),-1,'moving side crusher crushes');
 });
 test('ice hammer freezes and restores both later Tibet enemy kinds',()=>{
   for(const [symbol,kind] of [['Q',46],['T',49]] as const){

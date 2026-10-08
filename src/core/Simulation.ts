@@ -326,10 +326,11 @@ export class Simulation {
   updateSnake(x:number,y:number){
     const i=this.index(x,y),kind=this.tiles[i];let s=this.state[i],dir=s&7,m=this.motion[i],tx=x,ty=y;
     const above=this.index(x,y-1),left=this.index(x-1,y),right=this.index(x+1,y);
-    // The broader resting-stone branch of method_343 still needs route-wide
-    // recertification: enabling it changes Angkor 4's recorded stone room.
+    // method_343 also crushes snakes under a resting stone; only diamonds
+    // require a downward state. This matters when the stone is held on a ledge.
     const topHit=above>=0&&this.motion[above]<=6&&(
-      [0,1].includes(this.tiles[above])&&(this.state[above]&7)===3||
+      [0,8,9].includes(this.tiles[above])||
+      this.tiles[above]===1&&(this.state[above]&7)===3||
       [14,46,48].includes(this.tiles[above]));
     const rightHit=right>=0&&this.tiles[right]===14&&this.motion[right]<=0&&
       (this.state[right]&8)!==0&&(this.state[right]&7)!==3;
@@ -390,8 +391,18 @@ export class Simulation {
   }
   /** cGame.method_312: the Tibet shooter falls between ledges and aims a dart. */
   updateIceShooter(x:number,y:number){
-    const i=this.index(x,y),above=this.index(x,y-1),state=this.state[i],phase=state&31;
-    if(above>=0&&[0,1].includes(this.tiles[above])&&this.motion[above]<=6&&(this.state[above]&7)===3){
+    const i=this.index(x,y),above=this.index(x,y-1),left=this.index(x-1,y),right=this.index(x+1,y),state=this.state[i],phase=state&31;
+    // cGame.method_312 delegates to method_343. Resting stones and frozen
+    // blocks crush the shooter too; a diamond needs to be descending.
+    const topHit=above>=0&&this.motion[above]<=6&&(
+      [0,8,9].includes(this.tiles[above])||
+      this.tiles[above]===1&&(this.state[above]&7)===3||
+      [14,46,48].includes(this.tiles[above]));
+    const rightHit=right>=0&&this.tiles[right]===14&&this.motion[right]<=0&&
+      (this.state[right]&8)!==0&&(this.state[right]&7)!==3;
+    const leftHit=left>=0&&this.tiles[left]===14&&this.motion[left]<=0&&
+      (this.state[left]&8)===0&&(this.state[left]&7)!==3;
+    if(topHit||rightHit||leftHit){
       this.tiles[i]=-1;this.destroyEffect(i);this.wake(x,y);return;
     }
     this.active[i]=24;

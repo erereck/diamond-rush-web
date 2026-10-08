@@ -10,7 +10,7 @@
     "verifiedMaps": 13,
     "verifiedBosses": 3,
     "completedRoutes": 17,
-    "attemptedMaps": 7,
+    "attemptedMaps": 8,
     "campaignPrefixes": 1,
     "campaignPrefixStages": 9
   },
@@ -2445,7 +2445,7 @@
         {
           "plane": "tile",
           "tile": 47,
-          "description": "Peso de gelo 47: queda e placa implementadas, deposição comparada com Java; água pendente",
+          "description": "Peso de gelo 47: queda, placa e empurrão implementados, deposição comparada com Java; água pendente",
           "count": 7
         }
       ]
@@ -2622,7 +2622,7 @@
         {
           "plane": "tile",
           "tile": 47,
-          "description": "Peso de gelo 47: queda e placa implementadas, deposição comparada com Java; água pendente",
+          "description": "Peso de gelo 47: queda, placa e empurrão implementados, deposição comparada com Java; água pendente",
           "count": 5
         }
       ]
@@ -2647,7 +2647,7 @@
         {
           "plane": "tile",
           "tile": 48,
-          "description": "Deslizador 48: par, queda e puxão implementados, descida comparada com Java; ligação visual e água pendentes",
+          "description": "Deslizador 48: par, queda, puxão e empurrão implementados, descida comparada com Java; ligação visual e água pendentes",
           "count": 6
         }
       ]
@@ -2672,13 +2672,13 @@
         {
           "plane": "tile",
           "tile": 47,
-          "description": "Peso de gelo 47: queda e placa implementadas, deposição comparada com Java; água pendente",
+          "description": "Peso de gelo 47: queda, placa e empurrão implementados, deposição comparada com Java; água pendente",
           "count": 1
         },
         {
           "plane": "tile",
           "tile": 48,
-          "description": "Deslizador 48: par, queda e puxão implementados, descida comparada com Java; ligação visual e água pendentes",
+          "description": "Deslizador 48: par, queda, puxão e empurrão implementados, descida comparada com Java; ligação visual e água pendentes",
           "count": 7
         }
       ]
@@ -2703,13 +2703,13 @@
         {
           "plane": "tile",
           "tile": 47,
-          "description": "Peso de gelo 47: queda e placa implementadas, deposição comparada com Java; água pendente",
+          "description": "Peso de gelo 47: queda, placa e empurrão implementados, deposição comparada com Java; água pendente",
           "count": 1
         },
         {
           "plane": "tile",
           "tile": 48,
-          "description": "Deslizador 48: par, queda e puxão implementados, descida comparada com Java; ligação visual e água pendentes",
+          "description": "Deslizador 48: par, queda, puxão e empurrão implementados, descida comparada com Java; ligação visual e água pendentes",
           "count": 1
         }
       ]
@@ -2734,13 +2734,13 @@
         {
           "plane": "tile",
           "tile": 47,
-          "description": "Peso de gelo 47: queda e placa implementadas, deposição comparada com Java; água pendente",
+          "description": "Peso de gelo 47: queda, placa e empurrão implementados, deposição comparada com Java; água pendente",
           "count": 8
         },
         {
           "plane": "tile",
           "tile": 48,
-          "description": "Deslizador 48: par, queda e puxão implementados, descida comparada com Java; ligação visual e água pendentes",
+          "description": "Deslizador 48: par, queda, puxão e empurrão implementados, descida comparada com Java; ligação visual e água pendentes",
           "count": 6
         }
       ]
@@ -2765,13 +2765,13 @@
         {
           "plane": "tile",
           "tile": 47,
-          "description": "Peso de gelo 47: queda e placa implementadas, deposição comparada com Java; água pendente",
+          "description": "Peso de gelo 47: queda, placa e empurrão implementados, deposição comparada com Java; água pendente",
           "count": 6
         },
         {
           "plane": "tile",
           "tile": 48,
-          "description": "Deslizador 48: par, queda e puxão implementados, descida comparada com Java; ligação visual e água pendentes",
+          "description": "Deslizador 48: par, queda, puxão e empurrão implementados, descida comparada com Java; ligação visual e água pendentes",
           "count": 7
         }
       ]
@@ -2977,9 +2977,50 @@
           "y": 8
         }
       ],
-      "status": "unverified",
+      "status": "attempted",
       "evidence": [],
-      "pendingAttempts": [],
+      "pendingAttempts": [
+        {
+          "file": "tests/fixtures/route-attempts/tibet-13-bridge-switch.json",
+          "world": 2,
+          "level": 12,
+          "goal": "normal",
+          "initial": {
+            "diamonds": 82,
+            "redDiamonds": 25,
+            "lives": 12,
+            "health": 4,
+            "weaponTier": 8
+          },
+          "outcome": {
+            "status": "playing",
+            "ticks": 315,
+            "x": 24,
+            "y": 8,
+            "exitObject": 0,
+            "diamonds": 83,
+            "redDiamonds": 25,
+            "lives": 12,
+            "health": 4,
+            "weaponTier": 8,
+            "hits": 0,
+            "retries": 0,
+            "opened": [],
+            "demos": [],
+            "bossHealth": null,
+            "bossCleared": false
+          },
+          "events": {
+            "hammer": 6,
+            "break": 2,
+            "bridge-switch": 2,
+            "bridge-change": 2,
+            "diamond": 1,
+            "trap-trigger": 2,
+            "trap-fall": 1
+          }
+        }
+      ],
       "reviews": [
         {
           "plane": "tile",
@@ -2990,7 +3031,7 @@
         {
           "plane": "tile",
           "tile": 47,
-          "description": "Peso de gelo 47: queda e placa implementadas, deposição comparada com Java; água pendente",
+          "description": "Peso de gelo 47: queda, placa e empurrão implementados, deposição comparada com Java; água pendente",
           "count": 1
         }
       ]
@@ -3061,7 +3102,7 @@
         {
           "plane": "tile",
           "tile": 47,
-          "description": "Peso de gelo 47: queda e placa implementadas, deposição comparada com Java; água pendente",
+          "description": "Peso de gelo 47: queda, placa e empurrão implementados, deposição comparada com Java; água pendente",
           "count": 6
         }
       ]

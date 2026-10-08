@@ -110,6 +110,19 @@ test('all three boss routes contain their real hits and Tibet uses both bridge s
   }
 });
 
+test('Tibet 6 freezes an enemy onto the exit plate before passing its gate',()=>{
+  const fixture=fixtures.find(f=>f.name==='tibet-06-normal-ice.json')!.fixture;
+  const runner=playRoute(fixture,resources),sim=runner.sim;
+  assert.equal(completedRoute(runner),true);
+  assert.equal(runner.eventCounts.freeze,1);
+  assert.equal(runner.eventCounts['gate-open'],1);
+  assert.equal(runner.eventCounts.complete,1);
+  assert.equal(sim.tile(41,7),9);
+  assert.equal(sim.gatePhases[sim.index(44,7)],3);
+  assert.equal(runner.eventCounts.checkpoint,1);
+  assert.equal(runner.eventCounts['chest-reward'],1);
+});
+
 test('New Game completes Angkor and its boss with campaign resources and save reloads',()=>{
   const fixture=JSON.parse(readFileSync(new URL('fixtures/campaign-routes/angkor-start.json',import.meta.url),'utf8')) as CampaignRouteFixture;
   const result=verifyCampaignRoute(fixture);
@@ -284,8 +297,9 @@ test('the playability inventory covers all maps and every alternative exit witho
   }
   assert.equal(report.levels.find(level=>level.world===2&&level.level===10)!.status,'verified');
   assert.equal(report.counts.verifiedBosses,3);
-  assert.equal(report.counts.completedRoutes,17);
-  assert.equal(report.counts.verifiedMaps,13);
+  assert.equal(report.counts.completedRoutes,18);
+  assert.equal(report.counts.verifiedMaps,14);
+  assert.equal(report.levels.find(level=>level.world===2&&level.level===5)!.status,'verified');
   assert.equal(report.levels.find(level=>level.world===0&&level.level===7)!.status,'verified');
   const seventh=report.levels.find(level=>level.world===0&&level.level===6)!;
   assert.equal(seventh.status,'verified');

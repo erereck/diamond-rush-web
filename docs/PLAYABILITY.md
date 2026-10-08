@@ -55,7 +55,7 @@ Uma [varredura exploratória separada](STAGE_SMOKE.md) executa controles em todo
 | Tibet 10 (9) | Saída comum (99,15) | Ainda não verificada | 47, 48 |
 | Tibet 11 · chefe (10) | Cristal após vencer o chefe (27,5) | Percurso aprovado · [3145 ticks](../tests/fixtures/routes/tibet-boss-crystal.json) · [tentativa anterior em (16,16)](../tests/fixtures/route-attempts/tibet-boss-approach.json) | — |
 | Tibet 12 · secreta (11) | Saída comum (39,23) | Tentativa pendente · [tentativa em (36,9)](../tests/fixtures/route-attempts/tibet-12-two-checkpoints.json) | — |
-| Tibet 13 · secreta (12) | Saída comum (32,8) | Ainda não verificada | 38, 47 |
+| Tibet 13 · secreta (12) | Saída comum (32,8) | Tentativa pendente · [tentativa em (24,8)](../tests/fixtures/route-attempts/tibet-13-bridge-switch.json) | 38, 47 |
 | Tibet 14 · secreta (13) | Saída comum (5,21) | Tentativa pendente · [tentativa em (18,16)](../tests/fixtures/route-attempts/tibet-14-traps.json) | 38, 47 |
 
 ## Percursos aprovados
@@ -82,7 +82,7 @@ Angkor 1–8 comprovam a saída comum, sem exigir coleta de todos os diamantes/b
 
 Bavaria 3 tem um percurso parcial que quebra a barreira inicial, ativa dois checkpoints e abre temporariamente a porta de uma placa; a saída e a aquisição do gancho ainda precisam ser verificadas. Bavaria 7, com o equipamento de gancho predefinido, aciona a mina, o checkpoint e o interruptor da ponte inferior com martelo comum; sua saída secreta continua pendente. Tibet 2 agora tem as saídas comum e secreta aprovadas. A rota comum parte do spawn com gancho e armadura de oito corações explícitos, atravessa as armadilhas de teto, vence duas salas de desafio, coleta as duas chaves em baús, abre as fechaduras, aciona a ponte de gelo e sai pela passagem comum. Tibet 4 tem uma tentativa reproduzível até o primeiro checkpoint e a primeira placa, com queda de pesos de gelo; as portas e a saída permanecem pendentes. Tibet 12 atravessa oito ativações de armadilhas de teto, abre tijolos e chega ao segundo checkpoint. Tibet 14 aciona duas armadilhas de teto e deposita quatro placas de gelo durante um percurso parcial; as duas saídas permanecem pendentes.
 
-Tibet 5 tem duas tentativas separadas na ramificação comum: uma resolve a sala esquerda, coleta e usa a primeira chave prateada; a outra usa o gancho para deslocar uma pedra e alcançar o segundo baú de chave prateada. Ainda falta unir os caminhos, abrir a segunda fechadura e verificar as salas das chaves douradas e a saída comum. A saída secreta dessa fase já tem percurso aprovado.
+Tibet 5 tem duas tentativas separadas na ramificação comum: uma resolve a sala esquerda, coleta e usa a primeira chave prateada; a outra usa o gancho para deslocar uma pedra e alcançar o segundo baú de chave prateada. Ainda falta unir os caminhos, abrir a segunda fechadura e verificar as salas das chaves douradas e a saída comum. A saída secreta dessa fase já tem percurso aprovado. Tibet 13 agora tem uma tentativa reproduzível que quebra a primeira barreira de tijolos, alterna a ponte de gelo duas vezes e alcança a primeira fechadura prateada; suas chaves e saída ainda não foram verificadas.
 
 ## Começo de campanha desde New Game
 
@@ -103,8 +103,8 @@ A fase 5 recebe 37 diamantes, sete vidas, saúde 1 e o martelo da fase 4; termin
 - 8: Minas: queda padrão/explosão implementadas; água e demais casos de method_351.
 - 37: Escombros explosivos implementados; inundação de method_397 pendente.
 - 38: Mecanismo 38 e gatilhos associados.
-- 47: Peso de gelo 47: queda e placa implementadas, deposição comparada com Java; água pendente.
-- 48: Deslizador 48: par, queda e puxão implementados, descida comparada com Java; ligação visual e água pendentes.
+- 47: Peso de gelo 47: queda, placa e empurrão implementados, deposição comparada com Java; água pendente.
+- 48: Deslizador 48: par, queda, puxão e empurrão implementados, descida comparada com Java; ligação visual e água pendentes.
 
 As placas de objeto 6 foram implementadas com abertura/fechamento, esmagamento, scan antes da queda e afundamento visual. Há 137 casos comparados com métodos originais extraídos e executados em Java (`tests/pressure.test.ts`, `tools/trace-pressure-s700.ts`). O harness isola os métodos e substitui som, invalidação visual, efeito de destruição e callback de dano; não certifica execução integral do jogo ou os comportamentos ainda ausentes dos tiles 47/48.
 

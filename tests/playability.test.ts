@@ -192,6 +192,14 @@ test('Tibet 14 replays both ceiling traps and ice weight effects without a false
   assert.ok((runner.eventCounts['ice-patch']??0)>=4);
   assert.equal(runner.eventCounts.diamond,9);
 });
+test('Tibet 13 clears its first brick barrier and alternates the ice bridge twice',()=>{
+  const attempt=JSON.parse(readFileSync(new URL('fixtures/route-attempts/tibet-13-bridge-switch.json',import.meta.url),'utf8')) as RouteFixture;
+  const runner=playRoute(attempt,resources),sim=runner.sim;
+  assert.deepEqual([sim.player.x,sim.player.y,sim.status],[24,8,'playing']);
+  assert.equal(runner.eventCounts['bridge-switch'],2);
+  assert.equal(runner.eventCounts['bridge-change'],2);
+  assert.ok((runner.eventCounts.break??0)>=2);
+});
 
 test('Bavaria 7 switches the lower bridge with the hook-tier hammer after a mine and checkpoint',()=>{
   const attempt=JSON.parse(readFileSync(new URL('fixtures/route-attempts/bavaria-07-hook-switch.json',import.meta.url),'utf8')) as RouteFixture;

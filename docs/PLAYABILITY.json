@@ -3015,6 +3015,56 @@
       "evidence": [],
       "pendingAttempts": [
         {
+          "file": "tests/fixtures/route-attempts/tibet-12-first-key-and-plate.json",
+          "world": 2,
+          "level": 11,
+          "goal": "normal",
+          "initial": {
+            "diamonds": 82,
+            "redDiamonds": 25,
+            "lives": 12,
+            "health": 4,
+            "weaponTier": 8
+          },
+          "outcome": {
+            "status": "playing",
+            "ticks": 481,
+            "x": 35,
+            "y": 16,
+            "exitObject": 0,
+            "diamonds": 88,
+            "redDiamonds": 25,
+            "lives": 12,
+            "health": 3,
+            "weaponTier": 8,
+            "hits": 1,
+            "retries": 0,
+            "opened": [
+              609
+            ],
+            "demos": [],
+            "bossHealth": null,
+            "bossCleared": false
+          },
+          "events": {
+            "trap-trigger": 9,
+            "diamond": 6,
+            "trap-fall": 9,
+            "grass": 11,
+            "trap-impact": 9,
+            "hammer": 2,
+            "break": 2,
+            "boulder": 4,
+            "hurt": 1,
+            "checkpoint": 2,
+            "chest": 1,
+            "chest-reward": 1,
+            "silver-gate": 1,
+            "gate-open": 2,
+            "gate-opening": 2
+          }
+        },
+        {
           "file": "tests/fixtures/route-attempts/tibet-12-two-checkpoints.json",
           "world": 2,
           "level": 11,

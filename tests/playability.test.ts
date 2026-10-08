@@ -67,6 +67,18 @@ test('Tibet 1 and 3 approach replays preserve their puzzle progress without clai
   assert.equal(tibet3.sim.tile(6,25),46);
 });
 
+test('Tibet 12 first silver key, lock and pressure plate occur in one control replay',()=>{
+  const fixture=JSON.parse(readFileSync(new URL('fixtures/route-attempts/tibet-12-first-key-and-plate.json',import.meta.url),'utf8')) as RouteFixture;
+  const runner=playRoute(fixture,resources),sim=runner.sim;
+  assert.deepEqual([sim.player.x,sim.player.y],[35,16]);
+  assert.equal(sim.status,'playing');
+  assert.equal(runner.eventCounts.checkpoint,2);
+  assert.equal(runner.eventCounts['chest-reward'],1);
+  assert.equal(runner.eventCounts['silver-gate'],1);
+  assert.equal(runner.eventCounts['gate-open'],2);
+  assert.equal(sim.tile(33,17),0,'the first ceiling trap chain displaced the stone');
+});
+
 test('boss certification rejects a crystal route without a completed boss defeat',()=>{
   const runner=new RouteRunner(resources,0,8,{diamonds:0,redDiamonds:0,lives:5,health:4,weaponTier:1});
   // Exercise the certification guard independently from the three/four-hit

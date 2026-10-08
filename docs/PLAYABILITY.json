@@ -2510,7 +2510,114 @@
           }
         }
       ],
-      "pendingAttempts": [],
+      "pendingAttempts": [
+        {
+          "file": "tests/fixtures/route-attempts/tibet-05-left-silver.json",
+          "world": 2,
+          "level": 4,
+          "goal": "normal",
+          "initial": {
+            "diamonds": 82,
+            "redDiamonds": 25,
+            "lives": 12,
+            "health": 4,
+            "weaponTier": 2
+          },
+          "outcome": {
+            "status": "playing",
+            "ticks": 1351,
+            "x": 16,
+            "y": 17,
+            "exitObject": 0,
+            "diamonds": 82,
+            "redDiamonds": 25,
+            "lives": 11,
+            "health": 3,
+            "weaponTier": 2,
+            "hits": 4,
+            "retries": 1,
+            "opened": [
+              280
+            ],
+            "demos": [],
+            "bossHealth": null,
+            "bossCleared": false
+          },
+          "events": {
+            "enemy-shot": 24,
+            "enemy-death": 3,
+            "dart-impact": 23,
+            "ice-patch": 3,
+            "hurt": 4,
+            "hammer": 9,
+            "bridge-switch": 1,
+            "bridge-change": 1,
+            "checkpoint": 1,
+            "grass": 7,
+            "boulder": 8,
+            "death": 1,
+            "respawn-start": 1,
+            "respawn": 1,
+            "riddle": 1,
+            "break": 1,
+            "enemy-hit": 3,
+            "riddle-solved": 1,
+            "chest": 1,
+            "chest-reward": 1,
+            "silver-gate": 1
+          }
+        },
+        {
+          "file": "tests/fixtures/route-attempts/tibet-05-right-silver.json",
+          "world": 2,
+          "level": 4,
+          "goal": "normal",
+          "initial": {
+            "diamonds": 82,
+            "redDiamonds": 25,
+            "lives": 12,
+            "health": 4,
+            "weaponTier": 2
+          },
+          "outcome": {
+            "status": "playing",
+            "ticks": 379,
+            "x": 23,
+            "y": 7,
+            "exitObject": 0,
+            "diamonds": 82,
+            "redDiamonds": 25,
+            "lives": 12,
+            "health": 2,
+            "weaponTier": 2,
+            "hits": 2,
+            "retries": 0,
+            "opened": [
+              345
+            ],
+            "demos": [],
+            "bossHealth": null,
+            "bossCleared": false
+          },
+          "events": {
+            "enemy-shot": 7,
+            "enemy-death": 2,
+            "dart-impact": 7,
+            "ice-patch": 2,
+            "hurt": 2,
+            "hammer": 2,
+            "bridge-switch": 1,
+            "bridge-change": 1,
+            "checkpoint": 1,
+            "grass": 8,
+            "boulder": 18,
+            "hook": 1,
+            "hook-pull": 1,
+            "chest": 1,
+            "chest-reward": 1
+          }
+        }
+      ],
       "reviews": [
         {
           "plane": "tile",

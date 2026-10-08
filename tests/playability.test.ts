@@ -357,6 +357,26 @@ test('Tibet 2 normal route solves both combat rooms, earns both keys and flips t
   assert.deepEqual([...s.opened].sort((a,b)=>a-b),[615,771]);
 });
 
+test('Tibet 5 left normal branch defeats its room and spends the first silver key',()=>{
+  const fixture=JSON.parse(readFileSync(new URL('fixtures/route-attempts/tibet-05-left-silver.json',import.meta.url),'utf8')) as RouteFixture;
+  const runner=playRoute(fixture,resources),s=runner.sim;
+  assert.deepEqual([s.status,s.player.x,s.player.y,s.checkpointOrder],['playing',16,17,1]);
+  assert.equal(runner.eventCounts['bridge-switch'],1);
+  assert.equal(runner.eventCounts['riddle-solved'],1);
+  assert.equal(runner.eventCounts['chest-reward'],1);
+  assert.equal(runner.eventCounts['silver-gate'],1);
+  assert.equal(s.silverKeys,0);
+});
+
+test('Tibet 5 right normal branch retrieves the second silver key with a hook pull',()=>{
+  const fixture=JSON.parse(readFileSync(new URL('fixtures/route-attempts/tibet-05-right-silver.json',import.meta.url),'utf8')) as RouteFixture;
+  const runner=playRoute(fixture,resources),s=runner.sim;
+  assert.deepEqual([s.status,s.player.x,s.player.y,s.silverKeys],['playing',23,7,1]);
+  assert.equal(runner.eventCounts['hook-pull'],1);
+  assert.equal(runner.eventCounts['chest-reward'],1);
+  assert.equal(s.tile(22,7),-1);
+});
+
 test('Tibet 2 and 5 secret exits open their exact map branches and survive RMS reload',()=>{
  for(const [file,level,target] of [['tibet-02-secret.json',1,11],['tibet-05-secret.json',4,12]] as const){
   const runner=playRoute(fixtures.find(f=>f.name===file)!.fixture,resources);

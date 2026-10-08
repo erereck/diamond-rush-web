@@ -1,0 +1,179 @@
+{
+  "version": 1,
+  "engine": "fidelity-24",
+  "levelFingerprint": "d9bf5441",
+  "world": 2,
+  "level": 4,
+  "kind": "stage",
+  "scope": "isolated-stage",
+  "initial": {
+    "diamonds": 82,
+    "redDiamonds": 25,
+    "lives": 12,
+    "health": 4,
+    "weaponTier": 2
+  },
+  "provenance": "Control-only Tibet 5 normal-branch attempt: clears the air-bubble column, pulls a stone with the hook and opens the second silver-key chest. Returning to both silver locks and finishing the stage remain unverified.",
+  "controls": [
+    {
+      "ticks": 27,
+      "direction": 2,
+      "action": false
+    },
+    {
+      "ticks": 3,
+      "direction": 3,
+      "action": false
+    },
+    {
+      "ticks": 3,
+      "direction": 2,
+      "action": false
+    },
+    {
+      "ticks": 20,
+      "direction": 3,
+      "action": false
+    },
+    {
+      "ticks": 4,
+      "direction": 4,
+      "action": false
+    },
+    {
+      "ticks": 17,
+      "direction": 3,
+      "action": false
+    },
+    {
+      "ticks": 3,
+      "direction": 0,
+      "action": false
+    },
+    {
+      "ticks": 25,
+      "direction": 3,
+      "action": false
+    },
+    {
+      "ticks": 4,
+      "direction": 4,
+      "action": false
+    },
+    {
+      "ticks": 3,
+      "direction": 0,
+      "action": false
+    },
+    {
+      "ticks": 1,
+      "direction": 3,
+      "action": false
+    },
+    {
+      "ticks": 20,
+      "direction": 0,
+      "action": true
+    },
+    {
+      "ticks": 32,
+      "direction": 1,
+      "action": false
+    },
+    {
+      "ticks": 12,
+      "direction": 2,
+      "action": false
+    },
+    {
+      "ticks": 3,
+      "direction": 0,
+      "action": false
+    },
+    {
+      "ticks": 1,
+      "direction": 3,
+      "action": false
+    },
+    {
+      "ticks": 8,
+      "direction": 2,
+      "action": false
+    },
+    {
+      "ticks": 24,
+      "direction": 1,
+      "action": false
+    },
+    {
+      "ticks": 10,
+      "direction": 2,
+      "action": false
+    },
+    {
+      "ticks": 3,
+      "direction": 0,
+      "action": false
+    },
+    {
+      "ticks": 1,
+      "direction": 4,
+      "action": false
+    },
+    {
+      "ticks": 3,
+      "direction": 0,
+      "action": false
+    },
+    {
+      "ticks": 20,
+      "direction": 0,
+      "action": true
+    },
+    {
+      "ticks": 30,
+      "direction": 0,
+      "action": false
+    },
+    {
+      "ticks": 20,
+      "direction": 0,
+      "action": true
+    },
+    {
+      "ticks": 30,
+      "direction": 0,
+      "action": false
+    },
+    {
+      "ticks": 9,
+      "direction": 2,
+      "action": false
+    },
+    {
+      "ticks": 43,
+      "direction": 0,
+      "action": false
+    }
+  ],
+  "expected": {
+    "status": "playing",
+    "ticks": 379,
+    "x": 23,
+    "y": 7,
+    "exitObject": 0,
+    "diamonds": 82,
+    "redDiamonds": 25,
+    "lives": 12,
+    "health": 2,
+    "weaponTier": 2,
+    "hits": 2,
+    "retries": 0,
+    "opened": [
+      345
+    ],
+    "demos": [],
+    "bossHealth": null,
+    "bossCleared": false
+  }
+}

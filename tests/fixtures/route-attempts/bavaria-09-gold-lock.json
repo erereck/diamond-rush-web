@@ -1,0 +1,82 @@
+{
+  "version": 1,
+  "engine": "fidelity-24",
+  "levelFingerprint": "ea5d3761",
+  "world": 1,
+  "level": 8,
+  "kind": "stage",
+  "scope": "isolated-stage",
+  "initial": {
+    "diamonds": 82,
+    "redDiamonds": 10,
+    "lives": 12,
+    "health": 4,
+    "weaponTier": 2
+  },
+  "provenance": "Control-only isolated Bavaria 9 attempt from spawn through the lower snake corridor to the gold lock beside the normal-exit gate. The key and exit remain unverified.",
+  "controls": [
+    {
+      "ticks": 5,
+      "direction": 2,
+      "action": false
+    },
+    {
+      "ticks": 8,
+      "direction": 3,
+      "action": false
+    },
+    {
+      "ticks": 8,
+      "direction": 4,
+      "action": false
+    },
+    {
+      "ticks": 4,
+      "direction": 3,
+      "action": false
+    },
+    {
+      "ticks": 4,
+      "direction": 4,
+      "action": false
+    },
+    {
+      "ticks": 21,
+      "direction": 3,
+      "action": false
+    },
+    {
+      "ticks": 36,
+      "direction": 2,
+      "action": false
+    },
+    {
+      "ticks": 8,
+      "direction": 3,
+      "action": false
+    },
+    {
+      "ticks": 3,
+      "direction": 0,
+      "action": false
+    }
+  ],
+  "expected": {
+    "status": "playing",
+    "ticks": 97,
+    "x": 10,
+    "y": 18,
+    "exitObject": 0,
+    "diamonds": 82,
+    "redDiamonds": 10,
+    "lives": 12,
+    "health": 3,
+    "weaponTier": 2,
+    "hits": 1,
+    "retries": 0,
+    "opened": [],
+    "demos": [],
+    "bossHealth": null,
+    "bossCleared": false
+  }
+}

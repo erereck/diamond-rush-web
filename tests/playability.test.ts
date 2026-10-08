@@ -431,6 +431,8 @@ test('the playability inventory covers all maps and every alternative exit witho
   assert.equal(report.counts.verifiedBosses,3);
   assert.equal(report.counts.completedRoutes,21);
   assert.equal(report.counts.verifiedMaps,17);
+  assert.equal(report.counts.attemptedMaps,18);
+  assert.equal(report.levels.find(level=>level.world===1&&level.level===8)!.status,'attempted');
   assert.equal(report.levels.find(level=>level.world===0&&level.level===10)!.status,'verified');
   assert.equal(report.levels.find(level=>level.world===2&&level.level===2)!.status,'verified');
   assert.equal(report.levels.find(level=>level.world===0&&level.level===12)!.status,'verified');

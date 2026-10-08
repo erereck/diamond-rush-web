@@ -10,7 +10,7 @@
     "verifiedMaps": 17,
     "verifiedBosses": 3,
     "completedRoutes": 21,
-    "attemptedMaps": 17,
+    "attemptedMaps": 18,
     "campaignPrefixes": 1,
     "campaignPrefixStages": 9
   },
@@ -2280,9 +2280,44 @@
           "y": 19
         }
       ],
-      "status": "unverified",
+      "status": "attempted",
       "evidence": [],
-      "pendingAttempts": [],
+      "pendingAttempts": [
+        {
+          "file": "tests/fixtures/route-attempts/bavaria-09-gold-lock.json",
+          "world": 1,
+          "level": 8,
+          "goal": "normal",
+          "initial": {
+            "diamonds": 82,
+            "redDiamonds": 10,
+            "lives": 12,
+            "health": 4,
+            "weaponTier": 2
+          },
+          "outcome": {
+            "status": "playing",
+            "ticks": 97,
+            "x": 10,
+            "y": 18,
+            "exitObject": 0,
+            "diamonds": 82,
+            "redDiamonds": 10,
+            "lives": 12,
+            "health": 3,
+            "weaponTier": 2,
+            "hits": 1,
+            "retries": 0,
+            "opened": [],
+            "demos": [],
+            "bossHealth": null,
+            "bossCleared": false
+          },
+          "events": {
+            "hurt": 1
+          }
+        }
+      ],
       "reviews": [
         {
           "plane": "tile",

@@ -377,6 +377,15 @@ test('Tibet 14 replays both ceiling traps and ice weight effects without a false
   assert.ok((runner.eventCounts['ice-patch']??0)>=4);
   assert.equal(runner.eventCounts.diamond,9);
 });
+
+test('Tibet 14 normal route clears the stone corridor and descends to the real exit',()=>{
+  const runner=playRoute(fixtures.find(f=>f.name==='tibet-14-normal-hook.json')!.fixture,resources);
+  assert.equal(runner.sim.status,'complete');
+  assert.equal(runner.sim.exitObject,5);
+  assert.equal(runner.eventCounts.checkpoint,1);
+  assert.ok((runner.eventCounts['hook-pull']??0)>=16);
+  assert.equal(runner.eventCounts['trap-impact'],9);
+});
 test('Tibet 13 clears its first brick barrier and alternates the ice bridge twice',()=>{
   const attempt=JSON.parse(readFileSync(new URL('fixtures/route-attempts/tibet-13-bridge-switch.json',import.meta.url),'utf8')) as RouteFixture;
   const runner=playRoute(attempt,resources),sim=runner.sim;
@@ -439,9 +448,9 @@ test('the playability inventory covers all maps and every alternative exit witho
   }
   assert.equal(report.levels.find(level=>level.world===2&&level.level===10)!.status,'verified');
   assert.equal(report.counts.verifiedBosses,3);
-  assert.equal(report.counts.completedRoutes,21);
-  assert.equal(report.counts.verifiedMaps,17);
-  assert.equal(report.counts.attemptedMaps,19);
+  assert.equal(report.counts.completedRoutes,22);
+  assert.equal(report.counts.verifiedMaps,18);
+  assert.equal(report.counts.attemptedMaps,18);
   assert.equal(report.levels.find(level=>level.world===1&&level.level===8)!.status,'attempted');
   assert.equal(report.levels.find(level=>level.world===1&&level.level===5)!.status,'attempted');
   assert.equal(report.levels.find(level=>level.world===0&&level.level===10)!.status,'verified');

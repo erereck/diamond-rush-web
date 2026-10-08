@@ -57,6 +57,10 @@ test('Tibet 1 and 3 approach replays preserve their puzzle progress without clai
   assert.equal(tibet1.eventCounts.checkpoint,1);
   assert.equal(tibet1.eventCounts['trap-trigger'],10);
   assert.equal(tibet1.eventCounts['chest-reward'],1);
+  const nearExit=playRoute(JSON.parse(readFileSync(new URL('tibet-01-exit-gold-lock.json',attemptRoot),'utf8')) as RouteFixture,resources);
+  assert.deepEqual([nearExit.sim.player.x,nearExit.sim.player.y,nearExit.sim.status],[47,9,'playing']);
+  assert.equal(nearExit.eventCounts['trap-trigger'],17);
+  assert.equal(nearExit.sim.gatePhases[nearExit.sim.index(48,9)],0);
   const tibet3=playRoute(JSON.parse(readFileSync(new URL('tibet-03-exit-corridor.json',attemptRoot),'utf8')) as RouteFixture,resources);
   assert.equal(tibet3.sim.status,'playing');
   assert.deepEqual([tibet3.sim.player.x,tibet3.sim.player.y],[10,25]);

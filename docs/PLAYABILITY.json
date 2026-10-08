@@ -2665,6 +2665,50 @@
       "evidence": [],
       "pendingAttempts": [
         {
+          "file": "tests/fixtures/route-attempts/tibet-01-exit-gold-lock.json",
+          "world": 2,
+          "level": 0,
+          "goal": "normal",
+          "initial": {
+            "diamonds": 82,
+            "redDiamonds": 25,
+            "lives": 12,
+            "health": 4,
+            "weaponTier": 2
+          },
+          "outcome": {
+            "status": "playing",
+            "ticks": 451,
+            "x": 47,
+            "y": 9,
+            "exitObject": 0,
+            "diamonds": 83,
+            "redDiamonds": 26,
+            "lives": 12,
+            "health": 4,
+            "weaponTier": 2,
+            "hits": 0,
+            "retries": 0,
+            "opened": [
+              122
+            ],
+            "demos": [],
+            "bossHealth": null,
+            "bossCleared": false
+          },
+          "events": {
+            "chest": 1,
+            "chest-reward": 1,
+            "trap-trigger": 17,
+            "trap-fall": 17,
+            "trap-impact": 17,
+            "grass": 11,
+            "diamond": 1,
+            "boulder": 3,
+            "checkpoint": 1
+          }
+        },
+        {
           "file": "tests/fixtures/route-attempts/tibet-01-upper-checkpoint.json",
           "world": 2,
           "level": 0,

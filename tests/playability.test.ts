@@ -310,6 +310,16 @@ test('Bavaria 5 and secret Bavaria 11 establish their first checkpoint and plate
   assert.equal(secret.sim.gatePhases[secret.sim.index(17,17)],1);
 });
 
+test('Bavaria 6 clears the mine barrier and opens both silver gates before the checkpoint',()=>{
+  const fixture=JSON.parse(readFileSync(new URL('fixtures/route-attempts/bavaria-06-two-silver-gates.json',import.meta.url),'utf8')) as RouteFixture;
+  const runner=playRoute(fixture,resources),sim=runner.sim;
+  assert.deepEqual([sim.player.x,sim.player.y,sim.checkpointOrder,sim.status],[31,14,1,'playing']);
+  assert.equal(runner.eventCounts['mine-blast'],4);
+  assert.equal(runner.eventCounts['chest-reward'],2);
+  assert.equal(runner.eventCounts['silver-gate'],2);
+  assert.equal(runner.eventCounts.checkpoint,1);
+});
+
 test('Tibet 10 activates its first four-target riddle from spawn',()=>{
   const attempt=JSON.parse(readFileSync(new URL('fixtures/route-attempts/tibet-10-first-riddle.json',import.meta.url),'utf8')) as RouteFixture;
   const runner=playRoute(attempt,resources),sim=runner.sim;
@@ -431,8 +441,9 @@ test('the playability inventory covers all maps and every alternative exit witho
   assert.equal(report.counts.verifiedBosses,3);
   assert.equal(report.counts.completedRoutes,21);
   assert.equal(report.counts.verifiedMaps,17);
-  assert.equal(report.counts.attemptedMaps,18);
+  assert.equal(report.counts.attemptedMaps,19);
   assert.equal(report.levels.find(level=>level.world===1&&level.level===8)!.status,'attempted');
+  assert.equal(report.levels.find(level=>level.world===1&&level.level===5)!.status,'attempted');
   assert.equal(report.levels.find(level=>level.world===0&&level.level===10)!.status,'verified');
   assert.equal(report.levels.find(level=>level.world===2&&level.level===2)!.status,'verified');
   assert.equal(report.levels.find(level=>level.world===0&&level.level===12)!.status,'verified');

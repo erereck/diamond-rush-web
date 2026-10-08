@@ -10,7 +10,7 @@
     "verifiedMaps": 17,
     "verifiedBosses": 3,
     "completedRoutes": 21,
-    "attemptedMaps": 18,
+    "attemptedMaps": 19,
     "campaignPrefixes": 1,
     "campaignPrefixStages": 9
   },
@@ -2133,9 +2133,56 @@
           "y": 6
         }
       ],
-      "status": "unverified",
+      "status": "attempted",
       "evidence": [],
-      "pendingAttempts": [],
+      "pendingAttempts": [
+        {
+          "file": "tests/fixtures/route-attempts/bavaria-06-two-silver-gates.json",
+          "world": 1,
+          "level": 5,
+          "goal": "normal",
+          "initial": {
+            "diamonds": 82,
+            "redDiamonds": 10,
+            "lives": 12,
+            "health": 4,
+            "weaponTier": 2
+          },
+          "outcome": {
+            "status": "playing",
+            "ticks": 650,
+            "x": 31,
+            "y": 14,
+            "exitObject": 0,
+            "diamonds": 82,
+            "redDiamonds": 10,
+            "lives": 12,
+            "health": 4,
+            "weaponTier": 2,
+            "hits": 0,
+            "retries": 0,
+            "opened": [
+              395,
+              407
+            ],
+            "demos": [],
+            "bossHealth": null,
+            "bossCleared": false
+          },
+          "events": {
+            "grass": 3,
+            "mine-blast": 4,
+            "rubble-break": 3,
+            "chest": 2,
+            "chest-reward": 2,
+            "silver-gate": 2,
+            "gate-open": 2,
+            "gate-opening": 4,
+            "boulder": 3,
+            "checkpoint": 1
+          }
+        }
+      ],
       "reviews": [
         {
           "plane": "tile",

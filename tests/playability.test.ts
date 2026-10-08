@@ -79,6 +79,17 @@ test('Tibet 12 first silver key, lock and pressure plate occur in one control re
   assert.equal(sim.tile(33,17),0,'the first ceiling trap chain displaced the stone');
 });
 
+test('Angkor 10 first gate remains open under a boulder while the hero reaches the next plate',()=>{
+  const fixture=JSON.parse(readFileSync(new URL('fixtures/route-attempts/angkor-10-first-gate.json',import.meta.url),'utf8')) as RouteFixture;
+  const runner=playRoute(fixture,resources),sim=runner.sim;
+  assert.equal(sim.status,'playing');
+  assert.deepEqual([sim.player.x,sim.player.y],[12,17]);
+  assert.equal(sim.tile(9,7),0);
+  assert.equal(sim.gatePhases[sim.index(11,7)],3);
+  assert.equal(runner.eventCounts['hook-pull'],2);
+  assert.equal(runner.eventCounts.checkpoint,1);
+});
+
 test('boss certification rejects a crystal route without a completed boss defeat',()=>{
   const runner=new RouteRunner(resources,0,8,{diamonds:0,redDiamonds:0,lives:5,health:4,weaponTier:1});
   // Exercise the certification guard independently from the three/four-hit

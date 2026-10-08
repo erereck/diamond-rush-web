@@ -43,9 +43,9 @@ Uma [varredura exploratória separada](STAGE_SMOKE.md) executa controles em todo
 | Bavaria 11 · secreta (10) | Saída secreta (32,20) | Ainda não verificada | 8, 37, 38 |
 | Bavaria 12 · secreta (11) | Saída secreta (56,5) | Ainda não verificada | 8, 37, 38 |
 | Bavaria 13 · secreta (12) | Saída secreta (10,3) | Ainda não verificada | 8, 37, 38 |
-| Tibet 1 (0) | Saída comum (51,9) | Ainda não verificada | 38 |
+| Tibet 1 (0) | Saída comum (51,9) | Tentativa pendente · [tentativa em (34,4)](../tests/fixtures/route-attempts/tibet-01-upper-checkpoint.json) | 38 |
 | Tibet 2 (1) | Saída comum (4,6); Saída secreta (4,33) | Percurso aprovado · [1949 ticks](../tests/fixtures/routes/tibet-02-normal.json), [321 ticks](../tests/fixtures/routes/tibet-02-secret.json) | — |
-| Tibet 3 (2) | Saída comum (3,25) | Ainda não verificada | — |
+| Tibet 3 (2) | Saída comum (3,25) | Tentativa pendente · [tentativa em (10,25)](../tests/fixtures/route-attempts/tibet-03-exit-corridor.json) | — |
 | Tibet 4 (3) | Saída comum (33,3) | Tentativa pendente · [tentativa em (20,4)](../tests/fixtures/route-attempts/tibet-04-first-plate.json) | 47 |
 | Tibet 5 (4) | Saída comum (41,3); Saída secreta (6,23) | Saídas parcialmente aprovadas · [209 ticks](../tests/fixtures/routes/tibet-05-secret.json) · [tentativa em (16,17)](../tests/fixtures/route-attempts/tibet-05-left-silver.json), [tentativa em (23,7)](../tests/fixtures/route-attempts/tibet-05-right-silver.json) | 47 |
 | Tibet 6 (5) | Saída comum (46,7) | Ainda não verificada | 48 |
@@ -82,7 +82,7 @@ Angkor 1–8 comprovam a saída comum, sem exigir coleta de todos os diamantes/b
 
 Bavaria 3 tem um percurso parcial que quebra a barreira inicial, ativa dois checkpoints e abre temporariamente a porta de uma placa; a saída e a aquisição do gancho ainda precisam ser verificadas. Bavaria 7, com o equipamento de gancho predefinido, aciona a mina, o checkpoint e o interruptor da ponte inferior com martelo comum; sua saída secreta continua pendente. Tibet 2 agora tem as saídas comum e secreta aprovadas. A rota comum parte do spawn com gancho e armadura de oito corações explícitos, atravessa as armadilhas de teto, vence duas salas de desafio, coleta as duas chaves em baús, abre as fechaduras, aciona a ponte de gelo e sai pela passagem comum. Tibet 4 tem uma tentativa reproduzível até o primeiro checkpoint e a primeira placa, com queda de pesos de gelo; as portas e a saída permanecem pendentes. Tibet 12 atravessa oito ativações de armadilhas de teto, abre tijolos e chega ao segundo checkpoint. Tibet 14 aciona duas armadilhas de teto e deposita quatro placas de gelo durante um percurso parcial; as duas saídas permanecem pendentes.
 
-Tibet 5 tem duas tentativas separadas na ramificação comum: uma resolve a sala esquerda, coleta e usa a primeira chave prateada; a outra usa o gancho para deslocar uma pedra e alcançar o segundo baú de chave prateada. Ainda falta unir os caminhos, abrir a segunda fechadura e verificar as salas das chaves douradas e a saída comum. A saída secreta dessa fase já tem percurso aprovado. Tibet 13 agora tem uma tentativa reproduzível que quebra a primeira barreira de tijolos, alterna a ponte de gelo duas vezes e alcança a primeira fechadura prateada; suas chaves e saída ainda não foram verificadas.
+Tibet 1 tem uma tentativa desde o spawn que abre o baú vermelho, atravessa dez armadilhas de teto e chega ao primeiro checkpoint sem dano; o acesso às salas inferiores e à saída segue pendente. Tibet 3 tem uma tentativa que usa o gancho para retirar a pedra inicial, atravessa o mapa, ativa dois checkpoints, abre um baú de cura e chega ao corredor da saída; o atirador de gelo diante da porta ainda bloqueia esse percurso. Tibet 5 tem duas tentativas separadas na ramificação comum: uma resolve a sala esquerda, coleta e usa a primeira chave prateada; a outra usa o gancho para deslocar uma pedra e alcançar o segundo baú de chave prateada. Ainda falta unir os caminhos, abrir a segunda fechadura e verificar as salas das chaves douradas e a saída comum. A saída secreta dessa fase já tem percurso aprovado. Tibet 13 agora tem uma tentativa reproduzível que quebra a primeira barreira de tijolos, alterna a ponte de gelo duas vezes e alcança a primeira fechadura prateada; suas chaves e saída ainda não foram verificadas.
 
 ## Começo de campanha desde New Game
 
@@ -102,7 +102,7 @@ A fase 5 recebe 37 diamantes, sete vidas, saúde 1 e o martelo da fase 4; termin
 
 - 8: Minas: queda padrão/explosão implementadas; água e demais casos de method_351.
 - 37: Escombros explosivos implementados; inundação de method_397 pendente.
-- 38: Mecanismo 38 e gatilhos associados.
+- 38: Emissor de água 38: inicialização e propagação de method_293/method_369 pendentes.
 - 47: Peso de gelo 47: queda, placa e empurrão implementados, deposição comparada com Java; água pendente.
 - 48: Deslizador 48: par, queda, puxão e empurrão implementados, descida comparada com Java; ligação visual e água pendentes.
 

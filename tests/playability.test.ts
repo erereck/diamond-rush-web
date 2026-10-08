@@ -49,6 +49,24 @@ test('route files cannot inject map edits, positions, scripted movement or consu
   assert.throws(()=>playRoute(tooLong,resources),/run length/);
 });
 
+test('Tibet 1 and 3 approach replays preserve their puzzle progress without claiming an exit',()=>{
+  const attemptRoot=new URL('fixtures/route-attempts/',import.meta.url);
+  const tibet1=playRoute(JSON.parse(readFileSync(new URL('tibet-01-upper-checkpoint.json',attemptRoot),'utf8')) as RouteFixture,resources);
+  assert.equal(tibet1.sim.status,'playing');
+  assert.deepEqual([tibet1.sim.player.x,tibet1.sim.player.y],[34,4]);
+  assert.equal(tibet1.eventCounts.checkpoint,1);
+  assert.equal(tibet1.eventCounts['trap-trigger'],10);
+  assert.equal(tibet1.eventCounts['chest-reward'],1);
+  const tibet3=playRoute(JSON.parse(readFileSync(new URL('tibet-03-exit-corridor.json',attemptRoot),'utf8')) as RouteFixture,resources);
+  assert.equal(tibet3.sim.status,'playing');
+  assert.deepEqual([tibet3.sim.player.x,tibet3.sim.player.y],[10,25]);
+  assert.equal(tibet3.eventCounts.hook,1);
+  assert.equal(tibet3.eventCounts['hook-pull'],2);
+  assert.equal(tibet3.eventCounts.checkpoint,2);
+  assert.equal(tibet3.eventCounts['chest-reward'],1);
+  assert.equal(tibet3.sim.tile(6,25),46);
+});
+
 test('boss certification rejects a crystal route without a completed boss defeat',()=>{
   const runner=new RouteRunner(resources,0,8,{diamonds:0,redDiamonds:0,lives:5,health:4,weaponTier:1});
   // Exercise the certification guard independently from the three/four-hit

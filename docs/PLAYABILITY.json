@@ -10,7 +10,7 @@
     "verifiedMaps": 13,
     "verifiedBosses": 3,
     "completedRoutes": 17,
-    "attemptedMaps": 8,
+    "attemptedMaps": 10,
     "campaignPrefixes": 1,
     "campaignPrefixStages": 9
   },
@@ -1982,7 +1982,7 @@
         {
           "plane": "tile",
           "tile": 38,
-          "description": "Mecanismo 38 e gatilhos associados",
+          "description": "Emissor de água 38: inicialização e propagação de method_293/method_369 pendentes",
           "count": 3
         }
       ]
@@ -2019,7 +2019,7 @@
         {
           "plane": "tile",
           "tile": 38,
-          "description": "Mecanismo 38 e gatilhos associados",
+          "description": "Emissor de água 38: inicialização e propagação de method_293/method_369 pendentes",
           "count": 3
         }
       ]
@@ -2129,7 +2129,7 @@
         {
           "plane": "tile",
           "tile": 38,
-          "description": "Mecanismo 38 e gatilhos associados",
+          "description": "Emissor de água 38: inicialização e propagação de method_293/method_369 pendentes",
           "count": 2
         }
       ]
@@ -2166,7 +2166,7 @@
         {
           "plane": "tile",
           "tile": 38,
-          "description": "Mecanismo 38 e gatilhos associados",
+          "description": "Emissor de água 38: inicialização e propagação de method_293/method_369 pendentes",
           "count": 1
         }
       ]
@@ -2203,7 +2203,7 @@
         {
           "plane": "tile",
           "tile": 38,
-          "description": "Mecanismo 38 e gatilhos associados",
+          "description": "Emissor de água 38: inicialização e propagação de method_293/method_369 pendentes",
           "count": 2
         }
       ]
@@ -2221,14 +2221,59 @@
           "y": 9
         }
       ],
-      "status": "unverified",
+      "status": "attempted",
       "evidence": [],
-      "pendingAttempts": [],
+      "pendingAttempts": [
+        {
+          "file": "tests/fixtures/route-attempts/tibet-01-upper-checkpoint.json",
+          "world": 2,
+          "level": 0,
+          "goal": "normal",
+          "initial": {
+            "diamonds": 82,
+            "redDiamonds": 25,
+            "lives": 12,
+            "health": 4,
+            "weaponTier": 2
+          },
+          "outcome": {
+            "status": "playing",
+            "ticks": 371,
+            "x": 34,
+            "y": 4,
+            "exitObject": 0,
+            "diamonds": 83,
+            "redDiamonds": 26,
+            "lives": 12,
+            "health": 4,
+            "weaponTier": 2,
+            "hits": 0,
+            "retries": 0,
+            "opened": [
+              122
+            ],
+            "demos": [],
+            "bossHealth": null,
+            "bossCleared": false
+          },
+          "events": {
+            "chest": 1,
+            "chest-reward": 1,
+            "trap-trigger": 10,
+            "trap-fall": 10,
+            "trap-impact": 9,
+            "grass": 11,
+            "diamond": 1,
+            "boulder": 3,
+            "checkpoint": 1
+          }
+        }
+      ],
       "reviews": [
         {
           "plane": "tile",
           "tile": 38,
-          "description": "Mecanismo 38 e gatilhos associados",
+          "description": "Emissor de água 38: inicialização e propagação de method_293/method_369 pendentes",
           "count": 1
         }
       ]
@@ -2377,9 +2422,60 @@
           "y": 25
         }
       ],
-      "status": "unverified",
+      "status": "attempted",
       "evidence": [],
-      "pendingAttempts": [],
+      "pendingAttempts": [
+        {
+          "file": "tests/fixtures/route-attempts/tibet-03-exit-corridor.json",
+          "world": 2,
+          "level": 2,
+          "goal": "normal",
+          "initial": {
+            "diamonds": 82,
+            "redDiamonds": 25,
+            "lives": 12,
+            "health": 4,
+            "weaponTier": 2
+          },
+          "outcome": {
+            "status": "playing",
+            "ticks": 461,
+            "x": 10,
+            "y": 25,
+            "exitObject": 0,
+            "diamonds": 83,
+            "redDiamonds": 25,
+            "lives": 12,
+            "health": 3,
+            "weaponTier": 2,
+            "hits": 2,
+            "retries": 0,
+            "opened": [
+              687
+            ],
+            "demos": [],
+            "bossHealth": null,
+            "bossCleared": false
+          },
+          "events": {
+            "hook": 1,
+            "hook-pull": 2,
+            "boulder": 6,
+            "grass": 10,
+            "diamond": 1,
+            "enemy-shot": 52,
+            "checkpoint": 2,
+            "dart-impact": 50,
+            "enemy-death": 3,
+            "hurt": 2,
+            "chest": 1,
+            "chest-reward": 1,
+            "trap-trigger": 1,
+            "trap-fall": 1,
+            "trap-impact": 1
+          }
+        }
+      ],
       "reviews": []
     },
     {
@@ -3025,7 +3121,7 @@
         {
           "plane": "tile",
           "tile": 38,
-          "description": "Mecanismo 38 e gatilhos associados",
+          "description": "Emissor de água 38: inicialização e propagação de method_293/method_369 pendentes",
           "count": 1
         },
         {
@@ -3096,7 +3192,7 @@
         {
           "plane": "tile",
           "tile": 38,
-          "description": "Mecanismo 38 e gatilhos associados",
+          "description": "Emissor de água 38: inicialização e propagação de method_293/method_369 pendentes",
           "count": 1
         },
         {

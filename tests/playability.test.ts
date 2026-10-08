@@ -333,6 +333,16 @@ test('Bavaria 8 reaches the first combat riddle without claiming its exit',()=>{
   assert.equal(runner.sim.riddles.remaining[0],2);
 });
 
+test('Bavaria 4 clears the first stone barrier with the hook',()=>{
+  const fixture=JSON.parse(readFileSync(new URL('fixtures/route-attempts/bavaria-04-first-stone-wall.json',import.meta.url),'utf8')) as RouteFixture;
+  const runner=playRoute(fixture,resources);
+  assert.deepEqual([runner.sim.player.x,runner.sim.player.y,runner.sim.status],[15,6,'playing']);
+  assert.equal(runner.eventCounts['hook-pull'],5);
+  assert.equal(runner.sim.tile(8,5),-1);
+  assert.equal(runner.sim.tile(9,5),-1);
+  assert.equal(runner.sim.tile(10,5),-1);
+});
+
 test('Tibet 10 activates its first four-target riddle from spawn',()=>{
   const attempt=JSON.parse(readFileSync(new URL('fixtures/route-attempts/tibet-10-first-riddle.json',import.meta.url),'utf8')) as RouteFixture;
   const runner=playRoute(attempt,resources),sim=runner.sim;
@@ -463,7 +473,8 @@ test('the playability inventory covers all maps and every alternative exit witho
   assert.equal(report.counts.verifiedBosses,3);
   assert.equal(report.counts.completedRoutes,22);
   assert.equal(report.counts.verifiedMaps,18);
-  assert.equal(report.counts.attemptedMaps,19);
+  assert.equal(report.counts.attemptedMaps,20);
+  assert.equal(report.levels.find(level=>level.world===1&&level.level===3)!.status,'attempted');
   assert.equal(report.levels.find(level=>level.world===1&&level.level===7)!.status,'attempted');
   assert.equal(report.levels.find(level=>level.world===1&&level.level===8)!.status,'attempted');
   assert.equal(report.levels.find(level=>level.world===1&&level.level===5)!.status,'attempted');

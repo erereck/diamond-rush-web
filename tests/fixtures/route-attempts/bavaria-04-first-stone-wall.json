@@ -1,0 +1,202 @@
+{
+  "version": 1,
+  "engine": "fidelity-24",
+  "levelFingerprint": "777623df",
+  "world": 1,
+  "level": 3,
+  "kind": "stage",
+  "scope": "isolated-stage",
+  "initial": {
+    "diamonds": 82,
+    "redDiamonds": 10,
+    "lives": 12,
+    "health": 4,
+    "weaponTier": 2
+  },
+  "provenance": "Control-only Bavaria 4 attempt from spawn with pre-equipped hook: clears the three-stone upper barrier with five pulls and reaches the second stone column. Both exits remain unverified.",
+  "controls": [
+    {
+      "ticks": 9,
+      "direction": 2,
+      "action": false
+    },
+    {
+      "ticks": 3,
+      "direction": 0,
+      "action": false
+    },
+    {
+      "ticks": 1,
+      "direction": 1,
+      "action": false
+    },
+    {
+      "ticks": 4,
+      "direction": 2,
+      "action": false
+    },
+    {
+      "ticks": 3,
+      "direction": 0,
+      "action": false
+    },
+    {
+      "ticks": 8,
+      "direction": 3,
+      "action": false
+    },
+    {
+      "ticks": 4,
+      "direction": 4,
+      "action": false
+    },
+    {
+      "ticks": 80,
+      "direction": 0,
+      "action": false
+    },
+    {
+      "ticks": 5,
+      "direction": 1,
+      "action": false
+    },
+    {
+      "ticks": 4,
+      "direction": 2,
+      "action": false
+    },
+    {
+      "ticks": 3,
+      "direction": 0,
+      "action": false
+    },
+    {
+      "ticks": 1,
+      "direction": 2,
+      "action": true
+    },
+    {
+      "ticks": 25,
+      "direction": 0,
+      "action": false
+    },
+    {
+      "ticks": 4,
+      "direction": 4,
+      "action": false
+    },
+    {
+      "ticks": 1,
+      "direction": 2,
+      "action": true
+    },
+    {
+      "ticks": 40,
+      "direction": 0,
+      "action": false
+    },
+    {
+      "ticks": 5,
+      "direction": 2,
+      "action": false
+    },
+    {
+      "ticks": 3,
+      "direction": 0,
+      "action": false
+    },
+    {
+      "ticks": 1,
+      "direction": 2,
+      "action": true
+    },
+    {
+      "ticks": 28,
+      "direction": 0,
+      "action": false
+    },
+    {
+      "ticks": 4,
+      "direction": 4,
+      "action": false
+    },
+    {
+      "ticks": 1,
+      "direction": 2,
+      "action": true
+    },
+    {
+      "ticks": 28,
+      "direction": 0,
+      "action": false
+    },
+    {
+      "ticks": 4,
+      "direction": 4,
+      "action": false
+    },
+    {
+      "ticks": 1,
+      "direction": 2,
+      "action": true
+    },
+    {
+      "ticks": 40,
+      "direction": 0,
+      "action": false
+    },
+    {
+      "ticks": 21,
+      "direction": 2,
+      "action": false
+    },
+    {
+      "ticks": 3,
+      "direction": 0,
+      "action": false
+    },
+    {
+      "ticks": 1,
+      "direction": 2,
+      "action": false
+    },
+    {
+      "ticks": 8,
+      "direction": 3,
+      "action": false
+    },
+    {
+      "ticks": 8,
+      "direction": 2,
+      "action": false
+    },
+    {
+      "ticks": 4,
+      "direction": 1,
+      "action": false
+    },
+    {
+      "ticks": 3,
+      "direction": 0,
+      "action": false
+    }
+  ],
+  "expected": {
+    "status": "playing",
+    "ticks": 358,
+    "x": 15,
+    "y": 6,
+    "exitObject": 0,
+    "diamonds": 84,
+    "redDiamonds": 10,
+    "lives": 12,
+    "health": 4,
+    "weaponTier": 2,
+    "hits": 0,
+    "retries": 0,
+    "opened": [],
+    "demos": [],
+    "bossHealth": null,
+    "bossCleared": false
+  }
+}

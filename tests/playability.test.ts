@@ -102,6 +102,18 @@ test('Angkor 10 first gate remains open under a boulder while the hero reaches t
   assert.equal(runner.eventCounts.checkpoint,1);
 });
 
+test('Angkor 11 trace crosses the weighted gate, unlocks gold and opens the right silver chest',()=>{
+  const fixture=JSON.parse(readFileSync(new URL('fixtures/route-attempts/angkor-11-gold-and-silver.json',import.meta.url),'utf8')) as RouteFixture;
+  const runner=playRoute(fixture,resources),sim=runner.sim;
+  assert.equal(sim.status,'playing');
+  assert.deepEqual([sim.player.x,sim.player.y],[43,16]);
+  assert.equal(runner.eventCounts.checkpoint,3);
+  assert.equal(runner.eventCounts['gold-gate'],1);
+  assert.equal(runner.eventCounts['hook-pull'],1);
+  assert.equal(runner.eventCounts['chest-reward'],2);
+  assert.equal(sim.silverKeys,1);
+});
+
 test('boss certification rejects a crystal route without a completed boss defeat',()=>{
   const runner=new RouteRunner(resources,0,8,{diamonds:0,redDiamonds:0,lives:5,health:4,weaponTier:1});
   // Exercise the certification guard independently from the three/four-hit

@@ -10,7 +10,7 @@
     "verifiedMaps": 15,
     "verifiedBosses": 3,
     "completedRoutes": 19,
-    "attemptedMaps": 11,
+    "attemptedMaps": 12,
     "campaignPrefixes": 1,
     "campaignPrefixStages": 9
   },
@@ -1422,9 +1422,62 @@
           "y": 27
         }
       ],
-      "status": "unverified",
+      "status": "attempted",
       "evidence": [],
-      "pendingAttempts": [],
+      "pendingAttempts": [
+        {
+          "file": "tests/fixtures/route-attempts/angkor-11-gold-and-silver.json",
+          "world": 0,
+          "level": 10,
+          "goal": "normal",
+          "initial": {
+            "diamonds": 82,
+            "redDiamonds": 10,
+            "lives": 12,
+            "health": 4,
+            "weaponTier": 2
+          },
+          "outcome": {
+            "status": "playing",
+            "ticks": 1099,
+            "x": 43,
+            "y": 16,
+            "exitObject": 0,
+            "diamonds": 105,
+            "redDiamonds": 10,
+            "lives": 11,
+            "health": 3,
+            "weaponTier": 2,
+            "hits": 4,
+            "retries": 1,
+            "opened": [
+              843,
+              1126
+            ],
+            "demos": [],
+            "bossHealth": null,
+            "bossCleared": false
+          },
+          "events": {
+            "diamond": 29,
+            "grass": 27,
+            "boulder": 25,
+            "hammer": 1,
+            "hurt": 4,
+            "gate-open": 2,
+            "gate-opening": 4,
+            "checkpoint": 3,
+            "death": 1,
+            "respawn-start": 1,
+            "respawn": 1,
+            "chest": 2,
+            "chest-reward": 2,
+            "hook": 1,
+            "hook-pull": 1,
+            "gold-gate": 1
+          }
+        }
+      ],
       "reviews": []
     },
     {

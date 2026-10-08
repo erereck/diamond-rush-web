@@ -7,9 +7,9 @@
     "playableStages": 40,
     "secretStages": 10,
     "goals": 47,
-    "verifiedMaps": 14,
+    "verifiedMaps": 15,
     "verifiedBosses": 3,
-    "completedRoutes": 18,
+    "completedRoutes": 19,
     "attemptedMaps": 10,
     "campaignPrefixes": 1,
     "campaignPrefixStages": 9
@@ -1415,8 +1415,49 @@
           "y": 27
         }
       ],
-      "status": "unverified",
-      "evidence": [],
+      "status": "verified",
+      "evidence": [
+        {
+          "file": "tests/fixtures/routes/angkor-13-secret.json",
+          "world": 0,
+          "level": 12,
+          "goal": "secret",
+          "initial": {
+            "diamonds": 82,
+            "redDiamonds": 10,
+            "lives": 12,
+            "health": 4,
+            "weaponTier": 1
+          },
+          "outcome": {
+            "status": "complete",
+            "ticks": 529,
+            "x": 52,
+            "y": 27,
+            "exitObject": 28,
+            "diamonds": 101,
+            "redDiamonds": 10,
+            "lives": 12,
+            "health": 4,
+            "weaponTier": 1,
+            "hits": 0,
+            "retries": 0,
+            "opened": [],
+            "demos": [],
+            "bossHealth": null,
+            "bossCleared": false
+          },
+          "events": {
+            "grass": 45,
+            "diamond": 19,
+            "boulder": 41,
+            "hammer": 6,
+            "break": 3,
+            "checkpoint": 2,
+            "complete": 1
+          }
+        }
+      ],
       "pendingAttempts": [],
       "reviews": []
     },

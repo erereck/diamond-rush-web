@@ -123,6 +123,17 @@ test('Tibet 6 freezes an enemy onto the exit plate before passing its gate',()=>
   assert.equal(runner.eventCounts['chest-reward'],1);
 });
 
+test('Angkor 13 secret route clears the brick columns and both checkpoints',()=>{
+  const fixture=fixtures.find(f=>f.name==='angkor-13-secret.json')!.fixture;
+  const runner=playRoute(fixture,resources);
+  assert.equal(completedRoute(runner),true);
+  assert.equal(runner.sim.exitObject,28);
+  assert.equal(runner.eventCounts.checkpoint,2);
+  assert.equal(runner.eventCounts.break,3);
+  assert.equal(runner.eventCounts.complete,1);
+  assert.equal(runner.sim.hits,0);
+});
+
 test('New Game completes Angkor and its boss with campaign resources and save reloads',()=>{
   const fixture=JSON.parse(readFileSync(new URL('fixtures/campaign-routes/angkor-start.json',import.meta.url),'utf8')) as CampaignRouteFixture;
   const result=verifyCampaignRoute(fixture);
@@ -297,8 +308,9 @@ test('the playability inventory covers all maps and every alternative exit witho
   }
   assert.equal(report.levels.find(level=>level.world===2&&level.level===10)!.status,'verified');
   assert.equal(report.counts.verifiedBosses,3);
-  assert.equal(report.counts.completedRoutes,18);
-  assert.equal(report.counts.verifiedMaps,14);
+  assert.equal(report.counts.completedRoutes,19);
+  assert.equal(report.counts.verifiedMaps,15);
+  assert.equal(report.levels.find(level=>level.world===0&&level.level===12)!.status,'verified');
   assert.equal(report.levels.find(level=>level.world===2&&level.level===5)!.status,'verified');
   assert.equal(report.levels.find(level=>level.world===0&&level.level===7)!.status,'verified');
   const seventh=report.levels.find(level=>level.world===0&&level.level===6)!;

@@ -4,7 +4,7 @@ Motor: `fidelity-24`. Dados S700 fixados em `5e05c42aa1aae3377790600eb6d27497101
 
 Inventário: **41 mapas**, sendo 40 fases e a introdução; 10 fases são secretas. Há 47 conclusões a verificar, contando as saídas alternativas.
 
-Cobertura atual: **19 percursos aprovados**, incluindo os 3 chefes. Os percursos isolados partem do spawn, com recursos iniciais explícitos. Os chefes usam armas predefinidas; obter essas armas e liberar os chefes durante uma campanha nova ainda não está certificado.
+Cobertura atual: **21 percursos aprovados**, incluindo os 3 chefes. Os percursos isolados partem do spawn, com recursos iniciais explícitos. Os chefes usam armas predefinidas; obter essas armas e liberar os chefes durante uma campanha nova ainda não está certificado.
 
 O executor aceita somente direção, ação e retorno ao checkpoint. Diálogos e edições de cena vêm dos mesmos gatilhos e intérprete usados no jogo. Não aceita posições, chaves, baús previamente abertos ou edições de mapa no arquivo de controles. Para aprovar um chefe, exige o evento de derrota concluída e zero de vida antes de terminar o percurso.
 
@@ -26,7 +26,7 @@ Uma [varredura exploratória separada](STAGE_SMOKE.md) executa controles em todo
 | Angkor 8 (7) | Saída secreta (4,3); Saída comum (5,19) | Percurso aprovado · [2867 ticks](../tests/fixtures/routes/angkor-08-normal.json), [791 ticks](../tests/fixtures/routes/angkor-08-secret-ice.json) | — |
 | Angkor 9 · chefe (8) | Cristal após vencer o chefe (27,6) | Percurso aprovado · [1121 ticks](../tests/fixtures/routes/angkor-boss-crystal.json) | — |
 | Angkor 10 · secreta (9) | Saída secreta (42,11) | Tentativa pendente · [tentativa em (12,17)](../tests/fixtures/route-attempts/angkor-10-first-gate.json) | — |
-| Angkor 11 · secreta (10) | Saída secreta (43,27) | Tentativa pendente · [tentativa em (43,16)](../tests/fixtures/route-attempts/angkor-11-gold-and-silver.json) | — |
+| Angkor 11 · secreta (10) | Saída secreta (43,27) | Percurso aprovado · [1347 ticks](../tests/fixtures/routes/angkor-11-secret.json) · [tentativa anterior em (43,16)](../tests/fixtures/route-attempts/angkor-11-gold-and-silver.json) | — |
 | Angkor 12 · secreta (11) | Saída secreta (35,25) | Tentativa pendente · [tentativa em (32,6)](../tests/fixtures/route-attempts/angkor-12-three-gold-keys.json) | — |
 | Angkor 13 · secreta (12) | Saída secreta (39,27) | Percurso aprovado · [529 ticks](../tests/fixtures/routes/angkor-13-secret.json) | — |
 | Introdução (13) | Tutorial (61,3) | Percurso aprovado · [1428 ticks](../tests/fixtures/routes/angkor-introduction.json) | — |
@@ -34,25 +34,25 @@ Uma [varredura exploratória separada](STAGE_SMOKE.md) executa controles em todo
 | Bavaria 2 (1) | Saída comum (34,6) | Tentativa pendente · [tentativa em (21,4)](../tests/fixtures/route-attempts/bavaria-02-first-crusher.json), [tentativa em (30,9)](../tests/fixtures/route-attempts/bavaria-02-two-crushers.json) | — |
 | Bavaria 3 (2) | Saída comum (25,17) | Tentativa pendente · [tentativa em (13,27)](../tests/fixtures/route-attempts/bavaria-03-two-checkpoints.json) | — |
 | Bavaria 4 (3) | Saída comum (36,6); Saída secreta (2,10) | Ainda não verificada | — |
-| Bavaria 5 (4) | Saída comum (40,29) | Ainda não verificada | — |
+| Bavaria 5 (4) | Saída comum (40,29) | Tentativa pendente · [tentativa em (10,8)](../tests/fixtures/route-attempts/bavaria-05-first-checkpoint.json) | — |
 | Bavaria 6 (5) | Saída comum (36,6) | Ainda não verificada | 8, 37 |
 | Bavaria 7 (6) | Saída comum (30,21); Saída secreta (34,38) | Tentativa pendente · [tentativa em (24,37)](../tests/fixtures/route-attempts/bavaria-07-hook-switch.json) | 8, 37 |
 | Bavaria 8 (7) | Saída comum (49,22) | Ainda não verificada | 8, 37, 38 |
 | Bavaria 9 (8) | Saída comum (7,19) | Ainda não verificada | 8, 37, 38 |
 | Bavaria 10 · chefe (9) | Cristal após vencer o chefe (29,13) | Percurso aprovado · [1465 ticks](../tests/fixtures/routes/bavaria-boss-crystal.json) | — |
-| Bavaria 11 · secreta (10) | Saída secreta (32,20) | Ainda não verificada | 8, 37, 38 |
+| Bavaria 11 · secreta (10) | Saída secreta (32,20) | Tentativa pendente · [tentativa em (15,18)](../tests/fixtures/route-attempts/bavaria-11-checkpoint-plate.json) | 8, 37, 38 |
 | Bavaria 12 · secreta (11) | Saída secreta (56,5) | Ainda não verificada | 8, 37, 38 |
 | Bavaria 13 · secreta (12) | Saída secreta (10,3) | Tentativa pendente · [tentativa em (7,47)](../tests/fixtures/route-attempts/bavaria-13-brick-shaft.json) | 8, 37, 38 |
 | Tibet 1 (0) | Saída comum (51,9) | Tentativa pendente · [tentativa em (34,4)](../tests/fixtures/route-attempts/tibet-01-upper-checkpoint.json) | 38 |
 | Tibet 2 (1) | Saída comum (4,6); Saída secreta (4,33) | Percurso aprovado · [1949 ticks](../tests/fixtures/routes/tibet-02-normal.json), [321 ticks](../tests/fixtures/routes/tibet-02-secret.json) | — |
-| Tibet 3 (2) | Saída comum (3,25) | Tentativa pendente · [tentativa em (10,25)](../tests/fixtures/route-attempts/tibet-03-exit-corridor.json) | — |
+| Tibet 3 (2) | Saída comum (3,25) | Percurso aprovado · [727 ticks](../tests/fixtures/routes/tibet-03-normal.json) · [tentativa anterior em (10,25)](../tests/fixtures/route-attempts/tibet-03-exit-corridor.json) | — |
 | Tibet 4 (3) | Saída comum (33,3) | Tentativa pendente · [tentativa em (20,4)](../tests/fixtures/route-attempts/tibet-04-first-plate.json) | 47 |
 | Tibet 5 (4) | Saída comum (41,3); Saída secreta (6,23) | Saídas parcialmente aprovadas · [209 ticks](../tests/fixtures/routes/tibet-05-secret.json) · [tentativa em (16,17)](../tests/fixtures/route-attempts/tibet-05-left-silver.json), [tentativa em (23,7)](../tests/fixtures/route-attempts/tibet-05-right-silver.json), [tentativa em (23,7)](../tests/fixtures/route-attempts/tibet-05-two-silver-keys.json) | 47 |
 | Tibet 6 (5) | Saída comum (46,7) | Percurso aprovado · [752 ticks](../tests/fixtures/routes/tibet-06-normal-ice.json) | 48 |
 | Tibet 7 (6) | Saída comum (9,22) | Ainda não verificada | 47, 48 |
 | Tibet 8 (7) | Saída comum (5,14) | Tentativa pendente · [tentativa em (16,14)](../tests/fixtures/route-attempts/tibet-08-first-riddle-enemy.json) | 47, 48 |
 | Tibet 9 (8) | Saída comum (45,24) | Tentativa pendente · [tentativa em (31,5)](../tests/fixtures/route-attempts/tibet-09-upper-plate.json) | 47, 48 |
-| Tibet 10 (9) | Saída comum (99,15) | Ainda não verificada | 47, 48 |
+| Tibet 10 (9) | Saída comum (99,15) | Tentativa pendente · [tentativa em (13,3)](../tests/fixtures/route-attempts/tibet-10-first-riddle.json) | 47, 48 |
 | Tibet 11 · chefe (10) | Cristal após vencer o chefe (27,5) | Percurso aprovado · [3145 ticks](../tests/fixtures/routes/tibet-boss-crystal.json) · [tentativa anterior em (16,16)](../tests/fixtures/route-attempts/tibet-boss-approach.json) | — |
 | Tibet 12 · secreta (11) | Saída comum (39,23) | Tentativa pendente · [tentativa em (35,16)](../tests/fixtures/route-attempts/tibet-12-first-key-and-plate.json), [tentativa em (36,9)](../tests/fixtures/route-attempts/tibet-12-two-checkpoints.json) | — |
 | Tibet 13 · secreta (12) | Saída comum (32,8) | Tentativa pendente · [tentativa em (24,8)](../tests/fixtures/route-attempts/tibet-13-bridge-switch.json) | 38, 47 |
@@ -71,11 +71,13 @@ Uma [varredura exploratória separada](STAGE_SMOKE.md) executa controles em todo
 - [Angkor 8](../tests/fixtures/routes/angkor-08-normal.json): 2867 ticks de controles, 6 danos, 1 retorno; equipamento inicial 1; diálogos nenhum.
 - [Angkor 8](../tests/fixtures/routes/angkor-08-secret-ice.json): 791 ticks de controles, 2 danos, 0 retornos; equipamento inicial 8; diálogos nenhum.
 - [Angkor 9](../tests/fixtures/routes/angkor-boss-crystal.json): 1121 ticks de controles, 0 danos, 0 retornos; equipamento inicial 1; diálogos 33, 32.
+- [Angkor 11](../tests/fixtures/routes/angkor-11-secret.json): 1347 ticks de controles, 5 danos, 2 retornos; equipamento inicial 2; diálogos nenhum.
 - [Angkor 13](../tests/fixtures/routes/angkor-13-secret.json): 529 ticks de controles, 0 danos, 0 retornos; equipamento inicial 1; diálogos nenhum.
 - [Angkor introdução](../tests/fixtures/routes/angkor-introduction.json): 1428 ticks de controles, 0 danos, 2 retornos; equipamento inicial 0; diálogos 29, 10, 11, 13, 15, 16, 17, 28.
 - [Bavaria 10](../tests/fixtures/routes/bavaria-boss-crystal.json): 1465 ticks de controles, 2 danos, 0 retornos; equipamento inicial 2; diálogos 34, 30.
 - [Tibet 2](../tests/fixtures/routes/tibet-02-normal.json): 1949 ticks de controles, 5 danos, 0 retornos; equipamento inicial 2; diálogos nenhum.
 - [Tibet 2](../tests/fixtures/routes/tibet-02-secret.json): 321 ticks de controles, 1 dano, 0 retornos; equipamento inicial 2; diálogos nenhum.
+- [Tibet 3](../tests/fixtures/routes/tibet-03-normal.json): 727 ticks de controles, 4 danos, 0 retornos; equipamento inicial 2; diálogos nenhum.
 - [Tibet 5](../tests/fixtures/routes/tibet-05-secret.json): 209 ticks de controles, 1 dano, 0 retornos; equipamento inicial 2; diálogos nenhum.
 - [Tibet 6](../tests/fixtures/routes/tibet-06-normal-ice.json): 752 ticks de controles, 3 danos, 0 retornos; equipamento inicial 8; diálogos nenhum.
 - [Tibet 11](../tests/fixtures/routes/tibet-boss-crystal.json): 3145 ticks de controles, 1 dano, 0 retornos; equipamento inicial 8; diálogos 35.
@@ -90,7 +92,7 @@ Tibet 8 tem uma tentativa desde o spawn com martelo de gelo predefinido: aciona 
 
 Bavaria 13, fase secreta, tem um percurso parcial sem dano: usa o gancho para retirar a pedra da base, abre o poço de tijolos e ativa o primeiro checkpoint com o diálogo original 19. A chave prateada e a saída ainda não foram verificadas.
 
-Angkor 12 tem uma tentativa reproduzível desde o spawn, com gancho inicial explícito: as três primeiras salas de cobras e pedras são resolvidas e seus baús entregam três chaves douradas. A quarta sala, sua chave e as fechaduras finais ainda não têm percurso aprovado.
+Angkor 11 secreta tem saída aprovada desde o spawn com gancho predefinido: ativa três checkpoints, abre a fechadura dourada e alcança a saída após dois retornos ao círculo. Angkor 12 tem uma tentativa reproduzível desde o spawn, também com gancho inicial explícito: as três primeiras salas de cobras e pedras são resolvidas e seus baús entregam três chaves douradas. A quarta sala, sua chave e as fechaduras finais ainda não têm percurso aprovado. Bavaria 5 alcança o primeiro checkpoint com gancho; Bavaria 11 secreta aciona seu primeiro checkpoint e a placa que inicia a abertura do portão. Tibet 10 ativa seu primeiro enigma de quatro inimigos e alcança a fechadura de diamantes superior com martelo de gelo predefinido. Essas três saídas seguem pendentes. Tibet 3 tem saída comum aprovada: o tiro vertical do inimigo quebra a vegetação sob uma pedra, que o esmaga; o gancho então desloca a pedra e libera o corredor.
 
 ## Começo de campanha desde New Game
 

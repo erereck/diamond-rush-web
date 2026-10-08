@@ -1,0 +1,329 @@
+{
+  "version": 1,
+  "engine": "fidelity-24",
+  "levelFingerprint": "25c95a2d",
+  "world": 2,
+  "level": 2,
+  "kind": "stage",
+  "scope": "isolated-stage",
+  "initial": {
+    "diamonds": 82,
+    "redDiamonds": 25,
+    "lives": 12,
+    "health": 4,
+    "weaponTier": 2
+  },
+  "provenance": "Fixed control-only replay from Tibet 3 spawn with the hook equipped: lures the ice shooter's dart into the grass beneath a boulder, crushes the shooter, pulls the boulder clear of the corridor and reaches the normal exit.",
+  "controls": [
+    {
+      "ticks": 6,
+      "direction": 2,
+      "action": false
+    },
+    {
+      "ticks": 6,
+      "direction": 0,
+      "action": false
+    },
+    {
+      "ticks": 1,
+      "direction": 0,
+      "action": true
+    },
+    {
+      "ticks": 30,
+      "direction": 0,
+      "action": false
+    },
+    {
+      "ticks": 30,
+      "direction": 2,
+      "action": false
+    },
+    {
+      "ticks": 1,
+      "direction": 3,
+      "action": false
+    },
+    {
+      "ticks": 20,
+      "direction": 2,
+      "action": false
+    },
+    {
+      "ticks": 3,
+      "direction": 0,
+      "action": false
+    },
+    {
+      "ticks": 1,
+      "direction": 2,
+      "action": false
+    },
+    {
+      "ticks": 4,
+      "direction": 3,
+      "action": false
+    },
+    {
+      "ticks": 12,
+      "direction": 2,
+      "action": false
+    },
+    {
+      "ticks": 1,
+      "direction": 1,
+      "action": false
+    },
+    {
+      "ticks": 3,
+      "direction": 2,
+      "action": false
+    },
+    {
+      "ticks": 16,
+      "direction": 1,
+      "action": false
+    },
+    {
+      "ticks": 11,
+      "direction": 2,
+      "action": false
+    },
+    {
+      "ticks": 4,
+      "direction": 1,
+      "action": false
+    },
+    {
+      "ticks": 8,
+      "direction": 2,
+      "action": false
+    },
+    {
+      "ticks": 4,
+      "direction": 1,
+      "action": false
+    },
+    {
+      "ticks": 13,
+      "direction": 2,
+      "action": false
+    },
+    {
+      "ticks": 3,
+      "direction": 0,
+      "action": false
+    },
+    {
+      "ticks": 14,
+      "direction": 2,
+      "action": false
+    },
+    {
+      "ticks": 12,
+      "direction": 1,
+      "action": false
+    },
+    {
+      "ticks": 1,
+      "direction": 2,
+      "action": false
+    },
+    {
+      "ticks": 58,
+      "direction": 1,
+      "action": false
+    },
+    {
+      "ticks": 24,
+      "direction": 4,
+      "action": false
+    },
+    {
+      "ticks": 4,
+      "direction": 3,
+      "action": false
+    },
+    {
+      "ticks": 71,
+      "direction": 4,
+      "action": false
+    },
+    {
+      "ticks": 8,
+      "direction": 3,
+      "action": false
+    },
+    {
+      "ticks": 4,
+      "direction": 4,
+      "action": false
+    },
+    {
+      "ticks": 4,
+      "direction": 3,
+      "action": false
+    },
+    {
+      "ticks": 11,
+      "direction": 4,
+      "action": false
+    },
+    {
+      "ticks": 12,
+      "direction": 3,
+      "action": false
+    },
+    {
+      "ticks": 8,
+      "direction": 4,
+      "action": false
+    },
+    {
+      "ticks": 8,
+      "direction": 3,
+      "action": false
+    },
+    {
+      "ticks": 16,
+      "direction": 4,
+      "action": false
+    },
+    {
+      "ticks": 4,
+      "direction": 1,
+      "action": false
+    },
+    {
+      "ticks": 8,
+      "direction": 4,
+      "action": false
+    },
+    {
+      "ticks": 3,
+      "direction": 1,
+      "action": false
+    },
+    {
+      "ticks": 10,
+      "direction": 0,
+      "action": false
+    },
+    {
+      "ticks": 1,
+      "direction": 1,
+      "action": false
+    },
+    {
+      "ticks": 3,
+      "direction": 0,
+      "action": false
+    },
+    {
+      "ticks": 6,
+      "direction": 1,
+      "action": false
+    },
+    {
+      "ticks": 2,
+      "direction": 4,
+      "action": false
+    },
+    {
+      "ticks": 4,
+      "direction": 1,
+      "action": false
+    },
+    {
+      "ticks": 8,
+      "direction": 4,
+      "action": false
+    },
+    {
+      "ticks": 113,
+      "direction": 0,
+      "action": false
+    },
+    {
+      "ticks": 1,
+      "direction": 2,
+      "action": false
+    },
+    {
+      "ticks": 8,
+      "direction": 3,
+      "action": false
+    },
+    {
+      "ticks": 3,
+      "direction": 0,
+      "action": false
+    },
+    {
+      "ticks": 4,
+      "direction": 4,
+      "action": false
+    },
+    {
+      "ticks": 1,
+      "direction": 0,
+      "action": true
+    },
+    {
+      "ticks": 13,
+      "direction": 0,
+      "action": false
+    },
+    {
+      "ticks": 8,
+      "direction": 2,
+      "action": false
+    },
+    {
+      "ticks": 10,
+      "direction": 0,
+      "action": false
+    },
+    {
+      "ticks": 1,
+      "direction": 0,
+      "action": true
+    },
+    {
+      "ticks": 20,
+      "direction": 0,
+      "action": false
+    },
+    {
+      "ticks": 25,
+      "direction": 4,
+      "action": false
+    },
+    {
+      "ticks": 39,
+      "direction": 0,
+      "action": false
+    }
+  ],
+  "expected": {
+    "status": "complete",
+    "ticks": 727,
+    "x": -6,
+    "y": 25,
+    "exitObject": 5,
+    "diamonds": 85,
+    "redDiamonds": 25,
+    "lives": 12,
+    "health": 1,
+    "weaponTier": 2,
+    "hits": 4,
+    "retries": 0,
+    "opened": [
+      687
+    ],
+    "demos": [],
+    "bossHealth": null,
+    "bossCleared": false
+  }
+}

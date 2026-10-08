@@ -299,6 +299,47 @@ test('Angkor 12 solves three boulder riddles and collects their gold keys from s
   assert.deepEqual([sim.player.x,sim.player.y,sim.status],[32,6,'playing']);
 });
 
+test('Bavaria 5 and secret Bavaria 11 establish their first checkpoint and plate states',()=>{
+  const root=new URL('fixtures/route-attempts/',import.meta.url);
+  const fifth=playRoute(JSON.parse(readFileSync(new URL('bavaria-05-first-checkpoint.json',root),'utf8')) as RouteFixture,resources);
+  assert.deepEqual([fifth.sim.player.x,fifth.sim.player.y,fifth.sim.checkpointOrder,fifth.sim.status],[10,8,1,'playing']);
+  assert.equal(fifth.eventCounts.checkpoint,1);
+  const secret=playRoute(JSON.parse(readFileSync(new URL('bavaria-11-checkpoint-plate.json',root),'utf8')) as RouteFixture,resources);
+  assert.deepEqual([secret.sim.player.x,secret.sim.player.y,secret.sim.checkpointOrder,secret.sim.status],[15,18,1,'playing']);
+  assert.equal(secret.eventCounts['gate-open'],1);
+  assert.equal(secret.sim.gatePhases[secret.sim.index(17,17)],1);
+});
+
+test('Tibet 10 activates its first four-target riddle from spawn',()=>{
+  const attempt=JSON.parse(readFileSync(new URL('fixtures/route-attempts/tibet-10-first-riddle.json',import.meta.url),'utf8')) as RouteFixture;
+  const runner=playRoute(attempt,resources),sim=runner.sim;
+  assert.deepEqual([sim.player.x,sim.player.y,sim.status],[13,3,'playing']);
+  assert.equal(sim.riddles.active,0);
+  assert.equal(sim.riddles.remaining[0],4);
+  assert.equal(runner.eventCounts.riddle,1);
+});
+
+test('Tibet 3 clears the final ice shooter with its own dart and hooks the boulder off the exit path',()=>{
+  const route=JSON.parse(readFileSync(new URL('fixtures/routes/tibet-03-normal.json',import.meta.url),'utf8')) as RouteFixture;
+  const runner=playRoute(route,resources);
+  assert.equal(runner.outcome().status,'complete');
+  assert.equal(runner.outcome().exitObject,5);
+  assert.equal(runner.eventCounts['enemy-death'],4);
+  assert.ok((runner.eventCounts['hook-pull']??0)>=5);
+  assert.ok((runner.eventCounts.grass??0)>=11);
+  assert.equal(runner.eventCounts.death,undefined);
+});
+
+test('Angkor 11 secret reaches its exit after using the gold lock and two checkpoint returns',()=>{
+  const route=JSON.parse(readFileSync(new URL('fixtures/routes/angkor-11-secret.json',import.meta.url),'utf8')) as RouteFixture;
+  const runner=playRoute(route,resources);
+  assert.equal(runner.outcome().status,'complete');
+  assert.equal(runner.outcome().exitObject,28);
+  assert.equal(runner.eventCounts['gold-gate'],1);
+  assert.equal(runner.eventCounts.checkpoint,3);
+  assert.equal(runner.outcome().retries,2);
+});
+
 test('Bavaria 3 crosses its first brick barrier, activates two checkpoints and opens a plate gate',()=>{
   const attempt=JSON.parse(readFileSync(new URL('fixtures/route-attempts/bavaria-03-two-checkpoints.json',import.meta.url),'utf8')) as RouteFixture;
   const runner=playRoute(attempt,resources),sim=runner.sim;
@@ -388,8 +429,10 @@ test('the playability inventory covers all maps and every alternative exit witho
   }
   assert.equal(report.levels.find(level=>level.world===2&&level.level===10)!.status,'verified');
   assert.equal(report.counts.verifiedBosses,3);
-  assert.equal(report.counts.completedRoutes,19);
-  assert.equal(report.counts.verifiedMaps,15);
+  assert.equal(report.counts.completedRoutes,21);
+  assert.equal(report.counts.verifiedMaps,17);
+  assert.equal(report.levels.find(level=>level.world===0&&level.level===10)!.status,'verified');
+  assert.equal(report.levels.find(level=>level.world===2&&level.level===2)!.status,'verified');
   assert.equal(report.levels.find(level=>level.world===0&&level.level===12)!.status,'verified');
   assert.equal(report.levels.find(level=>level.world===2&&level.level===5)!.status,'verified');
   assert.equal(report.levels.find(level=>level.world===0&&level.level===7)!.status,'verified');

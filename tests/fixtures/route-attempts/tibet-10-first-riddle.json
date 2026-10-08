@@ -1,0 +1,97 @@
+{
+  "version": 1,
+  "engine": "fidelity-24",
+  "levelFingerprint": "fe983533",
+  "world": 2,
+  "level": 9,
+  "kind": "stage",
+  "scope": "isolated-stage",
+  "initial": {
+    "diamonds": 82,
+    "redDiamonds": 25,
+    "lives": 12,
+    "health": 4,
+    "weaponTier": 8
+  },
+  "provenance": "Fixed control-only replay from Tibet 10 spawn with the ice hammer equipped. Activates the first four-target riddle and reaches the upper diamond lock; no enemy defeat or exit is claimed.",
+  "controls": [
+    {
+      "ticks": 89,
+      "direction": 2,
+      "action": false
+    },
+    {
+      "ticks": 59,
+      "direction": 0,
+      "action": false
+    },
+    {
+      "ticks": 83,
+      "direction": 2,
+      "action": false
+    },
+    {
+      "ticks": 8,
+      "direction": 1,
+      "action": false
+    },
+    {
+      "ticks": 4,
+      "direction": 2,
+      "action": false
+    },
+    {
+      "ticks": 8,
+      "direction": 1,
+      "action": false
+    },
+    {
+      "ticks": 4,
+      "direction": 2,
+      "action": false
+    },
+    {
+      "ticks": 12,
+      "direction": 1,
+      "action": false
+    },
+    {
+      "ticks": 20,
+      "direction": 4,
+      "action": false
+    },
+    {
+      "ticks": 16,
+      "direction": 1,
+      "action": false
+    },
+    {
+      "ticks": 24,
+      "direction": 2,
+      "action": false
+    },
+    {
+      "ticks": 3,
+      "direction": 0,
+      "action": false
+    }
+  ],
+  "expected": {
+    "status": "playing",
+    "ticks": 330,
+    "x": 13,
+    "y": 3,
+    "exitObject": 0,
+    "diamonds": 86,
+    "redDiamonds": 25,
+    "lives": 12,
+    "health": 4,
+    "weaponTier": 8,
+    "hits": 0,
+    "retries": 0,
+    "opened": [],
+    "demos": [],
+    "bossHealth": null,
+    "bossCleared": false
+  }
+}

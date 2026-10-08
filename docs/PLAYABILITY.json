@@ -7,10 +7,10 @@
     "playableStages": 40,
     "secretStages": 10,
     "goals": 47,
-    "verifiedMaps": 15,
+    "verifiedMaps": 17,
     "verifiedBosses": 3,
-    "completedRoutes": 19,
-    "attemptedMaps": 16,
+    "completedRoutes": 21,
+    "attemptedMaps": 17,
     "campaignPrefixes": 1,
     "campaignPrefixStages": 9
   },
@@ -1423,8 +1423,61 @@
           "y": 27
         }
       ],
-      "status": "attempted",
-      "evidence": [],
+      "status": "verified",
+      "evidence": [
+        {
+          "file": "tests/fixtures/routes/angkor-11-secret.json",
+          "world": 0,
+          "level": 10,
+          "goal": "secret",
+          "initial": {
+            "diamonds": 82,
+            "redDiamonds": 10,
+            "lives": 12,
+            "health": 4,
+            "weaponTier": 2
+          },
+          "outcome": {
+            "status": "complete",
+            "ticks": 1347,
+            "x": 56,
+            "y": 27,
+            "exitObject": 28,
+            "diamonds": 105,
+            "redDiamonds": 10,
+            "lives": 10,
+            "health": 4,
+            "weaponTier": 2,
+            "hits": 5,
+            "retries": 2,
+            "opened": [
+              1126
+            ],
+            "demos": [],
+            "bossHealth": null,
+            "bossCleared": false
+          },
+          "events": {
+            "diamond": 29,
+            "grass": 27,
+            "boulder": 25,
+            "hammer": 1,
+            "hurt": 5,
+            "gate-open": 2,
+            "gate-opening": 4,
+            "checkpoint": 3,
+            "death": 2,
+            "respawn-start": 2,
+            "respawn": 2,
+            "chest": 2,
+            "chest-reward": 2,
+            "hook": 1,
+            "hook-pull": 1,
+            "gold-gate": 1,
+            "complete": 1
+          }
+        }
+      ],
       "pendingAttempts": [
         {
           "file": "tests/fixtures/route-attempts/angkor-11-gold-and-silver.json",
@@ -2025,9 +2078,46 @@
           "y": 29
         }
       ],
-      "status": "unverified",
+      "status": "attempted",
       "evidence": [],
-      "pendingAttempts": [],
+      "pendingAttempts": [
+        {
+          "file": "tests/fixtures/route-attempts/bavaria-05-first-checkpoint.json",
+          "world": 1,
+          "level": 4,
+          "goal": "normal",
+          "initial": {
+            "diamonds": 82,
+            "redDiamonds": 10,
+            "lives": 12,
+            "health": 4,
+            "weaponTier": 2
+          },
+          "outcome": {
+            "status": "playing",
+            "ticks": 84,
+            "x": 10,
+            "y": 8,
+            "exitObject": 0,
+            "diamonds": 82,
+            "redDiamonds": 10,
+            "lives": 12,
+            "health": 4,
+            "weaponTier": 2,
+            "hits": 0,
+            "retries": 0,
+            "opened": [],
+            "demos": [],
+            "bossHealth": null,
+            "bossCleared": false
+          },
+          "events": {
+            "grass": 5,
+            "boulder": 6,
+            "checkpoint": 1
+          }
+        }
+      ],
       "reviews": []
     },
     {
@@ -2300,9 +2390,45 @@
           "y": 20
         }
       ],
-      "status": "unverified",
+      "status": "attempted",
       "evidence": [],
-      "pendingAttempts": [],
+      "pendingAttempts": [
+        {
+          "file": "tests/fixtures/route-attempts/bavaria-11-checkpoint-plate.json",
+          "world": 1,
+          "level": 10,
+          "goal": "normal",
+          "initial": {
+            "diamonds": 82,
+            "redDiamonds": 10,
+            "lives": 12,
+            "health": 4,
+            "weaponTier": 2
+          },
+          "outcome": {
+            "status": "playing",
+            "ticks": 88,
+            "x": 15,
+            "y": 18,
+            "exitObject": 0,
+            "diamonds": 82,
+            "redDiamonds": 10,
+            "lives": 12,
+            "health": 4,
+            "weaponTier": 2,
+            "hits": 0,
+            "retries": 0,
+            "opened": [],
+            "demos": [],
+            "bossHealth": null,
+            "bossCleared": false
+          },
+          "events": {
+            "checkpoint": 1,
+            "gate-open": 1
+          }
+        }
+      ],
       "reviews": [
         {
           "plane": "tile",
@@ -2654,8 +2780,62 @@
           "y": 25
         }
       ],
-      "status": "attempted",
-      "evidence": [],
+      "status": "verified",
+      "evidence": [
+        {
+          "file": "tests/fixtures/routes/tibet-03-normal.json",
+          "world": 2,
+          "level": 2,
+          "goal": "normal",
+          "initial": {
+            "diamonds": 82,
+            "redDiamonds": 25,
+            "lives": 12,
+            "health": 4,
+            "weaponTier": 2
+          },
+          "outcome": {
+            "status": "complete",
+            "ticks": 727,
+            "x": -6,
+            "y": 25,
+            "exitObject": 5,
+            "diamonds": 85,
+            "redDiamonds": 25,
+            "lives": 12,
+            "health": 1,
+            "weaponTier": 2,
+            "hits": 4,
+            "retries": 0,
+            "opened": [
+              687
+            ],
+            "demos": [],
+            "bossHealth": null,
+            "bossCleared": false
+          },
+          "events": {
+            "hook": 3,
+            "hook-pull": 5,
+            "boulder": 9,
+            "grass": 11,
+            "diamond": 3,
+            "enemy-shot": 77,
+            "checkpoint": 2,
+            "dart-impact": 77,
+            "enemy-death": 4,
+            "hurt": 4,
+            "chest": 1,
+            "chest-reward": 1,
+            "trap-trigger": 1,
+            "trap-fall": 1,
+            "trap-impact": 1,
+            "gate-open": 1,
+            "gate-opening": 2,
+            "complete": 1
+          }
+        }
+      ],
       "pendingAttempts": [
         {
           "file": "tests/fixtures/route-attempts/tibet-03-exit-corridor.json",
@@ -3291,9 +3471,49 @@
           "y": 15
         }
       ],
-      "status": "unverified",
+      "status": "attempted",
       "evidence": [],
-      "pendingAttempts": [],
+      "pendingAttempts": [
+        {
+          "file": "tests/fixtures/route-attempts/tibet-10-first-riddle.json",
+          "world": 2,
+          "level": 9,
+          "goal": "normal",
+          "initial": {
+            "diamonds": 82,
+            "redDiamonds": 25,
+            "lives": 12,
+            "health": 4,
+            "weaponTier": 8
+          },
+          "outcome": {
+            "status": "playing",
+            "ticks": 330,
+            "x": 13,
+            "y": 3,
+            "exitObject": 0,
+            "diamonds": 86,
+            "redDiamonds": 25,
+            "lives": 12,
+            "health": 4,
+            "weaponTier": 8,
+            "hits": 0,
+            "retries": 0,
+            "opened": [],
+            "demos": [],
+            "bossHealth": null,
+            "bossCleared": false
+          },
+          "events": {
+            "gate-close": 2,
+            "riddle": 1,
+            "enemy-shot": 18,
+            "dart-impact": 18,
+            "diamond": 4,
+            "chest": 1
+          }
+        }
+      ],
       "reviews": [
         {
           "plane": "tile",

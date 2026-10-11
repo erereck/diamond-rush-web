@@ -1,5 +1,7 @@
 # Progresso e próximos marcos
 
+> **Retrato histórico.** Este arquivo reúne decisões e pendências da rodada indicada abaixo. A cobertura atual de cada fase é gerada em [PLAYABILITY.md](PLAYABILITY.md), e o critério de verificação está em [VERIFICACAO_DAS_FASES.md](VERIFICACAO_DAS_FASES.md).
+
 Estado em 02/10/2026. Fonte canônica S700 1.2.0. Referências Nokia e ferramentas são comparativas; não misturar regras de execução.
 
 | Área | Estado | Limitação restante |

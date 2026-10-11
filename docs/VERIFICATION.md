@@ -1,5 +1,7 @@
 # Verificações da build experimental
 
+> **Registro histórico de rodadas anteriores.** As quantidades de testes e percursos abaixo pertencem às datas de cada rodada e não representam a cobertura atual. Para o estado gerado pelos replays, veja [PLAYABILITY.md](PLAYABILITY.md); para o método e os comandos atuais, veja [VERIFICACAO_DAS_FASES.md](VERIFICACAO_DAS_FASES.md).
+
 Atualizado em 28/09/2026, no Windows, Node 26.7 e navegador Chromium integrado. A lista inclui verificações de rodadas anteriores; as capturas de 27/09 permanecem como evidência daquela revisão.
 
 - `npm test`: 294 testes passaram, sem testes ignorados. Incluem codecs, todos os 95 sprites, 41 mapas, 21 MIDIs, hashes, relógio, câmera, movimento, pedras, limites de colisão, equipamento, replay, RMS, placas/portões e percursos completos por controles.

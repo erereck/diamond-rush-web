@@ -343,6 +343,27 @@ test('Bavaria 4 clears the first stone barrier with the hook',()=>{
   assert.equal(runner.sim.tile(10,5),-1);
 });
 
+test('Bavaria 12 secret reaches its first checkpoint and activates the lower plate',()=>{
+  const fixture=JSON.parse(readFileSync(new URL('fixtures/route-attempts/bavaria-12-first-plate.json',import.meta.url),'utf8')) as RouteFixture;
+  const runner=playRoute(fixture,resources),sim=runner.sim;
+  assert.deepEqual([sim.player.x,sim.player.y,sim.status],[25,13,'playing']);
+  assert.equal(runner.eventCounts.checkpoint,1);
+  assert.equal(runner.eventCounts['gate-open'],1);
+  assert.equal(sim.gatePhases[sim.index(28,12)]>0,true);
+  assert.equal(sim.exitObject,0);
+});
+
+test('Angkor 12 reaches the fourth snake riddle with three gold keys',()=>{
+  const fixture=JSON.parse(readFileSync(new URL('fixtures/route-attempts/angkor-12-fourth-riddle.json',import.meta.url),'utf8')) as RouteFixture;
+  const runner=playRoute(fixture,resources),sim=runner.sim;
+  assert.deepEqual([sim.player.x,sim.player.y,sim.status],[18,18,'playing']);
+  assert.equal(runner.eventCounts.checkpoint,2);
+  assert.equal(runner.eventCounts['riddle-solved'],3);
+  assert.equal(runner.eventCounts['chest-reward'],3);
+  assert.deepEqual(sim.riddles.remaining,[0,0,0,3]);
+  assert.equal(sim.goldKeys,3);
+});
+
 test('Tibet 10 activates its first four-target riddle from spawn',()=>{
   const attempt=JSON.parse(readFileSync(new URL('fixtures/route-attempts/tibet-10-first-riddle.json',import.meta.url),'utf8')) as RouteFixture;
   const runner=playRoute(attempt,resources),sim=runner.sim;
@@ -473,7 +494,7 @@ test('the playability inventory covers all maps and every alternative exit witho
   assert.equal(report.counts.verifiedBosses,3);
   assert.equal(report.counts.completedRoutes,22);
   assert.equal(report.counts.verifiedMaps,18);
-  assert.equal(report.counts.attemptedMaps,20);
+  assert.equal(report.counts.attemptedMaps,21);
   assert.equal(report.levels.find(level=>level.world===1&&level.level===3)!.status,'attempted');
   assert.equal(report.levels.find(level=>level.world===1&&level.level===7)!.status,'attempted');
   assert.equal(report.levels.find(level=>level.world===1&&level.level===8)!.status,'attempted');

@@ -10,7 +10,7 @@
     "verifiedMaps": 18,
     "verifiedBosses": 3,
     "completedRoutes": 22,
-    "attemptedMaps": 20,
+    "attemptedMaps": 21,
     "campaignPrefixes": 1,
     "campaignPrefixStages": 9
   },
@@ -1551,6 +1551,57 @@
       "evidence": [],
       "pendingAttempts": [
         {
+          "file": "tests/fixtures/route-attempts/angkor-12-fourth-riddle.json",
+          "world": 0,
+          "level": 11,
+          "goal": "normal",
+          "initial": {
+            "diamonds": 82,
+            "redDiamonds": 10,
+            "lives": 12,
+            "health": 4,
+            "weaponTier": 2
+          },
+          "outcome": {
+            "status": "playing",
+            "ticks": 1765,
+            "x": 18,
+            "y": 18,
+            "exitObject": 0,
+            "diamonds": 84,
+            "redDiamonds": 10,
+            "lives": 12,
+            "health": 1,
+            "weaponTier": 2,
+            "hits": 3,
+            "retries": 0,
+            "opened": [
+              112,
+              192,
+              308
+            ],
+            "demos": [],
+            "bossHealth": null,
+            "bossCleared": false
+          },
+          "events": {
+            "grass": 18,
+            "boulder": 12,
+            "diamond": 2,
+            "checkpoint": 2,
+            "riddle": 4,
+            "hook": 8,
+            "hook-pull": 8,
+            "hammer": 5,
+            "enemy-hit": 5,
+            "enemy-death": 6,
+            "riddle-solved": 3,
+            "chest": 3,
+            "chest-reward": 3,
+            "hurt": 3
+          }
+        },
+        {
           "file": "tests/fixtures/route-attempts/angkor-12-three-gold-keys.json",
           "world": 0,
           "level": 11,
@@ -2621,9 +2672,53 @@
           "y": 5
         }
       ],
-      "status": "unverified",
+      "status": "attempted",
       "evidence": [],
-      "pendingAttempts": [],
+      "pendingAttempts": [
+        {
+          "file": "tests/fixtures/route-attempts/bavaria-12-first-plate.json",
+          "world": 1,
+          "level": 11,
+          "goal": "normal",
+          "initial": {
+            "diamonds": 82,
+            "redDiamonds": 10,
+            "lives": 12,
+            "health": 4,
+            "weaponTier": 1
+          },
+          "outcome": {
+            "status": "playing",
+            "ticks": 1206,
+            "x": 25,
+            "y": 13,
+            "exitObject": 0,
+            "diamonds": 89,
+            "redDiamonds": 10,
+            "lives": 9,
+            "health": 2,
+            "weaponTier": 1,
+            "hits": 7,
+            "retries": 3,
+            "opened": [],
+            "demos": [],
+            "bossHealth": null,
+            "bossCleared": false
+          },
+          "events": {
+            "hammer": 8,
+            "break": 4,
+            "hurt": 7,
+            "diamond": 24,
+            "death": 3,
+            "respawn-start": 3,
+            "respawn": 3,
+            "checkpoint": 1,
+            "gate-open": 1,
+            "gate-opening": 1
+          }
+        }
+      ],
       "reviews": [
         {
           "plane": "tile",

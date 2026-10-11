@@ -1,0 +1,357 @@
+{
+  "version": 1,
+  "engine": "fidelity-24",
+  "levelFingerprint": "fa9f22e2",
+  "world": 1,
+  "level": 11,
+  "kind": "stage",
+  "scope": "isolated-stage",
+  "initial": {
+    "diamonds": 82,
+    "redDiamonds": 10,
+    "lives": 12,
+    "health": 4,
+    "weaponTier": 1
+  },
+  "provenance": "Control-only Bavaria 12 secret attempt from the original spawn with a pre-equipped hammer: opens the entrance brick, survives the upper spike corridor, activates checkpoint 1 and presses the lower plate once. The linked gate begins opening but is not crossed; silver and gold keys and the secret exit remain unverified.",
+  "controls": [
+    {
+      "ticks": 9,
+      "direction": 2,
+      "action": false
+    },
+    {
+      "ticks": 8,
+      "direction": 1,
+      "action": false
+    },
+    {
+      "ticks": 8,
+      "direction": 4,
+      "action": false
+    },
+    {
+      "ticks": 11,
+      "direction": 0,
+      "action": false
+    },
+    {
+      "ticks": 1,
+      "direction": 0,
+      "action": true
+    },
+    {
+      "ticks": 17,
+      "direction": 0,
+      "action": false
+    },
+    {
+      "ticks": 1,
+      "direction": 0,
+      "action": true
+    },
+    {
+      "ticks": 1,
+      "direction": 0,
+      "action": false
+    },
+    {
+      "ticks": 12,
+      "direction": 4,
+      "action": false
+    },
+    {
+      "ticks": 20,
+      "direction": 1,
+      "action": false
+    },
+    {
+      "ticks": 12,
+      "direction": 2,
+      "action": false
+    },
+    {
+      "ticks": 12,
+      "direction": 3,
+      "action": false
+    },
+    {
+      "ticks": 13,
+      "direction": 2,
+      "action": false
+    },
+    {
+      "ticks": 8,
+      "direction": 3,
+      "action": false
+    },
+    {
+      "ticks": 58,
+      "direction": 2,
+      "action": false
+    },
+    {
+      "ticks": 88,
+      "direction": 3,
+      "action": false
+    },
+    {
+      "ticks": 60,
+      "direction": 2,
+      "action": false
+    },
+    {
+      "ticks": 8,
+      "direction": 1,
+      "action": false
+    },
+    {
+      "ticks": 8,
+      "direction": 4,
+      "action": false
+    },
+    {
+      "ticks": 5,
+      "direction": 0,
+      "action": false
+    },
+    {
+      "ticks": 1,
+      "direction": 0,
+      "action": true
+    },
+    {
+      "ticks": 17,
+      "direction": 0,
+      "action": false
+    },
+    {
+      "ticks": 1,
+      "direction": 0,
+      "action": true
+    },
+    {
+      "ticks": 1,
+      "direction": 0,
+      "action": false
+    },
+    {
+      "ticks": 12,
+      "direction": 4,
+      "action": false
+    },
+    {
+      "ticks": 20,
+      "direction": 1,
+      "action": false
+    },
+    {
+      "ticks": 12,
+      "direction": 2,
+      "action": false
+    },
+    {
+      "ticks": 12,
+      "direction": 3,
+      "action": false
+    },
+    {
+      "ticks": 29,
+      "direction": 2,
+      "action": false
+    },
+    {
+      "ticks": 8,
+      "direction": 3,
+      "action": false
+    },
+    {
+      "ticks": 185,
+      "direction": 2,
+      "action": false
+    },
+    {
+      "ticks": 8,
+      "direction": 1,
+      "action": false
+    },
+    {
+      "ticks": 8,
+      "direction": 4,
+      "action": false
+    },
+    {
+      "ticks": 10,
+      "direction": 0,
+      "action": false
+    },
+    {
+      "ticks": 1,
+      "direction": 0,
+      "action": true
+    },
+    {
+      "ticks": 17,
+      "direction": 0,
+      "action": false
+    },
+    {
+      "ticks": 1,
+      "direction": 0,
+      "action": true
+    },
+    {
+      "ticks": 1,
+      "direction": 0,
+      "action": false
+    },
+    {
+      "ticks": 12,
+      "direction": 4,
+      "action": false
+    },
+    {
+      "ticks": 20,
+      "direction": 1,
+      "action": false
+    },
+    {
+      "ticks": 12,
+      "direction": 2,
+      "action": false
+    },
+    {
+      "ticks": 12,
+      "direction": 3,
+      "action": false
+    },
+    {
+      "ticks": 13,
+      "direction": 2,
+      "action": false
+    },
+    {
+      "ticks": 8,
+      "direction": 3,
+      "action": false
+    },
+    {
+      "ticks": 177,
+      "direction": 2,
+      "action": false
+    },
+    {
+      "ticks": 8,
+      "direction": 1,
+      "action": false
+    },
+    {
+      "ticks": 8,
+      "direction": 4,
+      "action": false
+    },
+    {
+      "ticks": 16,
+      "direction": 0,
+      "action": false
+    },
+    {
+      "ticks": 1,
+      "direction": 0,
+      "action": true
+    },
+    {
+      "ticks": 17,
+      "direction": 0,
+      "action": false
+    },
+    {
+      "ticks": 1,
+      "direction": 0,
+      "action": true
+    },
+    {
+      "ticks": 1,
+      "direction": 0,
+      "action": false
+    },
+    {
+      "ticks": 12,
+      "direction": 4,
+      "action": false
+    },
+    {
+      "ticks": 20,
+      "direction": 1,
+      "action": false
+    },
+    {
+      "ticks": 12,
+      "direction": 2,
+      "action": false
+    },
+    {
+      "ticks": 12,
+      "direction": 3,
+      "action": false
+    },
+    {
+      "ticks": 45,
+      "direction": 2,
+      "action": false
+    },
+    {
+      "ticks": 8,
+      "direction": 3,
+      "action": false
+    },
+    {
+      "ticks": 44,
+      "direction": 2,
+      "action": false
+    },
+    {
+      "ticks": 4,
+      "direction": 3,
+      "action": false
+    },
+    {
+      "ticks": 3,
+      "direction": 0,
+      "action": false
+    },
+    {
+      "ticks": 25,
+      "direction": 3,
+      "action": false
+    },
+    {
+      "ticks": 8,
+      "direction": 4,
+      "action": false
+    },
+    {
+      "ticks": 3,
+      "direction": 0,
+      "action": false
+    }
+  ],
+  "expected": {
+    "status": "playing",
+    "ticks": 1206,
+    "x": 25,
+    "y": 13,
+    "exitObject": 0,
+    "diamonds": 89,
+    "redDiamonds": 10,
+    "lives": 9,
+    "health": 2,
+    "weaponTier": 1,
+    "hits": 7,
+    "retries": 3,
+    "opened": [],
+    "demos": [],
+    "bossHealth": null,
+    "bossCleared": false
+  }
+}

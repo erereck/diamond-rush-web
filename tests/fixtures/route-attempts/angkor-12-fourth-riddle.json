@@ -1,0 +1,661 @@
+{
+  "version": 1,
+  "engine": "fidelity-24",
+  "levelFingerprint": "e76abc0a",
+  "world": 0,
+  "level": 11,
+  "kind": "stage",
+  "scope": "isolated-stage",
+  "initial": {
+    "diamonds": 82,
+    "redDiamonds": 10,
+    "lives": 12,
+    "health": 4,
+    "weaponTier": 2
+  },
+  "provenance": "Control-only Angkor 12 secret attempt from spawn with the hook pre-equipped: solves the first three snake rooms, collects three gold keys, activates the second checkpoint and enters the fourth snake riddle. The fourth key and final exit remain unverified.",
+  "controls": [
+    {
+      "ticks": 1,
+      "direction": 2,
+      "action": false
+    },
+    {
+      "ticks": 44,
+      "direction": 1,
+      "action": false
+    },
+    {
+      "ticks": 1,
+      "direction": 2,
+      "action": false
+    },
+    {
+      "ticks": 3,
+      "direction": 1,
+      "action": false
+    },
+    {
+      "ticks": 40,
+      "direction": 2,
+      "action": false
+    },
+    {
+      "ticks": 36,
+      "direction": 1,
+      "action": false
+    },
+    {
+      "ticks": 105,
+      "direction": 4,
+      "action": false
+    },
+    {
+      "ticks": 8,
+      "direction": 1,
+      "action": false
+    },
+    {
+      "ticks": 12,
+      "direction": 4,
+      "action": false
+    },
+    {
+      "ticks": 3,
+      "direction": 0,
+      "action": false
+    },
+    {
+      "ticks": 1,
+      "direction": 2,
+      "action": false
+    },
+    {
+      "ticks": 24,
+      "direction": 3,
+      "action": false
+    },
+    {
+      "ticks": 4,
+      "direction": 4,
+      "action": false
+    },
+    {
+      "ticks": 3,
+      "direction": 0,
+      "action": false
+    },
+    {
+      "ticks": 4,
+      "direction": 4,
+      "action": false
+    },
+    {
+      "ticks": 4,
+      "direction": 2,
+      "action": false
+    },
+    {
+      "ticks": 1,
+      "direction": 0,
+      "action": true
+    },
+    {
+      "ticks": 20,
+      "direction": 0,
+      "action": false
+    },
+    {
+      "ticks": 1,
+      "direction": 0,
+      "action": true
+    },
+    {
+      "ticks": 14,
+      "direction": 0,
+      "action": false
+    },
+    {
+      "ticks": 9,
+      "direction": 2,
+      "action": false
+    },
+    {
+      "ticks": 12,
+      "direction": 1,
+      "action": false
+    },
+    {
+      "ticks": 3,
+      "direction": 0,
+      "action": false
+    },
+    {
+      "ticks": 12,
+      "direction": 4,
+      "action": false
+    },
+    {
+      "ticks": 20,
+      "direction": 0,
+      "action": false
+    },
+    {
+      "ticks": 1,
+      "direction": 4,
+      "action": false
+    },
+    {
+      "ticks": 8,
+      "direction": 3,
+      "action": false
+    },
+    {
+      "ticks": 4,
+      "direction": 4,
+      "action": false
+    },
+    {
+      "ticks": 4,
+      "direction": 3,
+      "action": false
+    },
+    {
+      "ticks": 3,
+      "direction": 0,
+      "action": false
+    },
+    {
+      "ticks": 1,
+      "direction": 0,
+      "action": true
+    },
+    {
+      "ticks": 20,
+      "direction": 0,
+      "action": false
+    },
+    {
+      "ticks": 1,
+      "direction": 0,
+      "action": true
+    },
+    {
+      "ticks": 14,
+      "direction": 0,
+      "action": false
+    },
+    {
+      "ticks": 9,
+      "direction": 4,
+      "action": false
+    },
+    {
+      "ticks": 12,
+      "direction": 1,
+      "action": false
+    },
+    {
+      "ticks": 3,
+      "direction": 0,
+      "action": false
+    },
+    {
+      "ticks": 12,
+      "direction": 2,
+      "action": false
+    },
+    {
+      "ticks": 20,
+      "direction": 0,
+      "action": false
+    },
+    {
+      "ticks": 9,
+      "direction": 1,
+      "action": false
+    },
+    {
+      "ticks": 8,
+      "direction": 2,
+      "action": false
+    },
+    {
+      "ticks": 53,
+      "direction": 0,
+      "action": false
+    },
+    {
+      "ticks": 26,
+      "direction": 2,
+      "action": false
+    },
+    {
+      "ticks": 8,
+      "direction": 3,
+      "action": false
+    },
+    {
+      "ticks": 117,
+      "direction": 2,
+      "action": false
+    },
+    {
+      "ticks": 4,
+      "direction": 3,
+      "action": false
+    },
+    {
+      "ticks": 33,
+      "direction": 0,
+      "action": false
+    },
+    {
+      "ticks": 1,
+      "direction": 4,
+      "action": false
+    },
+    {
+      "ticks": 3,
+      "direction": 1,
+      "action": false
+    },
+    {
+      "ticks": 19,
+      "direction": 0,
+      "action": false
+    },
+    {
+      "ticks": 1,
+      "direction": 0,
+      "action": true
+    },
+    {
+      "ticks": 14,
+      "direction": 0,
+      "action": false
+    },
+    {
+      "ticks": 8,
+      "direction": 1,
+      "action": false
+    },
+    {
+      "ticks": 5,
+      "direction": 2,
+      "action": false
+    },
+    {
+      "ticks": 3,
+      "direction": 1,
+      "action": false
+    },
+    {
+      "ticks": 1,
+      "direction": 4,
+      "action": false
+    },
+    {
+      "ticks": 3,
+      "direction": 1,
+      "action": false
+    },
+    {
+      "ticks": 1,
+      "direction": 0,
+      "action": true
+    },
+    {
+      "ticks": 45,
+      "direction": 0,
+      "action": false
+    },
+    {
+      "ticks": 9,
+      "direction": 3,
+      "action": false
+    },
+    {
+      "ticks": 3,
+      "direction": 1,
+      "action": false
+    },
+    {
+      "ticks": 10,
+      "direction": 0,
+      "action": false
+    },
+    {
+      "ticks": 1,
+      "direction": 4,
+      "action": false
+    },
+    {
+      "ticks": 4,
+      "direction": 3,
+      "action": false
+    },
+    {
+      "ticks": 3,
+      "direction": 1,
+      "action": false
+    },
+    {
+      "ticks": 1,
+      "direction": 2,
+      "action": false
+    },
+    {
+      "ticks": 3,
+      "direction": 1,
+      "action": false
+    },
+    {
+      "ticks": 1,
+      "direction": 0,
+      "action": true
+    },
+    {
+      "ticks": 14,
+      "direction": 0,
+      "action": false
+    },
+    {
+      "ticks": 12,
+      "direction": 1,
+      "action": false
+    },
+    {
+      "ticks": 1,
+      "direction": 4,
+      "action": false
+    },
+    {
+      "ticks": 3,
+      "direction": 1,
+      "action": false
+    },
+    {
+      "ticks": 1,
+      "direction": 2,
+      "action": false
+    },
+    {
+      "ticks": 3,
+      "direction": 1,
+      "action": false
+    },
+    {
+      "ticks": 1,
+      "direction": 0,
+      "action": true
+    },
+    {
+      "ticks": 45,
+      "direction": 0,
+      "action": false
+    },
+    {
+      "ticks": 1,
+      "direction": 2,
+      "action": false
+    },
+    {
+      "ticks": 8,
+      "direction": 1,
+      "action": false
+    },
+    {
+      "ticks": 4,
+      "direction": 4,
+      "action": false
+    },
+    {
+      "ticks": 48,
+      "direction": 0,
+      "action": false
+    },
+    {
+      "ticks": 23,
+      "direction": 2,
+      "action": false
+    },
+    {
+      "ticks": 16,
+      "direction": 3,
+      "action": false
+    },
+    {
+      "ticks": 125,
+      "direction": 2,
+      "action": false
+    },
+    {
+      "ticks": 4,
+      "direction": 3,
+      "action": false
+    },
+    {
+      "ticks": 3,
+      "direction": 0,
+      "action": false
+    },
+    {
+      "ticks": 5,
+      "direction": 2,
+      "action": false
+    },
+    {
+      "ticks": 4,
+      "direction": 3,
+      "action": false
+    },
+    {
+      "ticks": 3,
+      "direction": 0,
+      "action": false
+    },
+    {
+      "ticks": 4,
+      "direction": 4,
+      "action": false
+    },
+    {
+      "ticks": 1,
+      "direction": 0,
+      "action": true
+    },
+    {
+      "ticks": 14,
+      "direction": 0,
+      "action": false
+    },
+    {
+      "ticks": 1,
+      "direction": 0,
+      "action": true
+    },
+    {
+      "ticks": 14,
+      "direction": 0,
+      "action": false
+    },
+    {
+      "ticks": 13,
+      "direction": 1,
+      "action": false
+    },
+    {
+      "ticks": 3,
+      "direction": 0,
+      "action": false
+    },
+    {
+      "ticks": 4,
+      "direction": 2,
+      "action": false
+    },
+    {
+      "ticks": 4,
+      "direction": 4,
+      "action": false
+    },
+    {
+      "ticks": 1,
+      "direction": 0,
+      "action": true
+    },
+    {
+      "ticks": 38,
+      "direction": 0,
+      "action": false
+    },
+    {
+      "ticks": 13,
+      "direction": 3,
+      "action": false
+    },
+    {
+      "ticks": 3,
+      "direction": 0,
+      "action": false
+    },
+    {
+      "ticks": 1,
+      "direction": 0,
+      "action": true
+    },
+    {
+      "ticks": 24,
+      "direction": 0,
+      "action": false
+    },
+    {
+      "ticks": 16,
+      "direction": 1,
+      "action": false
+    },
+    {
+      "ticks": 1,
+      "direction": 4,
+      "action": false
+    },
+    {
+      "ticks": 3,
+      "direction": 1,
+      "action": false
+    },
+    {
+      "ticks": 1,
+      "direction": 2,
+      "action": false
+    },
+    {
+      "ticks": 3,
+      "direction": 1,
+      "action": false
+    },
+    {
+      "ticks": 1,
+      "direction": 0,
+      "action": true
+    },
+    {
+      "ticks": 55,
+      "direction": 0,
+      "action": false
+    },
+    {
+      "ticks": 1,
+      "direction": 2,
+      "action": false
+    },
+    {
+      "ticks": 8,
+      "direction": 3,
+      "action": false
+    },
+    {
+      "ticks": 4,
+      "direction": 2,
+      "action": false
+    },
+    {
+      "ticks": 48,
+      "direction": 0,
+      "action": false
+    },
+    {
+      "ticks": 43,
+      "direction": 4,
+      "action": false
+    },
+    {
+      "ticks": 20,
+      "direction": 3,
+      "action": false
+    },
+    {
+      "ticks": 4,
+      "direction": 2,
+      "action": false
+    },
+    {
+      "ticks": 3,
+      "direction": 0,
+      "action": false
+    },
+    {
+      "ticks": 1,
+      "direction": 2,
+      "action": false
+    },
+    {
+      "ticks": 34,
+      "direction": 3,
+      "action": false
+    },
+    {
+      "ticks": 144,
+      "direction": 4,
+      "action": false
+    },
+    {
+      "ticks": 8,
+      "direction": 3,
+      "action": false
+    },
+    {
+      "ticks": 8,
+      "direction": 4,
+      "action": false
+    },
+    {
+      "ticks": 3,
+      "direction": 0,
+      "action": false
+    }
+  ],
+  "expected": {
+    "status": "playing",
+    "ticks": 1765,
+    "x": 18,
+    "y": 18,
+    "exitObject": 0,
+    "diamonds": 84,
+    "redDiamonds": 10,
+    "lives": 12,
+    "health": 1,
+    "weaponTier": 2,
+    "hits": 3,
+    "retries": 0,
+    "opened": [
+      112,
+      192,
+      308
+    ],
+    "demos": [],
+    "bossHealth": null,
+    "bossCleared": false
+  }
+}

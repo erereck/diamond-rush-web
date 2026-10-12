@@ -1,50 +1,146 @@
 <!doctype html>
-<html lang="pt-BR"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><meta name="theme-color" content="#0b1110"><title>Diamond Rush — Web Port</title></head>
-<body><div id="app">
-  <header><a class="brand" href="./"><span class="diamond">◆</span><span>DIAMOND RUSH<small>WEB PORT · S700 / 1.2.0</small></span></a><span class="build-label"><i></i> EM DESENVOLVIMENTO</span></header>
-  <main>
-    <section class="player-panel" aria-label="Jogo">
-      <div class="stage"><canvas id="game" width="240" height="320" tabindex="0" aria-label="Diamond Rush. Use as setas ou WASD para mover, Escape para pausar."></canvas><div id="loading" role="status">Decodificando a aventura…</div></div>
-      <div class="player-bar"><span id="game-status">Carregando recursos originais</span><button id="next-level" aria-label="Próxima fase" title="Seguir a rota principal" hidden>Próxima →</button><button id="pause" aria-label="Pausar">Ⅱ</button><button id="restart" aria-label="Reiniciar fase">↻</button><button id="fullscreen" aria-label="Tela cheia">⛶</button></div>
-      <div class="touch-suite" id="touch-suite">
-        <div class="touch-heading"><span>CONTROLES DE TOQUE</span><button id="touch-config" type="button" aria-expanded="false" aria-controls="touch-settings">⚙ Ajustar</button></div>
-        <div class="touch-deck" id="touch-deck" aria-label="Controles do jogo">
-          <div class="touch-group" data-control-group="pad" aria-label="Movimento">
-            <div class="dpad"><button data-input="ArrowUp" aria-label="Cima">▲</button><button data-input="ArrowLeft" aria-label="Esquerda">◀</button><button data-input="ArrowDown" aria-label="Baixo">▼</button><button data-input="ArrowRight" aria-label="Direita">▶</button></div>
-            <div class="touch-stick" data-stick role="button" tabindex="0" aria-label="Controle analógico de movimento" hidden><span></span></div>
-          </div>
-          <div class="touch-group touch-actions" data-control-group="action" aria-label="Ações"><button class="touch-action" data-input="Space" aria-label="Agir ou selecionar">◆<small>AGIR</small></button><button class="touch-confirm" data-input="Enter" aria-label="Confirmar ou continuar">OK</button></div>
-          <div class="touch-group touch-utility" data-control-group="utility" aria-label="Comandos"><button data-command="back" aria-label="Voltar">VOLTAR</button><button data-command="pause" aria-label="Pausar ou continuar">Ⅱ</button><button data-input="KeyR" aria-label="Reiniciar no checkpoint, custa uma vida fora do checkpoint">↻</button></div>
+<html lang="pt-BR"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover,user-scalable=no"><meta name="theme-color" content="#000000"><meta name="mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-status-bar-style" content="black-translucent"><link rel="manifest" href="/manifest.webmanifest"><link rel="icon" href="/icon.svg" type="image/svg+xml"><link rel="apple-touch-icon" href="/icon.svg"><title>Diamond Rush</title></head>
+<body>
+<main id="app">
+  <div id="stage" class="stage">
+    <canvas id="game" width="240" height="320" tabindex="0" aria-label="Diamond Rush"></canvas>
+    <div id="crt" class="crt" hidden></div>
+  </div>
+  <div id="loading" role="status"><span class="gem">◆</span><span id="loading-text">Diamond Rush</span></div>
+  <output id="stats" hidden></output>
+  <div id="toast" role="status" hidden></div>
+
+  <div class="touch-deck" id="touch-deck" aria-label="Controles do jogo">
+    <div class="touch-group" data-control-group="pad" aria-label="Movimento">
+      <div class="dpad"><button data-input="ArrowUp" aria-label="Cima">▲</button><button data-input="ArrowLeft" aria-label="Esquerda">◀</button><button data-input="ArrowDown" aria-label="Baixo">▼</button><button data-input="ArrowRight" aria-label="Direita">▶</button></div>
+      <div class="touch-stick" data-stick role="button" tabindex="0" aria-label="Controle analógico de movimento" hidden><span></span></div>
+    </div>
+    <div class="touch-group touch-actions" data-control-group="action" aria-label="Ações"><button class="touch-action" data-input="Space" aria-label="Agir ou selecionar">◆</button><button class="touch-confirm" data-input="Enter" aria-label="Confirmar ou continuar">OK</button></div>
+    <div class="touch-group touch-utility" data-control-group="utility" aria-label="Comandos"><button data-command="back" aria-label="Voltar">◂</button><button data-command="pause" aria-label="Pausar ou continuar">Ⅱ</button><button data-input="KeyR" aria-label="Voltar ao checkpoint (custa uma vida fora dele)">↺</button><button data-hold="rewind" aria-label="Retroceder (segure)">«</button><button data-hold="turbo" aria-label="Avanço rápido (segure)">»</button></div>
+  </div>
+  <button id="touch-done" class="touch-done" type="button" hidden data-i18n="done">Concluir</button>
+
+  <button id="menu-button" class="menu-button" type="button" aria-label="Configurações" aria-controls="panel" aria-expanded="false">⚙</button>
+
+  <aside id="panel" class="panel" hidden aria-label="Configurações">
+    <header class="panel-head">
+      <span class="panel-title">◆ <b>Diamond Rush</b></span>
+      <button id="panel-close" type="button" aria-label="Fechar">✕</button>
+    </header>
+    <nav class="tabs" role="tablist">
+      <button role="tab" data-tab="game" class="selected" data-i18n="tabGame">Jogo</button>
+      <button role="tab" data-tab="video" data-i18n="tabVideo">Vídeo</button>
+      <button role="tab" data-tab="audio" data-i18n="tabAudio">Áudio</button>
+      <button role="tab" data-tab="controls" data-i18n="tabControls">Controles</button>
+      <button role="tab" data-tab="lab" data-i18n="tabLab">Lab</button>
+      <button role="tab" data-tab="about" data-i18n="tabAbout">Sobre</button>
+    </nav>
+    <div class="panel-body">
+
+      <section data-section="game">
+        <div class="row"><span data-i18n="language">Idioma</span><select id="language"><option value="en">English</option><option value="pt-BR">Português (Brasil)</option><option value="es">Español</option></select></div>
+        <div class="row"><span data-i18n="speed">Velocidade do jogo</span><div class="segmented" data-setting="speed"></div></div>
+        <label class="row toggle"><span><span data-i18n="turbo">Avanço rápido</span><small data-i18n="turboHint">Segure Tab</small></span><input type="checkbox" data-setting="turbo"></label>
+        <label class="row toggle"><span><span data-i18n="rewind">Retroceder</span><small data-i18n="rewindHint">Segure Backspace · últimos 30 s</small></span><input type="checkbox" data-setting="rewind"></label>
+        <div class="row"><span><span data-i18n="states">Estado salvo</span><small data-i18n="statesHint">F5 salva · F7 carrega</small></span><span class="buttons"><button id="state-save" type="button" data-i18n="save">Salvar</button><button id="state-load" type="button" data-i18n="load">Carregar</button></span></div>
+        <h3 data-i18n="cheats">Trapaças</h3>
+        <p class="note" data-i18n="cheatsNote">Alteram o jogo original; o resultado entra no save da campanha.</p>
+        <label class="row toggle"><span data-i18n="infiniteLives">Vidas infinitas</span><input type="checkbox" data-setting="infiniteLives"></label>
+        <label class="row toggle"><span data-i18n="infiniteHealth">Vida infinita</span><input type="checkbox" data-setting="infiniteHealth"></label>
+        <label class="row toggle"><span data-i18n="allEquipment">Todos os equipamentos</span><input type="checkbox" data-setting="allEquipment"></label>
+        <h3 data-i18n="session">Sessão</h3>
+        <div class="row"><span data-i18n="gameMenu">Menu do jogo</span><button id="title" type="button" data-i18n="openMenu">Abrir</button></div>
+      </section>
+
+      <section data-section="video" hidden>
+        <div class="row"><span data-i18n="fullscreen">Tela cheia</span><button id="fullscreen" type="button" data-i18n="toggle">Alternar</button></div>
+        <div class="row"><span data-i18n="scaling">Escala</span><div class="segmented" data-setting="scaling"></div></div>
+        <div class="row"><span data-i18n="filter">Filtro</span><div class="segmented" data-setting="filter"></div></div>
+        <div class="row column"><span><span data-i18n="surround">Ao redor da tela original</span><small data-i18n="surroundHint">O que aparece quando a janela é mais larga ou mais alta que o celular.</small></span><div class="segmented wrap" data-setting="surround"></div></div>
+        <label class="row toggle"><span data-i18n="stats">Mostrar FPS e tick</span><input type="checkbox" data-setting="showStats"></label>
+      </section>
+
+      <section data-section="audio" hidden>
+        <label class="row toggle"><span data-i18n="sound">Som</span><input type="checkbox" data-setting="sound"></label>
+        <div class="row column"><span><span data-i18n="synth">Sintetizador</span><small id="synth-status"></small></span><div class="segmented" data-setting="synth"></div></div>
+        <label class="row"><span data-i18n="master">Volume geral</span><input type="range" min="0" max="100" step="5" data-setting="master"></label>
+        <label class="row"><span data-i18n="music">Músicas</span><input type="range" min="0" max="100" step="5" data-setting="music"></label>
+        <label class="row"><span data-i18n="effects">Efeitos</span><input type="range" min="0" max="100" step="5" data-setting="effects"></label>
+        <label class="row toggle"><span data-i18n="vibration">Vibração do jogo</span><input type="checkbox" data-setting="vibration"></label>
+        <p class="note" data-i18n="audioNote">Como no aparelho, toca um som por vez, pelas prioridades do jogo original.</p>
+      </section>
+
+      <section data-section="controls" hidden>
+        <div class="keys">
+          <span><kbd>←↑→↓</kbd><kbd>WASD</kbd><i data-i18n="keyMove">mover</i></span>
+          <span><kbd>Espaço</kbd><kbd>Enter</kbd><i data-i18n="keyAct">agir</i></span>
+          <span><kbd>Esc</kbd><i data-i18n="keyPause">pausar / voltar</i></span>
+          <span><kbd>R</kbd><i data-i18n="keyReset">checkpoint</i></span>
+          <span><kbd>Tab</kbd><i data-i18n="keyTurbo">avanço rápido</i></span>
+          <span><kbd>⌫</kbd><i data-i18n="keyRewind">retroceder</i></span>
+          <span><kbd>F5</kbd><kbd>F7</kbd><i data-i18n="keyStates">estado salvo</i></span>
+          <span><kbd>O</kbd><i data-i18n="keyOptions">configurações</i></span>
+          <span><kbd>F</kbd><i data-i18n="keyFullscreen">tela cheia</i></span>
         </div>
-        <div class="touch-settings" id="touch-settings" hidden>
-          <p>Arraste os grupos na área acima para escolher a posição.</p>
-          <div class="touch-presets"><button type="button" data-touch-preset="right">Destro</button><button type="button" data-touch-preset="left">Canhoto</button><button type="button" data-touch-preset="compact">Compacto</button></div>
-          <label>Direcional<select id="touch-mode"><option value="pad">Cruz direcional</option><option value="stick">Analógico</option></select></label>
-          <label>Tamanho <output id="touch-size-value">100%</output><input id="touch-size" type="range" min="75" max="125" step="5" value="100"></label>
-          <label>Opacidade <output id="touch-opacity-value">90%</output><input id="touch-opacity" type="range" min="45" max="100" step="5" value="90"></label>
-          <label>Zona morta do analógico <output id="touch-deadzone-value">25%</output><input id="touch-deadzone" type="range" min="15" max="50" step="5" value="25"></label>
-          <label class="touch-haptics"><input id="touch-haptics" type="checkbox" checked> Vibração curta ao tocar</label>
-          <button id="touch-reset" type="button">Restaurar padrão</button>
+        <div class="row"><span data-i18n="touchControls">Controles de toque</span><div class="segmented" data-setting="touch"></div></div>
+        <div class="row"><span data-i18n="touchLayout">Posição na tela</span><button id="touch-config" type="button" data-i18n="adjust">Ajustar</button></div>
+        <div id="touch-settings" class="touch-settings">
+          <div class="row"><span data-i18n="presets">Predefinições</span><span class="buttons"><button type="button" data-touch-preset="right" data-i18n="right">Destro</button><button type="button" data-touch-preset="left" data-i18n="left">Canhoto</button><button type="button" data-touch-preset="compact" data-i18n="compact">Compacto</button></span></div>
+          <label class="row"><span data-i18n="direction">Direcional</span><select id="touch-mode"><option value="pad" data-i18n="pad">Cruz</option><option value="stick" data-i18n="stick">Analógico</option></select></label>
+          <label class="row"><span><span data-i18n="size">Tamanho</span> <output id="touch-size-value">100%</output></span><input id="touch-size" type="range" min="75" max="150" step="5" value="100"></label>
+          <label class="row"><span><span data-i18n="opacity">Opacidade</span> <output id="touch-opacity-value">60%</output></span><input id="touch-opacity" type="range" min="20" max="100" step="5" value="60"></label>
+          <label class="row"><span><span data-i18n="deadzone">Zona morta</span> <output id="touch-deadzone-value">25%</output></span><input id="touch-deadzone" type="range" min="15" max="50" step="5" value="25"></label>
+          <label class="row toggle"><span data-i18n="haptics">Vibração ao tocar</span><input id="touch-haptics" type="checkbox" checked></label>
+          <div class="row"><span></span><button id="touch-reset" type="button" data-i18n="reset">Restaurar padrão</button></div>
         </div>
-      </div>
-    </section>
-    <aside>
-      <p class="eyebrow">A AVENTURA ORIGINAL, NA WEB</p><h1>Mais uma<br> pedra no caminho.</h1>
-      <p class="intro">Exploração, diamantes e os caminhos de Angkor. Uma implementação nativa, construída a partir dos dados do jogo original.</p>
-      <button id="play" class="primary" disabled>Iniciar teste de Angkor <span>→</span></button>
-      <label class="language-picker">Idioma do jogo<select id="language" aria-label="Idioma do jogo"><option value="en">English · original S700</option><option value="pt-BR">Português (Brasil) · tradução web</option><option value="es">Español · traducción web</option></select></label>
-      <p class="build-note">Menu e mapa originais em desenvolvimento. As mecânicas das fases posteriores ainda estão incompletas.</p>
-      <div class="control-guide"><span><kbd>W</kbd><kbd>A</kbd><kbd>S</kbd><kbd>D</kbd> mover</span><span><kbd>Espaço</kbd> agir</span><span><kbd>Esc</kbd> pausar</span><span><kbd>R</kbd> reiniciar</span></div>
-      <details id="tools"><summary>Laboratório de preservação <span>＋</span></summary><div class="tools-body">
-        <nav aria-label="Ferramentas"><button data-view="levels" class="selected">Fases</button><button data-view="sprites">Sprites</button><button data-view="audio">Áudio</button></nav>
-        <div id="level-tools"><label>Mundo<select id="world"><option value="0">Angkor Wat</option><option value="1">Bavaria</option><option value="2">Tibet</option></select></label><label>Fase<select id="level"></select></label><label>Equipamento de teste<select id="test-weapon"><option value="0">Nenhum</option><option value="1">Martelo</option><option value="2">Gancho</option><option value="8">Martelo de gelo</option></select></label><button id="inspect">Abrir mapa completo</button><button id="test-level">Testar esta fase</button><label class="inline"><input type="checkbox" id="grid"> Grade de inspeção</label><p id="level-info"></p></div>
-        <div id="sprite-tools" hidden><label>Recurso<select id="sprite"></select></label><label>Paleta<select id="palette"></select></label><p id="sprite-info"></p></div>
-        <div id="audio-tools" hidden><label>Faixa MIDI<select id="track"></select></label><button id="play-audio">Ouvir faixa</button><button id="stop-audio">Parar</button><p>Notas originais; timbres de prévia sintetizados. A reprodução do S700 ainda não foi validada.</p><p id="audio-info"></p></div>
-        <div class="debug-tools"><button id="step">Avançar 1 tick</button><button id="export-replay">Exportar replay</button><button id="import-replay">Abrir replay</button><input id="replay-file" type="file" accept=".json" hidden><button id="export-save">Exportar sessão</button><button id="import-save">Importar sessão</button><input id="save-file" type="file" accept=".json" hidden><button id="render-audit">Validar todos os recursos</button><button id="title">Voltar ao título</button></div><output id="audit-result"></output><output id="debug-info"></output>
-        <details><summary>Formato de save original <span>＋</span></summary><p>Record 1 do RMS S700. A campanha atualiza recursos, fases, recompensas, segredos e baús nesse formato; bytes desconhecidos de um record importado são preservados.</p><button id="rms-template">Inspecionar modelo inicial</button><button id="export-rms">Exportar campanha em RMS</button><button id="inspect-rms">Inspecionar record RMS</button><button id="load-rms">Usar record na campanha</button><input id="rms-file" type="file" accept=".bin,.dat,.rms" hidden><output id="rms-info"></output></details>
-      </div></details>
-      <p class="resource-line" id="resource-line">Verificando recursos…</p>
-    </aside>
-    <section id="inspector" hidden><div class="inspector-heading"><h2 id="inspector-title">Mapa completo</h2><button id="close-inspector">Fechar ×</button></div><p id="inspector-description"></p><div class="canvas-scroll"><canvas id="inspection" aria-label="Inspeção dos recursos originais"></canvas></div><output id="hover-info">Passe o cursor para inspecionar uma célula.</output></section>
-  </main><footer><span>DIAMOND RUSH © GAMELOFT</span><span>Projeto independente de preservação · execução local</span></footer>
-</div><script type="module" src="/src/main.ts"></script></body></html>
+      </section>
+
+      <section data-section="lab" hidden>
+        <p class="note" data-i18n="labNote">Ferramentas de preservação: mapas, sprites, faixas MIDI, replays e o save original.</p>
+        <nav class="subtabs"><button data-view="levels" class="selected" data-i18n="levels">Fases</button><button data-view="sprites" data-i18n="sprites">Sprites</button><button data-view="audio" data-i18n="tracks">Áudio</button></nav>
+        <div id="level-tools">
+          <label class="row"><span data-i18n="world">Mundo</span><select id="world"><option value="0">Angkor Wat</option><option value="1">Bavaria</option><option value="2">Tibet</option></select></label>
+          <label class="row"><span data-i18n="stage">Fase</span><select id="level"></select></label>
+          <label class="row"><span data-i18n="testWeapon">Equipamento de teste</span><select id="test-weapon"><option value="0">—</option><option value="1">Martelo</option><option value="2">Gancho</option><option value="8">Martelo de gelo</option></select></label>
+          <div class="row"><span></span><span class="buttons"><button id="inspect" type="button" data-i18n="inspect">Ver mapa</button><button id="test-level" type="button" data-i18n="testStage">Jogar fase</button></span></div>
+          <label class="row toggle"><span data-i18n="grid">Grade de inspeção</span><input type="checkbox" id="grid"></label>
+          <p class="note" id="level-info"></p>
+        </div>
+        <div id="sprite-tools" hidden>
+          <label class="row"><span data-i18n="resource">Recurso</span><select id="sprite"></select></label>
+          <label class="row"><span data-i18n="palette">Paleta</span><select id="palette"></select></label>
+          <p class="note" id="sprite-info"></p>
+        </div>
+        <div id="audio-tools" hidden>
+          <label class="row"><span data-i18n="track">Faixa</span><select id="track"></select></label>
+          <div class="row"><span></span><span class="buttons"><button id="play-audio" type="button" data-i18n="listen">Ouvir</button><button id="stop-audio" type="button" data-i18n="stop">Parar</button></span></div>
+          <p class="note" id="audio-info"></p>
+        </div>
+        <h3 data-i18n="sessionTools">Sessão e replays</h3>
+        <div class="buttons wrap"><button id="step" type="button" data-i18n="step">Avançar 1 tick</button><button id="export-replay" type="button" data-i18n="exportReplay">Exportar replay</button><button id="import-replay" type="button" data-i18n="importReplay">Abrir replay</button><input id="replay-file" type="file" accept=".json" hidden><button id="export-save" type="button" data-i18n="exportSession">Exportar sessão</button><button id="import-save" type="button" data-i18n="importSession">Importar sessão</button><input id="save-file" type="file" accept=".json" hidden><button id="render-audit" type="button" data-i18n="audit">Validar recursos</button></div>
+        <output id="audit-result"></output><output id="debug-info"></output>
+        <h3 data-i18n="rms">Save original (RMS)</h3>
+        <div class="buttons wrap"><button id="rms-template" type="button" data-i18n="rmsTemplate">Modelo inicial</button><button id="export-rms" type="button" data-i18n="rmsExport">Exportar campanha</button><button id="inspect-rms" type="button" data-i18n="rmsInspect">Inspecionar arquivo</button><button id="load-rms" type="button" data-i18n="rmsLoad">Usar na campanha</button><input id="rms-file" type="file" accept=".bin,.dat,.rms" hidden></div>
+        <output id="rms-info"></output>
+      </section>
+
+      <section data-section="about" hidden>
+        <p class="about-title">◆ Diamond Rush <small>S700 · 1.2.0</small></p>
+        <p class="note" data-i18n="aboutText">O jogo original roda no navegador: a decompilação da versão Sony Ericsson S700 é traduzida para TypeScript e comparada quadro a quadro com Java. As 41 fases têm percurso verificado.</p>
+        <p class="links"><a href="https://github.com/erereck/diamond-rush-web" target="_blank" rel="noopener">GitHub</a><a href="https://github.com/erereck/diamond-rush-web/blob/main/docs/PLAYABILITY.md" target="_blank" rel="noopener" data-i18n="linkRoutes">Fases verificadas</a><a href="https://github.com/erereck/diamond-rush-web/blob/main/docs/NUCLEO_S700.md" target="_blank" rel="noopener" data-i18n="linkCore">Como funciona</a></p>
+        <p class="note" data-i18n="legal">Jogo, gráficos, textos e músicas © Gameloft. Projeto de preservação feito por fãs, sem afiliação com a Gameloft.</p>
+        <p class="note" id="resource-line"></p>
+        <div class="row"><span data-i18n="resetOptions">Opções do port</span><button id="settings-reset" type="button" data-i18n="reset">Restaurar padrão</button></div>
+      </section>
+    </div>
+  </aside>
+
+  <section id="inspector" class="inspector" hidden>
+    <header class="panel-head"><span id="inspector-title">Mapa</span><button id="close-inspector" type="button" aria-label="Fechar">✕</button></header>
+    <p class="note" id="inspector-description"></p>
+    <div class="canvas-scroll"><canvas id="inspection" aria-label="Inspeção dos recursos originais"></canvas></div>
+    <output id="hover-info"></output>
+  </section>
+</main>
+<script type="module" src="/src/main.ts"></script>
+</body></html>

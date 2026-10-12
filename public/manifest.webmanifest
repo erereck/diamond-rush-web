@@ -1,0 +1,12 @@
+{
+  "name": "Diamond Rush",
+  "short_name": "Diamond Rush",
+  "description": "Diamond Rush (Sony Ericsson S700) running in the browser.",
+  "display": "fullscreen",
+  "orientation": "any",
+  "background_color": "#000000",
+  "theme_color": "#000000",
+  "start_url": ".",
+  "scope": ".",
+  "icons": [{"src": "icon.svg", "sizes": "any", "type": "image/svg+xml", "purpose": "any"}]
+}

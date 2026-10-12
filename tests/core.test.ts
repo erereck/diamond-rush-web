@@ -197,3 +197,20 @@ test('a session replay is restored in the languages it was played in',{skip:!rou
     assert.equal(restore(mixedReplay),mixedState);
   }finally{Simulation.setLocale('en');}
 });
+
+test('rewinding a session restores the engine and cuts its replay at that point',()=>{
+  const sim=new Simulation(worlds[0].levels[3],{world:0,level:3,resources:{diamonds:0,redDiamonds:0,lives:5,health:4,weaponTier:1}});
+  const moves=controls(7,500);
+  for(const c of moves.slice(0,300))sim.step(c);
+  const snap=sim.snapshot(),atSnapshot=observe(sim.engine);
+  for(const c of moves.slice(300))sim.step(c);
+  assert.notEqual(observe(sim.engine),atSnapshot);
+  sim.restore(snap);
+  assert.equal(sim.tick,300);assert.equal(sim.inputs.length,300);assert.equal(observe(sim.engine),atSnapshot);
+  // The replay of the rewound session reproduces the same state, and play continues identically.
+  assert.equal(observe(restoreReplay(validateReplay(JSON.parse(JSON.stringify(sessionReplay(sim))),worlds),worlds).engine),atSnapshot);
+  const again=new Simulation(worlds[0].levels[3],{world:0,level:3,resources:{diamonds:0,redDiamonds:0,lives:5,health:4,weaponTier:1}});
+  for(const c of moves)again.step(c);
+  sim.restore(snap);for(const c of moves.slice(300))sim.step(c);
+  assert.equal(observe(sim.engine),observe(again.engine));
+});

@@ -10,11 +10,12 @@ Port de **Diamond Rush** para navegador a partir da versão J2ME **Sony Ericsson
 
 - New Game pelo menu do port, que reproduz o original e entra no caminho de New Game do jogo: o tutorial de Angkor com suas cenas; ao fim dele, Angkor 1 começa com o record que o tutorial gravou; depois de cada fase vêm a tela de resultados original e o mapa do mundo.
 - Selo, mapas dos três mundos, loja de armaduras (vida máxima de 5 a 8) e fases secretas, na interface do port. O progresso fica no formato do record 1 do RMS: o jogo escreve o resultado de cada fase, e o port grava no mesmo record as escolhas do selo e as compras da loja.
-- Teclado, gamepad ou toque. No celular, **Ajustar** troca direcional e analógico, inverte o lado, dimensiona e reposiciona botões e ajusta transparência, zona morta e vibração.
+- A página mostra só o jogo, na tela inteira. O botão ⚙ (tecla **O**) abre as opções do port: escala (pixels inteiros, ajustar, esticar), filtro (nítido, suave, CRT) e o que aparece ao redor da tela original (preto, fundo infinito, o cenário da fase ou o cenário com objetos); velocidade, avanço rápido, retroceder, estados salvos e trapaças; som com instrumentos GM, volumes e vibração. Veja [OPCOES_DO_PORT.md](docs/OPCOES_DO_PORT.md).
+- Teclado, gamepad ou toque. Os controles de toque ficam sobre a imagem e podem ser reposicionados, redimensionados e trocados entre direcional e analógico.
 - Inglês original ou traduções do port para português brasileiro e espanhol, desenhadas com a fonte original. O pacote S700 contém apenas o inglês.
-- O **Laboratório de preservação**: inspecionar os 41 mapas, testar uma fase isolada com o equipamento escolhido, ver sprites e paletas, ouvir as 21 faixas MIDI, exportar e importar replays e o record RMS.
+- O **Laboratório de preservação**, no mesmo painel: inspecionar os 41 mapas, jogar uma fase isolada com o equipamento escolhido, ver sprites e paletas, ouvir as 21 faixas MIDI, exportar e importar replays e o record RMS.
 
-No teclado: **setas/WASD** movem, **Enter/Espaço** agem ou confirmam, **Escape** pausa ou volta (nas telas do próprio jogo, como resultados, selo e loja após um cristal, faz o papel da tecla direita do aparelho) e **R** (a tecla * do aparelho) volta ao último checkpoint; fora do círculo do checkpoint, isso custa uma vida. A síntese MIDI do navegador não reproduz os timbres do aparelho.
+No teclado: **setas/WASD** movem, **Enter/Espaço** agem ou confirmam, **Escape** pausa ou volta (nas telas do próprio jogo, como resultados, selo e loja após um cristal, faz o papel da tecla direita do aparelho) e **R** (a tecla * do aparelho) volta ao último checkpoint; fora do círculo do checkpoint, isso custa uma vida. **Tab** acelera, **Backspace** retrocede, **F5/F7** salvam e carregam um estado, **F** alterna a tela cheia.
 
 ## Estado da verificação
 
@@ -64,6 +65,8 @@ npm run build                     # TypeScript e build estática
 | Núcleo gerado, patches e comparação com a JVM | [NUCLEO_S700.md](docs/NUCLEO_S700.md) |
 | Método de verificação das fases e o que falta | [VERIFICACAO_DAS_FASES.md](docs/VERIFICACAO_DAS_FASES.md) |
 | Percursos e objetivos de cada mapa | [PLAYABILITY.md](docs/PLAYABILITY.md) |
+| Opções do port (vídeo, áudio, extras, controles) | [OPCOES_DO_PORT.md](docs/OPCOES_DO_PORT.md) |
+| Som: motor original e sintetizador | [AUDIO.md](docs/AUDIO.md) |
 | Menus, selo e loja | [FRONT_END_S700.md](docs/FRONT_END_S700.md) |
 | Record RMS e replays | [SAVE_FORMAT.md](docs/SAVE_FORMAT.md) |
 | Formatos extraídos e relação com o Java | [SOURCE_MAP.md](docs/SOURCE_MAP.md), [LEVEL_FORMAT.md](docs/LEVEL_FORMAT.md), [SPRITE_FORMAT.md](docs/SPRITE_FORMAT.md) |

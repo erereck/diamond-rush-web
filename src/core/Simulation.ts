@@ -5,7 +5,7 @@
  */
 import type { LevelDefinition } from '../level/LevelParser.ts';
 import { S700Engine } from './s700/Engine.ts';
-import type { EngineStart } from './s700/Engine.ts';
+import type { EngineSnapshot, EngineStart } from './s700/Engine.ts';
 import { cSoundEngine } from '../generated/s700.ts';
 import { Display } from './s700/j2me.ts';
 import { setDecodedTextTranslator } from './s700/runtime.ts';
@@ -23,14 +23,21 @@ export type StageResult='exit'|'secret-exit'|'crystal'|'game-over';
  * so the record holds the outcome and the port's interface takes over.
  */
 export type SessionStatus='playing'|'finishing'|'dead'|'complete';
+export interface SimulationSnapshot {engine:EngineSnapshot;tick:number;status:SessionStatus;result:StageResult|null;inputs:number;localeChanges:number}
 /** `stageLoads`: stages loaded earlier in the same session (see EngineStart). */
 export interface SessionStart {world:number;level:number;resources?:StageStart;record?:Uint8Array;stageLoads?:number}
 
 const CORE=S700Engine.core;
-/** Sound requests from cSoundEngine.playSound (snd.f index) and vibrations, collected per tick. */
+/**
+ * Sound requests from cSoundEngine.playSound (snd.f index) and vibrations, collected per tick. A request
+ * of SOUND_CUT is the game's freeCrtPlayerResource(), which stops the sound playing (scene changes, seal).
+ */
+export const SOUND_CUT=-1;
 let soundQueue:number[]=[];let vibrations=0;
 const originalPlay=(cSoundEngine.prototype as any).playSound;
 (cSoundEngine.prototype as any).playSound=function(this:unknown,id:number){soundQueue.push(id);return originalPlay.call(this,id);};
+const originalCut=(cSoundEngine.prototype as any).freeCrtPlayerResource;
+(cSoundEngine.prototype as any).freeCrtPlayerResource=function(this:unknown){soundQueue.push(SOUND_CUT);return originalCut.call(this);};
 (Display.prototype as any).vibrate=function(){vibrations++;return true;};
 
 let menuLocale:GameLocale='en';
@@ -71,6 +78,15 @@ export class Simulation {
     if(menuLocale!=='en')CORE.menuText=languageStrings(menuLocale,english);
   }
   get game(){return this.engine.game;}
+  /** A point of the session to come back to (rewind, quick states): the engine and the session bookkeeping. */
+  snapshot():SimulationSnapshot{
+    return {engine:this.engine.snapshot(),tick:this.tick,status:this.status,result:this.result,inputs:this.inputs.length,localeChanges:this.localeChanges.length};
+  }
+  /** Returns to a snapshot of this session; later inputs are dropped, so its replay stays exact. */
+  restore(s:SimulationSnapshot){
+    this.engine.restore(s.engine);this.tick=s.tick;this.status=s.status;this.result=s.result;
+    this.inputs.length=s.inputs;this.localeChanges.length=s.localeChanges;this.sounds=[];this.vibrate=false;
+  }
   get gameState():number{return CORE.gameState;}
   /** One 50 ms frame of the original game. */
   step(input:InputFrame){
@@ -112,6 +128,21 @@ export class Simulation {
     const g=this.game;
     if(g.screen)ctx.drawImage(g.screen.canvas,0,0);
   }
+  /**
+   * The stage's live planes while it is loaded (tiles, objects, parameters), for the scenery the port
+   * draws around the original screen; null between stages.
+   */
+  liveCells(){
+    const g=this.game,tiles=CORE.field_334 as Int8Array[]|null,objects=CORE.field_332 as Int32Array[]|null;
+    if(!tiles||!objects||CORE.gameState!==1)return null;
+    const width:number=g.crtLevelWidth,height:number=g.crtLevelHeight;
+    return {world:g.currentWorld as number,index:g.currentLevel as number,width,height,
+      tile:(i:number)=>{const v=tiles[i%width][Math.floor(i/width)]&255;return v===255?-1:v;},
+      object:(i:number)=>objects[i%width][Math.floor(i/width)]&255,
+      parameter:(i:number)=>(objects[i%width][Math.floor(i/width)]>>8)&255};
+  }
+  /** The original camera (cGame.field_201/202, method_285): the map pixel shown at the play area's top left (screen y 40). */
+  get camera(){return {x:this.game.field_201 as number,y:this.game.field_202 as number};}
   /** The world whose map the original opens: the stage's world, or the one chosen on its seal after a crystal (method_75). */
   get mapWorld():number{return this.game.currentWorld;}
   /** The session's stage-load count after this stage loaded (cGame.field_167). */

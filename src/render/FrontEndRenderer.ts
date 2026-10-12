@@ -3,10 +3,11 @@ import type { Campaign } from '../core/Campaign.ts';
 import { unlockedNode, unlockedWorld } from '../core/Campaign.ts';
 import type { MapNode } from '../level/LevelParser.ts';
 import { SpriteRenderer } from './SpriteRenderer.ts';
-import { ARMOR_PRICES, WORLD_RED_PRICES } from '../core/Store.ts';
+import { ARMOR_PRICES, SEAL_ARROWS, WORLD_RED_PRICES } from '../core/Store.ts';
+import type { SealGlide } from '../core/Store.ts';
 import { CanonicalSave } from '../platform/CanonicalSave.ts';
 import { mapTitle } from '../core/OriginalText.ts';
-import { demoFontWidth, wrapDemoTextPixels } from '../core/IntroSequence.ts';
+import { demoFontWidth, wrapDemoTextPixels } from './TextLayout.ts';
 
 export type FrontScene='menu'|'map'|'seal'|'store'|'options'|'help'|'about'|'confirm'|'more'|'exit';
 export type PauseScene='menu'|'options'|'help'|'confirm';
@@ -129,7 +130,9 @@ export class FrontEndRenderer {
     this.panel(ctx,left-6,top-3,width+12,height+6,'#41340d');
     lines.forEach((line,i)=>this.text(ctx,line,left,top+i*15));
   }
-  drawSeal(ctx:CanvasRenderingContext2D,c:Campaign,selected:number,tick:number,unlockWorld:number|null=null,unlockTick=0){
+  drawSeal(ctx:CanvasRenderingContext2D,c:Campaign,target:number,tick:number,unlockWorld:number|null=null,unlockTick=0,glide:SealGlide|null=null){
+    // During the arrow glide the original still names the item it left (updateCrtSealItemName runs at the end).
+    const selected=glide?glide.name:target;
     this.sealBackdrop(ctx);
     const itemOffsets=[[-24,-23],[24,-23],[0,23]];
     let flags=0;
@@ -145,7 +148,7 @@ export class FrontEndRenderer {
       this.sprites.animation(ctx,this.assets.sprite('cm-7'),5,unlockTick,120+dx-12,124+dy);
     }
     this.sprites.frame(ctx,this.assets.sprite('ms-0'),11,144,159);
-    const arrows=[[-33,-54],[14,-54],[-8,-8],[22,2]],arrow=arrows[selected];
+    const arrow=glide?[glide.x,glide.y]:SEAL_ARROWS[target];
     this.sprites.frame(ctx,this.assets.sprite('mmv-4'),Math.floor(tick/5)%5,120+arrow[0],136+arrow[1]);
     const name=this.assets.strings[selected===3?31:28+selected];
     const available=selected===3||unlockedWorld(c,selected,this.assets.maps);

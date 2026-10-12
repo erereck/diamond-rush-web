@@ -1,0 +1,1469 @@
+{
+ "version": 2,
+ "engine": "s700-core-3",
+ "source": "4bfa92539bc374a6",
+ "world": 2,
+ "level": 10,
+ "kind": "stage",
+ "start": {
+  "world": 2,
+  "level": 10,
+  "lives": 12,
+  "diamonds": 0,
+  "redDiamonds": 0,
+  "maxHealth": 4,
+  "weaponTier": 8
+ },
+ "provenance": "Tibet 11 boss (w2 l10), control-only on the exact S700 core (s700-core-3), built to be robust to the java.util.Random seed: completes with 50/50 seeds of seedRobustness (Utils.random replaced after the stage loads with new JRandom(i*0x9E3779B9), i=1..50) and with seed 0 (harness default), all reaching the crystal at the same tick with health 4 and no life lost (the old route: 4/50). On a wider sample (i=1..1000) it completes 978/1000; the remaining failures are timer combinations outside the 51 tested seeds: a \"phantom\" pound (when the timer expires on a double-step frame, frameCounter % health == 0, the second loop iteration of method_282 sees the old walk animation ended and finishes the pound at once, so the boss does not stop and its path shifts by 32 frames), a second pound later than t=1220 (rain still falling when the hero leaves 22,16 at t=1315) or a third pound before t=1461. Start values: weaponTier 8 (ice hammer from the Tibet 6 chest; required: the boss only loses health to falling ice blocks (tile 9) in its three columns of rows 21-22, cGame.method_282, and only weapon 8 freezes ice creatures, method_230/method_240), maxHealth 4 (no armour; no damage is taken), lives 12 (campaign value of the old routes; no life is lost). Why the old route was seed dependent: the boss draws its ground-pound timer field_453 = frameCounter + Utils.getRandomInt(340,441) when it wakes and after every pound (method_282); a pound stops the boss for 32 frames and 40 frames after it ends the eight ceiling icicles (row 15, x 14-21) fall one after another (method_183/method_314), killing ice creatures and hurting the hero in those columns. So the boss position and the icicle rain depend on the seed. Method: every hit and every step in the arena columns happens in windows where all seeds agree (before the earliest pound, or after the latest pound + rain and before the earliest next pound; boss positions then differ by at most 6 px), and the hero and the creatures wait outside the icicle columns while the seeds differ: frozen creatures are stored in the side corridors, and creatures more than 8 cells from the hero are not updated at all (the map scan method_304 only processes hero x+-8). Route: opening as the old route (bridge switch 13,22 pressed at t=393; hits 1 and 2 with the creatures from 10,19 and 23,16 at t=520 and t=630); press 2 at t=663 (left switch), the hero goes to the right bridge 22,19 and freezes the new creature C at 23,19 in the corridor (t=746), waits there through the first pound and rain, unfreezes C at t=812 (it stays stunned 100 frames, method_206), enters the arena after the last possible rain and freezes C at 20,19 from 19,20 (t=938): hit 3 at t=952. Press 3 at the right switch (t=1033, boss walking away) spawns two creatures (boss health 2): the one at 10,19 stays inactive because the hero stays at x>=19, the one at 26,16 is frozen at 23,16 from the right bridge 22,16 (t=1089); the hero waits on 22,16 through the second pound and rain, unfreezes it at t=1222, leaves after the last rain and freezes it at 18,16 from 17,16 (t=1371): hit 4 at t=1389; walking left woke the creature at 10,19, frozen at 17,18 from 18,18 (t=1451): hit 5 at t=1461, boss defeated in every seed before the earliest third pound. The riddle gates open (method_327/method_303); the hero walks through the open bridge 22,16 and gate 30,16, up column 31, and opens the crystal chest at 27,5 (gameState 28 at t=1924). Built by t11r-build.ts; the previous seed-dependent route (4/50 seeds) is kept as attempts/t11r-old.json.",
+ "controls": [
+  {
+   "ticks": 21,
+   "direction": 0,
+   "action": false
+  },
+  {
+   "ticks": 1,
+   "direction": 2,
+   "action": false
+  },
+  {
+   "ticks": 4,
+   "direction": 0,
+   "action": false
+  },
+  {
+   "ticks": 1,
+   "direction": 2,
+   "action": false
+  },
+  {
+   "ticks": 4,
+   "direction": 0,
+   "action": false
+  },
+  {
+   "ticks": 1,
+   "direction": 2,
+   "action": false
+  },
+  {
+   "ticks": 4,
+   "direction": 0,
+   "action": false
+  },
+  {
+   "ticks": 1,
+   "direction": 0,
+   "action": true
+  },
+  {
+   "ticks": 1,
+   "direction": 0,
+   "action": false
+  },
+  {
+   "ticks": 1,
+   "direction": 0,
+   "action": true
+  },
+  {
+   "ticks": 1,
+   "direction": 0,
+   "action": false
+  },
+  {
+   "ticks": 1,
+   "direction": 0,
+   "action": true
+  },
+  {
+   "ticks": 1,
+   "direction": 0,
+   "action": false
+  },
+  {
+   "ticks": 1,
+   "direction": 0,
+   "action": true
+  },
+  {
+   "ticks": 1,
+   "direction": 0,
+   "action": false
+  },
+  {
+   "ticks": 1,
+   "direction": 0,
+   "action": true
+  },
+  {
+   "ticks": 1,
+   "direction": 0,
+   "action": false
+  },
+  {
+   "ticks": 1,
+   "direction": 0,
+   "action": true
+  },
+  {
+   "ticks": 1,
+   "direction": 0,
+   "action": false
+  },
+  {
+   "ticks": 1,
+   "direction": 0,
+   "action": true
+  },
+  {
+   "ticks": 1,
+   "direction": 0,
+   "action": false
+  },
+  {
+   "ticks": 1,
+   "direction": 0,
+   "action": true
+  },
+  {
+   "ticks": 1,
+   "direction": 0,
+   "action": false
+  },
+  {
+   "ticks": 1,
+   "direction": 0,
+   "action": true
+  },
+  {
+   "ticks": 1,
+   "direction": 0,
+   "action": false
+  },
+  {
+   "ticks": 1,
+   "direction": 0,
+   "action": true
+  },
+  {
+   "ticks": 1,
+   "direction": 0,
+   "action": false
+  },
+  {
+   "ticks": 1,
+   "direction": 0,
+   "action": true
+  },
+  {
+   "ticks": 1,
+   "direction": 0,
+   "action": false
+  },
+  {
+   "ticks": 1,
+   "direction": 0,
+   "action": true
+  },
+  {
+   "ticks": 1,
+   "direction": 0,
+   "action": false
+  },
+  {
+   "ticks": 1,
+   "direction": 0,
+   "action": true
+  },
+  {
+   "ticks": 1,
+   "direction": 0,
+   "action": false
+  },
+  {
+   "ticks": 1,
+   "direction": 0,
+   "action": true
+  },
+  {
+   "ticks": 1,
+   "direction": 0,
+   "action": false
+  },
+  {
+   "ticks": 1,
+   "direction": 0,
+   "action": true
+  },
+  {
+   "ticks": 1,
+   "direction": 0,
+   "action": false
+  },
+  {
+   "ticks": 1,
+   "direction": 0,
+   "action": true
+  },
+  {
+   "ticks": 1,
+   "direction": 0,
+   "action": false
+  },
+  {
+   "ticks": 1,
+   "direction": 0,
+   "action": true
+  },
+  {
+   "ticks": 1,
+   "direction": 0,
+   "action": false
+  },
+  {
+   "ticks": 1,
+   "direction": 0,
+   "action": true
+  },
+  {
+   "ticks": 1,
+   "direction": 0,
+   "action": false
+  },
+  {
+   "ticks": 1,
+   "direction": 0,
+   "action": true
+  },
+  {
+   "ticks": 1,
+   "direction": 0,
+   "action": false
+  },
+  {
+   "ticks": 1,
+   "direction": 0,
+   "action": true
+  },
+  {
+   "ticks": 1,
+   "direction": 0,
+   "action": false
+  },
+  {
+   "ticks": 1,
+   "direction": 0,
+   "action": true
+  },
+  {
+   "ticks": 1,
+   "direction": 0,
+   "action": false
+  },
+  {
+   "ticks": 1,
+   "direction": 0,
+   "action": true
+  },
+  {
+   "ticks": 1,
+   "direction": 0,
+   "action": false
+  },
+  {
+   "ticks": 1,
+   "direction": 0,
+   "action": true
+  },
+  {
+   "ticks": 1,
+   "direction": 0,
+   "action": false
+  },
+  {
+   "ticks": 1,
+   "direction": 0,
+   "action": true
+  },
+  {
+   "ticks": 1,
+   "direction": 0,
+   "action": false
+  },
+  {
+   "ticks": 1,
+   "direction": 0,
+   "action": true
+  },
+  {
+   "ticks": 1,
+   "direction": 0,
+   "action": false
+  },
+  {
+   "ticks": 1,
+   "direction": 0,
+   "action": true
+  },
+  {
+   "ticks": 1,
+   "direction": 0,
+   "action": false
+  },
+  {
+   "ticks": 1,
+   "direction": 0,
+   "action": true
+  },
+  {
+   "ticks": 1,
+   "direction": 0,
+   "action": false
+  },
+  {
+   "ticks": 1,
+   "direction": 0,
+   "action": true
+  },
+  {
+   "ticks": 1,
+   "direction": 0,
+   "action": false
+  },
+  {
+   "ticks": 1,
+   "direction": 0,
+   "action": true
+  },
+  {
+   "ticks": 1,
+   "direction": 0,
+   "action": false
+  },
+  {
+   "ticks": 1,
+   "direction": 0,
+   "action": true
+  },
+  {
+   "ticks": 1,
+   "direction": 0,
+   "action": false
+  },
+  {
+   "ticks": 1,
+   "direction": 0,
+   "action": true
+  },
+  {
+   "ticks": 1,
+   "direction": 0,
+   "action": false
+  },
+  {
+   "ticks": 1,
+   "direction": 2,
+   "action": false
+  },
+  {
+   "ticks": 4,
+   "direction": 0,
+   "action": false
+  },
+  {
+   "ticks": 1,
+   "direction": 2,
+   "action": false
+  },
+  {
+   "ticks": 4,
+   "direction": 0,
+   "action": false
+  },
+  {
+   "ticks": 1,
+   "direction": 2,
+   "action": false
+  },
+  {
+   "ticks": 210,
+   "direction": 0,
+   "action": false
+  },
+  {
+   "ticks": 1,
+   "direction": 2,
+   "action": false
+  },
+  {
+   "ticks": 4,
+   "direction": 0,
+   "action": false
+  },
+  {
+   "ticks": 1,
+   "direction": 2,
+   "action": false
+  },
+  {
+   "ticks": 4,
+   "direction": 0,
+   "action": false
+  },
+  {
+   "ticks": 1,
+   "direction": 2,
+   "action": false
+  },
+  {
+   "ticks": 4,
+   "direction": 0,
+   "action": false
+  },
+  {
+   "ticks": 1,
+   "direction": 3,
+   "action": false
+  },
+  {
+   "ticks": 4,
+   "direction": 0,
+   "action": false
+  },
+  {
+   "ticks": 1,
+   "direction": 3,
+   "action": false
+  },
+  {
+   "ticks": 4,
+   "direction": 0,
+   "action": false
+  },
+  {
+   "ticks": 1,
+   "direction": 3,
+   "action": false
+  },
+  {
+   "ticks": 4,
+   "direction": 0,
+   "action": false
+  },
+  {
+   "ticks": 1,
+   "direction": 3,
+   "action": false
+  },
+  {
+   "ticks": 13,
+   "direction": 0,
+   "action": false
+  },
+  {
+   "ticks": 1,
+   "direction": 3,
+   "action": false
+  },
+  {
+   "ticks": 4,
+   "direction": 0,
+   "action": false
+  },
+  {
+   "ticks": 1,
+   "direction": 3,
+   "action": false
+  },
+  {
+   "ticks": 15,
+   "direction": 0,
+   "action": false
+  },
+  {
+   "ticks": 1,
+   "direction": 4,
+   "action": false
+  },
+  {
+   "ticks": 4,
+   "direction": 0,
+   "action": false
+  },
+  {
+   "ticks": 1,
+   "direction": 0,
+   "action": true
+  },
+  {
+   "ticks": 11,
+   "direction": 0,
+   "action": false
+  },
+  {
+   "ticks": 5,
+   "direction": 1,
+   "action": false
+  },
+  {
+   "ticks": 4,
+   "direction": 0,
+   "action": false
+  },
+  {
+   "ticks": 1,
+   "direction": 1,
+   "action": false
+  },
+  {
+   "ticks": 34,
+   "direction": 0,
+   "action": false
+  },
+  {
+   "ticks": 5,
+   "direction": 2,
+   "action": false
+  },
+  {
+   "ticks": 4,
+   "direction": 0,
+   "action": false
+  },
+  {
+   "ticks": 1,
+   "direction": 2,
+   "action": false
+  },
+  {
+   "ticks": 4,
+   "direction": 0,
+   "action": false
+  },
+  {
+   "ticks": 1,
+   "direction": 2,
+   "action": false
+  },
+  {
+   "ticks": 4,
+   "direction": 0,
+   "action": false
+  },
+  {
+   "ticks": 1,
+   "direction": 2,
+   "action": false
+  },
+  {
+   "ticks": 4,
+   "direction": 0,
+   "action": false
+  },
+  {
+   "ticks": 1,
+   "direction": 2,
+   "action": false
+  },
+  {
+   "ticks": 15,
+   "direction": 0,
+   "action": false
+  },
+  {
+   "ticks": 1,
+   "direction": 4,
+   "action": false
+  },
+  {
+   "ticks": 26,
+   "direction": 0,
+   "action": false
+  },
+  {
+   "ticks": 1,
+   "direction": 0,
+   "action": true
+  },
+  {
+   "ticks": 71,
+   "direction": 0,
+   "action": false
+  },
+  {
+   "ticks": 1,
+   "direction": 4,
+   "action": false
+  },
+  {
+   "ticks": 4,
+   "direction": 0,
+   "action": false
+  },
+  {
+   "ticks": 1,
+   "direction": 4,
+   "action": false
+  },
+  {
+   "ticks": 4,
+   "direction": 0,
+   "action": false
+  },
+  {
+   "ticks": 1,
+   "direction": 4,
+   "action": false
+  },
+  {
+   "ticks": 22,
+   "direction": 0,
+   "action": false
+  },
+  {
+   "ticks": 1,
+   "direction": 0,
+   "action": true
+  },
+  {
+   "ticks": 13,
+   "direction": 0,
+   "action": false
+  },
+  {
+   "ticks": 5,
+   "direction": 4,
+   "action": false
+  },
+  {
+   "ticks": 4,
+   "direction": 0,
+   "action": false
+  },
+  {
+   "ticks": 1,
+   "direction": 4,
+   "action": false
+  },
+  {
+   "ticks": 4,
+   "direction": 0,
+   "action": false
+  },
+  {
+   "ticks": 1,
+   "direction": 3,
+   "action": false
+  },
+  {
+   "ticks": 4,
+   "direction": 0,
+   "action": false
+  },
+  {
+   "ticks": 1,
+   "direction": 3,
+   "action": false
+  },
+  {
+   "ticks": 4,
+   "direction": 0,
+   "action": false
+  },
+  {
+   "ticks": 1,
+   "direction": 4,
+   "action": false
+  },
+  {
+   "ticks": 3,
+   "direction": 0,
+   "action": false
+  },
+  {
+   "ticks": 1,
+   "direction": 0,
+   "action": true
+  },
+  {
+   "ticks": 11,
+   "direction": 0,
+   "action": false
+  },
+  {
+   "ticks": 5,
+   "direction": 1,
+   "action": false
+  },
+  {
+   "ticks": 4,
+   "direction": 0,
+   "action": false
+  },
+  {
+   "ticks": 1,
+   "direction": 1,
+   "action": false
+  },
+  {
+   "ticks": 4,
+   "direction": 0,
+   "action": false
+  },
+  {
+   "ticks": 1,
+   "direction": 2,
+   "action": false
+  },
+  {
+   "ticks": 4,
+   "direction": 0,
+   "action": false
+  },
+  {
+   "ticks": 1,
+   "direction": 2,
+   "action": false
+  },
+  {
+   "ticks": 4,
+   "direction": 0,
+   "action": false
+  },
+  {
+   "ticks": 1,
+   "direction": 2,
+   "action": false
+  },
+  {
+   "ticks": 4,
+   "direction": 0,
+   "action": false
+  },
+  {
+   "ticks": 1,
+   "direction": 2,
+   "action": false
+  },
+  {
+   "ticks": 4,
+   "direction": 0,
+   "action": false
+  },
+  {
+   "ticks": 1,
+   "direction": 2,
+   "action": false
+  },
+  {
+   "ticks": 4,
+   "direction": 0,
+   "action": false
+  },
+  {
+   "ticks": 1,
+   "direction": 2,
+   "action": false
+  },
+  {
+   "ticks": 4,
+   "direction": 0,
+   "action": false
+  },
+  {
+   "ticks": 1,
+   "direction": 1,
+   "action": false
+  },
+  {
+   "ticks": 4,
+   "direction": 0,
+   "action": false
+  },
+  {
+   "ticks": 1,
+   "direction": 2,
+   "action": false
+  },
+  {
+   "ticks": 4,
+   "direction": 0,
+   "action": false
+  },
+  {
+   "ticks": 1,
+   "direction": 2,
+   "action": false
+  },
+  {
+   "ticks": 16,
+   "direction": 0,
+   "action": false
+  },
+  {
+   "ticks": 1,
+   "direction": 0,
+   "action": true
+  },
+  {
+   "ticks": 65,
+   "direction": 0,
+   "action": false
+  },
+  {
+   "ticks": 1,
+   "direction": 0,
+   "action": true
+  },
+  {
+   "ticks": 64,
+   "direction": 0,
+   "action": false
+  },
+  {
+   "ticks": 5,
+   "direction": 4,
+   "action": false
+  },
+  {
+   "ticks": 4,
+   "direction": 0,
+   "action": false
+  },
+  {
+   "ticks": 1,
+   "direction": 3,
+   "action": false
+  },
+  {
+   "ticks": 4,
+   "direction": 0,
+   "action": false
+  },
+  {
+   "ticks": 1,
+   "direction": 4,
+   "action": false
+  },
+  {
+   "ticks": 4,
+   "direction": 0,
+   "action": false
+  },
+  {
+   "ticks": 1,
+   "direction": 4,
+   "action": false
+  },
+  {
+   "ticks": 15,
+   "direction": 0,
+   "action": false
+  },
+  {
+   "ticks": 1,
+   "direction": 2,
+   "action": false
+  },
+  {
+   "ticks": 25,
+   "direction": 0,
+   "action": false
+  },
+  {
+   "ticks": 1,
+   "direction": 0,
+   "action": true
+  },
+  {
+   "ticks": 69,
+   "direction": 0,
+   "action": false
+  },
+  {
+   "ticks": 1,
+   "direction": 2,
+   "action": false
+  },
+  {
+   "ticks": 4,
+   "direction": 0,
+   "action": false
+  },
+  {
+   "ticks": 1,
+   "direction": 2,
+   "action": false
+  },
+  {
+   "ticks": 4,
+   "direction": 0,
+   "action": false
+  },
+  {
+   "ticks": 1,
+   "direction": 3,
+   "action": false
+  },
+  {
+   "ticks": 4,
+   "direction": 0,
+   "action": false
+  },
+  {
+   "ticks": 1,
+   "direction": 3,
+   "action": false
+  },
+  {
+   "ticks": 4,
+   "direction": 0,
+   "action": false
+  },
+  {
+   "ticks": 1,
+   "direction": 2,
+   "action": false
+  },
+  {
+   "ticks": 4,
+   "direction": 0,
+   "action": false
+  },
+  {
+   "ticks": 1,
+   "direction": 0,
+   "action": true
+  },
+  {
+   "ticks": 16,
+   "direction": 0,
+   "action": false
+  },
+  {
+   "ticks": 5,
+   "direction": 1,
+   "action": false
+  },
+  {
+   "ticks": 4,
+   "direction": 0,
+   "action": false
+  },
+  {
+   "ticks": 1,
+   "direction": 1,
+   "action": false
+  },
+  {
+   "ticks": 4,
+   "direction": 0,
+   "action": false
+  },
+  {
+   "ticks": 1,
+   "direction": 1,
+   "action": false
+  },
+  {
+   "ticks": 4,
+   "direction": 0,
+   "action": false
+  },
+  {
+   "ticks": 1,
+   "direction": 1,
+   "action": false
+  },
+  {
+   "ticks": 4,
+   "direction": 0,
+   "action": false
+  },
+  {
+   "ticks": 1,
+   "direction": 1,
+   "action": false
+  },
+  {
+   "ticks": 4,
+   "direction": 0,
+   "action": false
+  },
+  {
+   "ticks": 1,
+   "direction": 1,
+   "action": false
+  },
+  {
+   "ticks": 4,
+   "direction": 0,
+   "action": false
+  },
+  {
+   "ticks": 1,
+   "direction": 2,
+   "action": false
+  },
+  {
+   "ticks": 4,
+   "direction": 0,
+   "action": false
+  },
+  {
+   "ticks": 1,
+   "direction": 0,
+   "action": true
+  },
+  {
+   "ticks": 132,
+   "direction": 0,
+   "action": false
+  },
+  {
+   "ticks": 1,
+   "direction": 0,
+   "action": true
+  },
+  {
+   "ticks": 96,
+   "direction": 0,
+   "action": false
+  },
+  {
+   "ticks": 5,
+   "direction": 4,
+   "action": false
+  },
+  {
+   "ticks": 4,
+   "direction": 0,
+   "action": false
+  },
+  {
+   "ticks": 1,
+   "direction": 4,
+   "action": false
+  },
+  {
+   "ticks": 4,
+   "direction": 0,
+   "action": false
+  },
+  {
+   "ticks": 1,
+   "direction": 4,
+   "action": false
+  },
+  {
+   "ticks": 4,
+   "direction": 0,
+   "action": false
+  },
+  {
+   "ticks": 1,
+   "direction": 4,
+   "action": false
+  },
+  {
+   "ticks": 4,
+   "direction": 0,
+   "action": false
+  },
+  {
+   "ticks": 1,
+   "direction": 4,
+   "action": false
+  },
+  {
+   "ticks": 15,
+   "direction": 0,
+   "action": false
+  },
+  {
+   "ticks": 1,
+   "direction": 2,
+   "action": false
+  },
+  {
+   "ticks": 11,
+   "direction": 0,
+   "action": false
+  },
+  {
+   "ticks": 1,
+   "direction": 0,
+   "action": true
+  },
+  {
+   "ticks": 24,
+   "direction": 0,
+   "action": false
+  },
+  {
+   "ticks": 1,
+   "direction": 2,
+   "action": false
+  },
+  {
+   "ticks": 4,
+   "direction": 0,
+   "action": false
+  },
+  {
+   "ticks": 1,
+   "direction": 3,
+   "action": false
+  },
+  {
+   "ticks": 4,
+   "direction": 0,
+   "action": false
+  },
+  {
+   "ticks": 1,
+   "direction": 3,
+   "action": false
+  },
+  {
+   "ticks": 15,
+   "direction": 0,
+   "action": false
+  },
+  {
+   "ticks": 1,
+   "direction": 4,
+   "action": false
+  },
+  {
+   "ticks": 28,
+   "direction": 0,
+   "action": false
+  },
+  {
+   "ticks": 1,
+   "direction": 0,
+   "action": true
+  },
+  {
+   "ticks": 122,
+   "direction": 0,
+   "action": false
+  },
+  {
+   "ticks": 5,
+   "direction": 1,
+   "action": false
+  },
+  {
+   "ticks": 4,
+   "direction": 0,
+   "action": false
+  },
+  {
+   "ticks": 1,
+   "direction": 1,
+   "action": false
+  },
+  {
+   "ticks": 4,
+   "direction": 0,
+   "action": false
+  },
+  {
+   "ticks": 1,
+   "direction": 2,
+   "action": false
+  },
+  {
+   "ticks": 4,
+   "direction": 0,
+   "action": false
+  },
+  {
+   "ticks": 1,
+   "direction": 2,
+   "action": false
+  },
+  {
+   "ticks": 4,
+   "direction": 0,
+   "action": false
+  },
+  {
+   "ticks": 1,
+   "direction": 2,
+   "action": false
+  },
+  {
+   "ticks": 4,
+   "direction": 0,
+   "action": false
+  },
+  {
+   "ticks": 1,
+   "direction": 2,
+   "action": false
+  },
+  {
+   "ticks": 4,
+   "direction": 0,
+   "action": false
+  },
+  {
+   "ticks": 1,
+   "direction": 2,
+   "action": false
+  },
+  {
+   "ticks": 4,
+   "direction": 0,
+   "action": false
+  },
+  {
+   "ticks": 1,
+   "direction": 2,
+   "action": false
+  },
+  {
+   "ticks": 4,
+   "direction": 0,
+   "action": false
+  },
+  {
+   "ticks": 1,
+   "direction": 2,
+   "action": false
+  },
+  {
+   "ticks": 4,
+   "direction": 0,
+   "action": false
+  },
+  {
+   "ticks": 1,
+   "direction": 2,
+   "action": false
+  },
+  {
+   "ticks": 4,
+   "direction": 0,
+   "action": false
+  },
+  {
+   "ticks": 1,
+   "direction": 2,
+   "action": false
+  },
+  {
+   "ticks": 4,
+   "direction": 0,
+   "action": false
+  },
+  {
+   "ticks": 1,
+   "direction": 2,
+   "action": false
+  },
+  {
+   "ticks": 4,
+   "direction": 0,
+   "action": false
+  },
+  {
+   "ticks": 1,
+   "direction": 2,
+   "action": false
+  },
+  {
+   "ticks": 24,
+   "direction": 0,
+   "action": false
+  },
+  {
+   "ticks": 1,
+   "direction": 2,
+   "action": false
+  },
+  {
+   "ticks": 4,
+   "direction": 0,
+   "action": false
+  },
+  {
+   "ticks": 1,
+   "direction": 2,
+   "action": false
+  },
+  {
+   "ticks": 4,
+   "direction": 0,
+   "action": false
+  },
+  {
+   "ticks": 1,
+   "direction": 1,
+   "action": false
+  },
+  {
+   "ticks": 4,
+   "direction": 0,
+   "action": false
+  },
+  {
+   "ticks": 1,
+   "direction": 1,
+   "action": false
+  },
+  {
+   "ticks": 4,
+   "direction": 0,
+   "action": false
+  },
+  {
+   "ticks": 1,
+   "direction": 1,
+   "action": false
+  },
+  {
+   "ticks": 4,
+   "direction": 0,
+   "action": false
+  },
+  {
+   "ticks": 1,
+   "direction": 1,
+   "action": false
+  },
+  {
+   "ticks": 4,
+   "direction": 0,
+   "action": false
+  },
+  {
+   "ticks": 1,
+   "direction": 1,
+   "action": false
+  },
+  {
+   "ticks": 4,
+   "direction": 0,
+   "action": false
+  },
+  {
+   "ticks": 1,
+   "direction": 1,
+   "action": false
+  },
+  {
+   "ticks": 4,
+   "direction": 0,
+   "action": false
+  },
+  {
+   "ticks": 1,
+   "direction": 1,
+   "action": false
+  },
+  {
+   "ticks": 4,
+   "direction": 0,
+   "action": false
+  },
+  {
+   "ticks": 1,
+   "direction": 1,
+   "action": false
+  },
+  {
+   "ticks": 4,
+   "direction": 0,
+   "action": false
+  },
+  {
+   "ticks": 1,
+   "direction": 1,
+   "action": false
+  },
+  {
+   "ticks": 4,
+   "direction": 0,
+   "action": false
+  },
+  {
+   "ticks": 1,
+   "direction": 1,
+   "action": false
+  },
+  {
+   "ticks": 4,
+   "direction": 0,
+   "action": false
+  },
+  {
+   "ticks": 1,
+   "direction": 4,
+   "action": false
+  },
+  {
+   "ticks": 4,
+   "direction": 0,
+   "action": false
+  },
+  {
+   "ticks": 1,
+   "direction": 1,
+   "action": false
+  },
+  {
+   "ticks": 4,
+   "direction": 0,
+   "action": false
+  },
+  {
+   "ticks": 1,
+   "direction": 4,
+   "action": false
+  },
+  {
+   "ticks": 4,
+   "direction": 0,
+   "action": false
+  },
+  {
+   "ticks": 1,
+   "direction": 4,
+   "action": false
+  },
+  {
+   "ticks": 4,
+   "direction": 0,
+   "action": false
+  },
+  {
+   "ticks": 1,
+   "direction": 4,
+   "action": false
+  },
+  {
+   "ticks": 184,
+   "direction": 0,
+   "action": false
+  }
+ ],
+ "expected": {
+  "result": "crystal",
+  "ticks": 1924,
+  "gameState": 28,
+  "x": 27,
+  "y": 5,
+  "health": 4,
+  "lives": 12,
+  "diamonds": 0,
+  "redDiamonds": 0,
+  "goldKeys": 0,
+  "silverKeys": 0,
+  "weaponTier": 8
+ }
+}

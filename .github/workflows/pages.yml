@@ -3,13 +3,16 @@ name: Test and publish GitHub Pages
 on:
   push:
     branches: [main]
+  # Pull requests run every check (tests and both comparisons with the JVM) but publish nothing.
+  pull_request:
+    branches: [main]
   workflow_dispatch:
 
 permissions:
   contents: read
 
 concurrency:
-  group: github-pages
+  group: ${{ github.event_name == 'pull_request' && format('checks-{0}', github.ref) || 'github-pages' }}
   cancel-in-progress: true
 
 jobs:
@@ -37,16 +40,28 @@ jobs:
           node-version: '24'
           cache: npm
           cache-dependency-path: outputs/diamond-rush-web/package-lock.json
+      - name: Set up JDK (translates the pinned decompilation into the game core)
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '21'
       - run: npm ci
       - run: npm run extract-assets
+      - run: npm run generate-core
       - run: npm test
+      - name: Compare the generated core and the routes with the recompiled Java
+        run: |
+          npm run verify:core -- --fuzz=8
+          npm run verify:routes -- --jvm
       - run: npm run build
       - name: Upload website
+        if: github.event_name != 'pull_request'
         uses: actions/upload-pages-artifact@v3
         with:
           path: outputs/diamond-rush-web/dist
 
   deploy:
+    if: github.event_name != 'pull_request'
     needs: build
     runs-on: ubuntu-latest
     permissions:

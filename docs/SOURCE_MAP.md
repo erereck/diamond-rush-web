@@ -1,26 +1,20 @@
-# Source traceability
+# Rastreabilidade das fontes
 
-| Web system | Canonical Java evidence |
+Toda a lógica de jogo dentro das fases é o próprio código da decompilação, traduzido pelo tradutor [`tools/j2ts/J2TS.java`](../tools/j2ts/J2TS.java), executado por [`tools/generate-core.ts`](../tools/generate-core.ts), para `src/generated/s700.ts` ([NUCLEO_S700.md](NUCLEO_S700.md)). Os módulos abaixo são do port; a coluna da direita indica o código Java que cada um lê ou imita.
+
+| Módulo do port | Evidência no Java |
 |---|---|
-| BinaryReader, Pack | getShortFromBytes, getI32FromBytes, loadPackedFile |
-| SpriteDecoder | ASprite.Load, decodeImage |
-| SpriteRenderer | ASprite.drawModule, drawFrameModule, drawAnimFrame |
-| LevelParser | cGame.loadLevelData |
-| World map parser | cGame.method_426 |
-| Localization | cGame.loadStringsFromFile |
-| Clock | cGame.run |
-| Camera | cGame.method_285 |
-| Movement investigation | cGame.method_236, method_288 |
-| Object update investigation | cGame.method_304, method_351 |
-| Bavaria rolling obstacles, paired crushers and timed spikes | cGame.method_264, method_336, method_337, method_338; gen1.f/1 spike frames |
-| Tibet falling ceiling stones | cGame.method_314, method_160; gen3.f/4 animations |
-| CanonicalSave | cGame.method_109–128; method_426 for first secret level |
-| Checkpoint snapshot and restore | cGame.method_346, method_347, killPlayer |
-| Full-health field pickup conversion | cGame.method_322, method_321 |
-| Per-category level rewards | cGame.method_249(11), method_116, method_117 |
-| Intro scripted movement and object edits | DemoInterpreter.method_28 opcodes 10/25/26 |
-| Hammer impact and hook launch animations | cGame.method_227, method_230, method_260; o.f/0 animations 13–16, 20/22, 41–44 |
+| Núcleo gerado (`src/generated/s700.ts`) | todas as classes de `src/*.java`, com os patches de [`ReferencePatches.ts`](../tools/routes/ReferencePatches.ts) |
+| `core/s700/runtime.ts`, `core/s700/j2me.ts` | APIs CLDC/MIDP usadas pelas classes (`java.lang`, `java.util`, `javax.microedition.*`) |
+| `core/s700/Engine.ts` | `GloftDIRU`/`cGame.run` (laço de 50 ms), `keyPressed`/`keyReleased`; caminho de New Game: `method_67` inicializa até o título (estado 30), o host passa a 4 como a tecla 5 em `method_217` e chama `method_218` (New Game), e `method_67` segue 16 → 11 (`method_86`) → 5 (`method_113` cria o record) → 1 (`method_78`) |
+| `core/Simulation.ts` | estados de `cGame.gameState`: 1 fase; ao sair dela, 35/17 resultados (saídas comuns e qualquer saída de fase secreta) ou 20 (saída secreta de fase comum), com saída comum ou secreta decidida por `field_551`; 28 cristal; 12 game over; 11, o carregamento aberto por `method_86`, marca o fim do tutorial na transição 1 → 11 do mapa 13 de Angkor (`method_267`); 21/15/4/22 encerram a sessão; `method_74` (avisos do mapa) |
+| `BinaryReader`, `Pack` | `getShortFromBytes`, `getI32FromBytes`, `loadPackedFile` |
+| `SpriteDecoder`, `SpriteRenderer` (menus, mapa, laboratório) | `ASprite.Load`, `decodeImage`, `drawModule`, `drawFrameModule`, `drawAnimFrame` |
+| `LevelParser` (inventário, laboratório, objetivos) | `cGame.loadLevelData`; mapas dos mundos em `method_426` |
+| `Localization`, `OriginalText` | `cGame.loadStringsFromFile` (`lang.f`), textos de `demo.f` decodificados por `DemoInterpreter` |
+| `CanonicalSave`, `CanonicalCampaign` | `cGame.method_109–128` (record 1), `method_426` (primeira fase secreta), `method_117`/`method_249` (flags) |
+| `FrontEndRenderer`, `Store`, `Campaign` | `method_71`–`method_75` (selo e avisos do mapa), `method_137` (desenho do selo), `method_175` (desenho dos menus), `method_212`–`method_215` (loja), `method_249(11)` (vidas de recompensa), `Define.worldPrices`, `Define.itemPrices`, `Define.sealMoveDirection` ([FRONT_END_S700.md](FRONT_END_S700.md)) |
+| `GameSound`, `Midi` | `cSoundEngine.playSound` (índices de `snd.f`), 21 arquivos MIDI de `snd.f` |
+| `Clock` | `cGame.run`: 20 quadros por segundo |
 
-See SAVE_FORMAT.md for the distinction between original RMS payloads and versioned development replays.
-
-Line references are meaningful only at pinned commit 5e05c42aa1aae3377790600eb6d27497101b79e7.
+Referências de linha só fazem sentido no commit fixado `5e05c42aa1aae3377790600eb6d27497101b79e7`. Ver [SAVE_FORMAT.md](SAVE_FORMAT.md) para a diferença entre o record RMS original e os replays de sessão.

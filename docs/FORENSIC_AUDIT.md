@@ -1,12 +1,14 @@
 # Diamond Rush S700 forensic audit
 
 Canonical source: `palaceswitcher/Diamond-Rush-Decomp` at `5e05c42aa1aae3377790600eb6d27497101b79e7`.
-The Application Descriptor identifies v1.2.0, MIDP 2.0, CLDC 1.0. README identifies Sony Ericsson S700, non-padlock. Original canonical executable has not yet been obtained or used for comparison.
+The Application Descriptor identifies v1.2.0, MIDP 2.0, CLDC 1.0. README identifies Sony Ericsson S700, non-padlock. Of the JARs supplied for the research, the one chosen as reference matches 40/40 resources; see ORIGINAL_JAR.md (resources match, bytecode identity is not proven).
+
+> Historical audit (September 2026). The game logic now runs from the decompilation itself (NUCLEO_S700.md) and every completion goal has a verified route (PLAYABILITY.md); the open-work list at the end is kept for the record.
 
 ## Evidence established from code and binary data
 
-- 11 Java source files; 40 resources. Complete byte sizes and SHA-256 hashes are in SOURCE_INVENTORY.json and RESOURCE_INVENTORY.json.
-- `cGame.run` (1295–1341) targets 50 ms per update (20 Hz). The lag branch is unusual and must not be confused with a 60 Hz simulation.
+- 10 Java source files; 40 resources. Complete byte sizes and SHA-256 hashes are in SOURCE_INVENTORY.json and RESOURCE_INVENTORY.json.
+- `cGame.run` (1295–1341) targets 50 ms per update (20 Hz). Its lag branch (a frame over 65 ms skips the next paint) runs after every checkpoint activation, which sleeps 100 ms; the host reproduces it (NUCLEO_S700.md).
 - 240 × 320 logical display; 24 × 24 tile grid; gameplay camera sees 240 × 240 plus surrounding UI (`method_285`, `method_166`).
 - `w0.bin`, `w1.bin`, `w2.bin` decode completely into 14, 13, 14 levels, respectively: **41 total**, including special/intro levels. Complete dimensions, object IDs and spawn markers are in LEVEL_INVENTORY.json.
 - New game initially uses Angkor index 13, not index 0 (`method_67`, state 5). Do not mistake file ordering for progression order.
@@ -23,9 +25,9 @@ The Application Descriptor identifies v1.2.0, MIDP 2.0, CLDC 1.0. README identif
 
 `mmv.f` entries 1–3 have a second animation-frame record referring to frame 255 with only one actual frame. The Java paths at `cGame.java:2195/2206/2216` use their module images directly. Decoder reports these as warnings, preserves all bytes, and does not invent replacement animation frames. Renderer must reject invalid frame access.
 
-## Current scope and open work
+## Scope at the time of the audit
 
-Completed: repository pinning, source/resource inventories, cross-release hashes, pack/sprite/world/map/string extraction and parser infrastructure.
-Still requires implementation and verification: full gameplay dispatch, all special objects/bosses, scripted scenes, exact save/progression, all original UI states, audio fidelity, and end-to-end original-JAR comparison. Parsing or rendering a level is not evidence it is completable.
+Completed then: repository pinning, source/resource inventories, cross-release hashes, pack/sprite/world/map/string extraction and parser infrastructure.
+Open then: full gameplay dispatch, special objects/bosses, scripted scenes, exact save/progression, original UI states, audio fidelity and end-to-end original-JAR comparison. The first four are now covered by the generated core and its verification; audio fidelity and a comparison with the original JAR's bytecode remain open.
 
-Use primary Java as implementation evidence; do not describe unverified behavior as original parity. No deployment or public distribution has been performed.
+Use primary Java as implementation evidence; do not describe unverified behavior as original parity.

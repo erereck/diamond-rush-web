@@ -1,8 +1,6 @@
 import type { Direction, StageStart } from './Simulation.ts';
 import type { MapNode } from '../level/LevelParser.ts';
 import { CanonicalSave } from '../platform/CanonicalSave.ts';
-import type { Simulation } from './Simulation.ts';
-import { stageCollectibleTotals } from './OriginalText.ts';
 import { WORLD_RED_PRICES } from './Store.ts';
 
 export const CAMPAIGN_KEY='diamond-rush:campaign:v1';
@@ -27,13 +25,6 @@ export function pendingRewards(c:Campaign,world:number,level:number,eligible:num
   let mask=0;
   for(const flag of REWARD_FLAGS)if(lives<99&&(eligible&flag)&&!((c.awards[world]?.[level]??0)&flag)){mask|=flag;lives++;}
   return {mask,lives};
-}
-/** The four result-screen prizes use the actual visit's collections and damage. */
-export function eligibleStageRewards(s:Simulation){
-  const totals=stageCollectibleTotals(s.level);
-  return (s.diamonds-s.initial.diamonds===totals.diamonds+s.bonusDiamondTotal?4:0)|
-    (s.redDiamonds-s.initial.redDiamonds===totals.redDiamonds?8:0)|
-    (s.hits===0?16:0)|(s.retries===0?32:0);
 }
 export function unlockedWorld(c:Campaign,world:number,maps:MapNode[][]):boolean {
   if(world===0)return true;

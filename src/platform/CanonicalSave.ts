@@ -104,11 +104,15 @@ export class CanonicalSave {
     const put16=(p:number,v:number)=>{bytes[p]=v;bytes[p+1]=v>>8;};
     const reserve=(n:number)=>{const p=cursor;cursor+=n;if(cursor>1000)throw new Error('RMS: capacidade original excedida.');return p;};
     bytes[3]=5;bytes[8]=4;
+    // method_113 writes field_515, the lowest secret node index seen so far: method_426 lowers it
+    // per map but nothing resets it between worlds, so the canonical maps give 9/9/9.
+    let firstSecret=100;
     for(let w=0;w<3;w++){
       const levels=worlds[w].levels,count=levels.length;
       if(worlds[w].world!==w||count<1||count>31)throw new Error('RMS: ordem ou quantidade de fases inválida.');
       const base=reserve(3+count*2);put16(14+w*2,base);bytes[base]=count;
-      bytes[base+2]=maps[w].reduce((first,node)=>node.type===1?Math.min(first,node.level):first,100);
+      firstSecret=maps[w].reduce((first,node)=>node.type===1?Math.min(first,node.level):first,firstSecret);
+      bytes[base+2]=firstSecret;
       for(let l=0;l<count;l++){
         const level=levels[l],chests=level.objects.flatMap((t,i)=>t===14||t===33?[{x:i%level.width,y:Math.floor(i/level.width)}]:[]);
         if(chests.length>127||chests.some(c=>c.x>127||c.y>127))throw new Error('RMS: baú fora da faixa Java byte.');

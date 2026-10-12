@@ -1,79 +1,71 @@
 # Como verificamos as fases
 
-Este guia explica o que a palavra **“verificada”** significa neste projeto, como reproduzir a evidência e onde o trabalho ainda precisa avançar. A tabela atual é gerada em [PLAYABILITY.md](PLAYABILITY.md); seus dados estruturados ficam em [PLAYABILITY.json](PLAYABILITY.json). Leia os números ali, pois eles mudam à medida que os percursos avançam.
+Este guia explica o que **“verificada”** significa no port, como reproduzir a evidência e o que ainda falta. A tabela atual é gerada em [PLAYABILITY.md](PLAYABILITY.md), com os dados estruturados em [PLAYABILITY.json](PLAYABILITY.json); os números mudam conforme novos percursos entram.
 
-## Três perguntas diferentes
+## Duas perguntas separadas
 
-1. **O mapa carrega e a simulação responde?** A [varredura exploratória](STAGE_SMOKE.md) inicia cada uma das 40 fases no spawn original, executa entradas de controle e reconstrói o estado pelo replay. Ela encontra erros de inicialização e algumas fronteiras de navegação. Não resolve a fase.
-2. **É possível concluir uma saída específica no port atual?** Um percurso fixo começa no spawn original e contém apenas direção, ação e retorno ao checkpoint. Ao reproduzi-lo, o verificador exige o resultado gravado e a conclusão real. Esse é o critério para aprovar uma saída, tutorial ou cristal de chefe.
-3. **O comportamento é idêntico ao Java S700?** Traces da decompilação recompilada e harnesses de métodos Java conferem estados, temporização e regras selecionados. Mesmo um percurso concluído no port não responde sozinho a esta pergunta. A paridade integral entre todas as cenas, fases e o JAR original ainda não foi demonstrada.
+1. **O motor do port se comporta como o jogo original?** Sim, por construção e por teste: a lógica de jogo é a decompilação S700 traduzida mecanicamente ([NUCLEO_S700.md](NUCLEO_S700.md)), e `npm run verify:core` compara o núcleo gerado com a mesma decompilação recompilada na JVM tick a tick (estado, posição, animação, vida, diamantes, chaves e hashes dos planos de tiles e objetos) e compara os seis planos completos do mapa no início, no meio e no fim de cada sequência.
+2. **Cada fase pode ser concluída?** Um **percurso aprovado** prova isso para um objetivo específico: ele parte do carregamento original da fase e contém somente controles. Como o motor é a lógica original, um percurso que conclui no port também conclui na JVM, e o verificador confirma isso reproduzindo-o lá.
 
-## O que aparece na tabela
+Antes do núcleo gerado, o port tinha seu próprio motor e os dois testes davam respostas diferentes: percursos aprovados no motor antigo não concluíam as fases na JVM. Por isso todos os percursos anteriores foram descartados como evidência e refeitos no núcleo exato; as intenções antigas (sequência de passos, sem a temporização) serviram de ponto de partida.
 
-O inventário contém **41 mapas**: a introdução e 40 fases jogáveis, das quais dez são secretas. Há **47 objetivos** porque algumas fases oferecem saída comum e secreta. O estado é atribuído por mapa:
+## O inventário
 
-| Estado | Critério |
-|---|---|
-| **Percurso aprovado** | Existe replay completo para **cada** objetivo daquele mapa. Para o chefe, a derrota e o cristal são exigidos. |
-| **Saídas parcialmente aprovadas** | Pelo menos uma saída foi concluída, mas outra saída do mesmo mapa ainda falta. |
-| **Tentativa pendente** | Há replay reproduzível que chega a um ponto do mapa, mas nenhuma saída foi aprovada. |
-| **Ainda não verificada** | Não há percurso completo nem tentativa registrada para o mapa. |
+São **41 mapas**: o tutorial (Angkor, índice 13) e 40 fases, das quais 10 são secretas e 3 são chefes. Dos **47 objetivos**, 46 saem dos próprios dados das fases, não de uma lista editada à mão; o fim do tutorial é uma regra fixa do código do jogo ([`PlayabilityReport.ts`](../tools/routes/PlayabilityReport.ts)):
 
-Uma tentativa pendente **não prova que a fase seja impossível**. Também não basta passar pelo portal visualmente: a simulação precisa entrar no estado de conclusão e registrar a saída correta. Fases secretas têm entrada própria no inventário; quando uma fase normal tem duas saídas, as duas são contadas separadamente.
+| Objetivo | Origem nos dados | Resultado exigido |
+|---|---|---|
+| Saída comum | objeto 5 | o jogo sai do estado 1 com saída normal (`field_551`) |
+| Saída secreta | objeto 28 | o jogo sai do estado 1 sem saída normal |
+| Cristal do chefe | baú (objeto 14/33) com tile 51–53 | depois da derrota do chefe, o herói abre o baú e, cerca de 141 quadros depois (fim da animação do cristal), o jogo entra no estado 28 |
+| Fim do tutorial | o selo do mapa 13 de Angkor, em 60,3/61,3 (o mapa não tem objeto 5) | o herói chega ao selo (`method_267`), o jogo passa ao estado 11 (`method_86`) e carrega Angkor 1 |
 
-O número de **percursos completos** pode ser maior que o de **mapas aprovados**: um mapa com duas saídas precisa de dois replays, e um percurso da saída secreta pode deixar o mapa parcialmente aprovado enquanto a saída comum falta. Os números de cobertura vêm de `buildPlayabilityReport()` em [`tools/routes/PlayabilityReport.ts`](../tools/routes/PlayabilityReport.ts), não de uma lista editada à mão.
+Um mapa fica **aprovado** quando todos os seus objetivos têm percurso, e **parcial** quando só parte deles tem.
 
-## Como é um replay de fase
+## Como é um percurso
 
-Os percursos completos estão em [`tests/fixtures/routes/`](../tests/fixtures/routes/); as tentativas incompletas, em [`tests/fixtures/route-attempts/`](../tests/fixtures/route-attempts/). Cada JSON registra:
+Cada arquivo em [`tests/fixtures/core-routes/`](../tests/fixtures/core-routes/) contém:
 
-- versão do motor e *fingerprint* do mapa, para rejeitar evidência feita em um estado incompatível;
-- mundo, índice da fase, recursos iniciais e uma frase de proveniência;
-- sequência comprimida de controles, com número de ticks, direção, ação e eventual retorno ao checkpoint;
-- resultado esperado: estado final, posição, tempo, recursos, danos, mortes/retornos, baús e diálogos vistos, entre outros campos.
+- `engine` (`CORE_REVISION`: revisão do host, dos patches e do tradutor) e `source` (hash dos fontes da decompilação depois dos patches): um percurso gravado em outro núcleo é recusado;
+- mundo, fase e **valores iniciais** do record: vidas, diamantes, diamantes vermelhos, vida máxima, equipamento (`weaponTier` 0, 1 martelo, 2 gancho, 8 martelo de gelo) e item de mergulho;
+- `provenance`, uma descrição em texto do percurso (marcos, danos, chaves) e da justificativa dos valores iniciais;
+- `controls`: sequências de `{ticks, direction, action, reset?}`, sem posições, edições de mapa ou estado injetado;
+- `expected`: resultado, tick da conclusão, estado do jogo, posição, vida, vidas, diamantes e diamantes vermelhos coletados na fase (não o total da campanha), chaves de ouro e de prata e `weaponTier` ao concluir.
 
-O executor em [`RouteRunner.ts`](../tools/routes/RouteRunner.ts) aceita **apenas controles** e recursos iniciais permitidos. Ele rejeita injeção de posição, chaves, baús já abertos, edições de mapa e movimento roteirizado pelo arquivo de teste. Cenas e edições legítimas acontecem pelos gatilhos do próprio jogo. Os recursos iniciais podem incluir equipamento predefinido; isso é declarado na proveniência e **não comprova que o item foi obtido naquela campanha**.
-
-Por exemplo, [Tibet 14](../tests/fixtures/routes/tibet-14-normal-hook.json) parte do spawn com gancho explicitamente equipado, retira pedras do corredor, aciona checkpoint e placa, atravessa armadilhas e alcança a saída comum. Já a [tentativa de Bavaria 12](../tests/fixtures/route-attempts/bavaria-12-first-plate.json) chega ao primeiro checkpoint e aciona uma placa, mas não atravessa o portão nem conclui a saída. Os dois replays são reproduzíveis; somente o primeiro conta como conclusão.
+A fase começa exatamente como no jogo: o herói entra pela coluna 0 e caminha até a marca de entrada. Os valores iniciais ficam explícitos porque uma fase isolada não sabe o que a campanha deu antes. Eles devem ser plausíveis para aquele ponto da campanha: o martelo está num baú de Angkor 4, o gancho em Bavaria 3, o item de mergulho em Bavaria 8 e o martelo de gelo em Tibet 6; escolher Bavaria no selo garante pelo menos o martelo, e Tibet, pelo menos o gancho (`cGame.method_75`). A vida máxima só passa de 4 com armaduras compradas na loja (5 a 8); o menu de selo em texto que daria vida 8 (`sealMenuSelectionHandler`) não é alcançável no jogo. Saídas revisitadas com equipamento obtido mais tarde (por exemplo, Angkor 7 secreta com o gancho e Angkor 8 secreta com o martelo de gelo) declaram isso na proveniência.
 
 ## Como a aprovação é conferida
 
-`npm run verify:routes` reexecuta todos os JSONs de percursos e tentativas com os recursos S700 extraídos. O comando falha se o resultado divergir do gravado, se um arquivo em `routes/` não terminar de fato, ou se um arquivo em `route-attempts/` passar a terminar e precisar ser promovido. Para chefes, a função `completedRoute()` exige também o evento de vitória e saúde zero do guardião. O teste [`playability.test.ts`](../tests/playability.test.ts) confere marcos relevantes, proíbe manipulação do estado inicial e reconstrói o snapshot final das rotas de fase com o replay normal do jogo.
+| Comando | O que faz |
+|---|---|
+| `npm test` | reproduz cada percurso e exige o `expected` gravado; também roda a campanha encadeada e o tutorial traduzido (abaixo) |
+| `npm run verify:routes` | reproduz os percursos, recusa os que não concluem e mostra a cobertura |
+| `npm run verify:routes -- --jvm` | também reproduz cada percurso na decompilação recompilada e exige que ela saia do estado 1 para o mesmo estado, no mesmo tick, com a mesma posição, vida, vidas, diamantes e chaves; qualquer divergência faz o comando falhar |
+| `npm run verify:routes -- --jvm --write-report` | regenera [PLAYABILITY.md](PLAYABILITY.md) e [PLAYABILITY.json](PLAYABILITY.json) |
+| `npm run verify:core -- --fuzz=8` | compara núcleo e JVM em todos os percursos e em 8 sequências aleatórias, tick a tick |
 
-O relatório não confunde **isolado** com **campanha**. Uma rota isolada pode começar com martelo, gancho, gelo, vidas ou energia explicitamente escolhidos para examinar uma mecânica. O [percurso encadeado](../tests/fixtures/campaign-routes/angkor-start.json) começa em **New Game** e passa da introdução por Angkor 1–8 até o chefe. Ele transfere recursos da fase anterior, aplica recompensas e confere recarga JSON e importação/reexportação RMS. Ele ainda não certifica uma campanha inteira pelos três mundos, nem a aquisição de gancho/gelo nessa campanha.
+Os comandos com JVM precisam de um JDK e do clone fixado da decompilação (por padrão `../../work/reference-s700`); defina `DIAMOND_JDK_BIN` com a pasta `bin` do JDK se `java`/`javac` não estiverem no `PATH`. A decompilação compilada fica em cache em `work/oracle-s700` (`DIAMOND_ORACLE_WORK` muda o local); depois de mudar os patches, rode `npm run verify:core -- --build`.
 
-## Comparação com o original
+### Campanha encadeada
 
-A referência principal é [Diamond-Rush-Decomp no commit fixado](https://github.com/palaceswitcher/Diamond-Rush-Decomp/commit/5e05c42aa1aae3377790600eb6d27497101b79e7), da variante S700 1.2.0. Os recursos do JAR pesquisado coincidem em 40/40 arquivos com essa referência; [ORIGINAL_JAR.md](ORIGINAL_JAR.md) explica a escolha e por que isso **não** demonstra identidade de todo o bytecode.
+[`campaign-chain.test.ts`](../tests/campaign-chain.test.ts) faz o que o app faz entre fases: começa em New Game, joga o tutorial, adota o record que o jogo escreveu, inicia Angkor 1 a partir dele, passa pela tela de resultados original e assim por diante até Angkor 8 e o chefe de Angkor: o cristal é gravado no bit 0 do byte 2 do record, o jogo abre o seu selo (estado 27) e a ação escolhe o mundo cujo mapa o port abre. O martelo não é declarado: vem do baú de Angkor 4 pelo record. Esse encadeamento prova a continuidade do save no primeiro mundo; Bavaria e Tibet ainda são verificados com percursos isolados. No mesmo arquivo, testes com o record de uma campanha mostram que as seis saídas secretas abrem suas fases secretas no mapa, que o game over passa pela tela original (vidas de volta a 5, menos 500 diamantes), que o décimo diamante vermelho anuncia Bavaria e que a loja do selo original, após um cristal, sai com a tecla direita do aparelho.
 
-Para cenas da introdução, [`tools/trace-s700.ts`](../tools/trace-s700.ts) recompila a decompilação fixada, executa-a no FreeJ2ME e registra estados de ticks selecionados. As amostras em [`tests/fixtures/`](../tests/fixtures/) comparam posição, câmera, comandos, textos, sprites e alterações do mapa onde esses campos foram capturados. Outros capturadores executam métodos Java isolados para placas, salas, inimigos e mecanismos; veja [PRESSURE_PLATES.md](PRESSURE_PLATES.md), [RIDDLES.md](RIDDLES.md) e [STAGE_MECHANISMS.md](STAGE_MECHANISMS.md). Os harnesses substituem alguns efeitos e callbacks. Portanto, a conclusão de uma fase no port e a concordância de um método isolado são evidências **diferentes e complementares**.
+### Traduções
 
-Para refazer um trace da introdução, além do clone fixado, são necessários **JDK 21** e [FreeJ2ME-Plus](https://github.com/TASEmulators/freej2me-plus). O comando recebe o diretório da decompilação, o diretório `bin` do JDK, o JAR do emulador e um diretório de saída; por exemplo:
+As falas em PT-BR e ES ocupam outro número de páginas, então um percurso em inglês dessincroniza em outro idioma. O teste do tutorial traduzido reaproveita os controles do percurso inglês fora dos diálogos, avança os diálogos com ação e exige que o tutorial termine nos dois idiomas.
 
-```powershell
-node tools/trace-s700.ts ../../work/reference-s700 C:/caminho/jdk-21/bin C:/caminho/freej2me.jar C:/caminho/trace --rock-lesson --ticks=665
-```
+## Ferramentas para criar percursos
 
-Sem opção de cena, ele mede a abertura; opções como `--auto-dialogue`, `--open-chest`, `--rock-lesson`, `--checkpoint-lesson` e `--seal-scene` isolam trechos específicos. O capturador injeta logs numa cópia temporária da decompilação recompilada. Os CSVs de referência usados nos testes documentam quais ticks e campos foram comparados; nenhum desses modos equivale a uma execução contínua de toda a campanha no JAR original.
+Os percursos são construídos fora do repositório, com um kit de pesquisa (`work/claude2` no layout de trabalho) sobre o mesmo núcleo: mapa em ASCII, planos de passos (`andar até`, `empurrar`, `golpear`, `esperar`), busca local por macros, *snapshots* para testar alternativas e reprodução das intenções do port antigo. Um percurso só entra em `tests/fixtures/core-routes/` depois de concluir no núcleo e na JVM. `node tools/import-route.ts <arquivo>` importa percursos gravados com outra versão do núcleo: reproduz cada um no núcleo atual (não na JVM), exige exatamente o resultado gravado e grava o fixture com os identificadores atuais; antes de versionar, rode `npm run verify:routes -- --jvm`. Ao estudar uma fase:
 
-## Reproduzir e continuar
+1. leia a linha dela em [PLAYABILITY.md](PLAYABILITY.md) e os objetos da fase (checkpoints, baús, placas, portões, fechaduras, salas de enigma);
+2. confira o comportamento do original no código (`cGame.java`), que é a fonte de verdade: por exemplo, a tecla mantida é consumida após a entrada e após eventos, o herói gira antes de andar depois de ~10 quadros parado, empurrar exige ~7 quadros, e o dano pode empurrar o herói uma casa para longe da fonte (para trás ou no sentido do movimento do atacante, `method_61`), enquanto várias fontes de dano não empurram;
+3. grave somente controles, declare e justifique os valores iniciais, rode `npm run verify:routes -- --jvm --write-report` e `npm test`.
 
-Siga o [layout de instalação do README](../README.md#rodar-localmente) para ter o clone da referência fixada e os recursos extraídos. Dentro do repositório do port:
+## O que ainda falta
 
-```powershell
-npm run verify:routes
-npm run verify:stages
-npm test
-npm run build
-```
+Os 47 objetivos têm percurso aprovado ([PLAYABILITY.md](PLAYABILITY.md)). Falta, em ordem de importância:
 
-Para atualizar os relatórios após mudar um percurso:
-
-```powershell
-npm run verify:routes -- --write-report
-npm run verify:stages -- --write-report
-```
-
-Ao investigar uma fase pendente, comece por sua linha em [PLAYABILITY.md](PLAYABILITY.md). Reproduza a tentativa vinculada e inspecione o obstáculo final. Se encontrar uma rota melhor, grave **controles reais desde o spawn**, declare o equipamento e os recursos iniciais, mantenha o `expected` gerado pela simulação e acrescente uma asserção que prove o marco novo. Só coloque o arquivo em `routes/` quando a conclusão for observada pelo verificador; em caso de saída alternativa, confira também o objeto de saída. Se o obstáculo persistir, registre a tentativa em `route-attempts/` com uma descrição precisa, sem classificar a fase como impossível.
-
-O comando `npm run verify:routes -- --write-report` gera novamente [PLAYABILITY.md](PLAYABILITY.md) e [PLAYABILITY.json](PLAYABILITY.json). Evite editar esses dois arquivos manualmente: a origem dos dados são os mapas, os replays e o gerador. A publicação no GitHub Pages também executa `npm test` e `npm run build`, mas uma build verde não substitui a aprovação de todas as saídas.
+1. uma campanha encadeada pelos três mundos: hoje o encadeamento cobre New Game até o cristal de Angkor; Bavaria e Tibet são verificadas com percursos isolados, cujos valores iniciais (vidas, equipamento, mergulho) são declarados e justificados, mas não vêm de uma única partida. Encadear exige percursos que juntem os 10 e 25 diamantes vermelhos que abrem Bavaria e Tibet;
+2. comparação visual com um emulador J2ME (o desenho original roda no navegador, mas não foi comparado pixel a pixel) e reprodução dos timbres MIDI do aparelho;
+3. o percurso do chefe de Tibet é o único que sorteia números (os tempos de ataque do chefe). Ele foi construído para não depender deles: conclui com as 50 sementes da verificação e com 978 de 1000 numa amostra maior; as falhas restantes vêm de sequências raras de tempos (um golpe que termina no mesmo quadro em que começa, ou golpes muito cedo ou muito tarde). Os outros 46 percursos não sorteiam números e valem para qualquer semente.

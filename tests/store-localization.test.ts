@@ -1,11 +1,12 @@
+import { SEAL_ARROWS, stepSealGlide } from '../src/core/Store.ts';
+import type { SealGlide } from '../src/core/Store.ts';
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
 import { newCampaign, unlockedWorld } from '../src/core/Campaign.ts';
 import { ARMOR_PRICES, nextSealItem, purchaseArmor, storeStatus } from '../src/core/Store.ts';
-import { campaignFromRecord, campaignRecord, campaignStageStart, completeCampaignLevel } from '../src/platform/CanonicalCampaign.ts';
+import { campaignFromRecord, campaignRecord } from '../src/platform/CanonicalCampaign.ts';
 import { CanonicalSave } from '../src/platform/CanonicalSave.ts';
-import { Simulation } from '../src/core/Simulation.ts';
 import { languageStrings, localizeDemoText } from '../src/core/Localization.ts';
 import { parseDemoScripts } from '../src/core/DemoScript.ts';
 import type { DemoCommand } from '../src/core/DemoScript.ts';
@@ -24,34 +25,7 @@ test('S700 seal unlocks worlds at red-diamond thresholds without spending them',
   assert.equal(c.resources.redDiamonds,25);
 });
 
-test('world notices set Bavaria and Tibet RMS bits in the original order',()=>{
-  const {worlds,maps}=loadRouteResources();let campaign=newCampaign();
-  const first=new Simulation(worlds[0].levels[0],campaign.resources);
-  first.redDiamonds=25;first.diamonds=150;first.status='complete';
-  campaign=completeCampaignLevel(campaign,first,worlds,maps);
-  assert.deepEqual(campaign.worldAccess,[true,true,false]);
-  const firstRecord=new CanonicalSave(Uint8Array.from(campaign.canonicalRecord!));
-  assert.equal(firstRecord.worldFlags&24,8);assert.equal(firstRecord.armorUnlockTier,1);
-  assert.equal(unlockedWorld(campaign,2,maps),true,'the price can already grant access');
-  const second=new Simulation(worlds[0].levels[0],campaignStageStart(campaign,worlds,maps,0,0));
-  second.status='complete';
-  campaign=completeCampaignLevel(campaign,second,worlds,maps);
-  assert.deepEqual(campaign.worldAccess,[true,true,true]);
-  const secondRecord=new CanonicalSave(Uint8Array.from(campaign.canonicalRecord!));
-  assert.equal(secondRecord.worldFlags&24,24);assert.equal(secondRecord.armorUnlockTier,1);
-  assert.equal(campaign.resources.redDiamonds,25);assert.equal(campaign.resources.diamonds,150);
-});
 
-test('one result can announce the highest newly affordable armor without buying it',()=>{
-  const {worlds,maps}=loadRouteResources();let campaign=newCampaign();
-  const stage=new Simulation(worlds[0].levels[0],campaign.resources);
-  stage.diamonds=3000;stage.status='complete';
-  campaign=completeCampaignLevel(campaign,stage,worlds,maps);
-  const record=new CanonicalSave(Uint8Array.from(campaign.canonicalRecord!));
-  assert.equal(record.armorUnlockTier,4);
-  assert.equal(record.diamonds,3000);
-  assert.equal(record.maxHealth,4,'the item still needs a shop purchase');
-});
 
 test('boss crystals persist in the S700 world flag bits',()=>{
   const {worlds,maps}=loadRouteResources(),c=newCampaign();
@@ -77,10 +51,6 @@ test('four armor tiers use original prices, persist in RMS and raise healing cap
     assert.equal(save.maxHealth,5+item);
     const restored=campaignFromRecord(new CanonicalSave(save.export()),worlds,maps);
     assert.equal(restored.resources.maxHealth,5+item);
-    const initial=campaignStageStart(restored,worlds,maps,0,0);
-    const sim=new Simulation(worlds[0].levels[0],initial);
-    sim.health=1;sim.restoreCheckpoint(true);
-    assert.equal(sim.health,5+item);
   }
 });
 
@@ -97,4 +67,12 @@ test('web translations cover every original menu entry and demo dialogue',()=>{
     for(const line of dialogue)assert.notEqual(localizeDemoText(locale,line),line,`${locale} demo: ${line}`);
   }
   assert.deepEqual(languageStrings('en',original),original);
+});
+
+test('the seal arrow glides for eight frames like cGame.method_75',()=>{
+  // From Angkor (-33,-54) to Bavaria (14,-54): each frame closes (target-current)/(8-step), truncated.
+  let glide:SealGlide|null={x:SEAL_ARROWS[0][0],y:SEAL_ARROWS[0][1],step:0,name:0};const xs:number[]=[];
+  for(let frame=0;frame<8;frame++){glide=stepSealGlide(glide!,1);if(glide)xs.push(glide.x);}
+  assert.equal(glide,null);
+  assert.deepEqual(xs,[-28,-22,-16,-10,-4,2,8]);
 });

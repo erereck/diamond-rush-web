@@ -1,12 +1,10 @@
 import type { WorldDefinition, MapNode } from '../level/LevelParser.ts';
 import type { Campaign } from '../core/Campaign.ts';
-import { eligibleStageRewards, finishLevel, newCampaign, pendingRewards, unlockedNode } from '../core/Campaign.ts';
-import type { Simulation } from '../core/Simulation.ts';
-import type { StageStart } from '../core/Simulation.ts';
+import { newCampaign, unlockedNode } from '../core/Campaign.ts';
 import { CanonicalSave } from './CanonicalSave.ts';
 
 /** Keeps the original RMS record alongside the web campaign, including unknown bytes. */
-export function campaignRecord(c:Campaign,worlds:WorldDefinition[],maps:MapNode[][],stage?:Simulation){
+export function campaignRecord(c:Campaign,worlds:WorldDefinition[],maps:MapNode[][]){
   const save=c.canonicalRecord?new CanonicalSave(Uint8Array.from(c.canonicalRecord)):CanonicalSave.create(worlds,maps);
   if(save.worlds.some((w,i)=>w.levels.length!==worlds[i]?.levels.length))throw new Error('RMS: mapas incompatíveis com a versão S700.');
   const {lives,diamonds,redDiamonds,weaponTier=0}=c.resources;
@@ -28,46 +26,7 @@ export function campaignRecord(c:Campaign,worlds:WorldDefinition[],maps:MapNode[
     for(const node of maps[w])if(node.level>0&&unlockedNode(c,w,node,maps))save.addLevelFlags(w,node.level,64);
     for(let level=0;level<c.awards[w].length;level++)if(c.awards[w][level])save.addLevelFlags(w,level,c.awards[w][level]);
   }
-  if(stage){
-    const {world,index}=stage.level;
-    // cGame.method_108 adds this visit's red diamonds to recordData's
-    // existing per-level count; revisiting must not erase earlier progress.
-    const earned=Math.max(0,stage.redDiamonds-stage.initial.redDiamonds);
-    save.setLevelStatus(world,index,Math.min(255,save.worlds[world].levels[index].status+earned));
-    for(const cell of stage.opened)if([14,33].includes(worlds[world].levels[index].objects[cell]))
-      save.openChest(world,index,cell%stage.level.width,Math.floor(cell/stage.level.width));
-  }
   return save;
-}
-
-export function campaignStageStart(c:Campaign,worlds:WorldDefinition[],maps:MapNode[][],world:number,level:number):StageStart {
-  const save=campaignRecord(c,worlds,maps),record=save.worlds[world]?.levels[level],definition=worlds[world]?.levels[level];
-  if(!record||!definition)throw new Error('RMS: fase inválida.');
-  const cells=definition.objects.flatMap((kind,i)=>[14,33].includes(kind)?[i]:[]);
-  if(record.chests.length!==cells.length)throw new Error('RMS: lista de baús incompatível.');
-  const openedChests:number[]=[];
-  record.chests.forEach((chest,i)=>{
-    if(chest.x===0&&chest.y===0)openedChests.push(cells[i]);
-    else if(chest.x!==cells[i]%definition.width||chest.y!==Math.floor(cells[i]/definition.width))throw new Error('RMS: posição de baú incompatível.');
-  });
-  return {...c.resources,openedChests};
-}
-
-/** Shared by the game and control-route verification, including the real RMS write. */
-export function completeCampaignLevel(c:Campaign,stage:Simulation,worlds:WorldDefinition[],maps:MapNode[][]):Campaign {
-  if(stage.status!=='complete')throw new Error('A fase ainda não foi concluída.');
-  const {world,index}=stage.level;
-  const awarded=pendingRewards(c,world,index,eligibleStageRewards(stage),stage.lives);
-  const next=finishLevel(c,world,index,{diamonds:stage.diamonds,redDiamonds:stage.redDiamonds,
-    lives:awarded.lives,health:stage.health,...(stage.maxHealth>4?{maxHealth:stage.maxHealth}:{}),weaponTier:stage.weaponTier},awarded.mask,stage.exitObject===28,maps);
-  // cGame.method_249(5) checks Bavaria before Tibet against the stored
-  // record flags. Only the first newly eligible notice runs per result.
-  const unlocked=([1,2] as const).find(w=>!c.worldAccess?.[w]&&next.resources.redDiamonds>=[0,10,25][w]);
-  if(unlocked){next.worldAccess=[...(next.worldAccess??[true,false,false])];next.worldAccess[unlocked]=true;}
-  const record=campaignRecord(next,worlds,maps,stage);
-  record.unlockAffordableArmor();
-  next.canonicalRecord=[...record.export()];
-  return next;
 }
 
 /** Imports record 1, whose level flags carry completion, prizes and secrets. */
@@ -83,6 +42,9 @@ export function campaignFromRecord(save:CanonicalSave,worlds:WorldDefinition[],m
   }
   const c=newCampaign();
   c.completed=save.worlds.map(w=>w.levels.flatMap((l,i)=>l.flags&2?[i]:[]));
+  // The boss stages never receive flag 2: the crystal chest writes bit 0/1/2 of record byte 2 instead
+  // and the game leaves through its seal (state 28 -> 27), so the crystal is what completes them.
+  [8,9,10].forEach((boss,w)=>{if(save.worldFlags&(1<<w)&&!c.completed[w].includes(boss))c.completed[w].push(boss);});
   c.secretUnlocked=save.worlds.map((w,i)=>w.levels.flatMap((l,j)=>l.flags&64&&maps[i].some(n=>n.level===j&&n.type===1)?[j]:[]));
   c.explicitUnlocked=save.worlds.map(w=>w.levels.flatMap((l,i)=>l.flags&64?[i]:[]));
   c.awards=save.worlds.map(w=>w.levels.map(l=>l.flags&60));

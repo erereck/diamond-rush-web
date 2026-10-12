@@ -1,44 +1,70 @@
 import { Simulation } from '../core/Simulation.ts';
-import type { Replay, InputFrame, StageStart } from '../core/Simulation.ts';
+import type { LocaleChange } from '../core/Simulation.ts';
+import type { InputFrame, StageStart } from '../core/Simulation.ts';
+import { CORE_REVISION } from '../core/s700/Engine.ts';
+import { S700_SOURCE_SHA256 } from '../generated/s700.ts';
 import type { WorldDefinition } from '../level/LevelParser.ts';
-import { ENGINE_REVISION, levelFingerprint } from '../core/Compatibility.ts';
-/** Development sessions use input replays, NOT an invented substitute for canonical RMS. */
+import type { GameLocale } from '../core/Localization.ts';
+
+/**
+ * Development session: the stage, its starting record values (or the campaign's RMS record 1)
+ * and the controls of every tick. Replaying it on the same generated core reproduces the session.
+ */
+export interface Replay {
+  version:4;engine:string;source:string;world:number;level:number;
+  /** Translated dialogues page differently, so a replay is restored in the language it started in, with the same changes. */
+  locale?:GameLocale;localeChanges?:LocaleChange[];
+  resources?:StageStart;record?:string;inputs:{ticks:number;direction:number;action:boolean;reset?:boolean;back?:boolean}[];
+}
+export const SESSION_KEY='diamond-rush:session:v4';
+const SOURCE=S700_SOURCE_SHA256.slice(0,16);
+function toBase64(bytes:Uint8Array){let s='';for(const b of bytes)s+=String.fromCharCode(b);return btoa(s);}
+function fromBase64(text:string){const s=atob(text);return Uint8Array.from(s,c=>c.charCodeAt(0));}
+export function sessionReplay(sim:Simulation):Replay{
+  const runs:Replay['inputs']=[];
+  for(const input of sim.inputs){
+    const last=runs.at(-1);
+    if(last&&last.direction===input.direction&&last.action===input.action&&!!last.reset===!!input.reset&&!!last.back===!!input.back)last.ticks++;
+    else runs.push({ticks:1,direction:input.direction,action:input.action,...(input.reset?{reset:true}:{}),...(input.back?{back:true}:{})});
+  }
+  return {version:4,engine:CORE_REVISION,source:SOURCE,world:sim.start.world,level:sim.start.level,...(sim.locale!=='en'?{locale:sim.locale}:{}),...(sim.localeChanges.length?{localeChanges:sim.localeChanges.map(c=>({...c}))}:{}),
+    ...(sim.start.resources?{resources:{...sim.start.resources}}:{}),...(sim.start.record?{record:toBase64(sim.start.record)}:{}),inputs:runs};
+}
 export function validateReplay(value:unknown,worlds:WorldDefinition[]):Replay {
   if(!value||typeof value!=='object')throw new Error('Arquivo de sessão inválido.');
   const r=value as Replay;
-  if(r.version!==3||r.target!=='1.2.0-s700'||r.engine!==ENGINE_REVISION)throw new Error('Versão de replay ou motor incompatível.');
+  if(r.version!==4||r.engine!==CORE_REVISION)throw new Error('Versão de replay ou motor incompatível.');
+  if(r.source!==SOURCE)throw new Error('Replay gravado com outra versão das fontes S700.');
   if(!Number.isInteger(r.world)||!Number.isInteger(r.level)||!worlds[r.world]?.levels[r.level])throw new Error('Fase não encontrada.');
-  if(r.levelFingerprint!==levelFingerprint(worlds[r.world].levels[r.level]))throw new Error('Dados da fase incompatíveis com o replay.');
-  if(!Array.isArray(r.inputs)||r.inputs.length>144000)throw new Error('Replay ausente ou acima do limite de duas horas.');
-  const initial=r.initial as StageStart|undefined;
-  if(!initial||!Number.isInteger(initial.diamonds)||initial.diamonds<0||initial.diamonds>65535||
-    !Number.isInteger(initial.redDiamonds)||initial.redDiamonds<0||initial.redDiamonds>65535||
-    !Number.isInteger(initial.lives)||initial.lives<0||initial.lives>99||
-    (initial.maxHealth!==undefined&&(!Number.isInteger(initial.maxHealth)||initial.maxHealth<4||initial.maxHealth>8))||
-    !Number.isInteger(initial.health)||initial.health<1||initial.health>(initial.maxHealth??4)||![0,1,2,8].includes(initial.weaponTier??0))
-    throw new Error('Estado inicial da fase inválido.');
-  const cellCount=worlds[r.world].levels[r.level].tiles.length;
-  if(initial.openedChests!==undefined&&(!Array.isArray(initial.openedChests)||initial.openedChests.length>128||
-    initial.openedChests.some(cell=>!Number.isInteger(cell)||cell<0||cell>=cellCount||![14,33].includes(worlds[r.world].levels[r.level].objects[cell]))))
-    throw new Error('Baús iniciais inválidos no replay.');
-  for(const input of r.inputs){
-    if(!input||!Number.isInteger(input.direction)||input.direction<0||input.direction>4||typeof input.action!=='boolean'||(input.reset!==undefined&&typeof input.reset!=='boolean')||(input.scripted!==undefined&&typeof input.scripted!=='boolean'))throw new Error('Entrada inválida no replay.');
-    if(input.scriptedView!==undefined){
-      const view=input.scriptedView,level=worlds[r.world].levels[r.level];
-      if(!input.scripted||!view||!Number.isInteger(view.x)||!Number.isInteger(view.y)||typeof view.follow!=='boolean'||
-        view.x<0||view.y<0||view.x>Math.max(0,level.width*24-240)||view.y>Math.max(0,level.height*24-240))throw new Error('Câmera de cena inválida no replay.');
-    }
-    if(input.demoEdits!==undefined&&(!Array.isArray(input.demoEdits)||input.demoEdits.length>8||input.demoEdits.some(edit=>
-      !edit||!Number.isInteger(edit.cell)||edit.cell<0||edit.cell>=cellCount||
-      (edit.object===undefined&&edit.parameter===undefined&&edit.state===undefined)||
-      (edit.object!==undefined&&(!Number.isInteger(edit.object)||edit.object<0||edit.object>255))||
-      (edit.parameter!==undefined&&(!Number.isInteger(edit.parameter)||edit.parameter<0||edit.parameter>255))||
-      (edit.state!==undefined&&(!Number.isInteger(edit.state)||edit.state< -2147483648||edit.state>2147483647))||
-      (edit.checkpoint!==undefined&&typeof edit.checkpoint!=='boolean')
-    )))throw new Error('Edição de cena inválida no replay.');
+  if(!Array.isArray(r.inputs))throw new Error('Replay sem controles.');
+  const locales=['en','pt-BR','es'];
+  if(r.locale!==undefined&&!locales.includes(r.locale))throw new Error('Idioma do replay desconhecido.');
+  if(r.localeChanges!==undefined&&(!Array.isArray(r.localeChanges)||r.localeChanges.some(c=>!c||!Number.isInteger(c.tick)||c.tick<0||!locales.includes(c.locale))))throw new Error('Mudança de idioma inválida no replay.');
+  let total=0;
+  for(const run of r.inputs){
+    if(!run||!Number.isInteger(run.ticks)||run.ticks<1||!Number.isInteger(run.direction)||run.direction<0||run.direction>4||typeof run.action!=='boolean'||
+      (run.reset!==undefined&&typeof run.reset!=='boolean')||(run.back!==undefined&&typeof run.back!=='boolean')||(total+=run.ticks)>144000)throw new Error('Controle inválido ou acima do limite de duas horas.');
   }
-  return {version:3,target:'1.2.0-s700',engine:ENGINE_REVISION,levelFingerprint:r.levelFingerprint,world:r.world,level:r.level,
-    initial:{...initial},inputs:r.inputs.map((i:InputFrame)=>({direction:i.direction,action:i.action,reset:i.reset??false,scripted:i.scripted??false,scriptedView:i.scriptedView?{...i.scriptedView}:undefined,demoEdits:i.demoEdits?.map(edit=>({...edit}))}))};
+  const s=r.resources;
+  if(s&&(![s.diamonds,s.redDiamonds].every(v=>Number.isInteger(v)&&v>=0&&v<=65535)||!Number.isInteger(s.lives)||s.lives<0||s.lives>99||
+    (s.maxHealth!==undefined&&(!Number.isInteger(s.maxHealth)||s.maxHealth<4||s.maxHealth>8))||![0,1,2,8].includes(s.weaponTier??0)))
+    throw new Error('Recursos iniciais inválidos.');
+  if(r.record!==undefined&&(typeof r.record!=='string'||fromBase64(r.record).length>1000))throw new Error('Record RMS inválido no replay.');
+  return {version:4,engine:r.engine,source:r.source,world:r.world,level:r.level,...(r.locale&&r.locale!=='en'?{locale:r.locale}:{}),...(r.localeChanges?.length?{localeChanges:r.localeChanges.map(c=>({tick:c.tick,locale:c.locale}))}:{}),...(s?{resources:{...s}}:{}),...(r.record?{record:r.record}:{}),inputs:r.inputs.map(i=>({...i}))};
 }
-export function restoreReplay(replay:Replay,worlds:WorldDefinition[]){const sim=new Simulation(worlds[replay.world].levels[replay.level],replay.initial);for(const input of replay.inputs){sim.step(input);for(const edit of input.demoEdits??[])sim.applyDemoEdit(edit);}return sim;}
-export const SESSION_KEY='diamond-rush:experimental-session:v3';
+export function restoreReplay(replay:Replay,worlds:WorldDefinition[]){
+  const previous=Simulation.locale;
+  Simulation.setLocale(replay.locale??'en');
+  try{
+  const sim=new Simulation(worlds[replay.world].levels[replay.level],{world:replay.world,level:replay.level,
+    ...(replay.resources?{resources:replay.resources}:{}),...(replay.record?{record:fromBase64(replay.record)}:{})});
+  const changes=[...(replay.localeChanges??[])].sort((a,b)=>a.tick-b.tick);
+  for(const run of replay.inputs)for(let i=0;i<run.ticks;i++){
+    while(changes.length&&changes[0].tick<=sim.tick)Simulation.setLocale(changes.shift()!.locale);
+    sim.step({direction:run.direction as InputFrame['direction'],action:run.action,...(run.reset?{reset:true}:{}),...(run.back?{back:true}:{})});
+  }
+  while(changes.length)Simulation.setLocale(changes.shift()!.locale);
+  return sim;
+  // Back to the page's language: the restored session records it as a change, so exporting it again replays the same.
+  }finally{Simulation.setLocale(previous);}
+}

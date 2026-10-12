@@ -2,6 +2,7 @@ import type { DecodedSprite } from './SpriteDecoder.ts';
 import type { WorldDefinition, MapNode } from '../level/LevelParser.ts';
 import { parseDemoScripts } from '../core/DemoScript.ts';
 import type { DemoScript } from '../core/DemoScript.ts';
+import { prepareEngine } from '../platform/EngineAssets.ts';
 export interface AssetManifest {version:string;sprites:string[];worlds:{world:number;levels:number}[];audio:string[];resources:{name:string;bytes:number;sha256:string}[]}
 export class AssetManager {
   sprites=new Map<string,DecodedSprite>();
@@ -25,6 +26,7 @@ export class AssetManager {
     this.demoScripts=parseDemoScripts(new Uint8Array(await demo.arrayBuffer()));
     const r=await fetch(`${import.meta.env.BASE_URL}assets/font-map.bin`); if(!r.ok)throw new Error('Font map unavailable');
     this.fontMap=new Uint8Array(await r.arrayBuffer());
+    await prepareEngine(import.meta.env.BASE_URL,this.manifest.resources.map(r=>r.name));
     this.splash=await Promise.all([0,1,2].map(async i=>{const image=new Image();image.src=`${import.meta.env.BASE_URL}assets/spl-${i}.png`;await image.decode();return image;}));
   }
   sprite(id:string) {const s=this.sprites.get(id);if(!s)throw new Error(`Unknown sprite ${id}`);return s;}

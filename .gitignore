@@ -1,9 +1,10 @@
 node_modules/
 dist/
 public/assets/
+src/generated/
 .DS_Store
 *.log
 # FreeJ2ME runtime files if a local trace is run from the checkout.
-config/
-freej2me_system/
-rms/
+/config/
+/freej2me_system/
+/rms/

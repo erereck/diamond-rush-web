@@ -7,11 +7,14 @@ import { parseWorld, parseWorldMap } from '../src/level/LevelParser.ts';
 const source = resolve(process.argv[2] ?? '../../work/reference-s700/res');
 const dest = resolve('public/assets');
 mkdirSync(dest, {recursive:true});
+// The generated S700 core reads the original JAR resources verbatim (see src/core/s700/Engine.ts).
+mkdirSync(join(dest,'res'), {recursive:true});
 const json = (name:string, obj:unknown) => writeFileSync(join(dest,name), JSON.stringify(obj));
 const manifest = { version:'1.2.0-s700', resources:[] as {name:string;bytes:number;sha256:string}[], sprites:[] as string[], worlds:[] as {world:number;levels:number}[], audio:[] as string[] };
 for (const name of readdirSync(source).sort()) {
   const data=readFileSync(join(source,name));
   manifest.resources.push({name,bytes:data.length,sha256:createHash('sha256').update(data).digest('hex')});
+  writeFileSync(join(dest,'res',name),data);
   if (!name.endsWith('.f')) continue;
   for (const e of parsePack(data,name)) {
     const id=`${name.slice(0,-2)}-${e.index}`;

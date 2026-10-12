@@ -2,19 +2,18 @@ import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
 import { CanonicalSave } from '../src/platform/CanonicalSave.ts';
-import { campaignFromRecord, campaignRecord, campaignStageStart } from '../src/platform/CanonicalCampaign.ts';
+import { campaignFromRecord, campaignRecord } from '../src/platform/CanonicalCampaign.ts';
 import { finishLevel, newCampaign, unlockedNode, unlockedWorld, validateCampaign } from '../src/core/Campaign.ts';
-import { Simulation } from '../src/core/Simulation.ts';
-import { restoreReplay } from '../src/platform/Session.ts';
 import { parseWorld,parseWorldMap } from '../src/level/LevelParser.ts';
 import type { WorldDefinition } from '../src/level/LevelParser.ts';
 
-// Independently specified miniature record: three worlds, one level in each.
+// Independently specified miniature record: three worlds, one level in each. The first secret
+// level (third byte of each world block) is method_113's running minimum, so 0 carries over.
 const expected=new Uint8Array([
   2,0,0,5,0,0,0,0,4,0,0,0,0,0,20,0,34,0,44,0,
   1,0,0,25,0,0,2,0,0,2,1,1,2,1,
-  1,0,100,39,0,0,0,0,0,0,
-  1,0,100,49,0,0,0,0,0,0,
+  1,0,0,39,0,0,0,0,0,0,
+  1,0,0,49,0,0,0,0,0,0,
 ]);
 const fixture:WorldDefinition[]=Array.from({length:3},(_,world)=>({world,version:0,levels:[{world,index:0,width:4,height:3,offset:0,
   tiles:Array.from({length:12},(_,i)=>world===0&&[5,6].includes(i)?2:255),parameters:Array(12).fill(255),
@@ -85,29 +84,14 @@ test('campaign progress round-trips through the original record without losing u
   const template=CanonicalSave.create(worlds,maps).export();template[12]=173;
   let campaign=newCampaign();campaign.canonicalRecord=[...template];
   campaign=finishLevel(campaign,0,6,{diamonds:120,redDiamonds:3,lives:9,health:4,weaponTier:2},4|16,true,maps);
-  const stage=new Simulation(worlds[0].levels[6],{diamonds:110,redDiamonds:2,lives:7,health:4,weaponTier:2});
-  stage.redDiamonds=3;
-  const chest=stage.level.objects.findIndex(o=>o===14||o===33);assert.ok(chest>=0);stage.opened.add(chest);
-  const save=campaignRecord(campaign,worlds,maps,stage),bytes=save.export();
+  const save=campaignRecord(campaign,worlds,maps),bytes=save.export();
   assert.equal(bytes[12],173);assert.equal(save.lives,9);assert.equal(save.diamonds,120);assert.equal(save.weaponTier,2);
   assert.equal(save.worlds[0].levels[6].flags&22,22);
-  assert.equal(save.worlds[0].levels[6].status,1);
-  assert.equal(save.worlds[0].levels[6].openedChests,1);
   const restored=campaignFromRecord(new CanonicalSave(bytes),worlds,maps);
   assert.equal(restored.completed[0].includes(6),true);
   assert.equal(restored.secretUnlocked[0].includes(9),true);
   assert.equal(restored.awards[0][6],20);
   assert.deepEqual(campaignRecord(restored,worlds,maps).export(),bytes);
-  const initial=campaignStageStart(restored,worlds,maps,0,6);
-  assert.deepEqual(initial.openedChests,[chest]);
-  const revisited=new Simulation(worlds[0].levels[6],initial);
-  assert.equal(revisited.tiles[chest],-1);assert.equal(revisited.chestFrames[chest],stage.level.objects[chest]===14?2:3);
-  assert.equal(revisited.opened.has(chest),true);
-  assert.equal(restoreReplay(revisited.replay(),worlds).tiles[chest],-1);
-  // method_108 accumulates red diamonds across visits instead of replacing
-  // the count stored in the level's RMS record.
-  revisited.redDiamonds++;
-  assert.equal(campaignRecord(restored,worlds,maps,revisited).worlds[0].levels[6].status,2);
 });
 
 test('Angkor main route stays unlocked after each original RMS round-trip',()=>{

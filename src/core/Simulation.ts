@@ -7,7 +7,7 @@ import type { LevelDefinition } from '../level/LevelParser.ts';
 import { S700Engine } from './s700/Engine.ts';
 import type { EngineSnapshot, EngineStart } from './s700/Engine.ts';
 import { cSoundEngine } from '../generated/s700.ts';
-import { Display } from './s700/j2me.ts';
+import { Display, renderingEnabled } from './s700/j2me.ts';
 import { setDecodedTextTranslator } from './s700/runtime.ts';
 import { languageStrings, localizeDemoText } from './Localization.ts';
 import type { GameLocale } from './Localization.ts';
@@ -86,6 +86,19 @@ export class Simulation {
   restore(s:SimulationSnapshot){
     this.engine.restore(s.engine);this.tick=s.tick;this.status=s.status;this.result=s.result;
     this.inputs.length=s.inputs;this.localeChanges.length=s.localeChanges;this.sounds=[];this.vibrate=false;
+    if(renderingEnabled())this.paintAt(s.engine);
+  }
+  /**
+   * Paints the current state again (after a restore, a new layout or HUD mode) without letting the
+   * paint change it: the original's paint also moves sprites the logic reads and can request sounds,
+   * so the engine is put back to the state it painted and the requests are dropped.
+   */
+  repaint(){if(renderingEnabled())this.paintAt(this.engine.snapshot());}
+  private paintAt(state:EngineSnapshot){
+    const queue=soundQueue,count=vibrations;soundQueue=[];
+    // field_170 asks for the whole HUD, which the original otherwise redraws only where it changed.
+    try{const g=this.game;g.field_170=true;g.method_132(g.getGraphics());}
+    finally{this.engine.restore(state);soundQueue=queue;vibrations=count;}
   }
   get gameState():number{return CORE.gameState;}
   /** One 50 ms frame of the original game. */
@@ -126,7 +139,8 @@ export class Simulation {
   /** Shows the last frame the original painted (each step runs cGame.method_132; requires enableRendering). */
   draw(ctx:CanvasRenderingContext2D){
     const g=this.game;
-    if(g.screen)ctx.drawImage(g.screen.canvas,0,0);
+    // With the wide HUD the screen's HUD bands are transparent.
+    ctx.clearRect(0,0,240,320);if(g.screen)ctx.drawImage(g.screen.canvas,0,0);
   }
   /**
    * The stage's live planes while it is loaded (tiles, objects, parameters), for the scenery the port
@@ -140,6 +154,17 @@ export class Simulation {
       tile:(i:number)=>{const v=tiles[i%width][Math.floor(i/width)]&255;return v===255?-1:v;},
       object:(i:number)=>objects[i%width][Math.floor(i/width)]&255,
       parameter:(i:number)=>(objects[i%width][Math.floor(i/width)]>>8)&255};
+  }
+  /**
+   * The original's whole-screen effects, so the port can carry them past the original screen: the
+   * shake (method_153 raises the camera by field_256 while it paints), the black bars closing from top
+   * and bottom (field_257, up to 160), the cutscene bars (DemoInterpreter.method_22 covers 0–42 and
+   * 278–320 except for its script ops 25 and 26) and the blacked-out screen (field_367).
+   */
+  get effects(){
+    const g=this.game,demo=g.field_354,op=demo?.field_45?demo.field_45[0]:-1;
+    return {shake:g.field_256 as number,closing:Math.min(160,g.field_257 as number),
+      cutscene:!!demo&&!demo.field_53&&!CORE.field_367&&op!==25&&op!==26,blackout:!!CORE.field_367};
   }
   /** The original camera (cGame.field_201/202, method_285): the map pixel shown at the play area's top left (screen y 40). */
   get camera(){return {x:this.game.field_201 as number,y:this.game.field_202 as number};}

@@ -15,13 +15,15 @@ export type Filter='sharp'|'smooth'|'crt';
  * camera, or the scenery with its objects (diamonds, stones, chests, enemies at rest).
  */
 export type Surround='black'|'backdrop'|'stage'|'stage-objects';
+/** The original HUD across the window (bars edge to edge, contents at the sides) or in the original screen. */
+export type HudLayout='wide'|'original';
 export type TouchMode='auto'|'always'|'never';
 export type SynthEngine='samples'|'synth';
 
 export interface PortSettings {
   version:1;
   // Video
-  scaling:Scaling;filter:Filter;surround:Surround;showStats:boolean;
+  scaling:Scaling;filter:Filter;surround:Surround;hud:HudLayout;showStats:boolean;
   // Audio
   sound:boolean;synth:SynthEngine;master:number;music:number;effects:number;vibration:boolean;
   // Game extras
@@ -32,7 +34,7 @@ export interface PortSettings {
 
 export const SPEEDS=[0.5,0.75,1,1.25,1.5,2] as const;
 export function defaultSettings():PortSettings{
-  return {version:1,scaling:'fit',filter:'sharp',surround:'stage-objects',showStats:false,
+  return {version:1,scaling:'fit',filter:'sharp',surround:'stage-objects',hud:'wide',showStats:false,
     sound:true,synth:'samples',master:0.8,music:1,effects:1,vibration:true,
     speed:1,turbo:true,rewind:true,saveStates:true,infiniteLives:false,infiniteHealth:false,allEquipment:false,
     touch:'auto'};
@@ -46,7 +48,7 @@ export function validateSettings(value:unknown):PortSettings{
   const v=value as Partial<PortSettings>;
   return {version:1,
     scaling:pick(v.scaling,['integer','fit','stretch'],d.scaling),filter:pick(v.filter,['sharp','smooth','crt'],d.filter),
-    surround:pick(v.surround,['black','backdrop','stage','stage-objects'],d.surround),showStats:flag(v.showStats,d.showStats),
+    surround:pick(v.surround,['black','backdrop','stage','stage-objects'],d.surround),hud:pick(v.hud,['wide','original'],d.hud),showStats:flag(v.showStats,d.showStats),
     sound:flag(v.sound,d.sound),synth:pick(v.synth,['samples','synth'],d.synth),
     master:unit(v.master,d.master),music:unit(v.music,d.music),effects:unit(v.effects,d.effects),vibration:flag(v.vibration,d.vibration),
     speed:SPEEDS.includes(v.speed as typeof SPEEDS[number])?v.speed!:d.speed,turbo:flag(v.turbo,d.turbo),rewind:flag(v.rewind,d.rewind),

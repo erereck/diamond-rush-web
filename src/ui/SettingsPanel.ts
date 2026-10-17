@@ -11,6 +11,7 @@ const CHOICES:Partial<Record<keyof PortSettings,Choice[]>>={
   scaling:valueChoices('scaling',['integer','fit','stretch']),
   filter:valueChoices('filter',['sharp','smooth','crt']),
   surround:valueChoices('surround',['black','backdrop','stage','stage-objects']),
+  hud:valueChoices('hud',['wide','original']),
   synth:valueChoices('synth',['samples','synth']),
   touch:valueChoices('touch',['auto','always','never']),
 };

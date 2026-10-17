@@ -38,6 +38,8 @@ const EDGE=14;
 export class MobileControls {
   settings:TouchSettings;editing=false;
   onEditingChange:(editing:boolean)=>void=()=>{};
+  /** Called after the controls move, change size or show or hide. */
+  onLayout:()=>void=()=>{};
   private input:Input;
   private deck=document.getElementById('touch-deck')!;
   private done=document.getElementById('touch-done') as HTMLButtonElement;
@@ -87,7 +89,10 @@ export class MobileControls {
   private updateVisibility(){
     this.deck.hidden=!(this.editing||this.mode==='always'||(this.mode==='auto'&&matchMedia('(pointer: coarse)').matches));
     this.layout();
+    if(this.deck.hidden)this.onLayout();
   }
+  /** Where the visible controls are, in CSS pixels. */
+  obstacles():DOMRect[]{return this.deck.hidden?[]:Object.values(this.groups).filter(g=>!g.hidden).map(g=>g.getBoundingClientRect());}
   setEditing(editing:boolean){
     this.editing=editing;this.deck.classList.toggle('is-editing',editing);this.done.hidden=!editing;
     this.updateVisibility();this.onEditingChange(editing);
@@ -121,5 +126,6 @@ export class MobileControls {
       group.style.top=`${Math.round(area.offsetTop+p.y*Math.max(0,area.height-group.offsetHeight*scale))}px`;
       group.style.transform=`scale(${scale})`;group.style.opacity=String(this.settings.opacity);
     }
+    this.onLayout();
   }
 }

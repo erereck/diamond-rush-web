@@ -6,6 +6,8 @@ import { Display } from './render/Display.ts';
 import { Clock } from './core/Clock.ts';
 import { S700Engine } from './core/s700/Engine.ts';
 import { SOUND_CUT, Simulation } from './core/Simulation.ts';
+import { installWideHud, wideHud } from './core/s700/Hud.ts';
+import type { HudLayer } from './core/s700/Hud.ts';
 import type { InputFrame, SimulationSnapshot, StageStart } from './core/Simulation.ts';
 import { Input } from './platform/Input.ts';
 import { MobileControls } from './platform/MobileControls.ts';
@@ -33,6 +35,7 @@ const game=$<HTMLCanvasElement>('game'),inspection=$<HTMLCanvasElement>('inspect
 ic.imageSmoothingEnabled=false;
 const assets=new AssetManager(),sprites=new SpriteRenderer(),renderer=new LevelRenderer(assets,sprites),clock=new Clock(),input=new Input(game);
 const display=new Display(game,renderer,$('crt'));
+installWideHud();
 /** Everything the original game and the port's menus draw goes to the 240×320 screen; the display presents it. */
 const ctx=display.screenContext;
 const gameSound=new GameSound(import.meta.env.BASE_URL);
@@ -147,7 +150,7 @@ function drawGame(){
   s.draw(ctx);
   if(paused)front.drawPause(ctx,pauseScene,pauseSelected,settings.sound,settings.vibration,stageKind==='campaign'&&!!campaign,pauseConfirmAction==='exit');
   const cells=s.liveCells();
-  display.present(cells?{cells,camera:s.camera,tick:sceneTick}:null);
+  display.present(cells?{cells,camera:s.camera,tick:sceneTick,...s.effects,hud:wideHud.active,paused}:null);
   if(!lastError){const h=s.hero;$('debug-info').textContent=`tick ${s.tick} · state ${s.gameState} · ${h.x},${h.y}\n♥ ${s.health}/${s.maxHealth} · ${s.lives} · ◆ ${s.stageDiamonds} · ${s.stageRedDiamonds} · 🔑 ${s.goldKeys}/${s.silverKeys}`;}
 }
 function showInspector(){inspectorVisible=true;$('inspector').hidden=false;panel.close();inspectionDirty=true;drawInspector();}
@@ -522,10 +525,22 @@ let soundUnlocked=false;
 function unlockGameSound(){if(soundUnlocked||!ready||!settings.sound)return;soundUnlocked=true;gameSound.unlock();if(scene==='menu')void gameSound.play(19);}
 document.addEventListener('pointerdown',unlockGameSound);
 document.addEventListener('keydown',unlockGameSound);
+/** The wide HUD draws into the display's HUD layer; a new layer or mode paints the running stage again. */
+let hudLayer:HudLayer|null|undefined;
+function applyHud(){
+  const layer=settings.hud==='wide'?display.hudLayer:null;
+  if(layer===hudLayer)return;
+  hudLayer=layer;wideHud.setLayer(layer);
+  if(simulation&&scene==='playing')simulation.repaint();
+}
+display.onLayout=applyHud;
+/** The HUD's contents keep clear of the touch controls and the settings button. */
+display.obstacles=()=>[...touchControls.obstacles(),$('menu-button').getBoundingClientRect()];
+touchControls.onLayout=()=>display.layout();
 store.subscribe(s=>{
   const soundTurnedOn=s.sound&&!settings.sound;
   settings=s;
-  display.configure(s);
+  display.configure(s);applyHud();
   gameSound.setEnabled(s.sound);gameSound.setVolumes({master:s.master,music:s.music,effects:s.effects});gameSound.setEngine(s.synth);
   if(soundTurnedOn&&soundUnlocked)gameSound.unlock();
   touchControls.setMode(s.touch);
@@ -578,7 +593,7 @@ async function boot(){
   }catch(e){$('loading-text').textContent=String(e);console.error(e);}
 }
 if(import.meta.env.DEV)(window as any).__diamondRush={
-  get scene(){return scene;},get simulation(){return simulation;},get campaign(){return campaign;},get display(){return display;},
+  get scene(){return scene;},get paused(){return paused;},get simulation(){return simulation;},get campaign(){return campaign;},get display(){return display;},
   feed(runs:{ticks:number;direction:InputFrame['direction'];action:boolean;reset?:boolean}[]){for(const r of runs)for(let i=0;i<r.ticks;i++)scriptedInputs.push({direction:r.direction,action:r.action,...(r.reset?{reset:true}:{})});},
   pending(){return scriptedInputs.length;},
   /** Runs n 20 Hz frames immediately, like the animation loop would. */

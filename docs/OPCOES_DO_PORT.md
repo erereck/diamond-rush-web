@@ -23,9 +23,14 @@ As opções que **alteram o jogo** (velocidade, retroceder, estados salvos e tra
 | Escala | **Pixels inteiros** (cada pixel do jogo ocupa o mesmo número de pixels da tela), **Ajustar** (o maior tamanho que cabe) ou **Esticar** (preenche a janela, deformando) |
 | Filtro | **Nítido**, **Suave** (interpolado) ou **CRT** (linhas de varredura e vinheta) |
 | Ao redor da tela original | O que aparece quando a janela é mais larga ou mais alta que 3:4: **Preto**; **Fundo infinito** (o fundo do mundo continua em todas as direções, acompanhando a câmera); **Cenário** (a fase continua além da câmera original, com paredes, portas, placas e decoração); **Cenário e objetos** (também diamantes, pedras, baús, chaves e criaturas) |
+| Interface do jogo | **Acompanha a janela** (padrão): as barras do HUD original vão de ponta a ponta, com vidas e bússola presas à esquerda, chaves, caldeirões e diamantes à direita e a energia no meio. **Original**: o HUD fica dentro dos 240 × 320 |
 | Mostrar FPS e tick | Quadros por segundo, velocidade, tick e estado do jogo |
 
-A área ao redor é reconstruída pelo port a partir do mapa vivo da fase (os planos de tiles e objetos do jogo original) e da câmera original (`cGame.field_201/202`), com os sprites originais. Dentro dos 240 × 320 originais, tudo continua desenhado pelo código do jogo. Fora deles, as criaturas aparecem paradas na célula em que estão e as faixas do HUD continuam escurecidas pela largura da janela.
+A área ao redor é reconstruída pelo port a partir do mapa vivo da fase (os planos de tiles e objetos do jogo original) e da câmera original (`cGame.field_201/202`), com os sprites originais. Dentro dos 240 × 320 originais, tudo continua desenhado pelo código do jogo. Fora deles, as criaturas aparecem paradas na célula em que estão; com a interface original, as faixas do HUD continuam escurecidas pela largura da janela.
+
+Os efeitos de tela inteira do original também passam a cobrir a janela toda: o tremor (o jogo sobe a câmera em até 11 pixels enquanto desenha a fase, e o cenário ao redor treme junto), as faixas pretas das cenas, as barras que fecham a tela quando o herói morre e o escurecimento total.
+
+Na interface que acompanha a janela, o jogo original continua desenhando cada peça do HUD com os sprites originais; o port só desloca cada grupo para a borda e completa as barras com o próprio módulo metálico delas (`ui.f`, sprite 2, módulo 20). O conteúdo das barras desvia dos controles de toque visíveis e do botão ⚙, e respeita as áreas seguras da tela (como o entalhe de celulares).
 
 ## Áudio
 

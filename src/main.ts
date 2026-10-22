@@ -8,6 +8,8 @@ import { S700Engine } from './core/s700/Engine.ts';
 import { SOUND_CUT, Simulation } from './core/Simulation.ts';
 import { installWideHud, wideHud } from './core/s700/Hud.ts';
 import type { HudLayer } from './core/s700/Hud.ts';
+import { surroundObjects } from './core/s700/Surround.ts';
+import type { SurroundLayer } from './core/s700/Surround.ts';
 import type { InputFrame, SimulationSnapshot, StageStart } from './core/Simulation.ts';
 import { Input } from './platform/Input.ts';
 import { MobileControls } from './platform/MobileControls.ts';
@@ -150,7 +152,7 @@ function drawGame(){
   s.draw(ctx);
   if(paused)front.drawPause(ctx,pauseScene,pauseSelected,settings.sound,settings.vibration,stageKind==='campaign'&&!!campaign,pauseConfirmAction==='exit');
   const cells=s.liveCells();
-  display.present(cells?{cells,camera:s.camera,tick:sceneTick,...s.effects,hud:wideHud.active,paused}:null);
+  display.present(cells?{cells,camera:s.camera,tick:sceneTick,...s.effects,hud:wideHud.active,objects:surroundObjects.active,paused}:null);
   if(!lastError){const h=s.hero;$('debug-info').textContent=`tick ${s.tick} · state ${s.gameState} · ${h.x},${h.y}\n♥ ${s.health}/${s.maxHealth} · ${s.lives} · ◆ ${s.stageDiamonds} · ${s.stageRedDiamonds} · 🔑 ${s.goldKeys}/${s.silverKeys}`;}
 }
 function showInspector(){inspectorVisible=true;$('inspector').hidden=false;panel.close();inspectionDirty=true;drawInspector();}
@@ -525,22 +527,25 @@ let soundUnlocked=false;
 function unlockGameSound(){if(soundUnlocked||!ready||!settings.sound)return;soundUnlocked=true;gameSound.unlock();if(scene==='menu')void gameSound.play(19);}
 document.addEventListener('pointerdown',unlockGameSound);
 document.addEventListener('keydown',unlockGameSound);
-/** The wide HUD draws into the display's HUD layer; a new layer or mode paints the running stage again. */
-let hudLayer:HudLayer|null|undefined;
-function applyHud(){
-  const layer=settings.hud==='wide'?display.hudLayer:null;
-  if(layer===hudLayer)return;
-  hudLayer=layer;wideHud.setLayer(layer);
+/**
+ * The wide HUD and the stage's objects beyond the screen are drawn by the original into the display's
+ * layers; a new layer or mode paints the running stage again.
+ */
+let hudLayer:HudLayer|null|undefined,objectsLayer:SurroundLayer|null|undefined;
+function applyLayers(){
+  const hud=settings.hud==='wide'?display.hudLayer:null,objects=settings.surround==='stage-objects'?display.objectsLayer:null;
+  if(hud===hudLayer&&objects===objectsLayer)return;
+  hudLayer=hud;objectsLayer=objects;wideHud.setLayer(hud);surroundObjects.setLayer(objects);
   if(simulation&&scene==='playing')simulation.repaint();
 }
-display.onLayout=applyHud;
+display.onLayout=applyLayers;
 /** The HUD's contents keep clear of the touch controls and the settings button. */
 display.obstacles=()=>[...touchControls.obstacles(),$('menu-button').getBoundingClientRect()];
 touchControls.onLayout=()=>display.layout();
 store.subscribe(s=>{
   const soundTurnedOn=s.sound&&!settings.sound;
   settings=s;
-  display.configure(s);applyHud();
+  display.configure(s);applyLayers();
   gameSound.setEnabled(s.sound);gameSound.setVolumes({master:s.master,music:s.music,effects:s.effects});gameSound.setEngine(s.synth);
   if(soundTurnedOn&&soundUnlocked)gameSound.unlock();
   touchControls.setMode(s.touch);

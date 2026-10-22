@@ -113,8 +113,13 @@ export class S700Engine {
    * DeviceClock.sleep) makes a frame overrun; run() then takes its lag branch on the next frame, which
    * skips the paint (field_229 = true) and does not wait, because 100 - field_370 - field_369 < 0.
    */
+  /**
+   * The port's hook before each paint, on the frame's state (it paints the stage beyond the original
+   * screen). It must leave the state as it found it; it may restore the engine from a snapshot.
+   */
+  static beforePaint:((engine:S700Engine)=>void)|null=null;
   private frame(){
-    const g=this.game,clock=Core.DeviceClock;
+    let g=this.game;const clock=Core.DeviceClock;
     g.field_368=clock.now();
     g.method_67();
     if(cGame.gameState!==2)cGame.frameCounter=(cGame.frameCounter+1)|0;
@@ -123,6 +128,7 @@ export class S700Engine {
       const wait=100n-(g.field_370 as bigint)-(g.field_369 as bigint);if(wait>0n)clock.time+=wait;
       g.field_229=true;g.field_370=0n;
     }else{
+      if(S700Engine.beforePaint){S700Engine.beforePaint(this);g=this.game;}
       g.method_132(g.getGraphics());
       g.field_229=false;
       if(cGame.gameState!==2)cGame.field_227=(cGame.field_227+1)|0;

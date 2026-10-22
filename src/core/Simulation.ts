@@ -8,6 +8,7 @@ import { S700Engine } from './s700/Engine.ts';
 import type { EngineSnapshot, EngineStart } from './s700/Engine.ts';
 import { cSoundEngine } from '../generated/s700.ts';
 import { Display, renderingEnabled } from './s700/j2me.ts';
+import { surroundObjects } from './s700/Surround.ts';
 import { setDecodedTextTranslator } from './s700/runtime.ts';
 import { languageStrings, localizeDemoText } from './Localization.ts';
 import type { GameLocale } from './Localization.ts';
@@ -39,6 +40,12 @@ const originalPlay=(cSoundEngine.prototype as any).playSound;
 const originalCut=(cSoundEngine.prototype as any).freeCrtPlayerResource;
 (cSoundEngine.prototype as any).freeCrtPlayerResource=function(this:unknown){soundQueue.push(SOUND_CUT);return originalCut.call(this);};
 (Display.prototype as any).vibrate=function(){vibrations++;return true;};
+/** Paints the stage beyond the original screen from the frame's state, then puts the engine back. */
+function paintSurround(engine:S700Engine){
+  const state=engine.snapshot(),queue=soundQueue,count=vibrations;soundQueue=[];
+  try{surroundObjects.paint(engine.game);}finally{engine.restore(state);soundQueue=queue;vibrations=count;}
+}
+S700Engine.beforePaint=engine=>{if(surroundObjects.active&&CORE.gameState===1)paintSurround(engine);};
 
 let menuLocale:GameLocale='en';
 /** The English lang.f table of the live session, so a language change applies to it at once. */
@@ -95,6 +102,7 @@ export class Simulation {
    */
   repaint(){if(renderingEnabled())this.paintAt(this.engine.snapshot());}
   private paintAt(state:EngineSnapshot){
+    if(surroundObjects.active&&CORE.gameState===1)paintSurround(this.engine);
     const queue=soundQueue,count=vibrations;soundQueue=[];
     // field_170 asks for the whole HUD, which the original otherwise redraws only where it changed.
     try{const g=this.game;g.field_170=true;g.method_132(g.getGraphics());}

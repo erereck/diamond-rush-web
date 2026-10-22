@@ -1,4 +1,5 @@
 import type { BarInsets, HudLayer } from '../core/s700/Hud.ts';
+import type { SurroundLayer } from '../core/s700/Surround.ts';
 import type { Filter, Scaling, Surround } from '../platform/Settings.ts';
 import type { CellSource, LevelRenderer } from './LevelRenderer.ts';
 
@@ -14,6 +15,8 @@ export interface StageView {
   shake:number;closing:number;cutscene:boolean;blackout:boolean;
   /** The HUD is in the HUD layer (wide HUD); under the screen while the port's pause menu covers it. */
   hud:boolean;paused:boolean;
+  /** The original painted the stage's objects beyond the screen into the objects layer (core/s700/Surround.ts). */
+  objects:boolean;
 }
 
 /**
@@ -30,6 +33,9 @@ export class Display {
   readonly hud=document.createElement('canvas');
   private readonly hudContext:CanvasRenderingContext2D;
   hudLayer:HudLayer;
+  /** The original paints the stage's objects beyond the screen here (core/s700/Surround.ts). */
+  readonly objects=document.createElement('canvas');
+  objectsLayer:SurroundLayer;
   /** Called after the canvas changes size or the HUD layer is replaced. */
   onLayout:()=>void=()=>{};
   private readonly context:CanvasRenderingContext2D;
@@ -50,6 +56,7 @@ export class Display {
     this.screenContext=this.screen.getContext('2d')!;this.screenContext.imageSmoothingEnabled=false;
     this.hudContext=this.hud.getContext('2d')!;
     this.hudLayer={ctx:this.hudContext,width:SCREEN_WIDTH,height:SCREEN_HEIGHT,originX:0,originY:0,top:{left:0,right:0},bottom:{left:0,right:0}};
+    this.objectsLayer={ctx:this.objects.getContext('2d')!,width:SCREEN_WIDTH,height:SCREEN_HEIGHT,originX:0,originY:0};
     this.context=canvas.getContext('2d')!;
     this.safeArea.style.cssText='position:fixed;inset:0;visibility:hidden;pointer-events:none;'+
       'padding:env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left)';
@@ -86,6 +93,9 @@ export class Display {
       h.top.left!==top.left||h.top.right!==top.right||h.bottom.left!==bottom.left||h.bottom.right!==bottom.right){
       this.hud.width=this.width;this.hud.height=this.height;this.hudContext.imageSmoothingEnabled=false;
       this.hudLayer={ctx:this.hudContext,width:this.width,height:this.height,originX:this.originX,originY:this.originY,top,bottom};
+      this.objects.width=this.width;this.objects.height=this.height;
+      const ctx=this.objects.getContext('2d')!;ctx.imageSmoothingEnabled=false;
+      this.objectsLayer={ctx,width:this.width,height:this.height,originX:this.originX,originY:this.originY};
       this.onLayout();
     }
   }
@@ -111,9 +121,11 @@ export class Display {
     if(view&&!view.blackout&&this.surround!=='black'&&(this.width>SCREEN_WIDTH||this.height>SCREEN_HEIGHT)){
       // The shake raises the original camera while the stage is painted; the scenery around it shakes along.
       const camera={x:view.camera.x,y:view.camera.y-view.shake};
-      const key=`${view.tick}/${camera.x},${camera.y}/${this.width}x${this.height}/${this.surround}/${view.hud}`;
-      if(key!==this.surroundKey){this.surroundKey=key;this.drawSurround(view.cells,camera,view.tick,!view.hud);}
+      const objects=view.objects&&this.surround==='stage-objects';
+      const key=`${view.tick}/${camera.x},${camera.y}/${this.width}x${this.height}/${this.surround}/${view.hud}/${objects}`;
+      if(key!==this.surroundKey){this.surroundKey=key;this.drawSurround(view.cells,camera,view.tick,!view.hud,objects);}
       c.drawImage(this.surroundCanvas,0,0);
+      if(objects)c.drawImage(this.objects,0,0);
     }
     const hud=!!view?.hud,hudOnTop=hud&&!view!.paused&&!view!.cutscene;
     if(hud&&view!.paused)c.drawImage(this.hud,0,0);
@@ -139,7 +151,7 @@ export class Display {
     band(0,oy,0,w);band(oy+SCREEN_HEIGHT,this.height,0,w);
     band(oy,oy+SCREEN_HEIGHT,0,ox);band(oy,oy+SCREEN_HEIGHT,ox+SCREEN_WIDTH,w-ox-SCREEN_WIDTH);
   }
-  private drawSurround(cells:CellSource,camera:{x:number;y:number},tick:number,hudBands:boolean){
+  private drawSurround(cells:CellSource,camera:{x:number;y:number},tick:number,hudBands:boolean,originalObjects:boolean){
     const s=this.surroundCanvas;
     if(s.width!==this.width||s.height!==this.height){s.width=this.width;s.height=this.height;}
     const c=s.getContext('2d')!;c.imageSmoothingEnabled=false;c.clearRect(0,0,this.width,this.height);
@@ -150,7 +162,7 @@ export class Display {
       for(let y=range.y0;y<range.y1;y++)for(let x=range.x0;x<range.x1;x++)this.levels.backdrop(c,cells.world,ox+x*24,oy+y*24);
       return;
     }
-    this.levels.drawCells(c,cells,range,ox,oy,tick,{objects:this.surround==='stage-objects'});
+    this.levels.drawCells(c,cells,range,ox,oy,tick,{objects:this.surround==='stage-objects',originalObjects});
     // With the original HUD, its bands continue across the window, as the phone's frame would.
     if(hudBands){
       c.fillStyle='rgba(0,0,0,.45)';

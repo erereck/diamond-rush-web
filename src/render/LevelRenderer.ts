@@ -34,8 +34,9 @@ export class LevelRenderer {
   /**
    * Draws the cells of `range` (cell coordinates, end exclusive; may extend beyond the stage, where the
    * background continues) with the stage's (0,0) at (ox,oy). `objects` adds items, stones and creatures.
+   * `originalObjects` draws only what lies behind them: the original paints the rest (core/s700/Surround.ts).
    */
-  drawCells(ctx:CanvasRenderingContext2D,source:CellSource,range:CellRange,ox:number,oy:number,tick:number,options:{objects:boolean;debug?:boolean}){
+  drawCells(ctx:CanvasRenderingContext2D,source:CellSource,range:CellRange,ox:number,oy:number,tick:number,options:{objects:boolean;debug?:boolean;originalObjects?:boolean}){
     const {assets:a,sprites:r}=this,w=source.world,{width,height}=source;
     const inside=(x:number,y:number)=>x>=0&&y>=0&&x<width&&y<height;
     const frame=(id:string,f:number,x:number,y:number,p=0,flags=0)=>{const s=a.sprite(id);if(s.frames[f])r.frame(ctx,s,f,x,y,flags,p);};
@@ -48,6 +49,7 @@ export class LevelRenderer {
       const i=x+y*width,t=source.tile(i),obj=source.object(i);
       if(t>=80)frame(`${w}-2`,t-80,px,py);
       if(t===10)frame(`${w}-1`,0,px,py);
+      if(options.originalObjects)continue;
       if(obj===6){const plate=a.sprite('gen2-9');r.module(ctx,plate,0,px,py+24-plate.modules[0].height);}
       if(obj===4)frame('cm-6',(tick>>1)%7,px,py);
       if(obj===5||obj===28)r.module(ctx,a.sprite('cm-0'),0,px,py);
@@ -59,6 +61,7 @@ export class LevelRenderer {
       const seal=a.sprite('mmv-0');
       for(let y=Math.max(2,y0);y<Math.min(7,y1);y++)for(let x=Math.max(60,x0);x<Math.min(65,x1);x++)r.frame(ctx,seal,4+(y-2)*5+x-60,ox+x*24,oy+y*24);
     }
+    if(options.originalObjects)return;
     if(options.objects){
       const sparkle=((tick&63)>>1)<4?(tick&63)>>1:0;
       for(let y=Math.max(0,y0);y<Math.min(height,y1);y++)for(let x=Math.max(0,x0);x<Math.min(width,x1);x++){
